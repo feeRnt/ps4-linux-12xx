@@ -4954,7 +4954,7 @@ static void gfx_v7_0_gpu_early_init(struct amdgpu_device *adev)
 		adev->gfx.config.max_tile_pipes = 8; // Verified
 		adev->gfx.config.max_cu_per_sh = 9; // Probably OK
 		adev->gfx.config.max_sh_per_se = 1; // Verified
-		adev->gfx.config.max_backends_per_se = 1; // Probably OK?
+		adev->gfx.config.max_backends_per_se = 2; // Probably OK?
 		adev->gfx.config.max_texture_channel_caches = 4; // ??
 		adev->gfx.config.max_gprs = 256;
 		adev->gfx.config.max_gs_threads = 32; // ??
