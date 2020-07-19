@@ -91,7 +91,7 @@ else
     ccflags-y += -DCFG_ENABLE_GTK_FRAME_FILTER=0
 endif
 
-MTK_MET_PROFILING_SUPPORT = yes
+MTK_MET_PROFILING_SUPPORT = no
 ifeq ($(MTK_MET_PROFILING_SUPPORT), yes)
     ccflags-y += -DCFG_MET_PACKET_TRACE_SUPPORT=1
 else

@@ -3134,12 +3134,15 @@ static int idme_get_mac_addr(unsigned char *mac_addr, size_t addr_len)
 		DBGLOG(INIT, ERROR, "can't open mac addr file\n");
 		return -1;
 	}
-
+#ifdef set_fs
 	old_fs = get_fs();
 	set_fs(get_ds());
+#endif
 	f->f_op->read(f, buf, IFHWADDRLEN * 2, &f->f_pos);
 	filp_close(f, NULL);
+#ifdef set_fs
 	set_fs(old_fs);
+#endif
 
 	if (strlen(buf) != IFHWADDRLEN * 2)
 		goto bailout;
@@ -4055,17 +4058,22 @@ UINT_8 kalGetRsnIeMfpCap(IN P_GLUE_INFO_T prGlueInfo)
 struct file *kalFileOpen(const char *path, int flags, int rights)
 {
 	struct file *filp = NULL;
+#ifdef set_fs
 	mm_segment_t oldfs;
+#endif
 	int err = 0;
-
+#ifdef set_fs
 	oldfs = get_fs();
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0)
 	set_fs(KERNEL_DS);
 #else
 	set_fs(get_ds());
 #endif
+#endif
 	filp = filp_open(path, flags, rights);
+#ifdef set_fs
 	set_fs(oldfs);
+#endif
 	if (IS_ERR(filp)) {
 		err = PTR_ERR(filp);
 		return NULL;
@@ -4080,14 +4088,17 @@ VOID kalFileClose(struct file *file)
 
 UINT_32 kalFileRead(struct file *file, unsigned long long offset, unsigned char *data, unsigned int size)
 {
+#ifdef set_fs
 	mm_segment_t oldfs;
+#endif
 	int ret;
-
+#ifdef set_fs
 	oldfs = get_fs();
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0)
 	set_fs(KERNEL_DS);
 #else
 	set_fs(get_ds());
+#endif
 #endif
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
 		ret = kernel_read(file, data, size, &offset);
@@ -4096,23 +4107,26 @@ UINT_32 kalFileRead(struct file *file, unsigned long long offset, unsigned char 
 #else
 		ret = vfs_read(file, data, size, &offset);
 #endif
-
+#ifdef set_fs
 	set_fs(oldfs);
+#endif
 	return ret;
 }
 
 UINT_32 kalFileWrite(struct file *file, unsigned long long offset, unsigned char *data, unsigned int size)
 {
+#ifdef set_fs
 	mm_segment_t oldfs;
+#endif
 	int ret;
-
+#ifdef set_fs
 	oldfs = get_fs();
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0)
 	set_fs(KERNEL_DS);
 #else
 	set_fs(get_ds());
 #endif
-
+#endif
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
 		ret = kernel_write(file, data, size, &offset);
 #elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
@@ -4120,8 +4134,9 @@ UINT_32 kalFileWrite(struct file *file, unsigned long long offset, unsigned char
 #else
 		ret = vfs_write(file, data, size, &offset);
 #endif
-
+#ifdef set_fs
 	set_fs(oldfs);
+#endif
 	return ret;
 }
 
