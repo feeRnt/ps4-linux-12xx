@@ -520,6 +520,9 @@ void __init x86_64_start_reservations(char *real_mode_data)
 	case X86_SUBARCH_INTEL_MID:
 		x86_intel_mid_early_setup();
 		break;
+	case X86_SUBARCH_PS4:
+		x86_ps4_early_setup();
+		break;
 	default:
 		break;
 	}
