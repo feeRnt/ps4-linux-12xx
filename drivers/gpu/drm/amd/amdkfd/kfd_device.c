@@ -62,6 +62,8 @@ static const struct kfd2kgd_calls *kfd2kgd_funcs[] = {
 #endif
 #ifdef CONFIG_DRM_AMDGPU_CIK
 	[CHIP_HAWAII] = &gfx_v7_kfd2kgd,
+	[CHIP_GLADIUS] = &gfx_v7_kfd2kgd,
+	[CHIP_LIVERPOOL] = &gfx_v7_kfd2kgd,
 #endif
 	[CHIP_TONGA] = &gfx_v8_kfd2kgd,
 	[CHIP_FIJI] = &gfx_v8_kfd2kgd,
@@ -162,6 +164,47 @@ static const struct kfd_device_info hawaii_device_info = {
 	.mqd_size_aligned = MQD_SIZE_ALIGNED,
 	.supports_cwsr = false,
 	.needs_iommu_device = false,
+	.needs_pci_atomics = false,
+	.num_sdma_engines = 2,
+	.num_xgmi_sdma_engines = 0,
+	.num_sdma_queues_per_engine = 2,
+};
+
+// TODO (ps4patches): asic_name was hawaii in original patches, check if liverpool as name is ok
+static const struct kfd_device_info liverpool_device_info = {
+	.asic_family = CHIP_LIVERPOOL,
+	.asic_name = "liverpool",
+	.gfx_target_version = 70001,
+	.max_pasid_bits = 16,
+	/* max num of queues for KV.TODO should be a dynamic value */
+	.max_no_of_hqd	= 24,
+	.doorbell_size  = 4,
+	.ih_ring_entry_size = 4 * sizeof(uint32_t),
+	.event_interrupt_class = &event_interrupt_class_cik,
+	.num_of_watch_points = 4,
+	.mqd_size_aligned = MQD_SIZE_ALIGNED,
+	.supports_cwsr = false,
+	.needs_iommu_device = true,
+	.needs_pci_atomics = false,
+	.num_sdma_engines = 2,
+	.num_xgmi_sdma_engines = 0,
+	.num_sdma_queues_per_engine = 2,
+};
+
+static const struct kfd_device_info gladius_device_info = {
+	.asic_family = CHIP_GLADIUS,
+	.asic_name = "gladius",
+	.gfx_target_version = 70001,
+	.max_pasid_bits = 16,
+	/* max num of queues for KV.TODO should be a dynamic value */
+	.max_no_of_hqd	= 24,
+	.doorbell_size  = 4,
+	.ih_ring_entry_size = 4 * sizeof(uint32_t),
+	.event_interrupt_class = &event_interrupt_class_cik,
+	.num_of_watch_points = 4,
+	.mqd_size_aligned = MQD_SIZE_ALIGNED,
+	.supports_cwsr = false,
+	.needs_iommu_device = true,
 	.needs_pci_atomics = false,
 	.num_sdma_engines = 2,
 	.num_xgmi_sdma_engines = 0,
@@ -661,6 +704,9 @@ static const struct kfd_device_info *kfd_supported_devices[][2] = {
 #endif
 	[CHIP_RAVEN] = {&raven_device_info, NULL},
 	[CHIP_HAWAII] = {&hawaii_device_info, NULL},
+	[CHIP_LIVERPOOL] = {&liverpool_device_info, NULL},
+	// TODO (ps4patches): This seems to be needed for the new kernel but this might break spectacularly
+	[CHIP_GLADIUS] = {&gladius_device_info, NULL},
 	[CHIP_TONGA] = {&tonga_device_info, NULL},
 	[CHIP_FIJI] = {&fiji_device_info, &fiji_vf_device_info},
 	[CHIP_POLARIS10] = {&polaris10_device_info, &polaris10_vf_device_info},

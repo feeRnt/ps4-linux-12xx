@@ -1349,6 +1349,9 @@ static int kfd_fill_gpu_cache_info(struct kfd_dev *kdev,
 		num_of_cache_types = ARRAY_SIZE(kaveri_cache_info);
 		break;
 	case CHIP_HAWAII:
+	case CHIP_LIVERPOOL:
+	case CHIP_GLADIUS:
+		// TODO (ps4patches): Is the Hawaii cache info really fine here?
 		pcache_info = hawaii_cache_info;
 		num_of_cache_types = ARRAY_SIZE(hawaii_cache_info);
 		break;

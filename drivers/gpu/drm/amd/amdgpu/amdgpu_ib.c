@@ -385,7 +385,12 @@ int amdgpu_ib_ring_tests(struct amdgpu_device *adev)
 		tmo_gfx = AMDGPU_IB_TEST_GFX_XGMI_TIMEOUT;
 	}
 
+	#ifdef CONFIG_X86_PS4
+	//TODO test if this is needed now
+	for (i = 0; i < 1 /*adev->num_rings*/; ++i) {
+	#else
 	for (i = 0; i < adev->num_rings; ++i) {
+	#endif
 		struct amdgpu_ring *ring = adev->rings[i];
 		long tmo;
 

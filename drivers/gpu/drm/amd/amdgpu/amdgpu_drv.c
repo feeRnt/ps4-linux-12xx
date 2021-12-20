@@ -46,6 +46,10 @@
 #include "amdgpu_fdinfo.h"
 #include "amdgpu_amdkfd.h"
 
+#ifdef CONFIG_X86_PS4
+#include <asm/ps4.h>
+#endif
+
 #include "amdgpu_ras.h"
 #include "amdgpu_xgmi.h"
 #include "amdgpu_reset.h"
@@ -1760,6 +1764,12 @@ static const struct pci_device_id pciidlist[] = {
 	{0x1002, 0x985D, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_MULLINS|AMD_IS_MOBILITY|AMD_IS_APU},
 	{0x1002, 0x985E, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_MULLINS|AMD_IS_MOBILITY|AMD_IS_APU},
 	{0x1002, 0x985F, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_MULLINS|AMD_IS_MOBILITY|AMD_IS_APU},
+	/* Liverpool */
+	{0x1002, 0x9920, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_LIVERPOOL|AMD_IS_APU},
+	{0x1002, 0x9922, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_LIVERPOOL|AMD_IS_APU},
+	{0x1002, 0x9923, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_LIVERPOOL|AMD_IS_APU},
+	/* Gladius */
+	{0x1002, 0x9924, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_GLADIUS|AMD_IS_APU},
 #endif
 	/* topaz */
 	{0x1002, 0x6900, PCI_ANY_ID, PCI_ANY_ID, 0, 0, CHIP_TOPAZ},
@@ -2066,6 +2076,21 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
 	base = pci_resource_start(pdev, 0);
 	size = pci_resource_len(pdev, 0);
 	is_fw_fb = amdgpu_is_fw_framebuffer(base, size);
+
+	/* Get rid of things like offb */
+	ret = drm_aperture_remove_conflicting_pci_framebuffers(pdev, &amdgpu_kms_driver);
+	if (ret)
+		return ret;
+
+	#ifdef CONFIG_X86_PS4
+	/* On the PS4 (Liverpool graphics) we have a hard dependency on the
+	 * Aeolia driver to set up the HDMI encoder which is connected to it,
+	 * so defer probe until it is ready. This test passes if this isn't
+	 * a PS4 (returns -ENODEV).
+	 */
+	if (apcie_status() == 0)
+		return -EPROBE_DEFER;
+	#endif
 
 	adev = devm_drm_dev_alloc(&pdev->dev, &amdgpu_kms_driver, typeof(*adev), ddev);
 	if (IS_ERR(adev))

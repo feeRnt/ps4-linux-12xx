@@ -38,12 +38,13 @@ static bool cik_event_interrupt_isr(struct kfd_dev *dev,
 	uint16_t pasid;
 	bool ret;
 
-	/* This workaround is due to HW/FW limitation on Hawaii that
+	/* This workaround is due to HW/FW limitation on Hawaii and Liverpool that
 	 * VMID and PASID are not written into ih_ring_entry
 	 */
 	if ((ihre->source_id == CIK_INTSRC_GFX_PAGE_INV_FAULT ||
 		ihre->source_id == CIK_INTSRC_GFX_MEM_PROT_FAULT) &&
-		dev->device_info->asic_family == CHIP_HAWAII) {
+		((dev->device_info->asic_family == CHIP_HAWAII) ||
+	         (dev->device_info->asic_family == CHIP_LIVERPOOL)) {
 		struct cik_ih_ring_entry *tmp_ihre =
 			(struct cik_ih_ring_entry *)patched_ihre;
 
