@@ -273,8 +273,14 @@ int radeon_audio_init(struct radeon_device *rdev)
 	radeon_audio_interface_init(rdev);
 
 	/* disable audio.  it will be set up later */
-	for (i = 0; i < rdev->audio.num_pins; i++)
-		radeon_audio_enable(rdev, &rdev->audio.pin[i], 0);
+	for (i = 0; i < rdev->audio.num_pins; i++) {
+		/* LVP has standalone S/PDIF on the third pin, always enable */
+		if (rdev->family == CHIP_LIVERPOOL) {
+			radeon_audio_enable(rdev, &rdev->audio.pin[i], 0xf);
+		} else {
+			radeon_audio_enable(rdev, &rdev->audio.pin[i], 0);
+		}
+	}
 
 	return 0;
 }
