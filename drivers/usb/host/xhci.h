@@ -1670,6 +1670,7 @@ struct xhci_hcd {
 #define XHCI_WRITE_64_HI_LO	BIT_ULL(47)
 #define XHCI_CDNS_SCTX_QUIRK	BIT_ULL(48)
 #define XHCI_LIMIT_ENDPOINT_INTERVAL_9 BIT_ULL(49)
+#define XHCI_PLAT_DMA		BIT_ULL(50) //Used to be BIT_ULL(43) = (1ULL << 43) in 5.15.15 PS4-Linux
 
 	unsigned int		num_active_eps;
 	unsigned int		limit_active_eps;
