@@ -219,28 +219,47 @@ static struct msi_domain_info apcie_msi_domain_info = {
 
 static struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 {
-	struct irq_domain *domain;
+	struct msi_domain_info *domain_info;
+	struct irq_domain *domain, *parent;
 	struct fwnode_handle *fn;
+	struct irq_fwspec fwspec;
 
 	sc_dbg("apcie_create_irq_domain\n");
 	if (x86_vector_domain == NULL)
 		return NULL;
 
-	apcie_msi_domain_info.chip_data = (void *)sc;
-	apcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
-	apcie_msi_controller.name = "IR-Aeolia-MSI";
-
-	fn = irq_domain_alloc_named_fwnode(apcie_msi_controller.name);
-	if (!fn)
+	domain_info = kzalloc(sizeof(*domain_info), GFP_KERNEL);
+	if (!domain_info)
 		return NULL;
-	domain = pci_msi_create_irq_domain(fn, &apcie_msi_domain_info,
-				      x86_vector_domain);
 
+	*domain_info = apcie_msi_domain_info;
+	domain_info->chip_data = (void *)sc;
+
+	fn = irq_domain_alloc_named_id_fwnode(apcie_msi_controller.name, pci_dev_id(sc->pdev));
+	if (!fn) {
+		kfree(domain_info);
+		return NULL;
+	}
+
+	fwspec.fwnode = fn;
+	fwspec.param_count = 1;
+
+	// It should be correct to put the pci device id in here
+	fwspec.param[0] = pci_dev_id(sc->pdev);
+
+	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY);
+	if (!parent) {
+		parent = x86_vector_domain;
+	} else {
+		apcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
+		apcie_msi_controller.name = "IR-Aeolia-MSI";
+	}
+
+	domain = msi_create_irq_domain(fn, domain_info, parent);
 	if (!domain) {
 		irq_domain_free_fwnode(fn);
+		kfree(domain_info);
 		pr_warn("Failed to initialize IR-Aeolia-MSI irqdomain.\n");
-	} else {
-		domain->flags |= IRQ_DOMAIN_MSI_NOMASK_QUIRK;
 	}
 
 	return domain;
@@ -283,6 +302,7 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 	/* IRQs "come from" function 4 as far as the IOMMU/system see */
 	//info.msi_dev = sc->pdev;
+	info.desc = alloc_msi_entry(&dev->dev, nvec, NULL);
 	/* Our hwirq number is function << 8 plus subfunction.
 	 * Subfunction is usually 0 and implicitly increments per hwirq,
 	 * but can also be 0xff to indicate that this is a shared IRQ. */

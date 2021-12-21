@@ -2693,6 +2693,12 @@ int pci_scan_slot(struct pci_bus *bus, int devfn)
 		nr++;
 
 	for (fn = next_fn(bus, dev, 0); fn > 0; fn = next_fn(bus, dev, fn)) {
+		if (PCI_SLOT(devfn) != AEOLIA_SLOT_NUM &&
+		    pci_bus_read_dev_vendor_id(bus, devfn + fn, &l, 60*1000) &&
+		    (l & 0xffff) == PCI_VENDOR_ID_SONY) {
+			continue;
+		}
+
 		dev = pci_scan_single_device(bus, devfn + fn);
 		if (dev) {
 			if (!pci_dev_is_added(dev))

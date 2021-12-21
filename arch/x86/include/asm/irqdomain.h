@@ -14,6 +14,7 @@ enum {
 
 extern int x86_fwspec_is_ioapic(struct irq_fwspec *fwspec);
 extern int x86_fwspec_is_hpet(struct irq_fwspec *fwspec);
+extern int x86_fwspec_is_aeolia(struct irq_fwspec *fwspec);
 
 extern struct irq_domain *x86_vector_domain;
 

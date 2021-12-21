@@ -3302,6 +3302,8 @@ static int irq_remapping_select(struct irq_domain *d, struct irq_fwspec *fwspec,
 		devid = get_ioapic_devid(fwspec->param[0]);
 	else if (x86_fwspec_is_hpet(fwspec))
 		devid = get_hpet_devid(fwspec->param[0]);
+	else if(x86_fwspec_is_aeolia(fwspec))
+		devid = fwspec->param[0];
 
 	if (devid < 0)
 		return 0;
