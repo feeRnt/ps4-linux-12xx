@@ -3308,6 +3308,7 @@ static int irq_remapping_select(struct irq_domain *d, struct irq_fwspec *fwspec,
 	if (devid < 0)
 		return 0;
 
+	pr_err("Remapping Selected: %x\n", devid);
 	iommu = amd_iommu_rlookup_table[devid];
 	return iommu && iommu->ir_domain == d;
 }

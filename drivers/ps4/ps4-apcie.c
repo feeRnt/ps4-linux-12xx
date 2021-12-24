@@ -18,6 +18,11 @@
 
 #include "aeolia.h"
 
+
+#define     MSI_DATA_VECTOR_SHIFT	0
+#define	    MSI_DATA_VECTOR(v)		(((u8)v) << MSI_DATA_VECTOR_SHIFT)
+#define     MSI_DATA_VECTOR_MASK	0xffffff00
+
 /* #define QEMU_HACK_NO_IOMMU */
 
 /* Number of implemented MSI registers per function */
@@ -63,12 +68,20 @@ static void apcie_config_msi(struct apcie_dev *sc, u32 func, u32 subfunc,
 
 	glue_clear_mask(sc, APCIE_REG_MSI_CONTROL, APCIE_REG_MSI_CONTROL_ENABLE);
 	/* Unknown */
+	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI(0x8), 0xffffffff);
 	glue_write32(sc, APCIE_REG_MSI(0x8), 0xffffffff);
 	/* Unknown */
+	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI(0xc + (func << 2)), 0xB7FFFF00 + func * 16);
 	glue_write32(sc, APCIE_REG_MSI(0xc + (func << 2)), 0xB7FFFF00 + func * 16);
+
+	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI_ADDR(func), addr);
 	glue_write32(sc, APCIE_REG_MSI_ADDR(func), addr);
 	/* Unknown */
+
+	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI(0xcc + (func << 2)), 0);
 	glue_write32(sc, APCIE_REG_MSI(0xcc + (func << 2)), 0);
+
+	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI_DATA_HI(func),  data & 0xffe0);
 	glue_write32(sc, APCIE_REG_MSI_DATA_HI(func), data & 0xffe0);
 
 	if (func < 4) {
@@ -84,6 +97,8 @@ static void apcie_config_msi(struct apcie_dev *sc, u32 func, u32 subfunc,
 	} else {
 		offset = 0xa0 + ((func - 5) << 4) + (subfunc << 2);
 	}
+
+	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4,  APCIE_REG_MSI_DATA_LO(offset), data & 0x1f);
 	glue_write32(sc, APCIE_REG_MSI_DATA_LO(offset), data & 0x1f);
 
 	if (func == AEOLIA_FUNC_ID_PCIE)
@@ -149,9 +164,17 @@ static void apcie_msi_calc_mask(struct irq_data *data) {
 static void apcie_irq_msi_compose_msg(struct irq_data *data,
 				       struct msi_msg *msg)
 {
-       __irq_msi_compose_msg(irqd_cfg(data), msg, false);
-}
+	struct irq_cfg *cfg = irqd_cfg(data);
 
+	memset(msg, 0, sizeof(*msg));
+	msg->address_hi = X86_MSI_BASE_ADDRESS_HIGH;
+	msg->address_lo = 0xfee00000;// Just do it like this for now
+
+	// I know this is absolute horseshit, but it matches a known working kernel
+	msg->data = data->irq - 1;
+
+	pr_err("apcie_irq_msi_compose_msg\n");
+}
 
 static struct irq_chip apcie_msi_controller = {
 	.name = "Aeolia-MSI",
@@ -162,7 +185,7 @@ static struct irq_chip apcie_msi_controller = {
 	.irq_retrigger = irq_chip_retrigger_hierarchy,
 	.irq_compose_msi_msg = apcie_irq_msi_compose_msg,
 	.irq_write_msi_msg = apcie_msi_write_msg,
-	.flags = IRQCHIP_SKIP_SET_WAKE,
+	.flags = IRQCHIP_SKIP_SET_WAKE | IRQCHIP_AFFINITY_PRE_STARTUP,
 };
 
 static irq_hw_number_t apcie_msi_get_hwirq(struct msi_domain_info *info,
@@ -176,7 +199,7 @@ static int apcie_msi_init(struct irq_domain *domain,
 			 irq_hw_number_t hwirq, msi_alloc_info_t *arg)
 {
 	struct irq_data *data;
-	pr_devel("apcie_msi_init(%p, %p, %d, 0x%lx, %p)\n", domain, info, virq, hwirq, arg);
+	pr_err("apcie_msi_init(%p, %p, %d, 0x%lx, %p)\n", domain, info, virq, hwirq, arg);
 
 	data = irq_domain_get_irq_data(domain, virq);
 	irq_domain_set_info(domain, virq, hwirq, info->chip, info->chip_data,
@@ -188,23 +211,25 @@ static int apcie_msi_init(struct irq_domain *domain,
 static void apcie_msi_free(struct irq_domain *domain,
 			  struct msi_domain_info *info, unsigned int virq)
 {
-	pr_devel("apcie_msi_free(%d)\n", virq);
+	pr_err("apcie_msi_free(%d)\n", virq);
 }
 
-int apcie_msi_prepare(struct irq_domain *domain, struct device *dev, int nvec,
-		     msi_alloc_info_t *arg)
+
+static void apcie_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc)
 {
-	init_irq_alloc_info(arg, NULL);
+	arg->desc = desc;
+	struct pci_dev* device = msi_desc_to_pci_dev(desc);
 
-	arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
-	arg->flags |= MSI_FLAG_MULTI_PCI_MSI;
+	arg->hwirq = PCI_FUNC(device->devfn) << 8;
 
-	return 0;
+#ifndef QEMU_HACK_NO_IOMMU
+	arg->hwirq |= 0xFF;
+#endif
 }
 
 static struct msi_domain_ops apcie_msi_domain_ops = {
 	.get_hwirq	= apcie_msi_get_hwirq,
-	.msi_prepare	= apcie_msi_prepare,
+	.set_desc       = apcie_set_desc,
 	.msi_init	= apcie_msi_init,
 	.msi_free	= apcie_msi_free,
 };
@@ -219,7 +244,6 @@ static struct msi_domain_info apcie_msi_domain_info = {
 
 static struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 {
-	struct msi_domain_info *domain_info;
 	struct irq_domain *domain, *parent;
 	struct fwnode_handle *fn;
 	struct irq_fwspec fwspec;
@@ -228,18 +252,14 @@ static struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 	if (x86_vector_domain == NULL)
 		return NULL;
 
-	domain_info = kzalloc(sizeof(*domain_info), GFP_KERNEL);
-	if (!domain_info)
-		return NULL;
-
-	*domain_info = apcie_msi_domain_info;
-	domain_info->chip_data = (void *)sc;
+	apcie_msi_domain_info.chip_data = (void *)sc;
 
 	fn = irq_domain_alloc_named_id_fwnode(apcie_msi_controller.name, pci_dev_id(sc->pdev));
 	if (!fn) {
-		kfree(domain_info);
 		return NULL;
 	}
+
+	sc_dbg("devid = %d\n", pci_dev_id(sc->pdev));
 
 	fwspec.fwnode = fn;
 	fwspec.param_count = 1;
@@ -249,17 +269,19 @@ static struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 
 	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY);
 	if (!parent) {
+		sc_dbg("no parent \n");
 		parent = x86_vector_domain;
+	} else if (parent == x86_vector_domain) {
+		sc_dbg("no parent \n");
 	} else {
 		apcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
 		apcie_msi_controller.name = "IR-Aeolia-MSI";
 	}
 
-	domain = msi_create_irq_domain(fn, domain_info, parent);
+	domain = msi_create_irq_domain(fn, &apcie_msi_domain_info, parent);
 	if (!domain) {
 		irq_domain_free_fwnode(fn);
-		kfree(domain_info);
-		pr_warn("Failed to initialize IR-Aeolia-MSI irqdomain.\n");
+		pr_warn("Failed to initialize Aeolia-MSI irqdomain.\n");
 	}
 
 	return domain;
@@ -302,14 +324,16 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 	/* IRQs "come from" function 4 as far as the IOMMU/system see */
 	//info.msi_dev = sc->pdev;
-	info.desc = alloc_msi_entry(&dev->dev, nvec, NULL);
+	info.devid = pci_dev_id(sc->pdev);
+
+	int i, base = 0;
+	struct msi_desc *desc;
+	struct device* bare_dev = &sc->pdev->dev;
+
 	/* Our hwirq number is function << 8 plus subfunction.
 	 * Subfunction is usually 0 and implicitly increments per hwirq,
 	 * but can also be 0xff to indicate that this is a shared IRQ. */
-	//https://git.kernel.org/pub/scm/linux/kernel/git/tip/tip.git/commit/?id=3b9c1d377d67072d1d8a2373b4969103cca00dab
 	info.hwirq = PCI_FUNC(dev->devfn) << 8;
-
-	dev_dbg(&dev->dev, "apcie_assign_irqs(%d)\n", nvec);
 
 #ifndef QEMU_HACK_NO_IOMMU
 	info.flags = X86_IRQ_ALLOC_CONTIGUOUS_VECTORS;
@@ -319,14 +343,23 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	}
 #endif
 
+	desc = alloc_msi_entry(bare_dev, 1, NULL);
+
+	info.desc = desc;
+	info.data = sc;
+
+	dev_info(&dev->dev, "apcie_assign_irqs(%d) (%d)\n", nvec, info.hwirq);
+
 	ret = irq_domain_alloc_irqs(sc->irqdomain, nvec, NUMA_NO_NODE, &info);
 	if (ret >= 0) {
+		dev_info(&dev->dev, "irq_domain_alloc_irqs = %x\n", ret);
 		dev->irq = ret;
+		desc->irq = ret;
 		ret = nvec;
 	}
 
 fail:
-	dev_dbg(&dev->dev, "apcie_assign_irqs returning %d\n", ret);
+	dev_info(&dev->dev, "apcie_assign_irqs returning %d\n", ret);
 	if (sc_dev)
 		pci_dev_put(sc_dev);
 	return ret;
@@ -494,10 +527,10 @@ static int apcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 
 	if ((ret = apcie_glue_init(sc)) < 0)
 		goto free_bars;
-	if ((ret = apcie_uart_init(sc)) < 0)
-		goto remove_glue;
+	//if ((ret = apcie_uart_init(sc)) < 0)
+	//	goto remove_glue;
 	if ((ret = apcie_icc_init(sc)) < 0)
-		goto remove_uart;
+		goto remove_glue;
 
 	apcie_initialized = true;
 	return 0;

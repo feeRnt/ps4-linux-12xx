@@ -151,11 +151,11 @@ struct apcie_dev {
 	struct apcie_icc_dev icc;
 };
 
-#define sc_err(...) dev_err(&sc->pdev->dev, __VA_ARGS__)
-#define sc_warn(...) dev_warn(&sc->pdev->dev, __VA_ARGS__)
-#define sc_notice(...) dev_notice(&sc->pdev->dev, __VA_ARGS__)
+#define sc_err(...) dev_info(&sc->pdev->dev, __VA_ARGS__)
+#define sc_warn(...) dev_info(&sc->pdev->dev, __VA_ARGS__)
+#define sc_notice(...) dev_info(&sc->pdev->dev, __VA_ARGS__)
 #define sc_info(...) dev_info(&sc->pdev->dev, __VA_ARGS__)
-#define sc_dbg(...) dev_dbg(&sc->pdev->dev, __VA_ARGS__)
+#define sc_dbg(...) dev_info(&sc->pdev->dev, __VA_ARGS__)
 
 static inline int apcie_irqnum(struct apcie_dev *sc, int index)
 {
