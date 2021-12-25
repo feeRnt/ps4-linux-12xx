@@ -1400,11 +1400,14 @@ static int gfx_v7_0_init_microcode(struct amdgpu_device *adev)
 	    (adev->asic_type == CHIP_GLADIUS)) {
 		snprintf(fw_name, sizeof(fw_name), "amdgpu/%s_mec2.bin", chip_name);
 		err = request_firmware(&adev->gfx.mec2_fw, fw_name, adev->dev);
+		if (err)
 		{
 			pr_err("gfx7: Failed to open firmware \"%s\"\n", fw_name);
 			goto out;
 		}
+
 		err = amdgpu_ucode_validate(adev->gfx.mec2_fw);
+		if (err)
 		{
 			pr_err("gfx7: Failed to validate ucode firmware \"%s\"\n", fw_name);
 			goto out;

@@ -8251,7 +8251,7 @@ restart_ih:
 		return IRQ_NONE;
 
 	rptr = rdev->ih.rptr;
-	DRM_DEBUG("cik_irq_process start: rptr %d, wptr %d\n", rptr, wptr);
+	//DRM_DEBUG("cik_irq_process start: rptr %d, wptr %d\n", rptr, wptr);
 
 	/* Order reading of wptr vs. reading of IH ring data */
 	rmb();
@@ -8294,7 +8294,7 @@ restart_ih:
 
 				break;
 			default:
-				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
 				break;
 			}
 			break;
@@ -8324,7 +8324,7 @@ restart_ih:
 
 				break;
 			default:
-				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
 				break;
 			}
 			break;
@@ -8354,7 +8354,7 @@ restart_ih:
 
 				break;
 			default:
-				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
 				break;
 			}
 			break;
@@ -8384,7 +8384,7 @@ restart_ih:
 
 				break;
 			default:
-				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
 				break;
 			}
 			break;
@@ -8414,7 +8414,7 @@ restart_ih:
 
 				break;
 			default:
-				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
 				break;
 			}
 			break;
@@ -8444,7 +8444,7 @@ restart_ih:
 
 				break;
 			default:
-				DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
+				//DRM_DEBUG("Unhandled interrupt: %d %d\n", src_id, src_data);
 				break;
 			}
 			break;

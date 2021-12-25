@@ -527,6 +527,7 @@ static int apcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 
 	if ((ret = apcie_glue_init(sc)) < 0)
 		goto free_bars;
+	// TODO (ps4patches): figure out why this dies a horrible and painful death.
 	//if ((ret = apcie_uart_init(sc)) < 0)
 	//	goto remove_glue;
 	if ((ret = apcie_icc_init(sc)) < 0)
