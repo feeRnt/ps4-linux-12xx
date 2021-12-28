@@ -244,7 +244,7 @@ int radeon_audio_init(struct radeon_device *rdev)
 
 	rdev->audio.enabled = true;
 
-	if (ASIC_IS_DCE83(rdev))		/* KB: 2 streams, 3 endpoints */
+	if (ASIC_IS_DCE83(rdev))	/* KB: 2 streams, 3 endpoints */
 		rdev->audio.num_pins = 3;
 	else if (ASIC_IS_DCE81(rdev))	/* KV: 4 streams, 7 endpoints */
 		rdev->audio.num_pins = 7;

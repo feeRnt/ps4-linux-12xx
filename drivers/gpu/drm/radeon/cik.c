@@ -1038,7 +1038,20 @@ static const u32 kalindi_rlc_save_restore_register_list[] =
 	(0x0e00 << 16) | (0x9600 >> 2),
 };
 
-static const u32 liverpool_rlc_save_restore_register_li
+static const u32 bonaire_golden_spm_registers[] =
+{
+	0x30800, 0xe0ffffff, 0xe0000000
+};
+
+static const u32 bonaire_golden_common_registers[] =
+{
+	0xc770, 0xffffffff, 0x00000800,
+	0xc774, 0xffffffff, 0x00000800,
+	0xc798, 0xffffffff, 0x00007fbf,
+	0xc79c, 0xffffffff, 0x00007faf
+};
+
+static const u32 liverpool_rlc_save_restore_register_list[] =
 {
 	(0x0600 << 16) | 0x263d,
 	0x00000000,
@@ -1453,19 +1466,6 @@ static const u32 liverpool_rlc_save_restore_register_li
 	(0x0e00 << 16) | 0x230d,
 };
 
-static const u32 bonaire_golden_spm_registers[] =
-{
-	0x30800, 0xe0ffffff, 0xe0000000
-};
-
-static const u32 bonaire_golden_common_registers[] =
-{
-	0xc770, 0xffffffff, 0x00000800,
-	0xc774, 0xffffffff, 0x00000800,
-	0xc798, 0xffffffff, 0x00007fbf,
-	0xc79c, 0xffffffff, 0x00007faf
-};
-
 static const u32 bonaire_golden_registers[] =
 {
 	0x3354, 0x00000333, 0x00000333,
@@ -1616,7 +1616,7 @@ static const u32 liverpool_golden_common_registers[] =
 	0x5004, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL */
 };
 
-onst u32 liverpool_golden_registers[] =
+static const u32 liverpool_golden_registers[] =
 {
 	0xc420, 0xffffffff, 0xfffffffc, /* RLC_CGTT_MGCG_OVERRIDE */
 	0x30800, 0xffffffff, 0xe0000000, /* GRBM_GFX_INDEX */

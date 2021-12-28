@@ -13,11 +13,14 @@
 
 #include <asm/ps4.h>
 
+#include <drm/drm_bridge.h>
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_edid.h>
-#include <drm/drmP.h>
+#include <drm/drm_print.h>
+
+#include <linux/pci.h>
 
 #include "radeon_mode.h"
 #include "ObjectID.h"
@@ -95,7 +98,6 @@
 # define HDCPEN_ENC_EN 0x03
 # define HDCPEN_ENC_DIS 0x05
 
-#define PCI_VENDOR_ID_AMD 0x1002
 #define PCI_DEVICE_ID_CUH_11XX 0x9920
 #define PCI_DEVICE_ID_CUH_12XX 0x9922
 #define PCI_DEVICE_ID_CUH_2XXX 0x9923
@@ -269,8 +271,8 @@ static inline struct radeon_ps4_bridge *
 }
 
 static void radeon_ps4_bridge_mode_set(struct drm_bridge *bridge,
-			      struct drm_display_mode *mode,
-			      struct drm_display_mode *adjusted_mode)
+			      const struct drm_display_mode *mode,
+			      const struct drm_display_mode *adjusted_mode)
 {
 	struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge);
 
@@ -357,7 +359,7 @@ static void radeon_ps4_bridge_enable(struct drm_bridge *bridge)
 	struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge);
 	struct drm_connector *connector = mn_bridge->connector;
 	struct drm_device *dev = connector->dev;
-	struct pci_dev *pdev = dev->pdev;
+	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	u8 dp[3];
 
 	if (!mn_bridge->mode) {
@@ -638,21 +640,21 @@ static const struct drm_display_mode mode_480p = {
 	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 		 752, 800, 0, 480, 490, 492, 525, 0,
 		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
-	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
+	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
 };
 /* 4 - 1280x720@60Hz */
 static const struct drm_display_mode mode_720p = {
 	DRM_MODE("1280x720", DRM_MODE_TYPE_DRIVER, 74250, 1280, 1390,
 		 1430, 1650, 0, 720, 725, 730, 750, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
-	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
+	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
 /* 16 - 1920x1080@60Hz */
 static const struct drm_display_mode mode_1080p = {
 	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
 		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
-	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
+	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
 
 int radeon_ps4_bridge_get_modes(struct drm_connector *connector)
@@ -669,7 +671,7 @@ int radeon_ps4_bridge_get_modes(struct drm_connector *connector)
 	//newmode = drm_mode_duplicate(dev, &mode_480p);
 	//drm_mode_probed_add(connector, newmode);
 
-	drm_mode_connector_update_edid_property(connector, NULL);
+	drm_connector_update_edid_property(connector, NULL);
 
 	return 0;
 }
@@ -718,7 +720,8 @@ int radeon_ps4_bridge_mode_valid(struct drm_connector *connector,
 	return MODE_OK;
 }
 
-static int radeon_ps4_bridge_attach(struct drm_bridge *bridge)
+static int radeon_ps4_bridge_attach(struct drm_bridge *bridge,
+				    enum drm_bridge_attach_flags flags)
 {
 	/* struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge); */
 
