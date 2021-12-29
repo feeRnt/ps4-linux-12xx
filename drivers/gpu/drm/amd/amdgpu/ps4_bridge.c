@@ -11,6 +11,10 @@
  * GNU General Public License for more details.
  */
 
+
+// TODO (ps4patches): Make functions atomic,
+//  https://lore.kernel.org/linux-arm-kernel/20211020181901.2114645-5-sam@ravnborg.org/
+
 #include <asm/ps4.h>
 
 #include <drm/drm_crtc.h>
@@ -676,7 +680,7 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 {
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *newmode;
-	DRM_DEBUG_KMS("ps4_bridge_get_modes\n");
+	pr_info("ps4_bridge_get_modes\n");
 
 	newmode = drm_mode_duplicate(dev, &mode_1080p);
 	drm_mode_probed_add(connector, newmode);
@@ -687,7 +691,7 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	//drm_mode_probed_add(connector, newmode);
 
 	drm_connector_update_edid_property(connector, NULL);
-    
+
 	return 0;
 }
 
@@ -738,7 +742,6 @@ int ps4_bridge_mode_valid(struct drm_connector *connector,
 static int ps4_bridge_attach(struct drm_bridge *bridge,
 			     enum drm_bridge_attach_flags flags)
 {
-	// TODO (ps4patches): Why is this in comments?
 	/* struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge); */
 
 	return 0;
@@ -761,16 +764,17 @@ int ps4_bridge_register(struct drm_connector *connector,
 
 	mn_bridge->encoder = encoder;
 	mn_bridge->connector = connector;
+	mn_bridge->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
-	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
+
+	// TODO (ps4patches): This seems to be the new way of adding bridges
+	drm_bridge_add(&mn_bridge->bridge);
+
+	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
 	if (ret) {
 		DRM_ERROR("Failed to initialize bridge with drm\n");
 		return -EINVAL;
 	}
-
-	//encoder->bridge = &mn_bridge->bridge;
-	// TODO (ps4patches): This seems to be the new way of adding bridges
-	drm_bridge_add(&mn_bridge->bridge);
 
 	return 0;
 }
