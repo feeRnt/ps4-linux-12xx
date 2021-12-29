@@ -343,7 +343,7 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	}
 #endif
 
-	desc = alloc_msi_entry(bare_dev, 1, NULL);
+	desc = alloc_msi_entry(bare_dev, nvec, NULL);
 
 	info.desc = desc;
 	info.data = sc;
