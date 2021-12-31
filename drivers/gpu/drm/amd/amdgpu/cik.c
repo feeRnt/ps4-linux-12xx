@@ -136,6 +136,8 @@ static int cik_query_video_codecs(struct amdgpu_device *adev, bool encode,
 	case CHIP_KAVERI:
 	case CHIP_KABINI:
 	case CHIP_MULLINS:
+	case CHIP_LIVERPOOL:
+	case CHIP_GLADIUS:
 		if (encode)
 			*codecs = &cik_video_codecs_encode;
 		else
