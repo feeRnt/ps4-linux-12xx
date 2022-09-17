@@ -62,4 +62,6 @@ typedef struct x86_msi_addr_hi {
 struct msi_msg;
 u32 x86_msi_msg_get_destid(struct msi_msg *msg, bool extid);
 
+void irq_msi_compose_msg(struct irq_data *data, struct msi_msg *msg);
+
 #endif /* _ASM_X86_MSI_H */
