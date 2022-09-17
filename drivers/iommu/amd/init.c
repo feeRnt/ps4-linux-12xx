@@ -2998,6 +2998,7 @@ static void __init free_iommu_resources(void)
 	free_pci_segments();
 }
 
+#ifndef CONFIG_X86_PS4 // TODO this should detect ps4-ness at runtime
 /* SB IOAPIC is always on this device in AMD systems */
 #define IOAPIC_SB_DEVID		((0x00 << 8) | PCI_DEVFN(0x14, 0))
 
@@ -3049,7 +3050,7 @@ static bool __init check_ioapic_information(void)
 
 	return ret;
 }
-
+#endif
 static void __init free_dma_resources(void)
 {
 	free_pages((unsigned long)amd_iommu_pd_alloc_bitmap,
@@ -3153,10 +3154,10 @@ static int __init early_amd_iommu_init(void)
 	/* Disable any previously enabled IOMMUs */
 	if (!is_kdump_kernel() || amd_iommu_disabled)
 		disable_iommus();
-
+/*
 	if (amd_iommu_irq_remap)
 		amd_iommu_irq_remap = check_ioapic_information();
-
+*/
 	if (amd_iommu_irq_remap) {
 		struct amd_iommu_pci_seg *pci_seg;
 		/*

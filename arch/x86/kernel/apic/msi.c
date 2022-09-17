@@ -23,6 +23,9 @@
 
 struct irq_domain *x86_pci_msi_default_domain __ro_after_init;
 
+/* __irq_msi_compose_msg used to be called from irq_msi_compose_msg which was a global
+* defined in this file, but now that consolidated function is x86_vector_msi_compose_msg, which calls __irq_msi_compose_msg */
+
 static void irq_msi_update_msg(struct irq_data *irqd, struct irq_cfg *cfg)
 {
 	struct msi_msg msg[2] = { [1] = { }, };
