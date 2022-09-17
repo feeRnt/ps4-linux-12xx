@@ -263,6 +263,7 @@ struct kfd_dev *kgd2kfd_probe(struct amdgpu_device *adev, bool vf)
 	switch (adev->asic_type) {
 #ifdef CONFIG_DRM_AMDGPU_CIK
 	case CHIP_KAVERI:
+	case
 		gfx_target_version = 70000;
 		if (!vf)
 			f2g = &gfx_v7_kfd2kgd;
@@ -281,6 +282,12 @@ struct kfd_dev *kgd2kfd_probe(struct amdgpu_device *adev, bool vf)
 	"KFD support on Hawaii is experimental. See modparam exp_hw_support\n"
 				);
 		else if (!vf)
+			f2g = &gfx_v7_kfd2kgd;
+		break;
+	case CHIP_LIVERPOOL:
+	case CHIP_GLADIUS:
+		gfx_target_version = 70001;
+		if (!vf)
 			f2g = &gfx_v7_kfd2kgd;
 		break;
 #endif
