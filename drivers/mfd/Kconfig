@@ -9,7 +9,7 @@ menu "Multifunction device drivers"
 config MFD_CORE
 	tristate
 	select IRQ_DOMAIN
-	default n
+	default y
 
 config MFD_CS5535
 	tristate "AMD CS5535 and CS5536 southbridge core functions"

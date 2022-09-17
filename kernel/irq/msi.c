@@ -1094,7 +1094,12 @@ int msi_domain_prepare_irqs(struct irq_domain *domain, struct device *dev,
 	struct msi_domain_info *info = domain->host_data;
 	struct msi_domain_ops *ops = info->ops;
 
-	return ops->msi_prepare(domain, dev, nvec, arg);
+	if (ops->msi_prepare)
+		return ops->msi_prepare(domain, dev, nvec, arg);
+	else {
+		pr_err("irq/msi: Failed to find msi_prepare function in %s. Returning ENOSYS.\n", __func__);
+		return -ENOSYS; // TODO: Remove this PS4 fail-safe after ensuring this pathway passes (it should)
+	}
 }
 
 int msi_domain_populate_irqs(struct irq_domain *domain, struct device *dev,
