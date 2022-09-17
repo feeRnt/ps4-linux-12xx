@@ -34,6 +34,10 @@
 #include <linux/io-64-nonatomic-lo-hi.h>
 #include "ahci.h"
 
+#ifdef CONFIG_X86_PS4
+#include <asm/ps4.h>
+#endif
+
 #define DRV_NAME	"ahci"
 #define DRV_VERSION	"3.0"
 
@@ -43,6 +47,7 @@ enum {
 	AHCI_PCI_BAR_ENMOTUS	= 2,
 	AHCI_PCI_BAR_CAVIUM_GEN5	= 4,
 	AHCI_PCI_BAR_STANDARD	= 5,
+	AHCI_PCI_BAR0_BAIKAL	= 0,
 };
 
 enum board_ids {
@@ -590,6 +595,11 @@ static const struct pci_device_id ahci_pci_tbl[] = {
 	/* Enmotus */
 	{ PCI_DEVICE(0x1c44, 0x8000), board_ahci },
 
+	/* Sony (PS4) */
+	{ PCI_VDEVICE(SONY, PCI_DEVICE_ID_SONY_AEOLIA_AHCI), board_ahci },
+	{ PCI_VDEVICE(SONY, PCI_DEVICE_ID_SONY_BELIZE_AHCI), board_ahci },
+	{ PCI_VDEVICE(SONY, PCI_DEVICE_ID_SONY_BAIKAL_AHCI), board_ahci },
+
 	/* Generic, PCI class code for AHCI */
 	{ PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID,
 	  PCI_CLASS_STORAGE_SATA_AHCI, 0xffffff, board_ahci },
@@ -917,11 +927,47 @@ static int ahci_configure_dma_masks(struct pci_dev *pdev, int using_dac)
 	 */
 	if (pdev->dma_mask && pdev->dma_mask < DMA_BIT_MASK(32))
 		return 0;
-
-	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(dma_bits));
-	if (rc)
-		dev_err(&pdev->dev, "DMA enable failed\n");
-	return rc;
+#ifdef CONFIG_X86_PS4
+	if (pdev->vendor == PCI_VENDOR_ID_SONY) {
+		rc = dma_set_mask(&pdev->dev, DMA_BIT_MASK(31));
+		if (rc) {
+			dev_err(&pdev->dev, "31-bit DMA enable failed\n");
+			return rc;
+		}
+		rc = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(31));
+		if (rc) {
+			dev_err(&pdev->dev,
+				"31-bit consistent DMA enable failed\n");
+			return rc;
+		}
+		return 0;
+	}
+#endif
+	if (using_dac &&
+	    !dma_set_mask(&pdev->dev, DMA_BIT_MASK(64))) {
+		rc = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(64));
+		if (rc) {
+			rc = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32));
+			if (rc) {
+				dev_err(&pdev->dev,
+					"64-bit DMA enable failed\n");
+				return rc;
+			}
+		}
+	} else {
+		rc = dma_set_mask(&pdev->dev, DMA_BIT_MASK(32));
+		if (rc) {
+			dev_err(&pdev->dev, "32-bit DMA enable failed\n");
+			return rc;
+		}
+		rc = dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32));
+		if (rc) {
+			dev_err(&pdev->dev,
+				"32-bit consistent DMA enable failed\n");
+			return rc;
+		}
+	}
+	return 0;
 }
 
 static void ahci_pci_print_info(struct ata_host *host)
@@ -1536,7 +1582,13 @@ static int ahci_init_msi(struct pci_dev *pdev, unsigned int n_ports,
 			struct ahci_host_priv *hpriv)
 {
 	int nvec;
-
+/*
+#ifdef CONFIG_X86_PS4
+	if (pdev->vendor == PCI_VENDOR_ID_SONY) {
+			return apcie_assign_irqs(pdev, n_ports);
+	}
+#endif
+*/
 	if (hpriv->flags & AHCI_HFLAG_NO_MSI)
 		return -ENODEV;
 
@@ -1650,7 +1702,11 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	VPRINTK("ENTER\n");
 
 	WARN_ON((int)ATA_MAX_QUEUE > AHCI_MAX_CMDS);
-
+#ifdef CONFIG_X86_PS4
+	/* This will return negative on non-PS4 platforms */
+	if (apcie_status() == 0)
+		return -EPROBE_DEFER;
+#endif
 	ata_print_version_once(&pdev->dev, DRV_VERSION);
 
 	/* The AHCI driver can only drive the SATA ports, the PATA driver
@@ -1681,6 +1737,8 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 			ahci_pci_bar = AHCI_PCI_BAR_CAVIUM;
 		if (pdev->device == 0xa084)
 			ahci_pci_bar = AHCI_PCI_BAR_CAVIUM_GEN5;
+	else if (pdev->vendor == PCI_VENDOR_ID_SONY && pdev->device == PCI_DEVICE_ID_SONY_BAIKAL_AHCI)
+			ahci_pci_bar = AHCI_PCI_BAR0_BAIKAL;			
 	}
 
 	/* acquire resources */
@@ -1889,7 +1947,1756 @@ static void ahci_remove_one(struct pci_dev *pdev)
 {
 	pm_runtime_get_noresume(&pdev->dev);
 	ata_pci_remove_one(pdev);
+#ifdef CONFIG_X86_PS4
+	if (pdev->vendor == PCI_VENDOR_ID_SONY) {
+		apcie_free_irqs(pdev->irq, 1);
+	}
+#endif
 }
+
+#ifdef CONFIG_X86_PS4
+void bpcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr)
+{
+  struct ahci_controller *ctlr_; // r15
+  __int64 v6; // rax
+  void (**v7)(void *, void *, _QWORD, int *); // rbx
+  int dev_id; // er12
+  __int64 v9; // rdi
+  unsigned __int32 v10; // er13
+  unsigned __int32 v11; // eax
+  int v12; // er9
+  int v13; // ecx
+  int v14; // edx
+  int v15; // er8
+  signed __int64 v16; // r10
+  signed __int64 v17; // rbx
+  struct f_resource *r_mem; // rax
+  __int64 is_mem; // rdi
+  __int64 bar_addr; // rdx
+  unsigned __int32 *bar_and_offset_0x20A0; // rax
+  unsigned __int32 v22; // eax
+  struct f_resource *v23; // rcx
+  _BOOL8 bpci_usb_ahci; // rsi
+  unsigned __int32 *v25; // rdx
+  struct f_resource *v26; // rax
+  __int64 v27; // rcx
+  unsigned int *v28; // rdx
+  unsigned int v29; // eax
+  unsigned __int32 v30; // eax
+  struct f_resource *v31; // rcx
+  struct f_resource *v32; // rax
+  __int64 v33; // rdi
+  __int64 v34; // rdx
+  unsigned __int32 *v35; // rax
+  unsigned __int32 v36; // eax
+  struct f_resource *v37; // rcx
+  unsigned __int32 *v38; // rdx
+  struct f_resource *v39; // rcx
+  __int64 v40; // rax
+  unsigned int *v41; // rdx
+  unsigned int v42; // eax
+  unsigned __int32 v43; // eax
+  struct f_resource *v44; // rcx
+  struct f_resource *v45; // rax
+  __int64 v46; // rdi
+  __int64 v47; // rdx
+  unsigned __int32 *v48; // rax
+  unsigned __int32 v49; // eax
+  struct f_resource *v50; // rcx
+  unsigned int *v51; // rdx
+  unsigned int v52; // ecx
+  int bpcie_buffer; // eax
+  unsigned int trace_length; // ebx
+  unsigned int v55; // ecx
+  int v56; // edx
+  unsigned int v57; // eax
+  struct f_resource *v58; // rax
+  unsigned int *v59; // rdx
+  unsigned int v60; // eax
+  struct f_resource *v61; // rax
+  unsigned int *v62; // rdx
+  unsigned int v63; // eax
+  unsigned __int32 v64; // eax
+  struct f_resource *v65; // rcx
+  struct f_resource *v66; // rax
+  unsigned int *v67; // rdx
+  unsigned int v68; // eax
+ unsigned __int32 v69; // eax
+  struct f_resource *v70; // rcx
+  struct f_resource *v71; // rax
+  unsigned int *v72; // rdx
+  unsigned int v73; // eax
+  unsigned __int32 v74; // eax
+  struct f_resource *v75; // rcx
+  struct f_resource *v76; // rax
+  unsigned int *v77; // rdx
+  unsigned int v78; // eax
+  unsigned __int32 v79; // eax
+  struct f_resource *v80; // rcx
+  struct f_resource *v81; // rax
+  unsigned int *v82; // rdx
+  unsigned int v83; // eax
+  unsigned __int32 v84; // eax
+  struct f_resource *v85; // rcx
+  struct f_resource *v86; // rax
+  unsigned int *v87; // rdx
+  unsigned int v88; // eax
+  unsigned __int32 v89; // eax
+  struct f_resource *v90; // rcx
+  struct f_resource *v91; // rax
+  unsigned int *v92; // rdx
+  unsigned int v93; // eax
+  unsigned __int32 v94; // eax
+  struct f_resource *v95; // rcx
+  struct f_resource *v96; // rax
+  unsigned int *v97; // rdx
+  unsigned int v98; // eax
+  unsigned __int32 v99; // eax
+  struct f_resource *v100; // rcx
+  struct f_resource *v101; // rax
+  unsigned int *v102; // rdx
+  unsigned int v103; // eax
+  unsigned __int32 v104; // eax
+  struct f_resource *v105; // rcx
+  struct f_resource *v106; // rax
+  unsigned int *v107; // rdx
+  unsigned int v108; // eax
+  unsigned __int32 v109; // eax
+  struct f_resource *v110; // rcx
+  struct f_resource *v111; // rax
+  unsigned int *v112; // rdx
+  unsigned int v113; // eax
+  unsigned __int32 v114; // eax
+  struct f_resource *v115; // rcx
+  struct f_resource *v116; // rax
+  unsigned int *v117; // rdx
+  unsigned __int32 v118; // eax
+  struct f_resource *v119; // rcx
+  unsigned int v120; // eax
+  struct f_resource *v121; // rax
+  unsigned int *v122; // rdx
+  unsigned int v123; // eax
+  struct f_resource *v124; // rax
+  unsigned int *v125; // rdx
+  unsigned int v126; // eax
+  unsigned __int32 v127; // eax
+  struct f_resource *v128; // rcx
+  struct f_resource *v129; // rax
+  unsigned int *v130; // rdx
+  unsigned int v131; // eax
+  unsigned __int32 v132; // eax
+  struct f_resource *v133; // rcx
+  struct f_resource *v134; // rax
+  unsigned int *v135; // rdx
+  unsigned int v136; // eax
+  unsigned __int32 v137; // eax
+  struct f_resource *v138; // rcx
+  struct f_resource *v139; // rax
+  unsigned int *v140; // rdx
+  unsigned int v141; // eax
+  unsigned __int32 v142; // eax
+  struct f_resource *v143; // rcx
+  struct f_resource *v144; // rax
+  unsigned int *v145; // rdx
+  unsigned int v146; // eax
+  unsigned __int32 v147; // eax
+  struct f_resource *v148; // rcx
+  struct f_resource *v149; // rax
+  unsigned int *v150; // rdx
+  unsigned int v151; // eax
+  unsigned __int32 v152; // eax
+  struct f_resource *v153; // rcx
+  struct f_resource *v154; // rax
+  unsigned int *v155; // rdx
+  unsigned int v156; // eax
+  unsigned __int32 v157; // eax
+  struct f_resource *v158; // rcx
+  struct f_resource *v159; // rax
+  unsigned int *v160; // rdx
+  unsigned int v161; // eax
+  unsigned __int32 v162; // eax
+  struct f_resource *v163; // rcx
+  struct f_resource *v164; // rax
+  unsigned int *v165; // rdx
+  unsigned int v166; // eax
+  unsigned __int32 v167; // eax
+  struct f_resource *v168; // rcx
+  struct f_resource *v169; // rax
+  unsigned int *v170; // rdx
+  unsigned int v171; // eax
+  unsigned __int32 v172; // eax
+  struct f_resource *v173; // rcx
+  struct f_resource *v174; // rax
+  unsigned int *v175; // rdx
+  unsigned int v176; // eax
+  unsigned __int32 v177; // eax
+  struct f_resource *v178; // rcx
+  struct f_resource *v179; // rax
+  struct f_resource *v180; // rcx
+  __int64 v181; // rax
+  unsigned int *v182; // rdx
+  unsigned int v183; // eax
+  unsigned __int32 v184; // eax
+  struct f_resource *v185; // rcx
+  struct f_resource *v186; // rax
+  __int64 v187; // rcx
+  unsigned int *v188; // rdx
+  unsigned int v189; // eax
+  unsigned __int32 v190; // eax
+  struct f_resource *v191; // rcx
+  struct f_resource *v192; // rax
+  __int64 v193; // rcx
+  unsigned int *v194; // rdx
+  unsigned int v195; // eax
+  unsigned __int32 v196; // eax
+  struct f_resource *v197; // rcx
+  struct f_resource *v198; // rax
+  __int64 v199; // rcx
+  unsigned int *v200; // rdx
+  unsigned int v201; // eax
+  unsigned __int32 v202; // eax
+  struct f_resource *v203; // rcx
+  struct f_resource *v204; // rax
+  __int64 v205; // rcx
+  unsigned int *v206; // rdx
+  unsigned int v207; // eax
+  unsigned __int32 v208; // eax
+  struct f_resource *v209; // rcx
+  struct f_resource *v210; // rcx
+  __int64 v211; // rax
+  unsigned int *v212; // rdx
+  unsigned int v213; // eax
+  unsigned __int32 v214; // eax
+  struct f_resource *v215; // rcx
+  struct f_resource *v216; // rax
+  __int64 v217; // rcx
+  unsigned int *v218; // rdx
+  unsigned int v219; // eax
+  unsigned __int32 v220; // eax
+  struct f_resource *v221; // rcx
+  struct f_resource *v222; // rax
+  __int64 v223; // rcx
+  unsigned int *v224; // rdx
+  unsigned int v225; // eax
+  unsigned __int32 v226; // eax
+  struct f_resource *v227; // rcx
+  struct f_resource *v228; // rcx
+  __int64 v229; // rax
+  unsigned int *v230; // rdx
+  unsigned int v231; // eax
+  unsigned __int32 v232; // eax
+  struct f_resource *v233; // rcx
+  __int64 v234; // rdi
+  unsigned int v235; // ebx
+  struct f_resource *v236; // rax
+  _DWORD *v237; // rdx
+  unsigned __int32 v238; // eax
+  struct f_resource *v239; // rax
+  unsigned int *v240; // rdx
+  unsigned int v241; // eax
+  unsigned __int32 v242; // eax
+  struct f_resource *v243; // rcx
+  struct f_resource *v244; // rax
+  _DWORD *v245; // rdx
+  struct f_resource *v246; // rax
+  __int64 v247; // rcx
+  unsigned int *v248; // rdx
+  unsigned int v249; // eax
+  unsigned __int32 v250; // eax
+  struct f_resource *v251; // rcx
+  struct f_resource *v252; // rax
+  __int64 v253; // rcx
+  unsigned int *v254; // rdx
+  unsigned int v255; // eax
+  unsigned __int32 v256; // eax
+  struct f_resource *v257; // rcx
+  unsigned __int32 v258; // eax
+  struct f_resource *v259; // rcx
+  unsigned __int32 v260; // eax
+  struct f_resource *v261; // rcx
+  struct f_resource *v262; // rax
+  unsigned int *v263; // rdx
+  unsigned int v264; // eax
+  unsigned __int32 v265; // eax
+  struct f_resource *v266; // rcx
+  struct f_resource *v267; // rax
+  unsigned int *v268; // rdx
+  unsigned int v269; // eax
+  unsigned __int32 v270; // eax
+  struct f_resource *v271; // rcx
+  struct f_resource *v272; // rax
+  unsigned int *v273; // rdx
+  unsigned int v274; // eax
+  unsigned __int32 v275; // eax
+  struct f_resource *v276; // rcx
+  struct f_resource *v277; // rax
+  unsigned int *v278; // rdx
+  unsigned int v279; // eax
+  unsigned __int32 v280; // eax
+  struct f_resource *v281; // rcx
+  struct f_resource *v282; // rax
+  unsigned int *v283; // rdx
+  unsigned int v284; // eax
+  unsigned __int32 v285; // eax
+  struct f_resource *v286; // rcx
+  struct f_resource *v287; // rax
+  unsigned int *v288; // rdx
+  unsigned int v289; // eax
+  unsigned __int32 v290; // eax
+  struct f_resource *v291; // rcx
+  struct f_resource *v292; // rax
+  unsigned int *v293; // rdx
+  unsigned int v294; // eax
+  unsigned __int32 v295; // eax
+  struct f_resource *v296; // rcx
+  struct f_resource *v297; // rax
+  unsigned int *v298; // rdx
+  unsigned int v299; // eax
+  unsigned __int32 v300; // eax
+  struct f_resource *v301; // rcx
+  struct f_resource *v302; // rax
+  unsigned int *v303; // rdx
+  unsigned int v304; // eax
+  unsigned __int32 v305; // eax
+  struct f_resource *v306; // rcx
+  struct f_resource *v307; // rax
+  unsigned int *v308; // rdx
+  unsigned int v309; // eax
+  unsigned __int32 v310; // eax
+  struct f_resource *v311; // rcx
+  struct f_resource *v312; // rax
+  unsigned int *v313; // rdx
+  unsigned int v314; // eax
+  unsigned __int32 v315; // eax
+  struct f_resource *v316; // rcx
+  struct f_resource *v317; // rax
+  unsigned int *v318; // rdx
+  unsigned int v319; // eax
+  unsigned __int32 v320; // eax
+  struct f_resource *v321; // rcx
+  struct f_resource *v322; // rax
+  unsigned int *v323; // rdx
+  unsigned int v324; // eax
+  unsigned __int32 v325; // eax
+  struct f_resource *v326; // rcx
+  struct f_resource *v327; // rax
+  unsigned int *v328; // rdx
+  unsigned int v329; // eax
+  unsigned __int32 v330; // eax
+  struct f_resource *v331; // rcx
+  struct f_resource *v332; // rax
+  unsigned int *v333; // rdx
+  unsigned int v334; // eax
+  unsigned __int32 v335; // eax
+  struct f_resource *v336; // rcx
+  struct f_resource *v337; // rax
+  unsigned int *v338; // rdx
+  unsigned int v339; // eax
+  unsigned __int32 v340; // eax
+  struct f_resource *v341; // rcx
+  struct f_resource *v342; // rax
+  unsigned __int32 v343; // eax
+  struct f_resource *v344; // rcx
+  struct f_resource *v345; // rax
+  unsigned int *v346; // rdx
+  unsigned int v347; // eax
+  unsigned __int32 v348; // eax
+  struct f_resource *v349; // rcx
+  unsigned __int32 v350; // eax
+  struct f_resource *v351; // rcx
+  struct f_resource *v352; // rax
+  unsigned int *v353; // rdx
+  unsigned int v354; // eax
+  unsigned __int32 v355; // eax
+  struct f_resource *v356; // rcx
+  struct f_resource *v357; // rax
+  unsigned __int32 v358; // eax
+  struct f_resource *v359; // rcx
+  struct f_resource *v360; // rax
+  unsigned int *v361; // rdx
+  unsigned int v362; // eax
+  unsigned __int32 v363; // eax
+  struct f_resource *v364; // rcx
+  struct f_resource *v365; // rax
+  unsigned int *v366; // rdx
+  unsigned int v367; // eax
+  unsigned __int32 v368; // eax
+  struct f_resource *v369; // rcx
+  struct f_resource *v370; // rax
+  unsigned int *v371; // rdx
+  unsigned int v372; // eax
+  unsigned __int32 v373; // eax
+  struct f_resource *v374; // rcx
+  struct f_resource *v375; // rax
+  unsigned int *v376; // rdx
+  unsigned int v377; // eax
+  unsigned __int32 v378; // eax
+  struct f_resource *v379; // rcx
+  struct f_resource *v380; // rax
+  unsigned int *v381; // rdx
+  unsigned int v382; // eax
+  unsigned __int32 v383; // eax
+  struct f_resource *v384; // rcx
+  struct f_resource *v385; // rax
+  unsigned int *v386; // rdx
+  unsigned int v387; // eax
+  unsigned __int32 v388; // eax
+  struct f_resource *v389; // rcx
+  struct f_resource *v390; // rax
+  unsigned int *v391; // rdx
+  unsigned int v392; // eax
+  unsigned __int32 v393; // eax
+  struct f_resource *v394; // rcx
+  struct f_resource *v395; // rax
+  unsigned int *v396; // rdx
+  unsigned int v397; // eax
+  unsigned __int32 v398; // eax
+  struct f_resource *v399; // rcx
+  struct f_resource *v400; // rax
+  unsigned int *v401; // rdx
+ unsigned int v402; // eax
+  unsigned __int32 v403; // eax
+  struct f_resource *v404; // rcx
+  struct f_resource *v405; // rax
+  unsigned int *v406; // rdx
+  unsigned int v407; // eax
+  unsigned __int32 v408; // eax
+  struct f_resource *v409; // rcx
+  struct f_resource *v410; // rax
+  unsigned int *v411; // rdx
+  unsigned int v412; // eax
+  unsigned __int32 v413; // eax
+  struct f_resource *v414; // rcx
+  struct f_resource *v415; // rax
+  unsigned __int32 v416; // eax
+  struct f_resource *v417; // rcx
+  int ivar_out; // [rsp+8h] [rbp-48h]
+  int v419; // [rsp+Ch] [rbp-44h]
+  int v420; // [rsp+10h] [rbp-40h]
+  int v421; // [rsp+14h] [rbp-3Ch]
+  int v422; // [rsp+18h] [rbp-38h]
+  int v423; // [rsp+1Ch] [rbp-34h]
+
+  dev_id = ctlr->dev_id;
+  ctlr_ = ctlr;
+  dev_info(dev, "Baikal SATA PHY init\n");
+  struct pci_dev* sc_dev = pci_get_device(PCI_VENDOR_ID_SONY, PCI_DEVICE_ID_SONY_BAIKAL_PCIE, NULL);
+  if (!sc_dev) {
+	  dev_err(dev, "bpcie glue: not device found\n");
+  }
+
+  sc = pci_get_drvdata(sc_dev);
+  if (!sc) {
+	  dev_err(dev, "bpcie glue: not ready yet\n");
+  	  return;
+  }
+
+  if ( dev_id == 0x90D9104D )
+  {
+    bpcie_write_to_bar2_and_0x180000_and_offset(108LL, 1u);
+    bpcie_write_to_bar2_and_0x180000_and_offset(44LL, 1u);
+    v9 = 108LL;
+  }
+  else
+  {
+    bpcie_write_to_bar2_and_0x180000_and_offset(112LL, 1u);
+    bpcie_write_to_bar2_and_0x180000_and_offset(48LL, 1u);
+    v9 = 112LL;
+  }
+  bpcie_write_to_bar2_and_0x180000_and_offset(v9, 0);
+  v10 = bpcie_read_from_bar4_and_0xC000_and_offset(72LL);
+  v11 = bpcie_read_from_bar4_and_0xC000_and_offset(108LL);
+  pci_dev_put(sc_dev);
+  v12 = 16;
+  v13 = 40;
+  v14 = 40;
+  v15 = 16;
+  v16 = 16LL;
+ if ( v11 & 0x40000 )
+  {
+    v15 = (v10 >> 6) & 0x1F;
+    v14 = v10 & 0x3F;
+    v16 = (unsigned __int16)v10 >> 11;
+  }
+  v17 = 16LL;
+  v422 = v14;
+  v420 = v15;
+  ivar_out = v16;
+  if ( v11 & 0x4000000 )
+  {
+  v13 = (v10 >> 16) & 0x3F;
+   v12 = (v10 >> 22) & 0x1F;
+   v17 = v10 >> 27;
+  }
+  v423 = v13;
+  v421 = v12;
+  v419 = v17;
+  dev_info(dev, "Baikal SATA EFUSE VALUE: 0x%02x:0x%02x:0x%02x:0x%02x:0x%02x:0x%02x\n", v16, v17, 0, 0, 0, 0);
+  r_mem = ctlr->r_mem;
+  is_mem = r_mem->r_bustag;
+  bar_addr = r_mem->r_bushandle;
+  bar_and_offset_0x20A0 = (unsigned __int32 *)(bar_addr + 0x20A0);
+  v22 = bpcie_ahci_read(ctlr->r_mem, 0x20A0);
+
+  bpci_usb_ahci = dev_id != 0x90D9104D;
+  bpcie_ahci_write(ctlr->r_mem, 0x20A0, (v22 & 0xFBFF03FF) | ((bpci_usb_ahci ? v423 : v422) << 10) | 0x4000000);
+
+  v29 = bpcie_ahci_read(ctlr->r_mem, 0x2014);
+  bpcie_ahci_write(ctlr->r_mem, 0x2014, v29 | 0x100000);
+
+  v36 = bpcie_ahci_read(ctlr->r_mem, 0x2054);
+  bpcie_ahci_write(ctlr->r_mem, 0x2054, v36 & (0xFFFFF07F | ((bpci_usb_ahci ? v421 : v420) << 7)));
+
+  v42 = bpcie_ahci_read(ctlr->r_mem, 0x201C);
+  bpcie_ahci_write(ctlr->r_mem, 0x201C, v42 | 4);
+
+  v49 = bpcie_ahci_read(ctlr->r_mem, 0x2078);
+  bpcie_ahci_write(ctlr->r_mem, 0x2078, v49 & (0xFFFFFE0F | 16 * ((bpci_usb_ahci ? v419 : ivar_out))));
+
+  bpcie_buffer = (int)ctlr_->apcie_bpcie_buffer;
+  if ( bpcie_buffer )
+  {
+    trace_length = 6;
+    v55 = (unsigned __int8)bpcie_buffer >> 5;
+    v56 = v55 - 2;
+    if ( v55 <= 2 )
+      v56 = 0;
+    v57 = v56 + ((_QWORD)ctlr_->apcie_bpcie_buffer & 0x1F);
+    if ( v57 <= 0x12 )
+      trace_length = v56 + ((_QWORD)ctlr_->apcie_bpcie_buffer & 0x1F);
+    dev_info(dev, "Baikal SATA PHY Trace length : %d\n", trace_length);
+    switch ( trace_length )
+    {
+      case 0u:
+      case 1u:
+      case 2u:
+    	  v123 = bpcie_ahci_read(ctlr->r_mem, 0x204C);
+    	  bpcie_ahci_write(ctlr->r_mem, 0x204C, (v123 & 0xFFFFC0FF) | 0x1D00);
+
+    	  v264 = bpcie_ahci_read(ctlr->r_mem, 0x2054);
+    	  bpcie_ahci_write(ctlr->r_mem, 0x2054, (v264 & 0xFFFF9FFF) | 0x4000);
+
+        v272 = ctlr_->r_mem;
+        v273 = (unsigned int *)(v272->r_bushandle + 0x207C);
+        if ( v272->r_bustag )
+        {
+          v274 = *v273 & 0xFFFFFFC0 | 0x20;
+LABEL_246:
+          *v273 = v274;
+          goto LABEL_247;
+        }
+        v280 = __indword((unsigned __int16)v273);
+        v281 = ctlr_->r_mem;
+        v274 = v280 & 0xFFFFFFC0 | 0x20;
+        v273 = (unsigned int *)(v281->r_bushandle + 0x207C);
+       if ( v281->r_bustag )
+          goto LABEL_246;
+        __outdword((unsigned __int16)v273, v274);
+LABEL_247:
+        v282 = ctlr_->r_mem;
+        v283 = (unsigned int *)(v282->r_bushandle + 0x205C);
+        if ( v282->r_bustag )
+        {
+          v284 = *v283 & 0xCFFFFFFF | 0x20000000;
+LABEL_254:
+          *v283 = v284;
+          goto LABEL_255;
+        }
+        v290 = __indword((unsigned __int16)v283);
+        v291 = ctlr_->r_mem;
+        v284 = v290 & 0xCFFFFFFF | 0x20000000;
+        v283 = (unsigned int *)(v291->r_bushandle + 0x205C);
+        if ( v291->r_bustag )
+          goto LABEL_254;
+        __outdword((unsigned __int16)v283, v284);
+LABEL_255:
+        v292 = ctlr_->r_mem;
+        v293 = (unsigned int *)(v292->r_bushandle + 0x2080);
+        if ( v292->r_bustag )
+        {
+          v294 = *v293 & 0xFFFFF03F | 0x880;
+LABEL_262:
+          *v293 = v294;
+          goto LABEL_263;
+        }
+        v300 = __indword((unsigned __int16)v293);
+        v301 = ctlr_->r_mem;
+        v294 = v300 & 0xFFFFF03F | 0x880;
+        v293 = (unsigned int *)(v301->r_bushandle + 0x2080);
+        if ( v301->r_bustag )
+          goto LABEL_262;
+        __outdword((unsigned __int16)v293, v294);
+LABEL_263:
+        v302 = ctlr_->r_mem;
+        v303 = (unsigned int *)(v302->r_bushandle + 0x2080);
+        if ( v302->r_bustag )
+        {
+          v304 = *v303 & 0xFFFC0FFF | 0x3000;
+LABEL_270:
+          *v303 = v304;
+          goto LABEL_271;
+        }
+        v310 = __indword((unsigned __int16)v303);
+        v311 = ctlr_->r_mem;
+        v304 = v310 & 0xFFFC0FFF | 0x3000;
+        v303 = (unsigned int *)(v311->r_bushandle + 0x2080);
+        if ( v311->r_bustag )
+          goto LABEL_270;
+        __outdword((unsigned __int16)v303, v304);
+LABEL_271:
+        v312 = ctlr_->r_mem;
+        v313 = (unsigned int *)(v312->r_bushandle + 0x205C);
+        if ( v312->r_bustag )
+        {
+          v314 = *v313 & 0x3FFFFFFF | 0x40000000;
+LABEL_278:
+          *v313 = v314;
+          goto LABEL_279;
+        }
+        v320 = __indword((unsigned __int16)v313);
+        v321 = ctlr_->r_mem;
+        v314 = v320 & 0x3FFFFFFF | 0x40000000;
+        v313 = (unsigned int *)(v321->r_bushandle + 0x205C);
+        if ( v321->r_bustag )
+         goto LABEL_278;
+        __outdword((unsigned __int16)v313, v314);
+LABEL_279:
+        v322 = ctlr_->r_mem;
+        v323 = (unsigned int *)(v322->r_bushandle + 0x204C);
+        if ( v322->r_bustag )
+        {
+          v324 = *v323 & 0xFFFFFFF0 | 3;
+LABEL_286:
+          *v323 = v324;
+          goto LABEL_287;
+        }
+        v330 = __indword((unsigned __int16)v323);
+        v331 = ctlr_->r_mem;
+        v324 = v330 & 0xFFFFFFF0 | 3;
+        v323 = (unsigned int *)(v331->r_bushandle + 0x204C);
+        if ( v331->r_bustag )
+          goto LABEL_286;
+        __outdword((unsigned __int16)v323, v324);
+LABEL_287:
+        v332 = ctlr_->r_mem;
+        v333 = (unsigned int *)(v332->r_bushandle + 0x206C);
+        if ( v332->r_bustag )
+        {
+          v334 = *v333 & 0xFFFFF0FF | 0x100;
+LABEL_294:
+          *v333 = v334;
+          goto LABEL_295;
+        }
+        v340 = __indword((unsigned __int16)v333);
+        v341 = ctlr_->r_mem;
+        v334 = v340 & 0xFFFFF0FF | 0x100;
+        v333 = (unsigned int *)(v341->r_bushandle + 0x206C);
+        if ( v341->r_bustag )
+          goto LABEL_294;
+        __outdword((unsigned __int16)v333, v334);
+LABEL_295:
+        v342 = ctlr_->r_mem;
+        v117 = (unsigned int *)(v342->r_bushandle + 0x2084);
+        if ( v342->r_bustag )
+        {
+          v120 = *v117 & 0xFFFFFF00 | 0x32;
+          goto LABEL_153;
+        }
+        v348 = __indword((unsigned __int16)v117);
+        v349 = ctlr_->r_mem;
+        v120 = v348 & 0xFFFFFF00 | 0x32;
+        v117 = (unsigned int *)(v349->r_bushandle + 0x2084);
+        if ( v349->r_bustag )
+          goto LABEL_153;
+        __outdword((unsigned __int16)v117, v120);
+        goto LABEL_154;
+      case 3u:
+      case 4u:
+      case 5u:
+        v124 = ctlr_->r_mem;
+        v125 = (unsigned int *)(v124->r_bushandle + 0x204C);
+        if ( v124->r_bustag )
+        {
+          v126 = *v125 & 0xFFC0FFFF | 0x1E0000;
+LABEL_234:
+          *v125 = v126;
+          goto LABEL_235;
+        }
+        v265 = __indword((unsigned __int16)v125);
+        v266 = ctlr_->r_mem;
+        v126 = v265 & 0xFFC0FFFF | 0x1E0000;
+        v125 = (unsigned int *)(v266->r_bushandle + 0x204C);
+        if ( v266->r_bustag )
+          goto LABEL_234;
+        __outdword((unsigned __int16)v125, v126);
+LABEL_235:
+        v267 = ctlr_->r_mem;
+        v268 = (unsigned int *)(v267->r_bushandle + 0x204C);
+        if ( v267->r_bustag )
+        {
+          v269 = *v268 & 0xC0FFFFFF;
+LABEL_242:
+          *v268 = v269;
+          goto LABEL_243;
+        }
+        v275 = __indword((unsigned __int16)v268);
+        v276 = ctlr_->r_mem;
+        v269 = v275 & 0xC0FFFFFF;
+        v268 = (unsigned int *)(v276->r_bushandle + 0x204C);
+        if ( v276->r_bustag )
+          goto LABEL_242;
+        __outdword((unsigned __int16)v268, v269);
+LABEL_243:
+        v277 = ctlr_->r_mem;
+        v278 = (unsigned int *)(v277->r_bushandle + 0x2054);
+        if ( v277->r_bustag )
+        {
+          v279 = *v278 & 0xFFFF9FFF | 0x2000;
+LABEL_250:
+          *v278 = v279;
+          goto LABEL_251;
+        }
+        v285 = __indword((unsigned __int16)v278);
+        v286 = ctlr_->r_mem;
+        v279 = v285 & 0xFFFF9FFF | 0x2000;
+        v278 = (unsigned int *)(v286->r_bushandle + 0x2054);
+        if ( v286->r_bustag )
+          goto LABEL_250;
+        __outdword((unsigned __int16)v278, v279);
+LABEL_251:
+        v287 = ctlr_->r_mem;
+        v288 = (unsigned int *)(v287->r_bushandle + 0x207C);
+        if ( v287->r_bustag )
+        {
+          v289 = *v288 & 0xFFFFF03F | 0x840;
+LABEL_258:
+          *v288 = v289;
+          goto LABEL_259;
+        }
+        v295 = __indword((unsigned __int16)v288);
+        v296 = ctlr_->r_mem;
+        v289 = v295 & 0xFFFFF03F | 0x840;
+        v288 = (unsigned int *)(v296->r_bushandle + 0x207C);
+        if ( v296->r_bustag )
+          goto LABEL_258;
+        __outdword((unsigned __int16)v288, v289);
+LABEL_259:
+        v297 = ctlr_->r_mem;
+        v298 = (unsigned int *)(v297->r_bushandle + 0x207C);
+        if ( v297->r_bustag )
+        {
+          v299 = *v298 & 0xFFFC0FFF | 0x2000;
+LABEL_266:
+          *v298 = v299;
+          goto LABEL_267;
+        }
+        v305 = __indword((unsigned __int16)v298);
+        v306 = ctlr_->r_mem;
+        v299 = v305 & 0xFFFC0FFF | 0x2000;
+        v298 = (unsigned int *)(v306->r_bushandle + 0x207C);
+        if ( v306->r_bustag )
+          goto LABEL_266;
+        __outdword((unsigned __int16)v298, v299);
+LABEL_267:
+        v307 = ctlr_->r_mem;
+        v308 = (unsigned int *)(v307->r_bushandle + 0x205C);
+        if ( v307->r_bustag )
+        {
+          v309 = *v308 & 0xCFFFFFFF | 0x10000000;
+LABEL_274:
+          *v308 = v309;
+          goto LABEL_275;
+        }
+        v315 = __indword((unsigned __int16)v308);
+        v316 = ctlr_->r_mem;
+        v309 = v315 & 0xCFFFFFFF | 0x10000000;
+        v308 = (unsigned int *)(v316->r_bushandle + 0x205C);
+        if ( v316->r_bustag )
+          goto LABEL_274;
+        __outdword((unsigned __int16)v308, v309);
+LABEL_275:
+        v317 = ctlr_->r_mem;
+        v318 = (unsigned int *)(v317->r_bushandle + 0x2080);
+        if ( v317->r_bustag )
+        {
+          v319 = *v318 & 0xFFFFF03F | 0x8C0;
+LABEL_282:
+          *v318 = v319;
+          goto LABEL_283;
+        }
+        v325 = __indword((unsigned __int16)v318);
+        v326 = ctlr_->r_mem;
+        v319 = v325 & 0xFFFFF03F | 0x8C0;
+        v318 = (unsigned int *)(v326->r_bushandle + 0x2080);
+        if ( v326->r_bustag )
+          goto LABEL_282;
+        __outdword((unsigned __int16)v318, v319);
+LABEL_283:
+        v327 = ctlr_->r_mem;
+        v328 = (unsigned int *)(v327->r_bushandle + 0x2080);
+        if ( v327->r_bustag )
+        {
+          v329 = *v328 & 0xFFFC0FFF | 0x7000;
+LABEL_290:
+          *v328 = v329;
+          goto LABEL_291;
+        }
+        v335 = __indword((unsigned __int16)v328);
+        v336 = ctlr_->r_mem;
+        v329 = v335 & 0xFFFC0FFF | 0x7000;
+        v328 = (unsigned int *)(v336->r_bushandle + 0x2080);
+        if ( v336->r_bustag )
+          goto LABEL_290;
+        __outdword((unsigned __int16)v328, v329);
+LABEL_291:
+        v337 = ctlr_->r_mem;
+        v338 = (unsigned int *)(v337->r_bushandle + 0x205C);
+        if ( v337->r_bustag )
+        {
+          v339 = *v338 & 0x3FFFFFFF | 0x40000000;
+LABEL_298:
+          *v338 = v339;
+          goto LABEL_299;
+        }
+        v343 = __indword((unsigned __int16)v338);
+        v344 = ctlr_->r_mem;
+        v339 = v343 & 0x3FFFFFFF | 0x40000000;
+        v338 = (unsigned int *)(v344->r_bushandle + 0x205C);
+        if ( v344->r_bustag )
+          goto LABEL_298;
+        __outdword((unsigned __int16)v338, v339);
+LABEL_299:
+        v345 = ctlr_->r_mem;
+        v346 = (unsigned int *)(v345->r_bushandle + 8268);
+        if ( v345->r_bustag )
+        {
+          v347 = *v346 & 0xFFFFFFF0 | 3;
+LABEL_304:
+          *v346 = v347;
+          goto LABEL_305;
+        }
+        v350 = __indword((unsigned __int16)v346);
+        v351 = ctlr_->r_mem;
+        v347 = v350 & 0xFFFFFFF0 | 3;
+        v346 = (unsigned int *)(v351->r_bushandle + 8268);
+        if ( v351->r_bustag )
+          goto LABEL_304;
+        __outdword((unsigned __int16)v346, v347);
+LABEL_305:
+        v352 = ctlr_->r_mem;
+        v353 = (unsigned int *)(v352->r_bushandle + 8300);
+        if ( v352->r_bustag )
+        {
+          v354 = *v353 & 0xFFFFF0FF | 0x100;
+LABEL_308:
+          *v353 = v354;
+          goto LABEL_309;
+        }
+        v355 = __indword((unsigned __int16)v353);
+        v356 = ctlr_->r_mem;
+        v354 = v355 & 0xFFFFF0FF | 0x100;
+        v353 = (unsigned int *)(v356->r_bushandle + 8300);
+        if ( v356->r_bustag )
+          goto LABEL_308;
+        __outdword((unsigned __int16)v353, v354);
+LABEL_309:
+        v357 = ctlr_->r_mem;
+        v117 = (unsigned int *)(v357->r_bushandle + 8324);
+        if ( v357->r_bustag )
+        {
+          v120 = *v117 & 0xFFFFFF00 | 0x43;
+          goto LABEL_153;
+        }
+        v358 = __indword((unsigned __int16)v117);
+        v359 = ctlr_->r_mem;
+        v120 = v358 & 0xFFFFFF00 | 0x43;
+        v117 = (unsigned int *)(v359->r_bushandle + 8324);
+        if ( v359->r_bustag )
+          goto LABEL_153;
+        __outdword((unsigned __int16)v117, v120);
+        goto LABEL_154;
+      case 6u:
+      case 7u:
+      case 8u:
+        goto LABEL_45;
+      case 9u:
+      case 0xAu:
+      case 0xBu:
+      case 0xCu:
+        v58 = ctlr_->r_mem;
+        v59 = (unsigned int *)(v58->r_bushandle + 8268);
+        if ( v58->r_bustag )
+        {
+          v60 = *v59 & 0xFFC0FFFF | 0x240000;
+LABEL_110:
+          *v59 = v60;
+          goto LABEL_111;
+        }
+        v127 = __indword((unsigned __int16)v59);
+        v128 = ctlr_->r_mem;
+        v60 = v127 & 0xFFC0FFFF | 0x240000;
+        v59 = (unsigned int *)(v128->r_bushandle + 8268);
+        if ( v128->r_bustag )
+          goto LABEL_110;
+        __outdword((unsigned __int16)v59, v60);
+LABEL_111:
+        v129 = ctlr_->r_mem;
+        v130 = (unsigned int *)(v129->r_bushandle + 8268);
+        if ( v129->r_bustag )
+        {
+          v131 = *v130 & 0xC0FFFFFF | 0x4000000;
+LABEL_114:
+          *v130 = v131;
+          goto LABEL_115;
+        }
+        v132 = __indword((unsigned __int16)v130);
+        v133 = ctlr_->r_mem;
+        v131 = v132 & 0xC0FFFFFF | 0x4000000;
+        v130 = (unsigned int *)(v133->r_bushandle + 8268);
+        if ( v133->r_bustag )
+          goto LABEL_114;
+        __outdword((unsigned __int16)v130, v131);
+LABEL_115:
+        v134 = ctlr_->r_mem;
+        v135 = (unsigned int *)(v134->r_bushandle + 8276);
+        if ( v134->r_bustag )
+        {
+          v136 = *v135 & 0xFFFF9FFF | 0x2000;
+LABEL_118:
+          *v135 = v136;
+          goto LABEL_119;
+        }
+      v137 = __indword((unsigned __int16)v135);
+        v138 = ctlr_->r_mem;
+        v136 = v137 & 0xFFFF9FFF | 0x2000;
+        v135 = (unsigned int *)(v138->r_bushandle + 8276);
+        if ( v138->r_bustag )
+          goto LABEL_118;
+        __outdword((unsigned __int16)v135, v136);
+LABEL_119:
+        v139 = ctlr_->r_mem;
+        v140 = (unsigned int *)(v139->r_bushandle + 8316);
+        if ( v139->r_bustag )
+        {
+          v141 = *v140 & 0xFFFFF03F | 0x880;
+LABEL_122:
+          *v140 = v141;
+          goto LABEL_123;
+        }
+        v142 = __indword((unsigned __int16)v140);
+        v143 = ctlr_->r_mem;
+        v141 = v142 & 0xFFFFF03F | 0x880;
+        v140 = (unsigned int *)(v143->r_bushandle + 8316);
+        if ( v143->r_bustag )
+          goto LABEL_122;
+        __outdword((unsigned __int16)v140, v141);
+LABEL_123:
+        v144 = ctlr_->r_mem;
+        v145 = (unsigned int *)(v144->r_bushandle + 8316);
+        if ( v144->r_bustag )
+        {
+          v146 = *v145 & 0xFFFC0FFF | 0x6000;
+LABEL_126:
+          *v145 = v146;
+          goto LABEL_127;
+       }
+        v147 = __indword((unsigned __int16)v145);
+        v148 = ctlr_->r_mem;
+        v146 = v147 & 0xFFFC0FFF | 0x6000;
+        v145 = (unsigned int *)(v148->r_bushandle + 8316);
+        if ( v148->r_bustag )
+          goto LABEL_126;
+        __outdword((unsigned __int16)v145, v146);
+LABEL_127:
+        v149 = ctlr_->r_mem;
+        v150 = (unsigned int *)(v149->r_bushandle + 8284);
+        if ( v149->r_bustag )
+        {
+          v151 = *v150 & 0xCFFFFFFF | 0x10000000;
+LABEL_130:
+          *v150 = v151;
+          goto LABEL_131;
+        }
+        v152 = __indword((unsigned __int16)v150);
+        v153 = ctlr_->r_mem;
+        v151 = v152 & 0xCFFFFFFF | 0x10000000;
+        v150 = (unsigned int *)(v153->r_bushandle + 8284);
+        if ( v153->r_bustag )
+          goto LABEL_130;
+        __outdword((unsigned __int16)v150, v151);
+LABEL_131:
+        v154 = ctlr_->r_mem;
+        v155 = (unsigned int *)(v154->r_bushandle + 8320);
+        if ( v154->r_bustag )
+        {
+          v156 = *v155 & 0xFFFFF03F | 0x900;
+LABEL_134:
+          *v155 = v156;
+          goto LABEL_135;
+        }
+        v157 = __indword((unsigned __int16)v155);
+        v158 = ctlr_->r_mem;
+        v156 = v157 & 0xFFFFF03F | 0x900;
+        v155 = (unsigned int *)(v158->r_bushandle + 8320);
+        if ( v158->r_bustag )
+          goto LABEL_134;
+        __outdword((unsigned __int16)v155, v156);
+LABEL_135:
+        v159 = ctlr_->r_mem;
+        v160 = (unsigned int *)(v159->r_bushandle + 8320);
+        if ( v159->r_bustag )
+        {
+          v161 = *v160 & 0xFFFC0FFF | 0xF000;
+LABEL_138:
+          *v160 = v161;
+          goto LABEL_139;
+        }
+        v162 = __indword((unsigned __int16)v160);
+        v163 = ctlr_->r_mem;
+        v161 = v162 & 0xFFFC0FFF | 0xF000;
+        v160 = (unsigned int *)(v163->r_bushandle + 8320);
+        if ( v163->r_bustag )
+          goto LABEL_138;
+        __outdword((unsigned __int16)v160, v161);
+LABEL_139:
+        v164 = ctlr_->r_mem;
+        v165 = (unsigned int *)(v164->r_bushandle + 8284);
+        if ( v164->r_bustag )
+        {
+          v166 = *v165 & 0x3FFFFFFF | 0x40000000;
+LABEL_142:
+          *v165 = v166;
+          goto LABEL_143;
+       }
+        v167 = __indword((unsigned __int16)v165);
+        v168 = ctlr_->r_mem;
+        v166 = v167 & 0x3FFFFFFF | 0x40000000;
+        v165 = (unsigned int *)(v168->r_bushandle + 8284);
+        if ( v168->r_bustag )
+          goto LABEL_142;
+        __outdword((unsigned __int16)v165, v166);
+LABEL_143:
+        v169 = ctlr_->r_mem;
+        v170 = (unsigned int *)(v169->r_bushandle + 8268);
+        if ( v169->r_bustag )
+        {
+          v171 = *v170 & 0xFFFFFFF0 | 5;
+LABEL_146:
+          *v170 = v171;
+          goto LABEL_147;
+        }
+        v172 = __indword((unsigned __int16)v170);
+        v173 = ctlr_->r_mem;
+        v171 = v172 & 0xFFFFFFF0 | 5;
+        v170 = (unsigned int *)(v173->r_bushandle + 8268);
+        if ( v173->r_bustag )
+          goto LABEL_146;
+        __outdword((unsigned __int16)v170, v171);
+LABEL_147:
+        v174 = ctlr_->r_mem;
+        v175 = (unsigned int *)(v174->r_bushandle + 8300);
+        if ( v174->r_bustag )
+        {
+          v176 = *v175 & 0xFFFFF0FF | 0x200;
+LABEL_150:
+          *v175 = v176;
+          goto LABEL_151;
+        }
+        v177 = __indword((unsigned __int16)v175);
+        v178 = ctlr_->r_mem;
+        v176 = v177 & 0xFFFFF0FF | 0x200;
+        v175 = (unsigned int *)(v178->r_bushandle + 8300);
+        if ( v178->r_bustag )
+          goto LABEL_150;
+        __outdword((unsigned __int16)v175, v176);
+LABEL_151:
+        v179 = ctlr_->r_mem;
+        v117 = (unsigned int *)(v179->r_bushandle + 8324);
+        if ( v179->r_bustag )
+          goto LABEL_152;
+        v258 = __indword((unsigned __int16)v117);
+        v259 = ctlr_->r_mem;
+        v120 = v258 & 0xFFFFFF00 | 0x55;
+        v117 = (unsigned int *)(v259->r_bushandle + 8324);
+        if ( v259->r_bustag )
+          goto LABEL_153;
+        __outdword((unsigned __int16)v117, v120);
+        goto LABEL_154;
+      default:
+        v360 = ctlr_->r_mem;
+        v361 = (unsigned int *)(v360->r_bushandle + 8268);
+        if ( v360->r_bustag )
+        {
+          v362 = *v361 & 0xFFC0FFFF | 0x260000;
+LABEL_347:
+          *v361 = v362;
+          goto LABEL_348;
+        }
+        v363 = __indword((unsigned __int16)v361);
+        v364 = ctlr_->r_mem;
+        v362 = v363 & 0xFFC0FFFF | 0x260000;
+        v361 = (unsigned int *)(v364->r_bushandle + 8268);
+        if ( v364->r_bustag )
+          goto LABEL_347;
+        __outdword((unsigned __int16)v361, v362);
+LABEL_348:
+        v365 = ctlr_->r_mem;
+        v366 = (unsigned int *)(v365->r_bushandle + 8268);
+        if ( v365->r_bustag )
+        {
+          v367 = *v366 & 0xC0FFFFFF | 0x7000000;
+LABEL_351:
+          *v366 = v367;
+          goto LABEL_352;
+        }
+        v368 = __indword((unsigned __int16)v366);
+        v369 = ctlr_->r_mem;
+        v367 = v368 & 0xC0FFFFFF | 0x7000000;
+        v366 = (unsigned int *)(v369->r_bushandle + 8268);
+        if ( v369->r_bustag )
+          goto LABEL_351;
+        __outdword((unsigned __int16)v366, v367);
+LABEL_352:
+        v370 = ctlr_->r_mem;
+        v371 = (unsigned int *)(v370->r_bushandle + 8276);
+        if ( v370->r_bustag )
+        {
+          v372 = *v371 & 0xFFFF9FFF | 0x2000;
+LABEL_355:
+         *v371 = v372;
+          goto LABEL_356;
+       }
+        v373 = __indword((unsigned __int16)v371);
+        v374 = ctlr_->r_mem;
+        v372 = v373 & 0xFFFF9FFF | 0x2000;
+        v371 = (unsigned int *)(v374->r_bushandle + 8276);
+        if ( v374->r_bustag )
+          goto LABEL_355;
+        __outdword((unsigned __int16)v371, v372);
+LABEL_356:
+        v375 = ctlr_->r_mem;
+        v376 = (unsigned int *)(v375->r_bushandle + 8316);
+       if ( v375->r_bustag )
+        {
+          v377 = *v376 & 0xFFFFF03F | 0x880;
+LABEL_359:
+          *v376 = v377;
+          goto LABEL_360;
+        }
+        v378 = __indword((unsigned __int16)v376);
+        v379 = ctlr_->r_mem;
+        v377 = v378 & 0xFFFFF03F | 0x880;
+        v376 = (unsigned int *)(v379->r_bushandle + 8316);
+        if ( v379->r_bustag )
+          goto LABEL_359;
+        __outdword((unsigned __int16)v376, v377);
+LABEL_360:
+        v380 = ctlr_->r_mem;
+        v381 = (unsigned int *)(v380->r_bushandle + 8316);
+        if ( v380->r_bustag )
+        {
+          v382 = *v381 & 0xFFFC0FFF | 0x6000;
+LABEL_363:
+          *v381 = v382;
+          goto LABEL_364;
+        }
+        v383 = __indword((unsigned __int16)v381);
+        v384 = ctlr_->r_mem;
+        v382 = v383 & 0xFFFC0FFF | 0x6000;
+        v381 = (unsigned int *)(v384->r_bushandle + 8316);
+        if ( v384->r_bustag )
+          goto LABEL_363;
+        __outdword((unsigned __int16)v381, v382);
+LABEL_364:
+        v385 = ctlr_->r_mem;
+        v386 = (unsigned int *)(v385->r_bushandle + 8284);
+        if ( v385->r_bustag )
+        {
+          v387 = *v386 & 0xCFFFFFFF | 0x10000000;
+LABEL_367:
+          *v386 = v387;
+          goto LABEL_368;
+        }
+        v388 = __indword((unsigned __int16)v386);
+        v389 = ctlr_->r_mem;
+        v387 = v388 & 0xCFFFFFFF | 0x10000000;
+        v386 = (unsigned int *)(v389->r_bushandle + 8284);
+        if ( v389->r_bustag )
+          goto LABEL_367;
+        __outdword((unsigned __int16)v386, v387);
+LABEL_368:
+        v390 = ctlr_->r_mem;
+        v391 = (unsigned int *)(v390->r_bushandle + 8320);
+        if ( v390->r_bustag )
+        {
+          v392 = *v391 & 0xFFFFF03F | 0x900;
+LABEL_371:
+          *v391 = v392;
+          goto LABEL_372;
+        }
+        v393 = __indword((unsigned __int16)v391);
+        v394 = ctlr_->r_mem;
+        v392 = v393 & 0xFFFFF03F | 0x900;
+        v391 = (unsigned int *)(v394->r_bushandle + 8320);
+        if ( v394->r_bustag )
+          goto LABEL_371;
+        __outdword((unsigned __int16)v391, v392);
+LABEL_372:
+        v395 = ctlr_->r_mem;
+        v396 = (unsigned int *)(v395->r_bushandle + 8320);
+        if ( v395->r_bustag )
+        {
+          v397 = *v396 & 0xFFFC0FFF | 0xF000;
+LABEL_375:
+         *v396 = v397;
+          goto LABEL_376;
+        }
+        v398 = __indword((unsigned __int16)v396);
+        v399 = ctlr_->r_mem;
+        v397 = v398 & 0xFFFC0FFF | 0xF000;
+        v396 = (unsigned int *)(v399->r_bushandle + 8320);
+        if ( v399->r_bustag )
+          goto LABEL_375;
+        __outdword((unsigned __int16)v396, v397);
+LABEL_376:
+        v400 = ctlr_->r_mem;
+        v401 = (unsigned int *)(v400->r_bushandle + 8284);
+        if ( v400->r_bustag )
+        {
+          v402 = *v401 & 0x3FFFFFFF | 0x40000000;
+LABEL_379:
+          *v401 = v402;
+          goto LABEL_380;
+        }
+        v403 = __indword((unsigned __int16)v401);
+        v404 = ctlr_->r_mem;
+        v402 = v403 & 0x3FFFFFFF | 0x40000000;
+        v401 = (unsigned int *)(v404->r_bushandle + 8284);
+        if ( v404->r_bustag )
+          goto LABEL_379;
+        __outdword((unsigned __int16)v401, v402);
+LABEL_380:
+        v405 = ctlr_->r_mem;
+        v406 = (unsigned int *)(v405->r_bushandle + 8268);
+        if ( v405->r_bustag )
+        {
+          v407 = *v406 & 0xFFFFFFF0 | 5;
+LABEL_383:
+          *v406 = v407;
+          goto LABEL_384;
+        }
+        v408 = __indword((unsigned __int16)v406);
+        v409 = ctlr_->r_mem;
+        v407 = v408 & 0xFFFFFFF0 | 5;
+        v406 = (unsigned int *)(v409->r_bushandle + 8268);
+        if ( v409->r_bustag )
+          goto LABEL_383;
+        __outdword((unsigned __int16)v406, v407);
+LABEL_384:
+        v410 = ctlr_->r_mem;
+        v411 = (unsigned int *)(v410->r_bushandle + 8300);
+        if ( v410->r_bustag )
+        {
+          v412 = *v411 & 0xFFFFF0FF | 0x200;
+LABEL_387:
+          *v411 = v412;
+          goto LABEL_388;
+        }
+        v413 = __indword((unsigned __int16)v411);
+        v414 = ctlr_->r_mem;
+        v412 = v413 & 0xFFFFF0FF | 0x200;
+        v411 = (unsigned int *)(v414->r_bushandle + 8300);
+        if ( v414->r_bustag )
+          goto LABEL_387;
+        __outdword((unsigned __int16)v411, v412);
+LABEL_388:
+        v415 = ctlr_->r_mem;
+        v117 = (unsigned int *)(v415->r_bushandle + 8324);
+        if ( v415->r_bustag )
+          goto LABEL_152;
+        v416 = __indword((unsigned __int16)v117);
+        v417 = ctlr_->r_mem;
+        v120 = v416 & 0xFFFFFF00 | 0x55;
+        v117 = (unsigned int *)(v417->r_bushandle + 8324);
+       if ( v417->r_bustag )
+          goto LABEL_153;
+        __outdword((unsigned __int16)v117, v120);
+        break;
+   }
+    goto LABEL_154;
+  }
+  dev_info(dev, "Baikal SATA PHY Trace length : %d\n", 6LL);
+LABEL_45:
+  v61 = ctlr_->r_mem;
+  v62 = (unsigned int *)(v61->r_bushandle + 8268);
+  if ( v61->r_bustag )
+  {
+    v63 = *v62 & 0xFFC0FFFF | 0x200000;
+LABEL_48:
+    *v62 = v63;
+    goto LABEL_49;
+  }
+  v64 = __indword((unsigned __int16)v62);
+  v65 = ctlr_->r_mem;
+  v63 = v64 & 0xFFC0FFFF | 0x200000;
+  v62 = (unsigned int *)(v65->r_bushandle + 8268);
+  if ( v65->r_bustag )
+    goto LABEL_48;
+  __outdword((unsigned __int16)v62, v63);
+LABEL_49:
+  v66 = ctlr_->r_mem;
+  v67 = (unsigned int *)(v66->r_bushandle + 8268);
+  if ( v66->r_bustag )
+  {
+    v68 = *v67 & 0xC0FFFFFF | 0x1000000;
+LABEL_52:
+    *v67 = v68;
+    goto LABEL_53;
+  }
+  v69 = __indword((unsigned __int16)v67);
+  v70 = ctlr_->r_mem;
+  v68 = v69 & 0xC0FFFFFF | 0x1000000;
+  v67 = (unsigned int *)(v70->r_bushandle + 8268);
+  if ( v70->r_bustag )
+    goto LABEL_52;
+  __outdword((unsigned __int16)v67, v68);
+LABEL_53:
+  v71 = ctlr_->r_mem;
+  v72 = (unsigned int *)(v71->r_bushandle + 8276);
+  if ( v71->r_bustag )
+  {
+    v73 = *v72 & 0xFFFF9FFF | 0x2000;
+LABEL_56:
+    *v72 = v73;
+    goto LABEL_57;
+  }
+  v74 = __indword((unsigned __int16)v72);
+  v75 = ctlr_->r_mem;
+  v73 = v74 & 0xFFFF9FFF | 0x2000;
+  v72 = (unsigned int *)(v75->r_bushandle + 8276);
+  if ( v75->r_bustag )
+    goto LABEL_56;
+  __outdword((unsigned __int16)v72, v73);
+LABEL_57:
+  v76 = ctlr_->r_mem;
+  v77 = (unsigned int *)(v76->r_bushandle + 8316);
+  if ( v76->r_bustag )
+  {
+    v78 = *v77 & 0xFFFFF03F | 0x880;
+LABEL_60:
+    *v77 = v78;
+    goto LABEL_61;
+  }
+  v79 = __indword((unsigned __int16)v77);
+  v80 = ctlr_->r_mem;
+  v78 = v79 & 0xFFFFF03F | 0x880;
+  v77 = (unsigned int *)(v80->r_bushandle + 8316);
+  if ( v80->r_bustag )
+    goto LABEL_60;
+  __outdword((unsigned __int16)v77, v78);
+LABEL_61:
+  v81 = ctlr_->r_mem;
+  v82 = (unsigned int *)(v81->r_bushandle + 8316);
+  if ( v81->r_bustag )
+  {
+    v83 = *v82 & 0xFFFC0FFF | 0x6000;
+LABEL_64:
+    *v82 = v83;
+    goto LABEL_65;
+  }
+  v84 = __indword((unsigned __int16)v82);
+  v85 = ctlr_->r_mem;
+  v83 = v84 & 0xFFFC0FFF | 0x6000;
+  v82 = (unsigned int *)(v85->r_bushandle + 8316);
+  if ( v85->r_bustag )
+    goto LABEL_64;
+  __outdword((unsigned __int16)v82, v83);
+LABEL_65:
+  v86 = ctlr_->r_mem;
+  v87 = (unsigned int *)(v86->r_bushandle + 8284);
+  if ( v86->r_bustag )
+  {
+    v88 = *v87 & 0xCFFFFFFF | 0x10000000;
+LABEL_68:
+    *v87 = v88;
+    goto LABEL_69;
+  }
+  v89 = __indword((unsigned __int16)v87);
+  v90 = ctlr_->r_mem;
+  v88 = v89 & 0xCFFFFFFF | 0x10000000;
+  v87 = (unsigned int *)(v90->r_bushandle + 8284);
+  if ( v90->r_bustag )
+    goto LABEL_68;
+  __outdword((unsigned __int16)v87, v88);
+LABEL_69:
+  v91 = ctlr_->r_mem;
+  v92 = (unsigned int *)(v91->r_bushandle + 8320);
+  if ( v91->r_bustag )
+  {
+    v93 = *v92 & 0xFFFFF03F | 0x900;
+LABEL_72:
+   *v92 = v93;
+    goto LABEL_73;
+  }
+  v94 = __indword((unsigned __int16)v92);
+  v95 = ctlr_->r_mem;
+  v93 = v94 & 0xFFFFF03F | 0x900;
+  v92 = (unsigned int *)(v95->r_bushandle + 8320);
+  if ( v95->r_bustag )
+    goto LABEL_72;
+  __outdword((unsigned __int16)v92, v93);
+LABEL_73:
+  v96 = ctlr_->r_mem;
+  v97 = (unsigned int *)(v96->r_bushandle + 8320);
+  if ( v96->r_bustag )
+  {
+    v98 = *v97 & 0xFFFC0FFF | 0xF000;
+LABEL_76:
+    *v97 = v98;
+    goto LABEL_77;
+  }
+  v99 = __indword((unsigned __int16)v97);
+  v100 = ctlr_->r_mem;
+  v98 = v99 & 0xFFFC0FFF | 0xF000;
+  v97 = (unsigned int *)(v100->r_bushandle + 8320);
+  if ( v100->r_bustag )
+    goto LABEL_76;
+  __outdword((unsigned __int16)v97, v98);
+LABEL_77:
+  v101 = ctlr_->r_mem;
+  v102 = (unsigned int *)(v101->r_bushandle + 8284);
+  if ( v101->r_bustag )
+  {
+    v103 = *v102 & 0x3FFFFFFF | 0x40000000;
+LABEL_80:
+    *v102 = v103;
+    goto LABEL_81;
+  }
+  v104 = __indword((unsigned __int16)v102);
+  v105 = ctlr_->r_mem;
+  v103 = v104 & 0x3FFFFFFF | 0x40000000;
+  v102 = (unsigned int *)(v105->r_bushandle + 8284);
+  if ( v105->r_bustag )
+    goto LABEL_80;
+  __outdword((unsigned __int16)v102, v103);
+LABEL_81:
+  v106 = ctlr_->r_mem;
+  v107 = (unsigned int *)(v106->r_bushandle + 8268);
+  if ( v106->r_bustag )
+  {
+    v108 = *v107 & 0xFFFFFFF0 | 5;
+LABEL_84:
+    *v107 = v108;
+    goto LABEL_85;
+  }
+  v109 = __indword((unsigned __int16)v107);
+  v110 = ctlr_->r_mem;
+  v108 = v109 & 0xFFFFFFF0 | 5;
+  v107 = (unsigned int *)(v110->r_bushandle + 8268);
+  if ( v110->r_bustag )
+    goto LABEL_84;
+  __outdword((unsigned __int16)v107, v108);
+LABEL_85:
+  v111 = ctlr_->r_mem;
+  v112 = (unsigned int *)(v111->r_bushandle + 8300);
+  if ( v111->r_bustag )
+  {
+    v113 = *v112 & 0xFFFFF0FF | 0x200;
+  }
+  else
+  {
+    v114 = __indword((unsigned __int16)v112);
+    v115 = ctlr_->r_mem;
+    v113 = v114 & 0xFFFFF0FF | 0x200;
+    v112 = (unsigned int *)(v115->r_bushandle + 8300);
+    if ( !v115->r_bustag )
+    {
+      __outdword((unsigned __int16)v112, v113);
+      goto LABEL_89;
+    }
+  }
+  *v112 = v113;
+LABEL_89:
+  v116 = ctlr_->r_mem;
+  v117 = (unsigned int *)(v116->r_bushandle + 8324);
+  if ( v116->r_bustag )
+  {
+LABEL_152:
+    v120 = *v117 & 0xFFFFFF00 | 0x55;
+  }
+  else
+  {
+    v118 = __indword((unsigned __int16)v117);
+    v119 = ctlr_->r_mem;
+    v120 = v118 & 0xFFFFFF00 | 0x55;
+    v117 = (unsigned int *)(v119->r_bushandle + 8324);
+    if ( !v119->r_bustag )
+    {
+      __outdword((unsigned __int16)v117, v120);
+      goto LABEL_154;
+    }
+  }
+LABEL_153:
+  *v117 = v120;
+LABEL_154:
+  v180 = ctlr_->r_mem;
+  v181 = v180->r_bushandle;
+  v182 = (unsigned int *)(v181 + 8256);
+  if ( v180->r_bustag )
+  {
+    v183 = *(_DWORD *)(v181 + 8256) & 0xFFFFFFE0 | 0x12;
+LABEL_157:
+    *v182 = v183;
+    goto LABEL_158;
+  }
+  v184 = __indword((unsigned __int16)v182);
+  v185 = ctlr_->r_mem;
+  v183 = v184 & 0xFFFFFFE0 | 0x12;
+  v182 = (unsigned int *)(v185->r_bushandle + 8256);
+  if ( v185->r_bustag )
+    goto LABEL_157;
+  __outdword((unsigned __int16)v182, v183);
+LABEL_158:
+  v186 = ctlr_->r_mem;
+  v187 = v186->r_bushandle;
+  v188 = (unsigned int *)(v187 + 8256);
+  if ( v186->r_bustag )
+  {
+    v189 = *(_DWORD *)(v187 + 8256) & 0xFFFFC0FF | 0x3100;
+LABEL_161:
+    *v188 = v189;
+    goto LABEL_162;
+  }
+  v190 = __indword((unsigned __int16)v188);
+  v191 = ctlr_->r_mem;
+  v189 = v190 & 0xFFFFC0FF | 0x3100;
+  v188 = (unsigned int *)(v191->r_bushandle + 8256);
+  if ( v191->r_bustag )
+    goto LABEL_161;
+  __outdword((unsigned __int16)v188, v189);
+LABEL_162:
+  v192 = ctlr_->r_mem;
+  v193 = v192->r_bushandle;
+  v194 = (unsigned int *)(v193 + 8256);
+  if ( v192->r_bustag )
+  {
+    v195 = *(_DWORD *)(v193 + 8256) & 0xFFE0FFFF | 0xE0000;
+LABEL_165:
+    *v194 = v195;
+    goto LABEL_166;
+  }
+  v196 = __indword((unsigned __int16)v194);
+  v197 = ctlr_->r_mem;
+  v195 = v196 & 0xFFE0FFFF | 0xE0000;
+  v194 = (unsigned int *)(v197->r_bushandle + 8256);
+  if ( v197->r_bustag )
+    goto LABEL_165;
+  __outdword((unsigned __int16)v194, v195);
+LABEL_166:
+  v198 = ctlr_->r_mem;
+  v199 = v198->r_bushandle;
+  v200 = (unsigned int *)(v199 + 8256);
+  if ( v198->r_bustag )
+  {
+    v201 = *(_DWORD *)(v199 + 8256) & 0xFFFFFF1F | 0x80;
+LABEL_169:
+    *v200 = v201;
+    goto LABEL_170;
+  }
+  v202 = __indword((unsigned __int16)v200);
+  v203 = ctlr_->r_mem;
+  v201 = v202 & 0xFFFFFF1F | 0x80;
+  v200 = (unsigned int *)(v203->r_bushandle + 8256);
+  if ( v203->r_bustag )
+    goto LABEL_169;
+  __outdword((unsigned __int16)v200, v201);
+LABEL_170:
+  if ( get_subsys_id() != 0x30100 )
+    goto LABEL_179;
+  v204 = ctlr_->r_mem;
+  v205 = v204->r_bushandle;
+  v206 = (unsigned int *)(v205 + 8232);
+  if ( v204->r_bustag )
+  {
+    v207 = *(_DWORD *)(v205 + 8232) & 0xFDFFFFFF;
+LABEL_174:
+    *v206 = v207;
+    goto LABEL_175;
+  }
+  v208 = __indword((unsigned __int16)v206);
+  v209 = ctlr_->r_mem;
+  v207 = v208 & 0xFDFFFFFF;
+  v206 = (unsigned int *)(v209->r_bushandle + 8232);
+  if ( v209->r_bustag )
+    goto LABEL_174;
+  __outdword((unsigned __int16)v206, v207);
+LABEL_175:
+  v210 = ctlr_->r_mem;
+  v211 = v210->r_bushandle;
+  v212 = (unsigned int *)(v211 + 8260);
+  if ( v210->r_bustag )
+  {
+    v213 = *(_DWORD *)(v211 + 8260) & 0xFFFFFF80 | 0x1C;
+LABEL_178:
+    *v212 = v213;
+    goto LABEL_179;
+  }
+  v214 = __indword((unsigned __int16)v212);
+  v215 = ctlr_->r_mem;
+  v213 = v214 & 0xFFFFFF80 | 0x1C;
+  v212 = (unsigned int *)(v215->r_bushandle + 8260);
+  if ( v215->r_bustag )
+    goto LABEL_178;
+  __outdword((unsigned __int16)v212, v213);
+LABEL_179:
+  v216 = ctlr_->r_mem;
+  v217 = v216->r_bushandle;
+  v218 = (unsigned int *)(v217 + 8220);
+  if ( v216->r_bustag )
+  {
+    v219 = *(_DWORD *)(v217 + 8220) & 0xFF0FFFFF | 0x200000;
+LABEL_182:
+    *v218 = v219;
+    goto LABEL_183;
+  }
+  v220 = __indword((unsigned __int16)v218);
+  v221 = ctlr_->r_mem;
+  v219 = v220 & 0xFF0FFFFF | 0x200000;
+  v218 = (unsigned int *)(v221->r_bushandle + 8220);
+  if ( v221->r_bustag )
+    goto LABEL_182;
+  __outdword((unsigned __int16)v218, v219);
+LABEL_183:
+  v222 = ctlr_->r_mem;
+  v223 = v222->r_bushandle;
+  v224 = (unsigned int *)(v223 + 8412);
+  if ( v222->r_bustag )
+ {
+    v225 = *(_DWORD *)(v223 + 8412) & 0xFFFFE0FF | 0x400;
+LABEL_186:
+    *v224 = v225;
+    goto LABEL_187;
+  }
+  v226 = __indword((unsigned __int16)v224);
+  v227 = ctlr_->r_mem;
+  v225 = v226 & 0xFFFFE0FF | 0x400;
+ v224 = (unsigned int *)(v227->r_bushandle + 8412);
+  if ( v227->r_bustag )
+    goto LABEL_186;
+  __outdword((unsigned __int16)v224, v225);
+LABEL_187:
+  v228 = ctlr_->r_mem;
+  v229 = v228->r_bushandle;
+  v230 = (unsigned int *)(v229 + 8228);
+  if ( v228->r_bustag )
+  {
+    v231 = *(_DWORD *)(v229 + 8228) | 0x30;
+  }
+  else
+  {
+    v232 = __indword((unsigned __int16)v230);
+    v233 = ctlr_->r_mem;
+    v231 = v232 | 0x30;
+    v230 = (unsigned int *)(v233->r_bushandle + 8228);
+    if ( !v233->r_bustag )
+    {
+      __outdword((unsigned __int16)v230, v231);
+      if ( dev_id != -1864822707 )
+        goto LABEL_191;
+LABEL_199:
+      v234 = 44LL;
+      goto LABEL_200;
+    }
+  }
+  *v230 = v231;
+  if ( dev_id == 0x90D9104D )
+    goto LABEL_199;
+LABEL_191:
+  v234 = 48LL;
+LABEL_200:
+  bpcie_write_to_bar2_and_0x180000_and_offset(v234, 0);
+  v235 = 0;
+  do
+  {
+    v236 = ctlr_->r_mem;
+    v237 = (_DWORD *)(v236->r_bushandle + 220);
+    if ( v236->r_bustag )
+    {
+      if ( *v237 & 1 )
+       break;
+    }
+    else
+    {
+      v238 = __indword((unsigned __int16)v237);
+      if ( v238 & 1 )
+        break;
+    }
+    delay(10);
+    ++v235;
+  }
+  while ( v235 < 0x64 );
+  v239 = ctlr_->r_mem;
+  v240 = (unsigned int *)v239->r_bushandle;
+  if ( v239->r_bustag )
+  {
+    v241 = *v240 & 0xE7FFFFFF;
+LABEL_209:
+    *v240 = v241;
+    goto LABEL_210;
+  }
+  v242 = __indword((unsigned __int16)v240);
+  v243 = ctlr_->r_mem;
+  v241 = v242 & 0xE7FFFFFF;
+  v240 = (unsigned int *)v243->r_bushandle;
+  if ( v243->r_bustag )
+    goto LABEL_209;
+  __outdword((unsigned __int16)v240, v241);
+LABEL_210:
+  v244 = ctlr_->r_mem;
+  v245 = (_DWORD *)(v244->r_bushandle + 12);
+  if ( v244->r_bustag )
+    *v245 = 1;
+  else
+    __outdword((unsigned __int16)v245, 1u);
+  v246 = ctlr_->r_mem;
+  v247 = v246->r_bushandle;
+  v248 = (unsigned int *)(v247 + 184);
+  if ( v246->r_bustag )
+  {
+    v249 = *(_DWORD *)(v247 + 184) & 0xFFFDFFFF;
+LABEL_216:
+    *v248 = v249;
+    goto LABEL_217;
+  }
+  v250 = __indword((unsigned __int16)v248);
+  v251 = ctlr_->r_mem;
+  v249 = v250 & 0xFFFDFFFF;
+  v248 = (unsigned int *)(v251->r_bushandle + 184);
+  if ( v251->r_bustag )
+    goto LABEL_216;
+  __outdword((unsigned __int16)v248, v249);
+LABEL_217:
+  v252 = ctlr_->r_mem;
+  v253 = v252->r_bushandle;
+  v254 = (unsigned int *)(v253 + 0x118);
+  if ( v252->r_bustag )
+  {
+    v255 = *(_DWORD *)(v253 + 0x118) & 0xFFE3FFFF | 0x40000;
+LABEL_220:
+    *v254 = v255;
+    return;
+  }
+  v256 = __indword((unsigned __int16)v254);
+  v257 = ctlr_->r_mem;
+  v255 = v256 & 0xFFE3FFFF | 0x40000;
+  v254 = (unsigned int *)(v257->r_bushandle + 0x118);
+  if ( v257->r_bustag )
+    goto LABEL_220;
+  __outdword((unsigned __int16)v254, v255);
+}
+EXPORT_SYMBOL_GPL(bpcie_sata_phy_init);
+#endif
+
 
 module_pci_driver(ahci_pci_driver);
 

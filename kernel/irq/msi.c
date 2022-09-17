@@ -306,7 +306,7 @@ int msi_domain_prepare_irqs(struct irq_domain *domain, struct device *dev,
 	int ret;
 
 	ret = ops->msi_check(domain, info, dev);
-	if (ret == 0)
+	if (ret == 0 && ops->msi_prepare)
 		ret = ops->msi_prepare(domain, dev, nvec, arg);
 
 	return ret;

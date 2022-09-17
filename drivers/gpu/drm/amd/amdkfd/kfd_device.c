@@ -130,6 +130,7 @@ static const struct kfd_device_info raven_device_info = {
 	.num_xgmi_sdma_engines = 0,
 	.num_sdma_queues_per_engine = 2,
 };
+
 #endif
 
 static const struct kfd_device_info hawaii_device_info = {
