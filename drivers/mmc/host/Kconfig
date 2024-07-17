@@ -594,7 +594,7 @@ config MMC_TIFM_SD
 
 config MMC_MVSDIO
 	tristate "Marvell MMC/SD/SDIO host driver"
-	depends on PLAT_ORION || (COMPILE_TEST && ARM)
+	depends on PLAT_ORION || COMPILE_TEST
 	depends on OF
 	help
 	  This selects the Marvell SDIO host driver.
