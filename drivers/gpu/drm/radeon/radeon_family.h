@@ -99,6 +99,7 @@ enum radeon_family {
 	CHIP_HAWAII,
 	CHIP_LIVERPOOL,
 	CHIP_MULLINS,
+	CHIP_GLADIUS,
 	CHIP_LAST,
 };
 
