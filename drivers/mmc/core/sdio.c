@@ -665,27 +665,29 @@ try_again:
 	 * Inform the card of the voltage
 	 */
 	err = mmc_send_io_op_cond(host, ocr, &rocr);
-	if (err)
+	if (err) {
 		pr_err("mmc: I was running the mmc_send_io_op_cond() test,  check its outputs.\n");
 		return err;
-
+	}
 	/*
 	 * For SPI, enable CRC as appropriate.
 	 */
 	if (mmc_host_is_spi(host)) {
 		err = mmc_spi_set_crc(host, use_spi_crc);
-		if (err)
+		if (err) {
 			pr_err("mmc: I was running the mmc_spi_set_crc() test, check its outputs.\n");
 			return err;
+		}
 	}
 
 	/*
 	 * Allocate card structure.
 	 */
 	card = mmc_alloc_card(host, &sdio_type);
-	if (IS_ERR(card))
+	if (IS_ERR(card)) {
 		pr_err("mmc: I was running the IS_ERR(card) test, check its outputs.\n");
 		return PTR_ERR(card);
+	}
 
 	if ((rocr & R4_MEMORY_PRESENT) &&
 	    mmc_sd_get_cid(host, ocr & rocr, card->raw_cid, NULL) == 0) {
@@ -797,7 +799,7 @@ try_again:
 	 */
 	err = sdio_read_cccr(card, ocr);
 	if (err) {
-		pr_err("mmc: I was trying the sdio_read_cccr() test,check its ouputs.\n
+		pr_err("mmc: I was trying the sdio_read_cccr() test,check its ouputs.\n\
 				Going to execute mmc_sdio_pre_init(), wish me luck");
 		mmc_sdio_pre_init(host, ocr_card, card);
 		if (ocr & R4_18V_PRESENT) {
@@ -1311,20 +1313,13 @@ err:
 	return err;
 }
 
-/* so normally what's supposed to happen, is that'
+/* so normally what's supposed to happen, is that
 the err: case is reached with either an EINVAL
 or the output from
 err = mmc_sdio_init_card(host, rocr, NULL);
 
-But in thid case, its possible that mmc_detach_bus
-also throws and err =, before reaching the end of
-thus command
-in core.c
+But in this case, its possible that mmc_detach_bus in core.c
+also throws an err =, before reaching the end of
+this command
 
-was gonna use printk, but what if it's not defined, or it breaks?
-
-
-arch/m68k/kernel/traps.c:			pr_err("BAD KERNEL BUSERR\n");
-
-yay
 */
