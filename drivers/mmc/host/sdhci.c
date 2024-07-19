@@ -2783,10 +2783,17 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 		sdhci_send_tuning(host, opcode);
 
 		if (!host->tuning_done) {
+			pr_err("Stack and reg dump before tuning is aborted:\n");
+			dump_stack();
+			sdhci_dumpregs(host);
 			pr_debug("%s: Tuning timeout, falling back to fixed sampling clock\n",
 				 mmc_hostname(host->mmc));
 			sdhci_abort_tuning(host, opcode);
+			pr_err("Stack and reg dump after tuning is aborted:\n");
+			dump_stack();
+			sdhci_dumpregs(host);
 			return -ETIMEDOUT;
+			pr_err("Completion of 'return -ETIMEDOUT'");
 		}
 
 		/* Spec does not require a delay between tuning cycles */

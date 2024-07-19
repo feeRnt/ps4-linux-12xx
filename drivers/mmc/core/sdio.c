@@ -674,7 +674,7 @@ try_again:
 	 */
 	if (mmc_host_is_spi(host)) {
 		err = mmc_spi_set_crc(host, use_spi_crc);
-		if (err) {
+		if (err) {	
 			pr_err("mmc: I was running the mmc_spi_set_crc() test, check its outputs.\n");
 			return err;
 		}
@@ -688,7 +688,7 @@ try_again:
 		pr_err("mmc: I was running the IS_ERR(card) test, check its outputs.\n");
 		return PTR_ERR(card);
 	}
-
+	
 	if ((rocr & R4_MEMORY_PRESENT) &&
 	    mmc_sd_get_cid(host, ocr & rocr, card->raw_cid, NULL) == 0) {
 		card->type = MMC_TYPE_SD_COMBO;
@@ -1305,10 +1305,20 @@ remove_added:
 	mmc_sdio_remove(host);
 	mmc_claim_host(host);
 err:
+//	pr_err("Dump before bus detach:\n");
+//	sdhci_dumpregs(host); any equivalent?
+	pr_err("Stack dump before bus detach:\n");
+	dump_stack();
+	
 	mmc_detach_bus(host);
-
-	pr_err("%s: error %d whilst initialising SDIO card\n",
+	
+//	pr_err("Dump after bus detach:\n");
+//	sdhci_dumpregs(host); any equivalent?
+	
+	pr_err("%s: error %d whilst initialising SDIO card\n Courtesy of the sdio.c err case foundation",
 		mmc_hostname(host), err);
+	pr_err("Stack dump after bus detach:\n");
+	dump_stack();	
 
 	return err;
 }
@@ -1320,6 +1330,6 @@ err = mmc_sdio_init_card(host, rocr, NULL);
 
 But in this case, its possible that mmc_detach_bus in core.c
 also throws an err =, before reaching the end of
-this command
+this command 
 
 */
