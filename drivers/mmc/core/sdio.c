@@ -666,6 +666,7 @@ try_again:
 	 */
 	err = mmc_send_io_op_cond(host, ocr, &rocr);
 	if (err)
+		pr_err("mmc: I was running the mmc_send_io_op_cond() test,  check its outputs.\n");
 		return err;
 
 	/*
@@ -674,6 +675,7 @@ try_again:
 	if (mmc_host_is_spi(host)) {
 		err = mmc_spi_set_crc(host, use_spi_crc);
 		if (err)
+			pr_err("mmc: I was running the mmc_spi_set_crc() test, check its outputs.\n");
 			return err;
 	}
 
@@ -682,6 +684,7 @@ try_again:
 	 */
 	card = mmc_alloc_card(host, &sdio_type);
 	if (IS_ERR(card))
+		pr_err("mmc: I was running the IS_ERR(card) test, check its outputs.\n");
 		return PTR_ERR(card);
 
 	if ((rocr & R4_MEMORY_PRESENT) &&
@@ -691,7 +694,7 @@ try_again:
 		if (oldcard && (oldcard->type != MMC_TYPE_SD_COMBO ||
 		    memcmp(card->raw_cid, oldcard->raw_cid, sizeof(card->raw_cid)) != 0)) {
 			err = -ENOENT;
-			goto mismatch;
+			goto mismatch; //check the enoents if we have them
 		}
 	} else {
 		card->type = MMC_TYPE_SDIO;
@@ -794,12 +797,16 @@ try_again:
 	 */
 	err = sdio_read_cccr(card, ocr);
 	if (err) {
+		pr_err("mmc: I was trying the sdio_read_cccr() test,check its ouputs.\n
+				Going to execute mmc_sdio_pre_init(), wish me luck");
 		mmc_sdio_pre_init(host, ocr_card, card);
 		if (ocr & R4_18V_PRESENT) {
 			/* Retry init sequence, but without R4_18V_PRESENT. */
+			pr_err("mmc: ocr & R4_18V_PRESENT while executing mmc_sdio_pre_init(), retrying.\n");
 			retries = 0;
 			goto try_again;
 		}
+		pr_err("mmc: I was trying the sdio_read_cccr() test, but I failed. Check its outputs.\n");
 		return err;
 	}
 
@@ -1304,3 +1311,20 @@ err:
 	return err;
 }
 
+/* so normally what's supposed to happen, is that'
+the err: case is reached with either an EINVAL
+or the output from
+err = mmc_sdio_init_card(host, rocr, NULL);
+
+But in thid case, its possible that mmc_detach_bus
+also throws and err =, before reaching the end of
+thus command
+in core.c
+
+was gonna use printk, but what if it's not defined, or it breaks?
+
+
+arch/m68k/kernel/traps.c:			pr_err("BAD KERNEL BUSERR\n");
+
+yay
+*/
