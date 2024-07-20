@@ -2815,7 +2815,7 @@ void sdhci_abort_tuning(struct sdhci_host *host, u32 opcode)
 	sdhci_end_tuning(host);
 	pr_err("I have done sdhci_end_tuning, here is my reg dump:\n");
 	sdhci_dumpregs(host);
-	
+
 	mmc_send_abort_tuning(host->mmc, opcode);
 	pr_err("I have sent mmc_send_abort_tuning. here is my reg dump:\n");
 	sdhci_dumpregs(host);
@@ -2889,14 +2889,15 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 {
 	pr_info("sdhci: I am in __sdhci_execute_tuning.\n");
 	int i;
-	pr_info("I have successfully issued the int counter i in __sdhci_execute_tuning().\n"); 
+	pr_info("I have successfully issued the int counter i in __sdhci_execute_tuning().\n");
 	/*
 	 * Issue opcode repeatedly till Execute Tuning is set to 0 or the number
 	 * of loops reaches tuning loop count.
 	 */
 	pr_info("SDHCI reg dump before entering loop");
 	sdhci_dumpregs(host);
-	pr_info("The output of sdhci_host *host is:%", 
+//	pr_info("The output of sdhci_host *host is:%",
+	
 	for (i = 0; i < host->tuning_loop_count; i++) {
 		pr_err("I have successfully entered the for loop in __sdhci_execute_tuning().\n");
 		u16 ctrl;
@@ -2931,7 +2932,7 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 
 	}
 
-	
+
 	pr_err("All conditions and tests failed, nothing returned. Stack and reg dump before fallback:\n");
 	stack_dump();
 	sdhci_dumpregs(host);
@@ -2939,12 +2940,12 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 		mmc_hostname(host->mmc));
 	stack_dump();
 	pr_err("Stack dump after pr_info, for testing the memory addresses ^^^\n");
-	
+
 	stack_dump();
 	sdhci_reset_tuning(host);
 	stack_dump();
 	sdhci_dumpregs(host);
-	
+
 	pr_err("Stack dump immediately before fallback, dump right after falling back, and reg dump after falll back ^^^\n");
 	return -EAGAIN;
 	stack_dump();
@@ -2965,7 +2966,7 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 		pr_info("sdhci: tuning mode 1.\n");
 		tuning_count = host->tuning_count;
 	}
-	
+
 	/*
 	 * The Host Controller needs tuning in case of SDR104 and DDR50
 	 * mode, and for SDR50 mode when Use Tuning for SDR50 is set in
@@ -2988,7 +2989,7 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 		if (hs400_tuning) {
 			pr_info("sdhci: tuning is hs200, but actually 400\n");
 			tuning_count = 0;
-		}	
+		}
 		break;
 
 	case MMC_TIMING_UHS_SDR104:
@@ -3386,7 +3387,7 @@ static void sdhci_cmd_irq(struct sdhci_host *host, u32 intmask, u32 *intmask_p)
 		if (intmask & SDHCI_INT_TIMEOUT)
 			host->cmd->error = -ETIMEDOUT;
 		else {
-			pr_err("sdhci: Assigning host->cmd->error = -EILSEQ in sdhci_cmd_irq\n")
+			pr_err("sdhci: Assigning host->cmd->error = -EILSEQ in sdhci_cmd_irq\n");
 			host->cmd->error = -EILSEQ;
 		}
 		/* Treat data command CRC error the same as data CRC error */
@@ -4316,7 +4317,7 @@ static inline bool sdhci_can_64bit_dma(struct sdhci_host *host)
 		pr_info("sdhci: using v4 64bit ");
 		return host->caps & SDHCI_CAN_64BIT_V4;
 	}
-	
+
 	pr_info("sdhci: normal 64 bit.\n");
 	return host->caps & SDHCI_CAN_64BIT;
 }
@@ -4375,14 +4376,14 @@ int sdhci_setup_host(struct sdhci_host *host)
 	if (host->quirks & SDHCI_QUIRK_FORCE_DMA) {
 		pr_info("sdhci: force dma, we have quirks");
 		host->flags |= SDHCI_USE_SDMA;
-	}	
+	}
 	else if (!(host->caps & SDHCI_CAN_DO_SDMA))
 		DBG("Controller doesn't have SDMA capability\n");
 	else {
 		pr_info("sdhci: Using sdma, we don't lack sdma capability.\n");
 		host->flags |= SDHCI_USE_SDMA;
 	}
-	
+
 	if ((host->quirks & SDHCI_QUIRK_BROKEN_DMA) &&
 		(host->flags & SDHCI_USE_SDMA)) {
 		DBG("Disabling DMA as it is marked broken\n");
@@ -4884,7 +4885,7 @@ EXPORT_SYMBOL_GPL(sdhci_setup_host);
 
 void sdhci_cleanup_host(struct sdhci_host *host)
 {
-	pr_info("sdhci: I am in sdhci_cleanup_host.\n"); 
+	pr_info("sdhci: I am in sdhci_cleanup_host.\n");
 	struct mmc_host *mmc = host->mmc;
 
 	if (host->sdhci_core_to_disable_vqmmc)
@@ -5019,7 +5020,7 @@ void sdhci_remove_host(struct sdhci_host *host, int dead)
 	pr_info("sdhci: Disabling card detection\n");
 	sdhci_disable_card_detection(host);
 
-	pr_info("sdhci: removing mmc host\n") 
+	pr_info("sdhci: removing mmc host\n");
 	mmc_remove_host(mmc);
 
 	pr_info("sdhci: unregistering host led\n");
