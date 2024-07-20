@@ -71,6 +71,7 @@ static struct device_type sdio_type = {
 
 static int sdio_read_fbr(struct sdio_func *func)
 {
+	pr_err("mmc: I am in sdio_read_fbr.\n"); //will use pr_err instead of pr_info, unsure if it's defined, should be, but not risks.
 	int ret;
 	unsigned char data;
 
@@ -101,12 +102,14 @@ out:
 
 static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 {
+	pr_err("mmc: I am in sdio_init_func.\n");
 	int ret;
 	struct sdio_func *func;
 
-	if (WARN_ON(fn > SDIO_MAX_FUNCS))
+	if (WARN_ON(fn > SDIO_MAX_FUNCS)) {
+		pr_err("mmc: I was in sdio_init_func and I have triggered the WARN_ON check.\n");
 		return -EINVAL;
-
+	}
 	func = sdio_alloc_func(card);
 	if (IS_ERR(func))
 		return PTR_ERR(func);
@@ -142,6 +145,7 @@ fail:
 
 static int sdio_read_cccr(struct mmc_card *card, u32 ocr)
 {
+	pr_err("mmc: I am in sdio_read_cccr.\n");
 	int ret;
 	int cccr_vsn;
 	int uhs = ocr & R4_18V_PRESENT;
@@ -245,6 +249,7 @@ out:
 
 static int sdio_enable_wide(struct mmc_card *card)
 {
+	pr_err("mmc: I am in sdio_enable_wide.\n");
 	int ret;
 	u8 ctrl;
 
@@ -281,6 +286,7 @@ static int sdio_enable_wide(struct mmc_card *card)
  */
 static int sdio_disable_cd(struct mmc_card *card)
 {
+	pr_err("mmc: I am in sdio_disable_cd.\n");
 	int ret;
 	u8 ctrl;
 
@@ -302,6 +308,7 @@ static int sdio_disable_cd(struct mmc_card *card)
  */
 static int sdio_disable_wide(struct mmc_card *card)
 {
+	pr_err("mmc: I am in sdio_disable_wide.\n");
 	int ret;
 	u8 ctrl;
 
@@ -332,6 +339,7 @@ static int sdio_disable_wide(struct mmc_card *card)
 
 static int sdio_disable_4bit_bus(struct mmc_card *card)
 {
+	pr_err("mmc: I am in sdio_disable_4bit_bus.\n");
 	int err;
 
 	if (card->type == MMC_TYPE_SDIO)
@@ -354,6 +362,7 @@ out:
 
 static int sdio_enable_4bit_bus(struct mmc_card *card)
 {
+	pr_err("mmc: I am in sdio_enable_4bit_bus.\n");
 	int err;
 
 	err = sdio_enable_wide(card);
@@ -381,6 +390,7 @@ out:
  */
 static int mmc_sdio_switch_hs(struct mmc_card *card, int enable)
 {
+	pr_err("mmc: I am in mmc_sdio_switch_hs.\n");
 	int ret;
 	u8 speed;
 
@@ -411,6 +421,7 @@ static int mmc_sdio_switch_hs(struct mmc_card *card, int enable)
  */
 static int sdio_enable_hs(struct mmc_card *card)
 {
+	pr_err("mmc: I am in sdio_enable_hs.\n");
 	int ret;
 
 	ret = mmc_sdio_switch_hs(card, true);
@@ -426,6 +437,7 @@ static int sdio_enable_hs(struct mmc_card *card)
 
 static unsigned mmc_sdio_get_max_clock(struct mmc_card *card)
 {
+	pr_err("mmc: I am in mmc_sdio_get_max_clock.\n");
 	unsigned max_dtr;
 
 	if (mmc_card_hs(card)) {
@@ -448,6 +460,7 @@ static unsigned mmc_sdio_get_max_clock(struct mmc_card *card)
 
 static unsigned char host_drive_to_sdio_drive(int host_strength)
 {
+	pr_err("mmc: I am in host_drive_to_sdio_drive.\n");
 	switch (host_strength) {
 	case MMC_SET_DRIVER_TYPE_A:
 		return SDIO_DTSx_SET_TYPE_A;
@@ -464,6 +477,7 @@ static unsigned char host_drive_to_sdio_drive(int host_strength)
 
 static void sdio_select_driver_type(struct mmc_card *card)
 {
+	pr_err("mmc: I am in sdio_select_driver_type.\n");
 	int card_drv_type, drive_strength, drv_type;
 	unsigned char card_strength;
 	int err;
@@ -496,11 +510,14 @@ static void sdio_select_driver_type(struct mmc_card *card)
 
 	if (drv_type)
 		mmc_set_driver_type(card->host, drv_type);
+	pr_err("The card driver type, drive strength, driver type is %d, %d, %d",
+		card_drv_type, card_strength, drv_type);
 }
 
 
 static int sdio_set_bus_speed_mode(struct mmc_card *card)
 {
+	pr_err("mmc: I am in sdio_set_bus_speed_mode.\n");
 	unsigned int bus_speed, timing;
 	int err;
 	unsigned char speed;
@@ -575,6 +592,7 @@ static int sdio_set_bus_speed_mode(struct mmc_card *card)
  */
 static int mmc_sdio_init_uhs_card(struct mmc_card *card)
 {
+	pr_err("mmc: I am in mmc_sdio_init_uhs_card.\n");
 	int err;
 
 	if (!card->scr.sda_spec3)
@@ -608,6 +626,7 @@ out:
 static int mmc_sdio_pre_init(struct mmc_host *host, u32 ocr,
 			     struct mmc_card *card)
 {
+	pr_err("mmc: I am in mmc_sdio_pre_init.\n");
 	if (card)
 		mmc_remove_card(card);
 
@@ -643,6 +662,7 @@ static int mmc_sdio_pre_init(struct mmc_host *host, u32 ocr,
 static int mmc_sdio_init_card(struct mmc_host *host, u32 ocr,
 			      struct mmc_card *oldcard)
 {
+	pr_err("mmc: I am in mmc_sdio_init_card.\n");
 	struct mmc_card *card;
 	int err;
 	int retries = 10;
@@ -902,6 +922,7 @@ remove:
 
 static int mmc_sdio_reinit_card(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio_reinit_card.\n");
 	int ret;
 
 	ret = mmc_sdio_pre_init(host, host->card->ocr, NULL);
@@ -916,6 +937,7 @@ static int mmc_sdio_reinit_card(struct mmc_host *host)
  */
 static void mmc_sdio_remove(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio+remove.\n");
 	int i;
 
 	for (i = 0;i < host->card->sdio_funcs;i++) {
@@ -934,6 +956,7 @@ static void mmc_sdio_remove(struct mmc_host *host)
  */
 static int mmc_sdio_alive(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio_init.\n");
 	return mmc_select_card(host->card);
 }
 
@@ -942,6 +965,7 @@ static int mmc_sdio_alive(struct mmc_host *host)
  */
 static void mmc_sdio_detect(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio_detect.\n");
 	int err;
 
 	/* Make sure card is powered before detecting it */
@@ -992,6 +1016,7 @@ out:
  */
 static int mmc_sdio_pre_suspend(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio_pre_suspend.\n");
 	int i;
 
 	for (i = 0; i < host->card->sdio_funcs; i++) {
@@ -1030,6 +1055,7 @@ remove:
  */
 static int mmc_sdio_suspend(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio_suspend.\n");
 	WARN_ON(host->sdio_irqs && !mmc_card_keep_power(host));
 
 	/* Prevent processing of SDIO IRQs in suspended state. */
@@ -1055,6 +1081,7 @@ static int mmc_sdio_suspend(struct mmc_host *host)
 
 static int mmc_sdio_resume(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio_resume.\n");
 	int err = 0;
 
 	/* Basic card reinitialization. */
@@ -1106,6 +1133,7 @@ out:
 
 static int mmc_sdio_runtime_suspend(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio_runtime_resume.\n");
 	/* No references to the card, cut the power to it. */
 	mmc_claim_host(host);
 	mmc_power_off(host);
@@ -1116,6 +1144,7 @@ static int mmc_sdio_runtime_suspend(struct mmc_host *host)
 
 static int mmc_sdio_runtime_resume(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio_runtime_resume.\n");
 	int ret;
 
 	/* Restore power and re-initialize. */
@@ -1135,6 +1164,7 @@ static int mmc_sdio_runtime_resume(struct mmc_host *host)
  */
 static int mmc_sdio_hw_reset(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio_hw_reset.\n");
 	struct mmc_card *card = host->card;
 
 	/*
@@ -1161,6 +1191,7 @@ static int mmc_sdio_hw_reset(struct mmc_host *host)
 
 static int mmc_sdio_sw_reset(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_sdio_sw_reset.\n");
 	mmc_set_clock(host, host->f_init);
 	sdio_reset(host);
 	mmc_go_idle(host);
@@ -1190,6 +1221,7 @@ static const struct mmc_bus_ops mmc_sdio_ops = {
  */
 int mmc_attach_sdio(struct mmc_host *host)
 {
+	pr_err("mmc: I am in mmc_attach_sdio.\n");
 	int err, i, funcs;
 	u32 ocr, rocr;
 	struct mmc_card *card;
@@ -1212,16 +1244,19 @@ int mmc_attach_sdio(struct mmc_host *host)
 	 */
 	if (!rocr) {
 		err = -EINVAL;
+		pr_err("mmc: !rocr, err is EINVAL, going to err. \n");
 		goto err;
 	}
 
 	/*
 	 * Detect and init the card.
 	 */
+	 pr_err("mmc: I am detecting and initing the card. \n");
 	err = mmc_sdio_init_card(host, rocr, NULL);
-	if (err)
+	if (err) {
+		pr_err("mmc: error while detecting and initing the card.\n");
 		goto err;
-
+	}
 	card = host->card;
 
 	/*
@@ -1310,12 +1345,14 @@ err:
 	pr_err("Stack dump before bus detach:\n");
 	dump_stack();
 	
+	pr_err("mmc: value of err before mmc_detach_bus(host): %d \n", err);
+	
 	mmc_detach_bus(host);
 	
 //	pr_err("Dump after bus detach:\n");
 //	sdhci_dumpregs(host); any equivalent?
 	
-	pr_err("%s: error %d whilst initialising SDIO card\n Courtesy of the sdio.c err case foundation",
+	pr_err("%s: error %d whilst initialising SDIO card\n Courtesy of the sdio.c err case foundation.",
 		mmc_hostname(host), err);
 	pr_err("Stack dump after bus detach:\n");
 	dump_stack();	
@@ -1330,6 +1367,6 @@ err = mmc_sdio_init_card(host, rocr, NULL);
 
 But in this case, its possible that mmc_detach_bus in core.c
 also throws an err =, before reaching the end of
-this command 
+this command.
 
 */
