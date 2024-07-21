@@ -2352,7 +2352,7 @@ void sdhci_set_uhs_signaling(struct sdhci_host *host, unsigned timing)
 EXPORT_SYMBOL_GPL(sdhci_set_uhs_signaling);
 
 void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
-{	
+{
 	struct sdhci_host *host = mmc_priv(mmc);
 	u8 ctrl;
 
@@ -2899,7 +2899,7 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 	pr_info("SDHCI reg dump before entering loop");
 	sdhci_dumpregs(host);
 //	pr_info("The output of sdhci_host *host is:%",
-	
+
 	for (i = 0; i < host->tuning_loop_count; i++) {
 		u16 ctrl;
 
@@ -3315,11 +3315,11 @@ static void sdhci_timeout_timer(struct timer_list *t)
 }
 
 static void sdhci_timeout_data_timer(struct timer_list *t)
-{	
+{
 	struct sdhci_host *host;
 	unsigned long flags;
 
-	pr_info("sdhci: I am in sdhci_timeout_data_timer.\n");	
+	pr_info("sdhci: I am in sdhci_timeout_data_timer.\n");
 	host = from_timer(host, t, data_timer);
 
 	spin_lock_irqsave(&host->lock, flags);
