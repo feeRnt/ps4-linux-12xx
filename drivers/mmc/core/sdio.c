@@ -1081,9 +1081,9 @@ static int mmc_sdio_suspend(struct mmc_host *host)
 
 static int mmc_sdio_resume(struct mmc_host *host)
 {
-	pr_err("mmc: I am in mmc_sdio_resume.\n");
 	int err = 0;
 
+	pr_err("mmc: I am in mmc_sdio_resume.\n");
 	/* Basic card reinitialization. */
 	mmc_claim_host(host);
 
