@@ -2356,7 +2356,7 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	struct sdhci_host *host = mmc_priv(mmc);
 	u8 ctrl;
 
-	pr_info("sdhci: I am in sdhci_get_ios.\n");	
+	pr_info("sdhci: I am in sdhci_get_ios.\n");
 	if (ios->power_mode == MMC_POWER_UNDEFINED)
 		return;
 
@@ -4340,6 +4340,7 @@ int sdhci_setup_host(struct sdhci_host *host)
 	if (host == NULL) {
 		pr_info("host == NULL. Returning EINVAL\n");
 		return -EINVAL;
+	}
 
 	mmc = host->mmc;
 	pr_info("sdhci: Reg dump in sdhci_setup_host:\n");
