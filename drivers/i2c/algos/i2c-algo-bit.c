@@ -97,7 +97,7 @@ static int sclhi(struct i2c_algo_bit_data *adap)
 				break;
 			return -ETIMEDOUT;
 		}
-		cpu_relax();
+		cpu_relax();			//relax cpu till scl (s clock line) is high again
 	}
 #ifdef DEBUG
 	if (jiffies != start && i2c_debug >= 3)
@@ -536,10 +536,14 @@ static int bit_xfer(struct i2c_adapter *i2c_adap,
 	int i, ret;
 	unsigned short nak_ok;
 
+	pr_debug("i2c-algo-bit: I am in bit_xfer.\n");
 	if (adap->pre_xfer) {
+		pr_debug("i2c-algo-bit: pre_xfer detected in bit_xfer.\n");
 		ret = adap->pre_xfer(i2c_adap);
-		if (ret < 0)
+		if (ret < 0) {
+			pr_debug("i2c-algo-bit: ret < 0 in bit_xfer.\n");
 			return ret;
+		}
 	}
 
 	bit_dbg(3, &i2c_adap->dev, "emitting start condition\n");
@@ -562,9 +566,9 @@ static int bit_xfer(struct i2c_adapter *i2c_adap,
 			}
 			ret = bit_doAddress(i2c_adap, pmsg);
 			if ((ret != 0) && !nak_ok) {
-				bit_dbg(1, &i2c_adap->dev,
-					"NAK from device addr 0x%02x msg #%d\n",
-					msgs[i].addr, i);
+				bit_dbg(1, &i2c_adap->dev,			//prio, device,
+					"NAK from device addr 0x%02x msg #%d\n",		//debug
+					msgs[i].addr, i);					//addr, msg count. if msg #0, it fails at the first message
 				goto bailout;
 			}
 		}

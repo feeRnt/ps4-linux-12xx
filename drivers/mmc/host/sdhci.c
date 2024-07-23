@@ -3612,12 +3612,14 @@ static irqreturn_t sdhci_irq(int irq, void *dev_id)
 	spin_lock(&host->lock);
 
 	if (host->runtime_suspended) {
+		pr_err("sdhci: runtime is suspended in sdhci_irq.\n");
 		spin_unlock(&host->lock);
 		return IRQ_NONE;
 	}
 
 	intmask = sdhci_readl(host, SDHCI_INT_STATUS);
 	if (!intmask || intmask == 0xffffffff) {
+		pr_err("sdhci: IRQ_NONE in sdhci_irq. intmask=%d.\n",intmask);
 		result = IRQ_NONE;
 		goto out;
 	}

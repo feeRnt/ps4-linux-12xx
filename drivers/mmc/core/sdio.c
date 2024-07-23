@@ -139,6 +139,7 @@ fail:
 	 * It is okay to remove the function here even though we hold
 	 * the host lock as we haven't registered the device yet.
 	 */
+	pr_err("I have reached the fail condition in sdio_init_func.\n");
 	sdio_remove_func(func);
 	return ret;
 }

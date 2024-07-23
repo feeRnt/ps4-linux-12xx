@@ -396,7 +396,8 @@ void mmc_remove_card(struct mmc_card *card)
 #ifdef CONFIG_DEBUG_FS
 	mmc_remove_card_debugfs(card);
 #endif
-
+	
+	pr_info("I am in mmc_remove_card.\n");
 	if (mmc_card_present(card)) {
 		if (mmc_host_is_spi(card->host)) {
 			pr_info("%s: SPI card removed\n",
@@ -410,9 +411,10 @@ void mmc_remove_card(struct mmc_card *card)
 	}
 
 	if (host->cqe_enabled) {
+		pr_info("bus: Host has cqe enabled, disabling it.\n"); 
 		host->cqe_ops->cqe_disable(host);
 		host->cqe_enabled = false;
 	}
-
+	pr_info("bus: 'put'ting device; reached end of function.\n");
 	put_device(&card->dev);
 }

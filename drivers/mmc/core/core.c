@@ -650,6 +650,7 @@ void mmc_set_data_timeout(struct mmc_data *data, const struct mmc_card *card)
 {
 	unsigned int mult;
 
+	pr_info("core: I am in mmc_set_data_timeout.\n");
 	/*
 	 * SDIO cards only define an upper 1 s limit on access.
 	 */
