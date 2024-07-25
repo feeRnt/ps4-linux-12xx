@@ -74,29 +74,40 @@ static int sdio_read_fbr(struct sdio_func *func)
 	int ret;
 	unsigned char data;
 
-	pr_err("mmc: I am in sdio_read_fbr.\n"); //will use pr_err instead of pr_info, unsure if it's defined, should be, but no risks.
+	pr_info("mmc: I am in sdio_read_fbr.\n");
 	if (mmc_card_nonstd_func_interface(func->card)) {
+		pr_err("mmc: I was in sdio_read_fbr and detected nonstd_func_interface.\n\
+				Hence assigning function class as SDIO_CLASS_NONE.\n");
 		func->class = SDIO_CLASS_NONE;
 		return 0;
 	}
 
+	pr_info("mmc: I am in sdio_read_fbr and going to test mmc_io_rw_direct.\n");
 	ret = mmc_io_rw_direct(func->card, 0, 0,
 		SDIO_FBR_BASE(func->num) + SDIO_FBR_STD_IF, 0, &data);
-	if (ret)
+	if (ret) {
+		pr_err("mmc: I was in sdio_read_fbr and detected return for mmc_io_rw_direct.\n\
+				Hence going to out condition.\n");
 		goto out;
+	}
 
 	data &= 0x0f;
-
+	pr_info("mmc: I am in sdio_read_fbr and have assigned data &= 0x0f.\n");
+	
 	if (data == 0x0f) {
 		ret = mmc_io_rw_direct(func->card, 0, 0,
 			SDIO_FBR_BASE(func->num) + SDIO_FBR_STD_IF_EXT, 0, &data);
-		if (ret)
+		if (ret) {
+			pr_info("mmc: I was in sdio_read_fbr and detected return for mmc_io_rw_direct,\
+					using data == 0x0f. Hence going to out.\n");
 			goto out;
+		}
 	}
-
+	pr_info("mmc: I am in sdio_read_fbr. Assigning func->class = data.\n"); 
 	func->class = data;
 
 out:
+	pr_err("I am in out condtion of sdio_read_fbr now.\n");
 	return ret;
 }
 
@@ -107,29 +118,45 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 
 	pr_err("mmc: I am in sdio_init_func.\n");
 	if (WARN_ON(fn > SDIO_MAX_FUNCS)) {
-		pr_err("mmc: I was in sdio_init_func and I have triggered the WARN_ON check.\n");
+		pr_err("mmc: I was in sdio_init_func and I have detected the WARN_ON check.\n\
+				Returning -EINVAL.\n");
 		return -EINVAL;
 	}
 	func = sdio_alloc_func(card);
-	if (IS_ERR(func))
+	if (IS_ERR(func)) {
+		pr_err("mmc: I was in sdio_init_func and detected an erroneous function. \n\
+				Returning PTR_ERR(func).\n");
 		return PTR_ERR(func);
-
+	}
+	
 	func->num = fn;
 
 	if (!(card->quirks & MMC_QUIRK_NONSTD_SDIO)) {
+		pr_err("mmc: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n\
+				Hence going to try sdio_read_fbr.\n");
 		ret = sdio_read_fbr(func);
-		if (ret)
+		if (ret) {
+			pr_err("mmc: I am in sdio_init_func and was testing sdio_read_fbr.\n\
+					It returned, hence going to fail condition.\n");
 			goto fail;
+		}
 
 		ret = sdio_read_func_cis(func);
-		if (ret)
+		if (ret) {
+			pr_err("mmc: I was in sdio_init_func and was testing sdio_read_func_cis.\n\
+					It returned, hence going to fail condition.\n");
 			goto fail;
+		}
 	} else {
+		pr_err("mmc: I was in sdio_init_function and no fail checks triggered.\n\
+				Hence filling up the vendor, device, and max_blksize information from func.\n");
 		func->vendor = func->card->cis.vendor;
 		func->device = func->card->cis.device;
 		func->max_blksize = func->card->cis.blksize;
 	}
 
+	pr_info("mmc: I am in sdio_init_func, assigning fn-1 to func.\n\
+			Returning 0.\n");
 	card->sdio_func[fn - 1] = func;
 
 	return 0;

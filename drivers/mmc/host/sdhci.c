@@ -212,25 +212,34 @@ void sdhci_reset(struct sdhci_host *host, u8 mask)
 {
 	ktime_t timeout;
 
-	pr_info("sdhci: I am in sdhci_reset.\n");
+	pr_info("sdhci: I am in sdhci_reset. Setting SDHCI_SOFTWARE_RESET bit.\n");
 	sdhci_writeb(host, mask, SDHCI_SOFTWARE_RESET);
 
 	if (mask & SDHCI_RESET_ALL) {
+		pr_info("sdhci: I am in sdhci_reset, SDHCI_RESET_ALL mask detected.\n\
+				Setting host clock to 0.\n");
 		host->clock = 0;
 		/* Reset-all turns off SD Bus Power */
-		if (host->quirks2 & SDHCI_QUIRK2_CARD_ON_NEEDS_BUS_ON)
+		if (host->quirks2 & SDHCI_QUIRK2_CARD_ON_NEEDS_BUS_ON) {
+			pr_info("sdhci: I am in sdhci_reset. Quirk CARD_ON_NEEDS_BUS_ON detected.\n\
+					Hence turning off SD Bus Power.\n"); //\\test if this quirk on/off helps
 			sdhci_runtime_pm_bus_off(host);
+		}
 	}
 
 	/* Wait max 100 ms */
-	timeout = ktime_add_ms(ktime_get(), 100);
+	pr_info("sdhci: About ot wait 100 ms for sdhci_reset.\n");
+	timeout = ktime_add_ms(ktime_get(), 100); //\\increase?
 
 	/* hw clears the bit when it's done */
 	while (1) {
 		bool timedout = ktime_after(ktime_get(), timeout);
 
-		if (!(sdhci_readb(host, SDHCI_SOFTWARE_RESET) & mask))
+		if (!(sdhci_readb(host, SDHCI_SOFTWARE_RESET) & mask)) {
+			pr_debug("sdhci: Reset wait (timeout) period is over in sdhci_reset, and reset bit\
+					not seen (hw cleared it, seemingly), finishing.\n");
 			break;
+		}
 		if (timedout) {
 			pr_err("%s: Reset 0x%x never completed.\n",
 				mmc_hostname(host->mmc), (int)mask);
@@ -247,20 +256,30 @@ static void sdhci_do_reset(struct sdhci_host *host, u8 mask)
 	pr_info("sdhci: I am in sdhci_do_reset.\n");
 	if (host->quirks & SDHCI_QUIRK_NO_CARD_NO_RESET) {
 		struct mmc_host *mmc = host->mmc;
-
-		if (!mmc->ops->get_cd(mmc))
+		pr_info("sdhci: Quirk NO_CARD_NO_RESET detected in sdhci_do_reset. Assigning struct.\n");
+	
+		if (!mmc->ops->get_cd(mmc)) {
+			pr_info("sdhci: get_cd(mmc) absent in sdhci_do_reset, returning.\n");
 			return;
+		}
+
 	}
 
+	pr_info("sdhci: Doing host->ops->reset(host, mask) in sdhci_do_reset.\n");
 	host->ops->reset(host, mask);
 
 	if (mask & SDHCI_RESET_ALL) {
+		pr_info("sdhci: SDHCI_RESET_ALL bitmask detected in sdhci_do_reset.\n");
 		if (host->flags & (SDHCI_USE_SDMA | SDHCI_USE_ADMA)) {
-			if (host->ops->enable_dma)
+			pr_info("sdhci: SDMA OR ADMA detected after spotting SDHCI_RESET_ALL.\n");
+			if (host->ops->enable_dma) {
+				pr_info("sdhci: host->ops->enable_dma spotted after spotting SDMA or ADMA.\n\
+						Enabling dma.\n");
 				host->ops->enable_dma(host);
+			}
 		}
-
 		/* Resetting the controller clears many */
+		pr_info("sdhci: host->preset_enabled to false in SDHCI_RESET_ALL, end of func.\n");
 		host->preset_enabled = false;
 	}
 }
@@ -1537,12 +1556,54 @@ static void sdhci_set_transfer_mode(struct sdhci_host *host,
 
 static bool sdhci_needs_reset(struct sdhci_host *host, struct mmc_request *mrq)
 {
+	/* implement later to print out all variables in sdhci_host */
+	/*
+	char hw_name = host->hw_name;
+	int quirks = host->quirks;
+	int quirks2 = host->quirks2;
+	int irq = host->irq;
+	//void iomem = host->__iomem;
+	// phys_addr_t = host->mapbase;
+	int bounce_buffer_size = host->bounce_buffer_size;
+	u64 dma_mask = host->dma_mask;
+	char led_name = host->led_name;
+	int flags = host->flags;
+	int version = host->version;
+	int max_clk = host->max_clk;
+	int timeout_clk = host->max_clk;
+	u8 max_timeout_count = host->max_timeout_count;
+	int clk_mul = host->clk_mul;
+	////
+	////
+	u32 caps = host->caps;
+	u32 ocr_avail_sdio host = host->ocr_avail_sdio;
+	u32 ier = host->ier;
+	u32 cqe_ier = host->cqe_ier;
+	int tuning_count = host->tuning_count;
+	int tuning_mode = host->tuning_mode;
+	int tuning_err = host->tuning_err;
+	*/
+
 	pr_info("sdhci: I am in sdhci_needs_reset.\n");
+	/*pr_info("sdhci: I need to be reset, here's some of sdhci_host *host values:\n\
+			hw_name=%s, quirks=%d, quirks2=%d */
+	
 	return (!(host->flags & SDHCI_DEVICE_DEAD) &&
 		((mrq->cmd && mrq->cmd->error) ||
 		 (mrq->sbc && mrq->sbc->error) ||
 		 (mrq->data && mrq->data->stop && mrq->data->stop->error) ||
 		 (host->quirks & SDHCI_QUIRK_RESET_AFTER_REQUEST)));
+	if (host->flags & SDHCI_DEVICE_DEAD)
+		pr_err("sdhci: SDHCI device is dead in sdhci_needs_reset.\n");
+	if (mrq->cmd && mrq->cmd->error)
+		pr_err("sdhci: SDHCI device cmd error in sdhci_needs_reset.\n");
+	if (mrq->sbc && mrq->sbc->error)
+		pr_err("sdhci: SDHCI device sbc error in sdhci_needs_reset.\n");
+	if (mrq->data && mrq->data->stop && mrq->data->stop->error)
+		pr_err("sdhci: SDHCI stop--due_to--error data in sdhci_needs_reset.\n");
+	if (host->quirks & SDHCI_QUIRK_RESET_AFTER_REQUEST)
+		pr_err("sdhci: SDHCI host needs reset after request quirk, in sdhci_needs_reset.\n");
+
 }
 
 static void sdhci_set_mrq_done(struct sdhci_host *host, struct mmc_request *mrq)
