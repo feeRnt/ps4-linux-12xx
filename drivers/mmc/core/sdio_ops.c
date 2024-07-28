@@ -65,13 +65,18 @@ static int mmc_io_rw_direct_host(struct mmc_host *host, int write, unsigned fn,
 	struct mmc_command cmd = {};
 	int err;
 
-	if (fn > 7)
+	if (fn > 7) {
+		pr_err("sdio_ops: fn > 7 in mmc_io_rw_direct_host, returning -EINVAL\n");
 		return -EINVAL;
-
+	}
+	
 	/* sanity check */
-	if (addr & ~0x1FFFF)
+	if (addr & ~0x1FFFF) {
+		pr_err("sdio_ops: addr & ~0x1FFFF in mmc_io_rw_direct_host,\
+		returning -EINVAL.\n");
 		return -EINVAL;
-
+	}
+	
 	cmd.opcode = SD_IO_RW_DIRECT;
 	cmd.arg = write ? 0x80000000 : 0x00000000;
 	cmd.arg |= fn << 28;
@@ -80,26 +85,42 @@ static int mmc_io_rw_direct_host(struct mmc_host *host, int write, unsigned fn,
 	cmd.arg |= in;
 	cmd.flags = MMC_RSP_SPI_R5 | MMC_RSP_R5 | MMC_CMD_AC;
 
-	err = mmc_wait_for_cmd(host, &cmd, 0);
-	if (err)
+	err = mmc_wait_for_cmd(host, &cmd, 0); 
+	if (err) {
+		pr_err("sdio_ops: err = mmc_wait_for_cmd returned, in \
+		mmc_io_rw_direct_host, returning err=%d", err);
 		return err;
-
+	}
+	
 	if (mmc_host_is_spi(host)) {
+		pr_info("sdio_ops: mmc_host_is_spi, errors already reported\n.");
 		/* host driver already reported errors */
 	} else {
-		if (cmd.resp[0] & R5_ERROR)
+		if (cmd.resp[0] & R5_ERROR) {
+			pr_err("sdio_ops: R5_ERROR. Returning -EIO in io_rw_direct_host.\n");
 			return -EIO;
-		if (cmd.resp[0] & R5_FUNCTION_NUMBER)
+		}
+		if (cmd.resp[0] & R5_FUNCTION_NUMBER) {
+			pr_err("sdio_ops: R5_FUNCTION_NUMBER. Returning -EINVAL in io_rw_direct_host.\n");
 			return -EINVAL;
-		if (cmd.resp[0] & R5_OUT_OF_RANGE)
+		}
+			
+		if (cmd.resp[0] & R5_OUT_OF_RANGE) {
+			pr_err("sdio_ops: R5_OUT_OF_RANGE. Returning -ERANGE in io_rw_direct_host.\n");
 			return -ERANGE;
+		}
 	}
 
 	if (out) {
-		if (mmc_host_is_spi(host))
+		pr_info("sdio_ops: out is true\n");
+		if (mmc_host_is_spi(host)) {
+			pr_info("sdio_ops: host_is_spi, Assigning out.\n");
 			*out = (cmd.resp[0] >> 8) & 0xFF;
-		else
+		}
+		else {
+			pr_info("sdio_ops: host is not spi. Assigning out.\n");
 			*out = cmd.resp[0] & 0xFF;
+		}
 	}
 
 	return 0;

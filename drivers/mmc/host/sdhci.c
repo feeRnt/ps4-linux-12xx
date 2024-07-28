@@ -151,8 +151,11 @@ EXPORT_SYMBOL_GPL(sdhci_enable_v4_mode);
 
 static inline bool sdhci_data_line_cmd(struct mmc_command *cmd)
 {
-	pr_info("sdhci: I am in sdhci_data_line_cmd.\n");
-	return cmd->data || cmd->flags & MMC_RSP_BUSY;
+	pr_info("sdhci: I am in sdhci_data_line_cmd.\n\
+	cmd->data = %d, cmd->flags & MMC_RSP_BUSY = 0x%x",
+		cmd->data, cmd->flags & MMC_RSP_BUSY);
+	//assuming data type is ints
+	return cmd->data || cmd->flags & MMC_RSP_BUSY;	
 }
 
 static void sdhci_set_card_detection(struct sdhci_host *host, bool enable)
@@ -228,7 +231,7 @@ void sdhci_reset(struct sdhci_host *host, u8 mask)
 	}
 
 	/* Wait max 100 ms */
-	pr_info("sdhci: About ot wait 100 ms for sdhci_reset.\n");
+	pr_info("sdhci: About to wait 100 ms for sdhci_reset.\n");
 	timeout = ktime_add_ms(ktime_get(), 100); //\\increase?
 
 	/* hw clears the bit when it's done */
@@ -470,7 +473,7 @@ static void sdhci_led_unregister(struct sdhci_host *host)
 
 static inline void sdhci_led_activate(struct sdhci_host *host)
 {
-	pr_info("sdhci: I am in the sdhci_led_activate function.\n");
+	pr_info("sdhci: I am in the empty sdhci_led_activate function.\n");
 }
 
 static inline void sdhci_led_deactivate(struct sdhci_host *host)
@@ -495,6 +498,9 @@ static inline void sdhci_led_activate(struct sdhci_host *host)
 {
 	pr_info("sdhci: I am in led_acivate.\n");
 	__sdhci_led_activate(host);
+	/*this function is never called because it's further in the file
+	* than the fake led function? Was the fake one added by the ps4 devs?
+	*/
 }
 
 static inline void sdhci_led_deactivate(struct sdhci_host *host)
@@ -508,11 +514,17 @@ static inline void sdhci_led_deactivate(struct sdhci_host *host)
 static void sdhci_mod_timer(struct sdhci_host *host, struct mmc_request *mrq,
 			    unsigned long timeout)
 {
+	//I'm guessing this function just makes sure to wait after each command
 	pr_info("sdhci: I am in sdhci_mod_timer.\n");
-	if (sdhci_data_line_cmd(mrq->cmd))
+	if (sdhci_data_line_cmd(mrq->cmd)) {
+		pr_info("sdhci: sdhcqi_data_line_cmd(mrq->cmd) is true");
 		mod_timer(&host->data_timer, timeout);
+	}
+	//this test invokes the 3rd sdhci_data_line_cmd in the dmesg ^^^
+	
 	else
 		mod_timer(&host->timer, timeout);
+	
 }
 
 static void sdhci_del_timer(struct sdhci_host *host, struct mmc_request *mrq)
@@ -1584,7 +1596,7 @@ static bool sdhci_needs_reset(struct sdhci_host *host, struct mmc_request *mrq)
 	int tuning_err = host->tuning_err;
 	*/
 
-	pr_info("sdhci: I am in sdhci_needs_reset.\n");
+	pr_info("sdhci: I am in sdhci_needs_reset, checking if SDHCI needs reset.\n");
 	/*pr_info("sdhci: I need to be reset, here's some of sdhci_host *host values:\n\
 			hw_name=%s, quirks=%d, quirks2=%d */
 	
@@ -1593,6 +1605,8 @@ static bool sdhci_needs_reset(struct sdhci_host *host, struct mmc_request *mrq)
 		 (mrq->sbc && mrq->sbc->error) ||
 		 (mrq->data && mrq->data->stop && mrq->data->stop->error) ||
 		 (host->quirks & SDHCI_QUIRK_RESET_AFTER_REQUEST)));
+	if (!(host->flags & SDHCI_DEVICE_DEAD)) //SDHCI_DEVICE_DEAD = 1000 in sdhci.h, wrong value?
+		pr_err("sdhci: SDHCI device is not dead in sdhci_needs_reset.\n");
 	if (host->flags & SDHCI_DEVICE_DEAD)
 		pr_err("sdhci: SDHCI device is dead in sdhci_needs_reset.\n");
 	if (mrq->cmd && mrq->cmd->error)
@@ -1756,21 +1770,35 @@ static bool sdhci_send_command(struct sdhci_host *host, struct mmc_command *cmd)
 	    cmd->opcode == MMC_STOP_TRANSMISSION)
 		cmd->flags |= MMC_RSP_BUSY;
 
+	pr_info("sdhci: Going to check sdhci_data_line_cmd's output from sdhci_send_command\n");
 	mask = SDHCI_CMD_INHIBIT;
-	if (sdhci_data_line_cmd(cmd))
+	if (sdhci_data_line_cmd(cmd)) {
+		pr_info("sdhci: sdhci_data_line cmd returned either busy or data present.\n\
+		Inhibit data transfer in sdhci_send_command mask.\n");
 		mask |= SDHCI_DATA_INHIBIT;
+	}
 
 	/* We shouldn't wait for data inihibit for stop commands, even
 	   though they might use busy signaling */
-	if (cmd->mrq->data && (cmd == cmd->mrq->data->stop))
+	if (cmd->mrq->data && (cmd == cmd->mrq->data->stop)) {
+		pr_info("sdhci: mrq has data, but it is stop data, negate inhibit mask\
+		in sdhci_send_command.\n");
 		mask &= ~SDHCI_DATA_INHIBIT;
-
-	if (sdhci_readl(host, SDHCI_PRESENT_STATE) & mask)
+	}
+	
+	if (sdhci_readl(host, SDHCI_PRESENT_STATE) & mask) {
+		pr_info("sdhci: Current state of host matches set mask; return false\
+		in sdhci_send_command.\n"); 
 		return false;
-
+	}
 	host->cmd = cmd;
 	host->data_timeout = 0;
+	/*too many logs, too little time. .	c ^.^ )
+	  this is what calls the second sdhci_data_line_cmd in the dmesg
+	*/
 	if (sdhci_data_line_cmd(cmd)) {
+		pr_info("sdhci: Host still has data_line_cmd, warn if host gets data_cmd.\
+		Assigning host's data_cmd to normal host commmand. And setting timeout.\n");
 		WARN_ON(host->data_cmd);
 		host->data_cmd = cmd;
 		sdhci_set_timeout(host, cmd);
@@ -1817,19 +1845,25 @@ static bool sdhci_send_command(struct sdhci_host *host, struct mmc_command *cmd)
 		flags |= SDHCI_CMD_DATA;
 
 	timeout = jiffies;
-	if (host->data_timeout)
+	if (host->data_timeout) {
+		pr_info("sdhci: data_timeout in sdhci_send_command. setting timeout\n");
 		timeout += nsecs_to_jiffies(host->data_timeout);
+	}	
 	else if (!cmd->data && cmd->busy_timeout > 9000)
 		timeout += DIV_ROUND_UP(cmd->busy_timeout, 1000) * HZ + HZ;
 	else
 		timeout += 10 * HZ;
 	sdhci_mod_timer(host, cmd->mrq, timeout);
-
+	// ^^ invocation of 3rd sdhci_data_line_cmd from here 
+	
 	if (host->use_external_dma)
 		sdhci_external_dma_pre_transfer(host, cmd);
 
 	sdhci_writew(host, SDHCI_MAKE_CMD(cmd->opcode, flags), SDHCI_COMMAND);
+	//thanks for the documentation folks.
 
+	pr_info("sdhci: returning true in sdchi_send_command\n");
+	// why does it jump to shdci_irq after mod_timer? 
 	return true;
 }
 
@@ -1838,10 +1872,19 @@ static bool sdhci_present_error(struct sdhci_host *host,
 {
 	pr_info("sdhci: I am in sdhci_present_error.\n");
 	if (!present || host->flags & SDHCI_DEVICE_DEAD) {
+		pr_info("sdhci: Not present or SHDCI_DEVICE_DEAD in sdhci_present_error.\
+		cmd>error=-ENOMEDIUM.\n");
 		cmd->error = -ENOMEDIUM;
+
+		if (!present)
+			pr_info("sdhci: !present in sdhci_present_error.\n");
+		if (host->flags & SDHCI_DEVICE_DEAD)
+			pr_info("sdhci: SDHCI_DEVICE_DEAD in sdhci_present_error.\n");
+
+		pr_info("sdhci: Error present, returning true in sdhci_present_error.\n");
 		return true;
 	}
-
+	pr_info("sdhci: No error in  sdhci_present_error. Returning false.\n");
 	return false;
 }
 
@@ -1852,37 +1895,61 @@ static bool sdhci_send_command_retry(struct sdhci_host *host,
 	__acquires(host->lock)
 {
 	struct mmc_command *deferred_cmd = host->deferred_cmd;
-	int timeout = 10; /* Approx. 10 ms */
+	int timeout = 10; /* Approx. 10 ms ===> increase? */ 
 	bool present;
-
+	
+	//__releases releases the lock resource, __acquires acquires the lock resource
+	
+	pr_info("sdhci: I am in sdhci_send_command_retry.\n");
+	/*how did I miss this important function before ?
+	 *because Geany doesn't detect it
+	*/
+	 
 	while (!sdhci_send_command(host, cmd)) {
 		if (!timeout--) {
-			pr_err("%s: Controller never released inhibit bit(s).\n",
+			pr_err("%s: Controller never released inhibit bit(s).\
+			Assigning cmd->error = -EIO. Returning false.\n",
 			       mmc_hostname(host->mmc));
 			sdhci_dumpregs(host);
 			cmd->error = -EIO;
 			return false;
+		/*while sdhci_send_command does not return true, if timeout not
+		  equal 0, decrement timeout by 1. If timeout reaches 0, controller
+		  never released inhibit bits. Then return false as sdhci_send_command_retry answer.
+		*/ 
 		}
 
+		pr_info("sdhci: Doing spin_unlock_irqrestore in sdhci_send_command_retry\n");
 		spin_unlock_irqrestore(&host->lock, flags);
-
+		//from spinlock.h
+		
+		//do usleep.
 		usleep_range(1000, 1250);
 
+		//access sdhci_get_cd to check if card is present
+	//	pr_info("Checking ...
 		present = host->mmc->ops->get_cd(host->mmc);
 
 		spin_lock_irqsave(&host->lock, flags);
 
 		/* A deferred command might disappear, handle that */
-		if (cmd == deferred_cmd && cmd != host->deferred_cmd)
+		if (cmd == deferred_cmd && cmd != host->deferred_cmd) {
+			pr_info("sdhci: Command is deferred in sdhci_send_command_retry,\
+			returning true.\n");
 			return true;
-
-		if (sdhci_present_error(host, cmd, present))
+		}
+		
+		if (sdhci_present_error(host, cmd, present)) {
+			pr_info("sdhci: Error present while in sdhci_send_command_retry.\
+			Returning false.\n");
 			return false;
+		}
 	}
 
 	if (cmd == host->deferred_cmd)
 		host->deferred_cmd = NULL;
 
+	pr_info("sdhci: End of sdhci_send_command_retry function. Returning true.");
 	return true;
 }
 
@@ -2185,7 +2252,7 @@ void sdhci_set_power_noreg(struct sdhci_host *host, unsigned char mode,
 
 	pr_info("sdhci: I am in sdhci_set_power_noreg.\n");
 	if (mode != MMC_POWER_OFF) {
-		pr_info("sdhci: current mode is mmc_power_off\n");
+		pr_info("sdhci: current mode is mmc_power_off in sdhci_set_power_noreg.\n");
 		switch (1 << vdd) {
 		case MMC_VDD_165_195:
 		/*
@@ -2304,29 +2371,52 @@ void sdhci_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	unsigned long flags;
 	bool present;
 
-	pr_info("sdhci: I am in sdhci_request.\n");
+	pr_info("sdhci: I am in sdhci_request. Checking if card is present.\n");
 	/* Firstly check card presence */
 	present = mmc->ops->get_cd(mmc);
-
+	pr_info("sdhci: Card present in sdhci_request? %s \n", present); 
+	//this bool is acquired from sdhci_get_cd
+	
+	pr_info("sdhci: doing spin_lock_irqsave in sdhci_requst.\n", present); 	
 	spin_lock_irqsave(&host->lock, flags);
+	// from include spinlock.h?
 
 	sdhci_led_activate(host);
+	// ghost sdhci_led_activate function
 
-	if (sdhci_present_error(host, mrq->cmd, present))
+	if (sdhci_present_error(host, mrq->cmd, present)) {
+		pr_info("sdhci: sdhci_present_error returned true in sdhci_request.\
+		Going to out_finish.\n");
 		goto out_finish;
-
+		//it seems we don't meet this condition, and move to the next one.
+	}
+	
 	cmd = sdhci_manual_cmd23(host, mrq) ? mrq->sbc : mrq->cmd;
+	/* check if sdhci_manual_cmd23() returns true or false.
+	 * If  true, cmd = mrq->sbc ; if false, cmd = mrq->cmd
+	*/
+	pr_info("Just tested manual_cmd23. cmd = mrq->sbc? %s. If no, then mrq->cmd\n",
+		cmd);
+		//calling the function again in the pr_info will damage the logging
 
-	if (!sdhci_send_command_retry(host, cmd, flags))
+	if (!sdhci_send_command_retry(host, cmd, flags)) { 
+		pr_info("sdhci: sdhci_send_command_retry is false, going to out_finish.\n");
 		goto out_finish;
-
+	}
+	pr_info("sdhci: Doing spin_unlock_irqrestore in sdhci_request. Returning void.\n");
 	spin_unlock_irqrestore(&host->lock, flags);
 
 	return;
 
 out_finish:
+	pr_err("sdhci: out_finish label in sdhci_request.\
+	Doing sdhci_finish_mrq.\n");
 	sdhci_finish_mrq(host, mrq);
+	
+	pr_err("sdhci: out_finish label in sdhci_request.\
+	Doing spin_unlock_irqrestore.\n");
 	spin_unlock_irqrestore(&host->lock, flags);
+	//in include spinlock.h
 }
 EXPORT_SYMBOL_GPL(sdhci_request);
 
@@ -2575,24 +2665,39 @@ static int sdhci_get_cd(struct mmc_host *mmc)
 	int gpio_cd = mmc_gpio_get_cd(mmc);
 
 	pr_info("sdhci: I am in sdhci_get_cd.\n");
-	if (host->flags & SDHCI_DEVICE_DEAD)
+	if (host->flags & SDHCI_DEVICE_DEAD) {
+		pr_info("sdhci: SDHCI_DEVICE_DEAD flag in sdhci_get_cd. Returning 0.\n");
 		return 0;
-
+	}
+	
 	/* If nonremovable, assume that the card is always present. */
-	if (!mmc_card_is_removable(mmc))
+	if (!mmc_card_is_removable(mmc)) {
+		pr_info("sdhci: mmc card is not removable, always present; in sdhci_get_cd. \
+		Returning 1.\n");
 		return 1;
-
+	}
+	
 	/*
 	 * Try slot gpio detect, if defined it take precedence
 	 * over build in controller functionality
 	 */
-	if (gpio_cd >= 0)
+	if (gpio_cd >= 0) {
+		pr_info("sdhci: gpio_cd >= 0 in sdhci_get_cd, gpio will take precedence\
+		over controller. Returning:%d.\n Might double call the gpio function.\n", 
+			!!gpio_cd);
 		return !!gpio_cd;
+	}
 
 	/* If polling, assume that the card is always present. */
-	if (host->quirks & SDHCI_QUIRK_BROKEN_CARD_DETECTION)
+	if (host->quirks & SDHCI_QUIRK_BROKEN_CARD_DETECTION) {
+		pr_info("sdhci: BROKEN_CARD_DETECTION quirk detected in sdhci_get_cd.\
+		Card is always present. Returning 1.\n");
 		return 1;
-
+	}
+	
+	pr_info("sdhci: Other conditions unmet in sdhci_get_cd. Using host native card detect.\n\
+	Returning:0x%x. Double call of sdhci_readl.\n", 
+		!!(sdhci_readl(host, SDHCI_PRESENT_STATE) & SDHCI_CARD_PRESENT));
 	/* Host native card detect */
 	return !!(sdhci_readl(host, SDHCI_PRESENT_STATE) & SDHCI_CARD_PRESENT);
 }
@@ -2708,84 +2813,124 @@ int sdhci_start_signal_voltage_switch(struct mmc_host *mmc,
 	 * Signal Voltage Switching is only applicable for Host Controllers
 	 * v3.00 and above.
 	 */
-	if (host->version < SDHCI_SPEC_300)
+	if (host->version < SDHCI_SPEC_300) {
+		pr_info("sdhci: Controller ver<3, returning 0 in \
+		sdhci_start_signal_switch.\n");
 		return 0;
+	}
 
 	ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
-
+	pr_info("sdhci: ctrl=%d, in sdhci_start_signal_switch.\n", ctrl);
+	
 	switch (ios->signal_voltage) {
 	case MMC_SIGNAL_VOLTAGE_330:
-		if (!(host->flags & SDHCI_SIGNALING_330))
+		if (!(host->flags & SDHCI_SIGNALING_330)) {
+			pr_err("sdhci: ios volt=3.3, but host is not capable of 3.3V Signaling.\
+			Returning -EINVAL, in sdhci_start_signal__switch.\n");
 			return -EINVAL;
+		}	
 		/* Set 1.8V Signal Enable in the Host Control2 register to 0 */
+		pr_info("sdhci: Disabling 1.8V signal in Control2 register;\
+		in sdhci_start_signal_switch.\n");
 		ctrl &= ~SDHCI_CTRL_VDD_180;
 		sdhci_writew(host, ctrl, SDHCI_HOST_CONTROL2);
 
 		if (!IS_ERR(mmc->supply.vqmmc)) {
 			ret = mmc_regulator_set_vqmmc(mmc, ios);
 			if (ret < 0) {
-				pr_warn("%s: Switching to 3.3V signalling voltage failed\n",
+				pr_err("%s: Switching to 3.3V signalling voltage failed in\
+				mmc_regulator_set_vqmmc. returning -EIO\n",
 					mmc_hostname(mmc));
 				return -EIO;
 			}
 		}
+		else
+			pr_info("sdhci: error in mmc->supply.vqmmc; in\
+			sdhci_start_signal_voltage_switch.\n");
 		/* Wait for 5ms */
-		usleep_range(5000, 5500);
+		usleep_range(5000, 5500); //\\increase?
 
 		/* 3.3V regulator output should be stable within 5 ms */
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
-		if (!(ctrl & SDHCI_CTRL_VDD_180))
+		if (!(ctrl & SDHCI_CTRL_VDD_180)) {	
+			pr_info("sdhci: Waited 5 ms, and 3.3 V seems to be on or stable. Returning 0.\n"); 
 			return 0;
-
-		pr_warn("%s: 3.3V regulator output did not become stable\n",
+		}
+		
+		pr_warn("%s: 3.3V regulator output did not become stable. Trying -EAGAIN\n",
 			mmc_hostname(mmc));
 
 		return -EAGAIN;
 	case MMC_SIGNAL_VOLTAGE_180:
-		if (!(host->flags & SDHCI_SIGNALING_180))
+		if (!(host->flags & SDHCI_SIGNALING_180)) {
+			pr_err("sdhci: ios volt=1.8, but host is not capable of 1.8V Signaling.\
+			Returning -EINVAL, in sdhci_start_signal__switch.\n");
 			return -EINVAL;
+		}
 		if (!IS_ERR(mmc->supply.vqmmc)) {
 			ret = mmc_regulator_set_vqmmc(mmc, ios);
 			if (ret < 0) {
-				pr_warn("%s: Switching to 1.8V signalling voltage failed\n",
+				pr_warn("%s: Switching to 1.8V signalling voltage failed\
+				in mmc_regulator_set_vqmmc, returning -EIO.\n",
 					mmc_hostname(mmc));
 				return -EIO;
 			}
 		}
-
+		else
+			pr_info("sdhci: error in mmc->supply.vqmmc; in\
+			sdhci_start_signal_voltage_switch.\n");
 		/*
 		 * Enable 1.8V Signal Enable in the Host Control2
 		 * register
-		 */
+		 *
+		 * wait 5 ms here too?
+		*/
+		pr_info("sdhci: Enabling 1.8V Signal in Control2 Register\n"); 
 		ctrl |= SDHCI_CTRL_VDD_180;
 		sdhci_writew(host, ctrl, SDHCI_HOST_CONTROL2);
 
 		/* Some controller need to do more when switching */
-		if (host->ops->voltage_switch)
+		if (host->ops->voltage_switch) {
+			pr_info("sdhci: Host needs volage_switch operation, switching\n");
 			host->ops->voltage_switch(host);
-
+		}
+		
 		/* 1.8V regulator output should be stable within 5 ms */
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
-		if (ctrl & SDHCI_CTRL_VDD_180)
+		if (ctrl & SDHCI_CTRL_VDD_180) {
+			pr_info("sdhci: Waited 5 ms, and 1.8V seems to be on or stable. Returning 0.\n"); 
 			return 0;
-
-		pr_warn("%s: 1.8V regulator output did not become stable\n",
+		}
+		
+		pr_warn("%s: 1.8V regulator output did not become stable. Trying -EAGAIN.\n",
 			mmc_hostname(mmc));
 
 		return -EAGAIN;
 	case MMC_SIGNAL_VOLTAGE_120:
-		if (!(host->flags & SDHCI_SIGNALING_120))
+		if (!(host->flags & SDHCI_SIGNALING_120)) {
+			pr_err("sdhci: ios volt=1.2, but host is not capable of 1.2V Signaling.\
+			Returning -EINVAL, in sdhci_start_signal__switch.\n");
 			return -EINVAL;
+		}
+		
 		if (!IS_ERR(mmc->supply.vqmmc)) {
 			ret = mmc_regulator_set_vqmmc(mmc, ios);
 			if (ret < 0) {
-				pr_warn("%s: Switching to 1.2V signalling voltage failed\n",
+				pr_warn("%s: Switching to 1.2V signalling voltage failed\
+				in mmc_regulator_set_vqmmc, returning -EIO.\n",
 					mmc_hostname(mmc));
 				return -EIO;
 			}
 		}
+		else 
+			pr_info("sdhci: error in mmc->supply.vqmmc; in\
+			sdhci_start_signal_voltage_switch.\n");
+		
+		pr_info("sdhci: Returning 0 in shdci_start_signal_voltage_switch.\n");
 		return 0;
 	default:
+		pr_info("sdhci: Default case in sdhci_start_signal_voltage_switch.\
+		Voltage switch not required, returning 0.\n");
 		/* No signal voltage switch required */
 		return 0;
 	}
@@ -2800,7 +2945,10 @@ static int sdhci_card_busy(struct mmc_host *mmc)
 	pr_info("sdhci: I am in sdhci_card_busy. Yeah she's just busy, dw.\n");
 	/* Check whether DAT[0] is 0 */
 	present_state = sdhci_readl(host, SDHCI_PRESENT_STATE);
-
+	pr_info("sdhci: present_state=%d\n", present_state);
+	
+	pr_info("sdhci: Returning:%d in sdhci_card_busy\n", 
+		!(present_state & SDHCI_DATA_0_LVL_MASK));
 	return !(present_state & SDHCI_DATA_0_LVL_MASK);
 }
 
@@ -2867,7 +3015,7 @@ EXPORT_SYMBOL_GPL(sdhci_reset_tuning);
 
 void sdhci_abort_tuning(struct sdhci_host *host, u32 opcode)
 {
-	pr_err("I am in sdhci_abort_tuning, here is my reg dump:\n");
+	pr_err("sdhci: I am in sdhci_abort_tuning, here is my reg dump:\n");
 	sdhci_dumpregs(host);
 	sdhci_reset_tuning(host);
 
@@ -2875,11 +3023,11 @@ void sdhci_abort_tuning(struct sdhci_host *host, u32 opcode)
 	sdhci_do_reset(host, SDHCI_RESET_DATA);
 
 	sdhci_end_tuning(host);
-	pr_err("I have done sdhci_end_tuning, here is my reg dump:\n");
+	pr_err("sdhci: I have done sdhci_end_tuning, here is my reg dump:\n");
 	sdhci_dumpregs(host);
 
 	mmc_send_abort_tuning(host->mmc, opcode);
-	pr_err("I have sent mmc_send_abort_tuning. here is my reg dump:\n");
+	pr_err("sdhci: I have sent mmc_send_abort_tuning. here is my reg dump:\n");
 	sdhci_dumpregs(host);
 }
 EXPORT_SYMBOL_GPL(sdhci_abort_tuning);
@@ -2913,11 +3061,14 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
 	 * to 64 here.
 	 */
 	if (cmd.opcode == MMC_SEND_TUNING_BLOCK_HS200 &&
-	    mmc->ios.bus_width == MMC_BUS_WIDTH_8)
+	    mmc->ios.bus_width == MMC_BUS_WIDTH_8) {
+		pr_info("sdhci: HS200 block and bus width 8 in sdhci_send_tuning\n");
 		sdhci_writew(host, SDHCI_MAKE_BLKSZ(b, 128), SDHCI_BLOCK_SIZE);
-	else
+	}
+	else {
+		pr_info("sdhci: else condition in  sdhci_send_tuning\n");
 		sdhci_writew(host, SDHCI_MAKE_BLKSZ(b, 64), SDHCI_BLOCK_SIZE);
-
+	}
 	/*
 	 * The tuning block is sent by the card to the host controller.
 	 * So we set the TRNS_READ bit in the Transfer Mode register.
@@ -2927,6 +3078,8 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
 	sdhci_writew(host, SDHCI_TRNS_READ, SDHCI_TRANSFER_MODE);
 
 	if (!sdhci_send_command_retry(host, &cmd, flags)) {
+		pr_info("sdhci: Retry not needed in sdhci_send_clock.\
+		spin_unlock_irqrestore. Setting tuning_done=0.\n");	
 		spin_unlock_irqrestore(&host->lock, flags);
 		host->tuning_done = 0;
 		return;
@@ -2982,35 +3135,45 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 		}
 
 		/* Spec does not require a delay between tuning cycles */
-		if (host->tuning_delay > 0)
+		if (host->tuning_delay > 0) {
+			pr_info("sdhci: host has delay %d between tune cycles\
+			in __sdhci_execute_tuning.\n", host->tuning_delay);	
 			mdelay(host->tuning_delay);
-
+		}
+		pr_info("sdhci: Reading if tuning is done from control2 reg in \
+		__sdhci_execute_tuning.\n");	
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
-			if (ctrl & SDHCI_CTRL_TUNED_CLK)
+			if (ctrl & SDHCI_CTRL_TUNED_CLK) {
+				pr_info("sdhci: sdhci_tuning success, returning 0\
+				in __sdhci_execute_tuning.\n");	
 				return 0; /* Success! */
+			}
+			pr_info("sdhci: breaking loop in __sdhci_execute_tuning\n.");	
 			break;
 		}
-
+		else
+			pr_info("sdhci: Still executing tuning in __sdhci_execute_tuning. /n");	
 	}
 
 
-	pr_err("All conditions and tests failed, nothing returned. Stack and reg dump before fallback:\n");
-	dump_stack();
+	pr_err("All conditions and tests failed, nothing returned. Stack \
+	and reg dump before fallback:\n");
+	//dump_stack();
 	sdhci_dumpregs(host);
 	pr_info("%s: Tuning failed, falling back to fixed sampling clock\n",
 		mmc_hostname(host->mmc));
-	dump_stack();
+	//dump_stack();
 	pr_err("Stack dump after pr_info, for testing the memory addresses ^^^\n");
 
-	dump_stack();
+	//dump_stack();
 	sdhci_reset_tuning(host);
-	dump_stack();
+	//dump_stack();
 	sdhci_dumpregs(host);
 
 	pr_err("Stack dump immediately before fallback, dump right after falling back, and reg dump after falll back ^^^\n");
 	return -EAGAIN;
-	dump_stack();
+	//dump_stack();
 	pr_err("Stack dump after 'return -EAGAIN'\n");
 }
 
@@ -3670,24 +3833,26 @@ static irqreturn_t sdhci_irq(int irq, void *dev_id)
 	int i;
 
 	pr_info("sdhci: I am in irqreturn_t sdhci_irq.\n");
+	pr_info("sdhci: Doing spin_lock on host in sdhci_irq.\n");
 	spin_lock(&host->lock);
 
 	if (host->runtime_suspended) {
-		pr_err("sdhci: runtime is suspended in sdhci_irq.\n");
+		pr_err("sdhci: runtime is suspended in sdhci_irq.\
+		Returning IRQ_NONE after unlocking\n");
 		spin_unlock(&host->lock);
 		return IRQ_NONE;
 	}
 
 	intmask = sdhci_readl(host, SDHCI_INT_STATUS);
 	if (!intmask || intmask == 0xffffffff) {
-		pr_err("sdhci: IRQ_NONE in sdhci_irq. intmask=%d.\n",intmask);
+		pr_err("sdhci: IRQ_NONE in sdhci_irq. intmask=%d. Going to out.\n",intmask);
 		result = IRQ_NONE;
 		goto out;
 	}
 
 	do {
 		DBG("IRQ status 0x%08x\n", intmask);
-
+		// we don't see this
 		if (host->ops->irq) {
 			intmask = host->ops->irq(host, intmask);
 			if (!intmask)
@@ -3759,9 +3924,13 @@ static irqreturn_t sdhci_irq(int irq, void *dev_id)
 		}
 cont:
 		pr_info("sdhci: I am in cont case of sdhci_thread_irq.\n");
-		if (result == IRQ_NONE)
+		if (result == IRQ_NONE) { 
+			pr_info("sdhci: IRQ_NONE in cont case of sdhci_thread_irq.\
+			result = IRQ_HANDLED.\n");
 			result = IRQ_HANDLED;
-
+		}
+		
+		
 		intmask = sdhci_readl(host, SDHCI_INT_STATUS);
 	} while (intmask && --max_loops);
 
@@ -3781,9 +3950,12 @@ cont:
 	}
 out:
 	pr_info("sdhci: I am in out case of sdhci_thread_irq.\n");
-	if (host->deferred_cmd)
+	if (host->deferred_cmd) {
+		pr_info("sdhci: host deferred cmd in out label of sdhci_thread_irq out\n");
 		result = IRQ_WAKE_THREAD;
-
+	}
+	
+	pr_info("sdhci: Unlocking spins in sdhci_thread_irq\n");	
 	spin_unlock(&host->lock);
 
 	/* Process mrqs ready for immediate completion */

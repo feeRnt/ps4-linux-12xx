@@ -80,13 +80,14 @@ static int sdio_read_fbr(struct sdio_func *func)
 				Hence assigning function class as SDIO_CLASS_NONE.\n");
 		func->class = SDIO_CLASS_NONE;
 		return 0;
+	//\\ hard change to non_standard_func?	
 	}
 
 	pr_info("mmc: I am in sdio_read_fbr and going to test mmc_io_rw_direct.\n");
 	ret = mmc_io_rw_direct(func->card, 0, 0,
 		SDIO_FBR_BASE(func->num) + SDIO_FBR_STD_IF, 0, &data);
 	if (ret) {
-		pr_err("mmc: I was in sdio_read_fbr and detected return for mmc_io_rw_direct.\n\
+		pr_err("mmc: I was in sdio_read_fbr and detected return for ret=mmc_io_rw_direct.\n\
 				Hence going to out condition.\n");
 		goto out;
 	}
@@ -107,7 +108,7 @@ static int sdio_read_fbr(struct sdio_func *func)
 	func->class = data;
 
 out:
-	pr_err("I am in out condtion of sdio_read_fbr now.\n");
+	pr_err("I am in out condtion of sdio_read_fbr now. Returning ret.\n");
 	return ret;
 }
 

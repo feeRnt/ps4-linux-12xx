@@ -76,11 +76,16 @@ static int sclhi(struct i2c_algo_bit_data *adap)
 {
 	unsigned long start;
 
+	pr_debug("i2c-algo-bit: Setting adapter scl to high in sclhi.\n");
 	setscl(adap, 1);
 
 	/* Not all adapters have scl sense line... */
-	if (!adap->getscl)
+	if (!adap->getscl) {
+		pr_debug("i2c-algo-bit: i2c adapter doesn't support serial\
+		clock sense line in sclhi. Can't acquire its value.\n\
+		Going to done condition.\n");
 		goto done;
+	}
 
 	start = jiffies;
 	while (!getscl(adap)) {
@@ -89,23 +94,46 @@ static int sclhi(struct i2c_algo_bit_data *adap)
 		 * chips may hold it low ("clock stretching") while they
 		 * are processing data internally.
 		 */
+		pr_debug("i2c-algo-bit: Haven't acquired i2c adapter's high scl\
+		yet.\nProcessing; in sclhi.\n"); 
 		if (time_after(jiffies, start + adap->timeout)) {
-			/* Test one last time, as we may have been preempted
+			
+			/*jiffies= total kernel time (ticks) that has elapsed,
+			 * start = total kernel time at start of function,
+			 * start + adap->timeout = start + timeout_period* 
+			 * syntax: time_after(a, b) - if a > b, then returns true,or
+			 * a is time_after b. Way to test if a timeout has elapsed
+			 * 
+			 * Test one last time, as we may have been preempted
 			 * between last check and timeout test.
 			 */
-			if (getscl(adap))
+			pr_debug("i2c-algo-bit: adapter tiemout passed in sclhi.\
+			Testing for adapter's scl again.\n");
+			if (getscl(adap)) {
+				pr_debug("i2c-algo-bit: Finally acquired adapter's scl!\
+				hiscl=%d. Ending; in sclhi.\n", getscl(adap));
 				break;
+			}
+			/*
+			pr_debug("i2c-algo-bit: Failed to get adapter's high scl in\
+			sclhi. Returning -ETIMEDOUT.\n");
+			*/
 			return -ETIMEDOUT;
 		}
-		cpu_relax();			//relax cpu till scl (s clock line) is high again
+		pr_debug("i2c-algo-bit: Failed to get i2c adapter scl.\
+					Relaxing CPU.\n");
+		cpu_relax();	//relax cpu till scl (s clock line) is high again
 	}
 #ifdef DEBUG
-	if (jiffies != start && i2c_debug >= 3)
+	if (jiffies != start)
 		pr_debug("i2c-algo-bit: needed %ld jiffies for SCL to go high\n",
 			 jiffies - start);
+	//\\ removed && i2c_debug >= 3 in if
 #endif
 
 done:
+	pr_debug("i2c-algo-bit: done condition: Executing udelay=adapter's\
+	udelay; in sclhi. Returing 0 afterwards.\n");
 	udelay(adap->udelay);
 	return 0;
 }
@@ -165,6 +193,8 @@ static int i2c_outb(struct i2c_adapter *i2c_adap, unsigned char c)
 			bit_dbg(1, &i2c_adap->dev,
 				"i2c_outb: 0x%02x, timeout at bit #%d\n",
 				(int)c, i);
+			pr_debug("i2c-algo-bit: current adapter udelay in i2c_outb\
+			:%d\nMatch with data.\n", adap->udelay);
 			return -ETIMEDOUT;
 		}
 		/* FIXME do arbitration here:
@@ -442,7 +472,7 @@ static int readbytes(struct i2c_adapter *i2c_adap, struct i2c_msg *msg)
 				dev_err(&i2c_adap->dev,
 					"readbytes: invalid block length (%d)\n",
 					inval);
-				return -EPROTO;
+				return -EPROTO; //\\wonder if this'll happen
 			}
 			/* The original count value accounts for the extra
 			   bytes, that is, either 1 for a regular transaction,
