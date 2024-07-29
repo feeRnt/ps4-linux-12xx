@@ -151,8 +151,7 @@ EXPORT_SYMBOL_GPL(sdhci_enable_v4_mode);
 
 static inline bool sdhci_data_line_cmd(struct mmc_command *cmd)
 {
-	pr_info("sdhci: I am in sdhci_data_line_cmd.\n\
-	cmd->data = %d, cmd->flags & MMC_RSP_BUSY = 0x%x",
+	pr_info("sdhci: I am in sdhci_data_line_cmd.\n cmd->data = %d, cmd->flags & MMC_RSP_BUSY = 0x%x",
 		cmd->data, cmd->flags & MMC_RSP_BUSY);
 	//assuming data type is ints
 	return cmd->data || cmd->flags & MMC_RSP_BUSY;	
@@ -2376,10 +2375,10 @@ void sdhci_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	pr_info("sdhci: I am in sdhci_request. Checking if card is present.\n");
 	/* Firstly check card presence */
 	present = mmc->ops->get_cd(mmc);
-	pr_info("sdhci: Card present in sdhci_request? %s \n", present); 
+	pr_info("sdhci: Card present in sdhci_request? %d \n", present); 
 	//this bool is acquired from sdhci_get_cd
 	
-	pr_info("sdhci: doing spin_lock_irqsave in sdhci_requst.\n", present); 	
+	pr_info("sdhci: doing spin_lock_irqsave in sdhci_requst.\n"); 	
 	spin_lock_irqsave(&host->lock, flags);
 	// from include spinlock.h?
 
@@ -2397,7 +2396,7 @@ void sdhci_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	/* check if sdhci_manual_cmd23() returns true or false.
 	 * If  true, cmd = mrq->sbc ; if false, cmd = mrq->cmd
 	*/
-	pr_info("Just tested manual_cmd23. cmd = mrq->sbc? %s. If no, then mrq->cmd\n",
+	pr_info("Just tested manual_cmd23. cmd = mrq->sbc? %d. If no, then mrq->cmd\n",
 		cmd);
 		//calling the function again in the pr_info will damage the logging
 
