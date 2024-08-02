@@ -2238,7 +2238,7 @@ static void sdhci_set_power_reg(struct sdhci_host *host, unsigned char mode,
 	struct mmc_host *mmc = host->mmc;
 
 	pr_info("sdhci: I am in sdhci_set_power_reg. Doing \
-	mmc_regulator_set_ocr(mmc, mmc->supply.vmmc, vdd)\n");
+mmc_regulator_set_ocr(mmc, mmc->supply.vmmc, vdd)\n");
 	mmc_regulator_set_ocr(mmc, mmc->supply.vmmc, vdd);
 
 	if (mode != MMC_POWER_OFF) {

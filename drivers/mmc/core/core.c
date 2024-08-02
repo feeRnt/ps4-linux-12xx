@@ -665,6 +665,7 @@ int mmc_wait_for_cmd(struct mmc_host *host, struct mmc_command *cmd, int retries
 	pr_debug("mmc-core: current command in mmc_wait_for_cmd is %d \
 Setting cmd->data = NULL\n", cmd);
 	cmd->data = NULL;
+	//DEBUG is defined but doesn't print. Guess I needed -DDEBUG after all.
 
 	mmc_wait_for_req(host, &mrq);
 	pr_info("mmc-core: Returning cmd->error = %d in mmc_wait_for_cmd.\n" , cmd->error);
@@ -690,7 +691,7 @@ void mmc_set_data_timeout(struct mmc_data *data, const struct mmc_card *card)
 	 * SDIO cards only define an upper 1 s limit on access.
 	 */
 	if (mmc_card_sdio(card)) {
-		pr_debug("mmc-core: SDIO card in mmc_set_data_timeout, setting timeout to 1s.\n");
+		pr_info("mmc-core: SDIO card in mmc_set_data_timeout, setting timeout to 1s.\n");
 		data->timeout_ns = 1000000000;
 		data->timeout_clks = 0;
 		return;
