@@ -94,8 +94,10 @@ static int sclhi(struct i2c_algo_bit_data *adap)
 		 * chips may hold it low ("clock stretching") while they
 		 * are processing data internally.
 		 */
-		pr_debug("i2c-algo-bit: Haven't acquired i2c adapter's high scl\
+		
+		/*pr_debug("i2c-algo-bit: Haven't acquired i2c adapter's high scl\
 		yet.\nProcessing; in sclhi.\n"); 
+		*/
 		if (time_after(jiffies, start + adap->timeout)) {
 			
 			/*jiffies= total kernel time (ticks) that has elapsed,
@@ -108,20 +110,23 @@ static int sclhi(struct i2c_algo_bit_data *adap)
 			 * between last check and timeout test.
 			 */
 			pr_debug("i2c-algo-bit: adapter tiemout passed in sclhi.\
-			Testing for adapter's scl again.\n");
+Testing for adapter's scl again.\n");
+
 			if (getscl(adap)) {
 				pr_debug("i2c-algo-bit: Finally acquired adapter's scl!\
-				hiscl=%d. Ending; in sclhi.\n", getscl(adap));
+hiscl=%d. Ending; in sclhi.\n", getscl(adap));
 				break;
 			}
 			/*
 			pr_debug("i2c-algo-bit: Failed to get adapter's high scl in\
-			sclhi. Returning -ETIMEDOUT.\n");
+sclhi. Returning ETIMEDOUT.\n");
 			*/
 			return -ETIMEDOUT;
 		}
-		pr_debug("i2c-algo-bit: Failed to get i2c adapter scl.\
-					Relaxing CPU.\n");
+
+		/*pr_debug("i2c-algo-bit: Failed to get i2c adapter scl.\
+Relaxing CPU.\n");
+		*/
 		cpu_relax();	//relax cpu till scl (s clock line) is high again
 	}
 #ifdef DEBUG
@@ -194,7 +199,7 @@ static int i2c_outb(struct i2c_adapter *i2c_adap, unsigned char c)
 				"i2c_outb: 0x%02x, timeout at bit #%d\n",
 				(int)c, i);
 			pr_debug("i2c-algo-bit: current adapter udelay in i2c_outb\
-			:%d\nMatch with data.\n", adap->udelay);
+:%d \n Match with data. Returning ETIMEDOUT.\n", adap->udelay);
 			return -ETIMEDOUT;
 		}
 		/* FIXME do arbitration here:

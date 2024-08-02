@@ -3,7 +3,7 @@
 
 #include <linux/io.h>
 #include <linux/pci.h>
-#include <linux/i2c.h>
+#include <linux/i2cdss.h>
 
 enum aeolia_func_id {
 	AEOLIA_FUNC_ID_ACPI = 0,

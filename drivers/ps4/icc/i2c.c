@@ -89,7 +89,7 @@ static int icc_i2c_smbus_xfer(struct i2c_adapter *adapter, u16 addr,
 
 	msg.length = msg.cmd.length + 4;
 	ret = apcie_icc_cmd(0x10, 0x0, &msg, msg.length, resultbuf,
-		      sizeof(resultbuf));
+		      sizeof(resultbuf));         // major cmd category, minor cmd category, input, size of input, output, size of ouput 
 	if (ret < 2 || ret > sizeof(resultbuf)) {
 		sc_err("icc-i2c: icc command failed: %d\n", ret);
 		return -EIO;

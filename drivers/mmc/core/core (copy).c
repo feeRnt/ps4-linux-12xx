@@ -218,34 +218,27 @@ static void __mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
 {
 	int err;
 
-	pr_info("mmc-core: I am in __mmc_start_request.\n");
 	/* Assumes host controller has been runtime resumed by mmc_claim_host */
 	err = mmc_retune(host);
 	if (err) {
 		mrq->cmd->error = err;
 		mmc_request_done(host, mrq);
-		pr_info("mmc-core: err in mmc_retune host in __mmc_start_request, ending function (return void).\n\
-		err = %d", err);
 		return;
 	}
 
 	/*
 	 * For sdio rw commands we must wait for card busy otherwise some
-	 * sdio devices won't work properly. //\\note this
+	 * sdio devices won't work properly.
 	 * And bypass I/O abort, reset and bus suspend operations.
 	 */
 	if (sdio_is_io_busy(mrq->cmd->opcode, mrq->cmd->arg) &&
 	    host->ops->card_busy) {
-		pr_info("mmc-core: sdio_is_io_busy in __mmc_start_request. Waiting 500 ms\n");
 		int tries = 500; /* Wait aprox 500ms at maximum */
-		//\\increase ... ...? 
 
 		while (host->ops->card_busy(host) && --tries)
 			mmc_delay(1);
 
 		if (tries == 0) {
-			pr_info("mmc-core: Ran out of tries, card is busy, \
-returning void in __mmc_start_request.\n");
 			mrq->cmd->error = -EBUSY;
 			mmc_request_done(host, mrq);
 			return;
@@ -253,7 +246,6 @@ returning void in __mmc_start_request.\n");
 	}
 
 	if (mrq->cap_cmd_during_tfr) {
-		pr_info("mmc-core: mrq->cap_cmd_during_tfr detected.\n");
 		host->ongoing_mrq = mrq;
 		/*
 		 * Retry path could come through here without having waiting on
@@ -264,10 +256,9 @@ returning void in __mmc_start_request.\n");
 
 	trace_mmc_request_start(host, mrq);
 
-	if (host->cqe_on) {
-		pr_info("mmc-core: Host has cqe ob __mmc_start_request, turning it off.\n");
+	if (host->cqe_on)
 		host->cqe_ops->cqe_off(host);
-	}
+
 	host->ops->request(host, mrq);
 }
 
@@ -320,38 +311,25 @@ static int mmc_mrq_prep(struct mmc_host *host, struct mmc_request *mrq)
 		mrq->sbc->mrq = mrq;
 	}
 	if (mrq->data) {
-		pr_info("mmc-core: mrq has data in mmc_mrq_prep. Checking conditions.\n");
 		if (mrq->data->blksz > host->max_blk_size ||
 		    mrq->data->blocks > host->max_blk_count ||
-		    mrq->data->blocks * mrq->data->blksz > host->max_req_size) {
-			pr_err("mmc-core: mrq's data->blksz > host->max_blk_size or\
-data->blocks > host->max_blk_count or data->blocks * data->blksz > host->max_req_size.\n\
-mrq->data->blksz = %d vs host->max_blk_size = %d \n\
-mrq->data->blocks = %d vs host->max_blk_count = %d \n\
-mrq->data->blocks * mrq->data->blksz = %d * %d vs host->max_req_size = %d \n\
-Returning -EINVAL\n", 
-	mrq->data->blksz, host->max_blk_size, mrq->data->blocks, host->max_blk_count,
-	mrq->data->blocks, mrq->data->blksz, host->max_req_size);
+		    mrq->data->blocks * mrq->data->blksz > host->max_req_size)
 			return -EINVAL;
-		}
 
 		for_each_sg(mrq->data->sg, sg, mrq->data->sg_len, i)
 			sz += sg->length;
-		if (sz != mrq->data->blocks * mrq->data->blksz) {
-			pr_info("mmc-core: size != data_blocks * block_size in mmc_mrq_prep\
- Error in length or size logic? Returning -EINVAL.\n ");
+		if (sz != mrq->data->blocks * mrq->data->blksz)
 			return -EINVAL;
-		}
+
 		mrq->data->error = 0;
 		mrq->data->mrq = mrq;
 		if (mrq->stop) {
-			pr_info("mmc-core: mrq->stop detected, stopping mrq.\n");
 			mrq->data->stop = mrq->stop;
 			mrq->stop->error = 0;
 			mrq->stop->mrq = mrq;
 		}
 	}
-	pr_info("mmc-core: Success!! in mmc_mrq_prep. Returning 0.\n");
+
 	return 0;
 }
 
@@ -359,7 +337,6 @@ int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
 {
 	int err;
 
-	pr_info("mmc-core: I am in mmc_start_request \n");
 	init_completion(&mrq->cmd_completion);
 
 	mmc_retune_hold(host);
@@ -372,13 +349,9 @@ int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
 	WARN_ON(!host->claimed);
 
 	err = mmc_mrq_prep(host, mrq);
-	if (err) {
-		pr_err("mmc-core: err from mmc_mrq_prep(host, mrq) in mmc_start_request. Returning err. \n");
+	if (err)
 		return err;
-	}
-	
-	pr_info("mmc-core: No errors in mmc_start_request. Turning on led, \
-going back to __mmc_start_request(host, mrq) \n");
+
 	led_trigger_event(host->led, LED_FULL);
 	__mmc_start_request(host, mrq);
 
@@ -407,7 +380,6 @@ static int __mmc_start_req(struct mmc_host *host, struct mmc_request *mrq)
 {
 	int err;
 
-	pr_info("mmc-core: I am in __mmc_start_req.\n");
 	mmc_wait_ongoing_tfr_cmd(host);
 
 	init_completion(&mrq->completion);
@@ -419,8 +391,7 @@ static int __mmc_start_req(struct mmc_host *host, struct mmc_request *mrq)
 		mmc_complete_cmd(mrq);
 		complete(&mrq->completion);
 	}
-	pr_info("mmc-core: I am returning err=mmc_start_request=%d in __mmc_start_req\
-	\n", err);
+
 	return err;
 }
 
@@ -634,7 +605,7 @@ void mmc_wait_for_req(struct mmc_host *host, struct mmc_request *mrq)
 	__mmc_start_req(host, mrq);
 	pr_info("mmc-core: I am in mmc_wait_for_req. Just started request.\n");
 	if (!mrq->cap_cmd_during_tfr) {
-		pr_info("mmc-core: I am in mmc_wait_for_req. Request is done.\n");
+		pr_info("mmc-core: I am in mmc_wait_for_req. Request is done.\n");	
 		mmc_wait_for_req_done(host, mrq);
 	}
 }
@@ -656,18 +627,15 @@ int mmc_wait_for_cmd(struct mmc_host *host, struct mmc_command *cmd, int retries
 
 	WARN_ON(!host->claimed);
 
-
 	memset(cmd->resp, 0, sizeof(cmd->resp));
 	cmd->retries = retries;
-	pr_debug("mmc-core: no. of retries in mmc_wait_for_cmd is %d \n", retries);
+	pr_debug("mmc-core: no. of retries in mmc_wait_for_cmd is %d", retries);
 	//set manually?
 	mrq.cmd = cmd;
-	pr_debug("mmc-core: current command in mmc_wait_for_cmd is %d \
-Setting cmd->data = NULL\n", cmd);
 	cmd->data = NULL;
 
 	mmc_wait_for_req(host, &mrq);
-	pr_info("mmc-core: Returning cmd->error = %d in mmc_wait_for_cmd.\n" , cmd->error);
+
 	return cmd->error;
 }
 
@@ -685,7 +653,6 @@ void mmc_set_data_timeout(struct mmc_data *data, const struct mmc_card *card)
 {
 	unsigned int mult;
 
-	pr_info("core: I am in mmc_set_data_timeout.\n");
 	/*
 	 * SDIO cards only define an upper 1 s limit on access.
 	 */
@@ -715,8 +682,10 @@ void mmc_set_data_timeout(struct mmc_data *data, const struct mmc_card *card)
 	 * SD cards also have an upper limit on the timeout.
 	 */
 	if (mmc_card_sd(card)) {
+		
 		unsigned int timeout_us, limit_us;
-		pr_debug("mmc-core: SD card in mmc_set_data_timeout, setting timeout to ...\n");
+		pr_debug("mmc-core: SD card in mmc_set_data_timeout, setting timeout to 1ms.\n");
+		data->timeout_ns = 1000000000;
 		timeout_us = data->timeout_ns / 1000;
 		if (card->host->ios.clock)
 			timeout_us += data->timeout_clks * 1000 /
@@ -731,6 +700,7 @@ void mmc_set_data_timeout(struct mmc_data *data, const struct mmc_card *card)
 			 * previous value of 300ms is known to be
 			 * insufficient for some cards.
 			 */
+			 
 			limit_us = 3000000;
 		else
 			limit_us = 100000;
@@ -1236,8 +1206,7 @@ int mmc_set_uhs_voltage(struct mmc_host *host, u32 ocr)
 {
 	struct mmc_command cmd = {};
 	int err = 0;
-	
-	pr_info("mmc-core: I am in mmc_set_uhs_voltage.\n");
+
 	/*
 	 * If we cannot switch voltages, return failure so the caller
 	 * can continue without UHS mode

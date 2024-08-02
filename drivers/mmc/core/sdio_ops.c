@@ -20,6 +20,7 @@ int mmc_send_io_op_cond(struct mmc_host *host, u32 ocr, u32 *rocr)
 	struct mmc_command cmd = {};
 	int i, err = 0;
 
+	pr_info("sdio-ops: I am in mmc_send_io_op_cond.\n");
 	cmd.opcode = SD_IO_SEND_OP_COND;
 	cmd.arg = ocr;
 	cmd.flags = MMC_RSP_SPI_R4 | MMC_RSP_R4 | MMC_CMD_BCR;
@@ -30,8 +31,11 @@ int mmc_send_io_op_cond(struct mmc_host *host, u32 ocr, u32 *rocr)
 			break;
 
 		/* if we're just probing, do a single pass */
-		if (ocr == 0)
+		if (ocr == 0) {
+			pr_info("sdio_ops: Single pass because we're probing, ocr==0;\
+ in mmc_send_io_op_cond.\n");
 			break;
+		}
 
 		/* otherwise wait until reset completes */
 		if (mmc_host_is_spi(host)) {
@@ -41,21 +45,32 @@ int mmc_send_io_op_cond(struct mmc_host *host, u32 ocr, u32 *rocr)
 			 * (Marvell's) only behave when looking at this
 			 * one.
 			 */
-			if (cmd.resp[1] & MMC_CARD_BUSY)
+			if (cmd.resp[1] & MMC_CARD_BUSY) {
+				pr_info("sdio_ops: cmd.resp[1] has MMC_CARD_BUSY, so spi card is initialized;\
+exiting loop in mmc_send_io_op_cond.\n");
 				break;
+			}
 		} else {
-			if (cmd.resp[0] & MMC_CARD_BUSY)
+			if (cmd.resp[0] & MMC_CARD_BUSY) {
+				pr_info("sdio_ops: cmd.resp[0] has MMC_CARD_BUSY, so non-spi card is initialized;\
+exiting loop in mmc_send_io_op_cond.\n");
 				break;
+			}
 		}
-
+		
+		pr_info("sdio_ops: Ran out of i loops in mmc_send_io_op_cond. Returning -ETIMEDOUT.\
+Executing mmc_delay(10).");
 		err = -ETIMEDOUT;
-
+		// i need to learn ftrace
 		mmc_delay(10);
 	}
 
-	if (rocr)
+	if (rocr) {
+		pr_info("sdio_ops: rocr detected in mmc_send_io_op_cond.\
+Assigning *rocr = cmd.resp[1 or 0] based on spi.\n");
 		*rocr = cmd.resp[mmc_host_is_spi(host) ? 1 : 0];
-
+	}
+	pr_err("sdio_ops: End of function, returning %d", err);
 	return err;
 }
 
@@ -77,18 +92,19 @@ static int mmc_io_rw_direct_host(struct mmc_host *host, int write, unsigned fn,
 		return -EINVAL;
 	}
 	
-	cmd.opcode = SD_IO_RW_DIRECT;
+	//check these?
+	cmd.opcode = SD_IO_RW_DIRECT; 
 	cmd.arg = write ? 0x80000000 : 0x00000000;
-	cmd.arg |= fn << 28;
+	cmd.arg |= fn << 28;	//this
 	cmd.arg |= (write && out) ? 0x08000000 : 0x00000000;
-	cmd.arg |= addr << 9;
+	cmd.arg |= addr << 9;	//this
 	cmd.arg |= in;
 	cmd.flags = MMC_RSP_SPI_R5 | MMC_RSP_R5 | MMC_CMD_AC;
 
 	err = mmc_wait_for_cmd(host, &cmd, 0); 
 	if (err) {
-		pr_err("sdio_ops: err = mmc_wait_for_cmd returned, in \
-		mmc_io_rw_direct_host, returning err=%d", err);
+		pr_err("sdio_ops: err = mmc_wait_for_cmd returned, in\
+mmc_io_rw_direct_host, returning err=%d", err);
 		return err;
 	}
 	

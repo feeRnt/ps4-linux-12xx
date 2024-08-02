@@ -2237,14 +2237,23 @@ static void sdhci_set_power_reg(struct sdhci_host *host, unsigned char mode,
 {
 	struct mmc_host *mmc = host->mmc;
 
-	pr_info("sdhci: I am in sdhci_set_power_reg.\n");
+	pr_info("sdhci: I am in sdhci_set_power_reg. Doing \
+	mmc_regulator_set_ocr(mmc, mmc->supply.vmmc, vdd)\n");
 	mmc_regulator_set_ocr(mmc, mmc->supply.vmmc, vdd);
 
-	if (mode != MMC_POWER_OFF)
+	if (mode != MMC_POWER_OFF) {
+		pr_info("sdhci: mode != MMC_POWER_OFF in sdhci_set_power_reg.\n\
+Writing to host: SDHCI_POWER_ON, in SDHCI_POWER_CONTROL.\n");
 		sdhci_writeb(host, SDHCI_POWER_ON, SDHCI_POWER_CONTROL);
-	else
+	}
+	else {
+		pr_info("sdhci: mode = MMC_POWER_OFF in sdhci_set_power_reg.\n\
+Writing to host: SDHCI_POWER_ON, in SDHCI_POWER_CONTROL.\n");
 		sdhci_writeb(host, 0, SDHCI_POWER_CONTROL);
+	}
 }
+
+//pr_info("sdhci: Going to sdhci_set_power_noreg in shdci_set_power_reg with the mode and vdd.\n");
 
 void sdhci_set_power_noreg(struct sdhci_host *host, unsigned char mode,
 			   unsigned short vdd)
@@ -2286,9 +2295,12 @@ void sdhci_set_power_noreg(struct sdhci_host *host, unsigned char mode,
 		}
 	}
 
-	if (host->pwr == pwr)
+	if (host->pwr == pwr) {
+		pr_info("sdhci: host->power now in sdhci_set_power_noreg.\n");
 		return;
-
+	}	
+	
+	pr_info("sdhci: Manually setting host->pwr = pwr in sdhci_set_power_noreg.\n");
 	host->pwr = pwr;
 
 	if (pwr == 0) {
@@ -2308,6 +2320,8 @@ void sdhci_set_power_noreg(struct sdhci_host *host, unsigned char mode,
 		 * voltage and set turn on power at the same time, so set the
 		 * voltage first.
 		 */
+		 
+		 //\\check this later
 		if (host->quirks & SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER)
 			sdhci_writeb(host, pwr, SDHCI_POWER_CONTROL);
 
@@ -2322,8 +2336,13 @@ void sdhci_set_power_noreg(struct sdhci_host *host, unsigned char mode,
 		 * Some controllers need an extra 10ms delay of 10ms before
 		 * they can apply clock after applying power
 		 */
-		if (host->quirks & SDHCI_QUIRK_DELAY_AFTER_POWER)
+		 //\\increase
+		 
+		if (host->quirks & SDHCI_QUIRK_DELAY_AFTER_POWER) {
+			pr_info("sdhci: DELAY_AFTER_POWER for clock quirk in \
+sdhci_set_power _no_reg. Waiting 10 ms.\n");
 			mdelay(10);
+		}	
 	}
 }
 EXPORT_SYMBOL_GPL(sdhci_set_power_noreg);
@@ -3140,16 +3159,16 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 		/* Spec does not require a delay between tuning cycles */
 		if (host->tuning_delay > 0) {
 			pr_info("sdhci: host has delay %d between tune cycles\
-			in __sdhci_execute_tuning.\n", host->tuning_delay);	
+in __sdhci_execute_tuning.\n", host->tuning_delay);	
 			mdelay(host->tuning_delay);
 		}
-		pr_info("sdhci: Reading if tuning is done from control2 reg in \
-		__sdhci_execute_tuning.\n");	
+		pr_info("sdhci: Reading if tuning is done from control2 reg in\
+__sdhci_execute_tuning.\n");	
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
 			if (ctrl & SDHCI_CTRL_TUNED_CLK) {
 				pr_info("sdhci: sdhci_tuning success, returning 0\
-				in __sdhci_execute_tuning.\n");	
+in __sdhci_execute_tuning.\n");	
 				return 0; /* Success! */
 			}
 			pr_info("sdhci: breaking loop in __sdhci_execute_tuning\n.");	
@@ -3161,7 +3180,7 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 
 
 	pr_err("All conditions and tests failed, nothing returned. Stack \
-	and reg dump before fallback:\n");
+and reg dump before fallback:\n");
 	//dump_stack();
 	sdhci_dumpregs(host);
 	pr_info("%s: Tuning failed, falling back to fixed sampling clock\n",
