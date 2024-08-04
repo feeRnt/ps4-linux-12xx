@@ -90,13 +90,17 @@ static void mmc_should_fail_request(struct mmc_host *host,
 		-EIO,
 	};
 
-	if (!data)
+	pr_info("mmc-core: I am in mmc_should_fail_request.\n");
+	if (!data) {
+		pr_info("mmc-core: I am in mmc_should_fail_request. !data, retrurning void.\n");
 		return;
-
+	}
 	if ((cmd && cmd->error) || data->error ||
-	    !should_fail(&host->fail_mmc_request, data->blksz * data->blocks))
+	    !should_fail(&host->fail_mmc_request, data->blksz * data->blocks)) {
+		pr_info("mmc-core: I am in mmc_should_fail_request. cmd or data error, \
+or !should_fail, returning. \n");
 		return;
-
+	}
 	data->error = data_errors[prandom_u32() % ARRAY_SIZE(data_errors)];
 	data->bytes_xfered = (prandom_u32() % (data->bytes_xfered >> 9)) << 9;
 }
@@ -106,18 +110,24 @@ static void mmc_should_fail_request(struct mmc_host *host,
 static inline void mmc_should_fail_request(struct mmc_host *host,
 					   struct mmc_request *mrq)
 {
+	pr_info("mmc-core: I am in the empty mmc_should_fail_request.\n");
 }
 
 #endif /* CONFIG_FAIL_MMC_REQUEST */
 
 static inline void mmc_complete_cmd(struct mmc_request *mrq)
 {
-	if (mrq->cap_cmd_during_tfr && !completion_done(&mrq->cmd_completion))
+	pr_info("mmc-core: I am in mmc_complete_cmd.\n");
+	if (mrq->cap_cmd_during_tfr && !completion_done(&mrq->cmd_completion)) {
+		pr_info("mmc-core: cap_cmd_during_tfr and completion not done in mmc_complete_cmd.\n\
+Going to complete_all.\n");
 		complete_all(&mrq->cmd_completion);
+	}
 }
 
 void mmc_command_done(struct mmc_host *host, struct mmc_request *mrq)
 {
+	pr_info("mmc-core: I am in mmc_command_done.\n");
 	if (!mrq->cap_cmd_during_tfr)
 		return;
 
@@ -139,16 +149,19 @@ EXPORT_SYMBOL(mmc_command_done);
 void mmc_request_done(struct mmc_host *host, struct mmc_request *mrq)
 {
 	struct mmc_command *cmd = mrq->cmd;
-	int err = cmd->error;
+	int err = cmd->error; //mmc_command: error
 
+	pr_info("mmc-core: I am in mmc_request_done.\n");
 	/* Flag re-tuning needed on CRC errors */
 	if (cmd->opcode != MMC_SEND_TUNING_BLOCK &&
 	    cmd->opcode != MMC_SEND_TUNING_BLOCK_HS200 &&
 	    !host->retune_crc_disable &&
 	    (err == -EILSEQ || (mrq->sbc && mrq->sbc->error == -EILSEQ) ||
 	    (mrq->data && mrq->data->error == -EILSEQ) ||
-	    (mrq->stop && mrq->stop->error == -EILSEQ)))
+	    (mrq->stop && mrq->stop->error == -EILSEQ))) {
+	    pr_info("mmc-core: mmc_retune_needed in mmc_request_done.\n");
 		mmc_retune_needed(host);
+	}
 
 	if (err && cmd->retries && mmc_host_is_spi(host)) {
 		if (cmd->resp[0] & R1_SPI_ILLEGAL_COMMAND)
@@ -178,13 +191,14 @@ void mmc_request_done(struct mmc_host *host, struct mmc_request *mrq)
 			led_trigger_event(host->led, LED_OFF);
 
 		if (mrq->sbc) {
+			pr_info("mmc-core: mrq->sbc in mmc_request_done\n");
 			pr_debug("%s: req done <CMD%u>: %d: %08x %08x %08x %08x\n",
 				mmc_hostname(host), mrq->sbc->opcode,
 				mrq->sbc->error,
 				mrq->sbc->resp[0], mrq->sbc->resp[1],
 				mrq->sbc->resp[2], mrq->sbc->resp[3]);
 		}
-
+		//\\//err = cmd->error
 		pr_debug("%s: req done (CMD%u): %d: %08x %08x %08x %08x\n",
 			mmc_hostname(host), cmd->opcode, err,
 			cmd->resp[0], cmd->resp[1],
@@ -224,8 +238,8 @@ static void __mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
 	if (err) {
 		mrq->cmd->error = err;
 		mmc_request_done(host, mrq);
-		pr_info("mmc-core: err in mmc_retune host in __mmc_start_request, ending function (return void).\n\
-		err = %d", err);
+		pr_info("mmc-core: err in mmc_retune host in __mmc_start_request,\
+ending function (return void).\n err = %d", err);
 		return;
 	}
 
@@ -236,9 +250,10 @@ static void __mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
 	 */
 	if (sdio_is_io_busy(mrq->cmd->opcode, mrq->cmd->arg) &&
 	    host->ops->card_busy) {
-		pr_info("mmc-core: sdio_is_io_busy in __mmc_start_request. Waiting 500 ms\n");
+		//this goes to sdhci_card_busy
 		int tries = 500; /* Wait aprox 500ms at maximum */
 		//\\increase ... ...? 
+		pr_info("mmc-core: sdio_is_io_busy in __mmc_start_request. Waiting 500 ms\n");
 
 		while (host->ops->card_busy(host) && --tries)
 			mmc_delay(1);
@@ -262,12 +277,14 @@ returning void in __mmc_start_request.\n");
 		reinit_completion(&mrq->cmd_completion);
 	}
 
+	pr_info("mmc-core: Going to trace_mmc_core_request_start in __mmc_start_request.\n");
 	trace_mmc_request_start(host, mrq);
 
 	if (host->cqe_on) {
 		pr_info("mmc-core: Host has cqe ob __mmc_start_request, turning it off.\n");
 		host->cqe_ops->cqe_off(host);
 	}
+	pr_info("mmc-core: Going to host-ops-request(host, mrq) in __mmc_start_request.\n");
 	host->ops->request(host, mrq);
 }
 
@@ -378,7 +395,7 @@ int mmc_start_request(struct mmc_host *host, struct mmc_request *mrq)
 	}
 	
 	pr_info("mmc-core: No errors in mmc_start_request. Turning on led, \
-going back to __mmc_start_request(host, mrq) \n");
+going to ** __mmc_start_request(host, mrq) \n");
 	led_trigger_event(host->led, LED_FULL);
 	__mmc_start_request(host, mrq);
 
@@ -415,12 +432,15 @@ static int __mmc_start_req(struct mmc_host *host, struct mmc_request *mrq)
 
 	err = mmc_start_request(host, mrq);
 	if (err) {
+	pr_info("mmc-core: actual err detected in __mmc_start_req from mmc_start_request; \
+err = %d.\n Setting mrq->cmd->error = err, going to mmc_complete_cmd(mrq), and doing \
+complete(&mrq->completion)", err);
 		mrq->cmd->error = err;
 		mmc_complete_cmd(mrq);
 		complete(&mrq->completion);
 	}
-	pr_info("mmc-core: I am returning err=mmc_start_request=%d in __mmc_start_req\
-	\n", err);
+	pr_info("mmc-core: I am returning err=mmc_start_request=%d in __mmc_start_req \
+\n", err);
 	return err;
 }
 
@@ -428,9 +448,13 @@ void mmc_wait_for_req_done(struct mmc_host *host, struct mmc_request *mrq)
 {
 	struct mmc_command *cmd;
 
+	pr_debug("mmc-core: I am in mmc_wait_for_req_done. About to enter infinite loop.\n");
 	while (1) {
 		wait_for_completion(&mrq->completion);
-
+		/* either the timeout is in the linux completion and related frameworks, OR...
+		but we don't have the "req failed" below, so we probably don't enter this function,
+		or fail it. (this was before putting the pr_debug right above.)
+		*/
 		cmd = mrq->cmd;
 
 		if (!cmd->error || !cmd->retries ||
@@ -438,7 +462,9 @@ void mmc_wait_for_req_done(struct mmc_host *host, struct mmc_request *mrq)
 			break;
 
 		mmc_retune_recheck(host);
-
+		/*checks whether host requests a hold on retune. if not, sets the retune_now on host 
+		 to 1. put a pr_debug in the header file itself? (host.h)
+		*/
 		pr_debug("%s: req failed (CMD%u): %d, retrying...\n",
 			 mmc_hostname(host), cmd->opcode, cmd->error);
 		cmd->retries--;
@@ -510,6 +536,7 @@ EXPORT_SYMBOL(mmc_cqe_start_req);
  */
 void mmc_cqe_request_done(struct mmc_host *host, struct mmc_request *mrq)
 {
+	pr_info("mmc-core: I am in mmc_cqe_request_done/n");
 	mmc_should_fail_request(host, mrq);
 
 	/* Flag re-tuning needed on CRC errors */
@@ -566,6 +593,7 @@ int mmc_cqe_recovery(struct mmc_host *host)
 	struct mmc_command cmd;
 	int err;
 
+	pr_info("mmc-core: I am in mmc_cqe_recovery.\n");
 	mmc_retune_hold_now(host);
 
 	/*
@@ -634,7 +662,8 @@ void mmc_wait_for_req(struct mmc_host *host, struct mmc_request *mrq)
 	__mmc_start_req(host, mrq);
 	pr_info("mmc-core: I am in mmc_wait_for_req. Just started request.\n");
 	if (!mrq->cap_cmd_during_tfr) {
-		pr_info("mmc-core: I am in mmc_wait_for_req. Request is done.\n");
+		pr_info("mmc-core: I am in mmc_wait_for_req. Wait for request done because \
+cap_cmd_during _transfer not found.\n");
 		mmc_wait_for_req_done(host, mrq);
 	}
 }
@@ -660,10 +689,10 @@ int mmc_wait_for_cmd(struct mmc_host *host, struct mmc_command *cmd, int retries
 	memset(cmd->resp, 0, sizeof(cmd->resp));
 	cmd->retries = retries;
 	pr_debug("mmc-core: no. of retries in mmc_wait_for_cmd is %d \n", retries);
-	//set manually?
+	//set manually? ;; this returns to 0.
 	mrq.cmd = cmd;
 	pr_debug("mmc-core: current command in mmc_wait_for_cmd is %d \
-Setting cmd->data = NULL\n", cmd);
+Setting cmd->data = NULL\n", mrq.cmd);
 	cmd->data = NULL;
 	//DEBUG is defined but doesn't print. Guess I needed -DDEBUG after all.
 
@@ -1525,6 +1554,7 @@ static unsigned int mmc_mmc_erase_timeout(struct mmc_card *card,
 {
 	unsigned int erase_timeout;
 
+	pr_info("mmc-core: I am in mmc_mmc_erase_timeout\n");
 	if (arg == MMC_DISCARD_ARG ||
 	    (arg == MMC_TRIM_ARG && card->ext_csd.rev >= 6)) {
 		erase_timeout = card->ext_csd.trim_timeout;
@@ -1618,7 +1648,7 @@ static unsigned int mmc_sd_erase_timeout(struct mmc_card *card,
 static unsigned int mmc_erase_timeout(struct mmc_card *card,
 				      unsigned int arg,
 				      unsigned int qty)
-{
+{	pr_info("mmc-core: I am in mmc_erase_timeout\n");
 	if (mmc_card_sd(card))
 		return mmc_sd_erase_timeout(card, arg, qty);
 	else
@@ -1910,6 +1940,7 @@ static unsigned int mmc_do_calc_max_discard(struct mmc_card *card,
 	unsigned int max_busy_timeout = host->max_busy_timeout ?
 			host->max_busy_timeout : MMC_ERASE_TIMEOUT_MS;
 
+	pr_info("mmc-core: I am in mmc_do_calc_max_discard\n");
 	if (card->erase_shift) {
 		max_qty = UINT_MAX >> card->erase_shift;
 		min_qty = card->pref_erase >> card->erase_shift;
@@ -1989,6 +2020,7 @@ unsigned int mmc_calc_max_discard(struct mmc_card *card)
 	 * frequence which can change.  In that case, the best choice is
 	 * just the preferred erase size.
 	 */
+	pr_info("mmc-core: I am in mmc_calc_max_discard\n");
 	if (mmc_card_mmc(card) && !(card->ext_csd.erase_group_def & 1))
 		return card->pref_erase;
 

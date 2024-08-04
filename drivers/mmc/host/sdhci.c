@@ -218,29 +218,36 @@ void sdhci_reset(struct sdhci_host *host, u8 mask)
 	sdhci_writeb(host, mask, SDHCI_SOFTWARE_RESET);
 
 	if (mask & SDHCI_RESET_ALL) {
-		pr_info("sdhci: I am in sdhci_reset, SDHCI_RESET_ALL mask detected.\n\
-				Setting host clock to 0.\n");
+		pr_info("sdhci: I am in sdhci_reset, SDHCI_RESET_ALL mask detected.\n \
+Setting host clock to 0.\n");
 		host->clock = 0;
 		/* Reset-all turns off SD Bus Power */
 		if (host->quirks2 & SDHCI_QUIRK2_CARD_ON_NEEDS_BUS_ON) {
-			pr_info("sdhci: I am in sdhci_reset. Quirk CARD_ON_NEEDS_BUS_ON detected.\n\
-					Hence turning off SD Bus Power.\n"); //\\test if this quirk on/off helps
+			pr_info("sdhci: I am in sdhci_reset. Quirk CARD_ON_NEEDS_BUS_ON detected.\n \
+Hence turning off SD Bus Power.\n"); //\\test if this quirk on/off helps
 			sdhci_runtime_pm_bus_off(host);
 		}
 	}
 
 	/* Wait max 100 ms */
-	pr_info("sdhci: About to wait 100:500 ms for sdhci_reset.\n");
-	timeout = ktime_add_ms(ktime_get(), 500); //\\increase? ===> increased to 500 ms
+	pr_info("sdhci: About to wait 100 ms for sdhci_reset.\n");
+	timeout = ktime_add_ms(ktime_get(), 500); //\\increase? ===> increase to ...
 
 	/* hw clears the bit when it's done */
+	//maybe this bit is cleared sooner than it should be? or is not properly set either?
+	//manually wait 100 ms , and wait at max 500 ms, to see what happens
+	//currently it seems to wait a mere **~0.078** ms..., almost everytime, never fails.
+	// so not set properly and that's just the cpu freq/jiffy?
+	
+	/*
 	while (1) {
 		bool timedout = ktime_after(ktime_get(), timeout);
 
 		if (!(sdhci_readb(host, SDHCI_SOFTWARE_RESET) & mask)) {
 			pr_debug("sdhci: Reset wait (timeout) period is over in sdhci_reset, and reset bit\
-					not seen (hw cleared it, seemingly), finishing.\n");
+not seen (hw cleared it, seemingly), exiting reset loop.\n");
 			break;
+
 		}
 		if (timedout) {
 			pr_err("%s: Reset 0x%x never completed.\n",
@@ -250,6 +257,28 @@ void sdhci_reset(struct sdhci_host *host, u8 mask)
 		}
 		udelay(10);
 	}
+	*/
+	while (1) {
+		bool timedout = ktime_after(ktime_get(), timeout);
+		msleep(100);
+		
+		if (!(sdhci_readb(host, SDHCI_SOFTWARE_RESET) & mask)) {
+			pr_debug("sdhci: Reset wait (timeout) period is over in sdhci_reset, and reset bit\
+not seen (hw cleared it, seemingly), exiting reset loop.\n");
+			break;
+		}	
+			
+		else if (timedout) {
+			pr_err("%s: Reset 0x%x never completed. Returning void in sdhci_reset.\n",
+				mmc_hostname(host->mmc), (int)mask);
+			sdhci_dumpregs(host);
+			return;
+		}
+	udelay(10);
+	pr_info("sdhci: Returning in sdhci_reset, because we apparently succeeded.\n");
+	return;
+	}
+	
 }
 EXPORT_SYMBOL_GPL(sdhci_reset);
 
@@ -415,9 +444,10 @@ static void __sdhci_led_deactivate(struct sdhci_host *host)
 	u8 ctrl;
 
 	pr_info("sdhci: I am in __sdhci_led_deactivate.\n");
-	if (host->quirks & SDHCI_QUIRK_NO_LED)
+	if (host->quirks & SDHCI_QUIRK_NO_LED) {
+		pr_info("sdhci: SDHCI_QUIRK_NO_LED in led_deactivate, returning void.\n");
 		return;
-
+	}
 	ctrl = sdhci_readb(host, SDHCI_HOST_CONTROL);
 	ctrl &= ~SDHCI_CTRL_LED;
 	sdhci_writeb(host, ctrl, SDHCI_HOST_CONTROL);
@@ -1774,22 +1804,22 @@ static bool sdhci_send_command(struct sdhci_host *host, struct mmc_command *cmd)
 	pr_info("sdhci: Going to check sdhci_data_line_cmd's output from sdhci_send_command\n");
 	mask = SDHCI_CMD_INHIBIT;
 	if (sdhci_data_line_cmd(cmd)) {
-		pr_info("sdhci: sdhci_data_line cmd returned either busy or data present.\n\
-		Inhibit data transfer in sdhci_send_command mask.\n");
+		pr_info("sdhci: sdhci_data_line cmd returned either busy or data present.\n \
+Inhibit data transfer in sdhci_send_command mask.\n");
 		mask |= SDHCI_DATA_INHIBIT;
 	}
 
 	/* We shouldn't wait for data inihibit for stop commands, even
 	   though they might use busy signaling */
 	if (cmd->mrq->data && (cmd == cmd->mrq->data->stop)) {
-		pr_info("sdhci: mrq has data, but it is stop data, negate inhibit mask\
-		in sdhci_send_command.\n");
+		pr_info("sdhci: mrq has data, but it is stop data, negate inhibit mask \
+in sdhci_send_command.\n");
 		mask &= ~SDHCI_DATA_INHIBIT;
 	}
 	
 	if (sdhci_readl(host, SDHCI_PRESENT_STATE) & mask) {
-		pr_info("sdhci: Current state of host matches set mask; return false\
-		in sdhci_send_command.\n"); 
+		pr_info("sdhci: Current state of host matches set mask; return false \
+in sdhci_send_command.\n"); 
 		return false;
 	}
 	host->cmd = cmd;
@@ -1798,8 +1828,8 @@ static bool sdhci_send_command(struct sdhci_host *host, struct mmc_command *cmd)
 	  this is what calls the second sdhci_data_line_cmd in the dmesg
 	*/
 	if (sdhci_data_line_cmd(cmd)) {
-		pr_info("sdhci: Host still has data_line_cmd, warn if host gets data_cmd.\
-		Assigning host's data_cmd to normal host commmand. And setting timeout.\n");
+		pr_info("sdhci: Host still has data_line_cmd, warn if host gets data_cmd. \
+Assigning host's data_cmd to normal host commmand. And setting timeout.\n");
 		WARN_ON(host->data_cmd);
 		host->data_cmd = cmd;
 		sdhci_set_timeout(host, cmd);
@@ -1863,7 +1893,7 @@ static bool sdhci_send_command(struct sdhci_host *host, struct mmc_command *cmd)
 	sdhci_writew(host, SDHCI_MAKE_CMD(cmd->opcode, flags), SDHCI_COMMAND);
 	//thanks for the documentation folks.
 
-	pr_info("sdhci: returning true in sdchi_send_command\n");
+	pr_info("sdhci: returning true in sdhci_send_command\n");
 	// why does it jump to shdci_irq after mod_timer? 
 	return true;
 }
@@ -2397,7 +2427,7 @@ void sdhci_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	pr_info("sdhci: Card present in sdhci_request? %d \n", present); 
 	//this bool is acquired from sdhci_get_cd
 	
-	pr_info("sdhci: doing spin_lock_irqsave in sdhci_requst.\n"); 	
+	pr_info("sdhci: doing spin_lock_irqsave in sdhci_request.\n"); 	
 	spin_lock_irqsave(&host->lock, flags);
 	// from include spinlock.h?
 
@@ -2417,8 +2447,9 @@ void sdhci_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	*/
 	pr_info("Just tested manual_cmd23. cmd = mrq->sbc? %d. If no, then mrq->cmd\n",
 		cmd);
-		//calling the function again in the pr_info will damage the logging
-
+		/*calling the function again in the pr_info will damage the logging
+		this return seems to be in binary, not hex or decimal, but it returns negative,
+		so no mrq->sbc for our case*/
 	if (!sdhci_send_command_retry(host, cmd, flags)) { 
 		pr_info("sdhci: sdhci_send_command_retry is false, going to out_finish.\n");
 		goto out_finish;
@@ -2835,7 +2866,7 @@ int sdhci_start_signal_voltage_switch(struct mmc_host *mmc,
 	 */
 	if (host->version < SDHCI_SPEC_300) {
 		pr_info("sdhci: Controller ver<3, returning 0 in \
-		sdhci_start_signal_switch.\n");
+sdhci_start_signal_switch.\n");
 		return 0;
 	}
 
@@ -2845,28 +2876,28 @@ int sdhci_start_signal_voltage_switch(struct mmc_host *mmc,
 	switch (ios->signal_voltage) {
 	case MMC_SIGNAL_VOLTAGE_330:
 		if (!(host->flags & SDHCI_SIGNALING_330)) {
-			pr_err("sdhci: ios volt=3.3, but host is not capable of 3.3V Signaling.\
-			Returning -EINVAL, in sdhci_start_signal__switch.\n");
+			pr_err("sdhci: ios volt=3.3, but host is not capable of 3.3V Signaling. \
+Returning -EINVAL, in sdhci_start_signal__switch.\n");
 			return -EINVAL;
 		}	
 		/* Set 1.8V Signal Enable in the Host Control2 register to 0 */
-		pr_info("sdhci: Disabling 1.8V signal in Control2 register;\
-		in sdhci_start_signal_switch.\n");
+		pr_info("sdhci: Disabling 1.8V signal in Control2 register; \
+in sdhci_start_signal_switch.\n");
 		ctrl &= ~SDHCI_CTRL_VDD_180;
 		sdhci_writew(host, ctrl, SDHCI_HOST_CONTROL2);
 
 		if (!IS_ERR(mmc->supply.vqmmc)) {
 			ret = mmc_regulator_set_vqmmc(mmc, ios);
 			if (ret < 0) {
-				pr_err("%s: Switching to 3.3V signalling voltage failed in\
-				mmc_regulator_set_vqmmc. returning -EIO\n",
+				pr_err("%s: Switching to 3.3V signalling voltage failed in \
+mmc_regulator_set_vqmmc. returning -EIO\n",
 					mmc_hostname(mmc));
 				return -EIO;
 			}
 		}
 		else
-			pr_info("sdhci: error in mmc->supply.vqmmc; in\
-			sdhci_start_signal_voltage_switch.\n");
+			pr_info("sdhci: error in mmc->supply.vqmmc; in \
+sdhci_start_signal_voltage_switch.\n");
 		/* Wait for 5ms */ 
 		usleep_range(5000, 7500); //\\increase? =====> increased to 25 ms*/ 
 
@@ -2883,22 +2914,22 @@ int sdhci_start_signal_voltage_switch(struct mmc_host *mmc,
 		return -EAGAIN;
 	case MMC_SIGNAL_VOLTAGE_180:
 		if (!(host->flags & SDHCI_SIGNALING_180)) {
-			pr_err("sdhci: ios volt=1.8, but host is not capable of 1.8V Signaling.\
-			Returning -EINVAL, in sdhci_start_signal__switch.\n");
+			pr_err("sdhci: ios volt=1.8, but host is not capable of 1.8V Signaling. \
+Returning -EINVAL, in sdhci_start_signal__switch.\n");
 			return -EINVAL;
 		}
 		if (!IS_ERR(mmc->supply.vqmmc)) {
 			ret = mmc_regulator_set_vqmmc(mmc, ios);
 			if (ret < 0) {
-				pr_warn("%s: Switching to 1.8V signalling voltage failed\
-				in mmc_regulator_set_vqmmc, returning -EIO.\n",
+				pr_warn("%s: Switching to 1.8V signalling voltage failed \
+in mmc_regulator_set_vqmmc, returning -EIO.\n",
 					mmc_hostname(mmc));
 				return -EIO;
 			}
 		}
 		else
-			pr_info("sdhci: error in mmc->supply.vqmmc; in\
-			sdhci_start_signal_voltage_switch.\n");
+			pr_info("sdhci: error in mmc->supply.vqmmc; in \
+sdhci_start_signal_voltage_switch.\n");
 		/*
 		 * Enable 1.8V Signal Enable in the Host Control2
 		 * register
@@ -2928,29 +2959,29 @@ int sdhci_start_signal_voltage_switch(struct mmc_host *mmc,
 		return -EAGAIN;
 	case MMC_SIGNAL_VOLTAGE_120:
 		if (!(host->flags & SDHCI_SIGNALING_120)) {
-			pr_err("sdhci: ios volt=1.2, but host is not capable of 1.2V Signaling.\
-			Returning -EINVAL, in sdhci_start_signal__switch.\n");
+			pr_err("sdhci: ios volt=1.2, but host is not capable of 1.2V Signaling. \
+Returning -EINVAL, in sdhci_start_signal__switch.\n");
 			return -EINVAL;
 		}
 		
 		if (!IS_ERR(mmc->supply.vqmmc)) {
 			ret = mmc_regulator_set_vqmmc(mmc, ios);
 			if (ret < 0) {
-				pr_warn("%s: Switching to 1.2V signalling voltage failed\
-				in mmc_regulator_set_vqmmc, returning -EIO.\n",
+				pr_warn("%s: Switching to 1.2V signalling voltage failed \
+in mmc_regulator_set_vqmmc, returning -EIO.\n",
 					mmc_hostname(mmc));
 				return -EIO;
 			}
 		}
 		else 
-			pr_info("sdhci: error in mmc->supply.vqmmc; in\
-			sdhci_start_signal_voltage_switch.\n");
+			pr_info("sdhci: error in mmc->supply.vqmmc; in \
+sdhci_start_signal_voltage_switch.\n");
 		
 		pr_info("sdhci: Returning 0 in shdci_start_signal_voltage_switch.\n");
 		return 0;
 	default:
-		pr_info("sdhci: Default case in sdhci_start_signal_voltage_switch.\
-		Voltage switch not required, returning 0.\n");
+		pr_info("sdhci: Default case in sdhci_start_signal_voltage_switch. \
+Voltage switch not required, returning 0.\n");
 		/* No signal voltage switch required */
 		return 0;
 	}
@@ -2967,8 +2998,11 @@ static int sdhci_card_busy(struct mmc_host *mmc)
 	present_state = sdhci_readl(host, SDHCI_PRESENT_STATE);
 	pr_info("sdhci: present_state=%d\n", present_state);
 	
-	pr_info("sdhci: Returning:%d in sdhci_card_busy\n", 
+	pr_info("sdhci: Returning: %d in sdhci_card_busy\n", 
 		!(present_state & SDHCI_DATA_0_LVL_MASK));
+		//if data is present in data line 0, meaning A & MASK = 1, return 0, Aka busy
+		//if data is absent in data line 0, meaning A & MASK = 0, reutrn 1. Aka not busy
+		// .. . . .. ?
 	return !(present_state & SDHCI_DATA_0_LVL_MASK);
 }
 
@@ -3099,7 +3133,7 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
 
 	if (!sdhci_send_command_retry(host, &cmd, flags)) {
 		pr_info("sdhci: Retry not needed in sdhci_send_clock.\
-		spin_unlock_irqrestore. Setting tuning_done=0.\n");	
+spin_unlock_irqrestore. Setting tuning_done=0.\n");	
 		spin_unlock_irqrestore(&host->lock, flags);
 		host->tuning_done = 0;
 		return;
@@ -3152,8 +3186,8 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 			pr_err("Stack and reg dump after tuning is aborted:\n");
 			dump_stack();
 			sdhci_dumpregs(host);
+			pr_err("sdhci: Returning -ETIMEDOUT in __sdhci_execute_tuning.\n");
 			return -ETIMEDOUT;
-			pr_err("Completion of 'return -ETIMEDOUT'");
 		}
 
 		/* Spec does not require a delay between tuning cycles */
@@ -3552,7 +3586,7 @@ static void sdhci_timeout_timer(struct timer_list *t)
 		pr_err("%s: Timeout waiting for hardware cmd interrupt.\n",
 		       mmc_hostname(host->mmc));
 		sdhci_dumpregs(host);
-
+		pr_err("sdhci: Assigning cmd->error=-ETIMEDOUT in sdhci_timeout_timer.\n");
 		host->cmd->error = -ETIMEDOUT;
 		sdhci_finish_mrq(host, host->cmd->mrq);
 	}
@@ -3577,13 +3611,16 @@ static void sdhci_timeout_data_timer(struct timer_list *t)
 		sdhci_dumpregs(host);
 
 		if (host->data) {
+			pr_info("sdhci: Assigning data->error=-ETIMEDOUT in sdhci_timeout_data_timer.\n");
 			host->data->error = -ETIMEDOUT;
 			__sdhci_finish_data(host, true);
 			queue_work(host->complete_wq, &host->complete_work);
 		} else if (host->data_cmd) {
+			pr_info("sdhci: Assigning data_cmd->error=-ETIMEDOUT in sdhci_timeout_data_timer.\n");
 			host->data_cmd->error = -ETIMEDOUT;
 			sdhci_finish_mrq(host, host->data_cmd->mrq);
 		} else {
+			pr_err("sdhci: Assigning generic cmd->error=-ETIMEDOUT in sdhci_timeout_data_timer.\n");
 			host->cmd->error = -ETIMEDOUT;
 			sdhci_finish_mrq(host, host->cmd->mrq);
 		}
@@ -3632,8 +3669,11 @@ static void sdhci_cmd_irq(struct sdhci_host *host, u32 intmask, u32 *intmask_p)
 
 	if (intmask & (SDHCI_INT_TIMEOUT | SDHCI_INT_CRC |
 		       SDHCI_INT_END_BIT | SDHCI_INT_INDEX)) {
-		if (intmask & SDHCI_INT_TIMEOUT)
+		if (intmask & SDHCI_INT_TIMEOUT) {
+			pr_err("sdhci: SDHCI_INT_TIMEOUT detected with mask in sdhci_cmd_irq.\
+Assigning host->cmd->error = -ETIMEDOUT in sdhci_cmd_irq.\n");
 			host->cmd->error = -ETIMEDOUT;
+		}
 		else {
 			pr_err("sdhci: Assigning host->cmd->error = -EILSEQ in sdhci_cmd_irq\n");
 			host->cmd->error = -EILSEQ;
@@ -3642,11 +3682,14 @@ static void sdhci_cmd_irq(struct sdhci_host *host, u32 intmask, u32 *intmask_p)
 		if (host->cmd->data &&
 		    (intmask & (SDHCI_INT_CRC | SDHCI_INT_TIMEOUT)) ==
 		     SDHCI_INT_CRC) {
+			pr_err("sdhci: data command crc /data crc error?\n");
 			host->cmd = NULL;
 			*intmask_p |= SDHCI_INT_DATA_CRC;
 			return;
 		}
-
+		
+		pr_info("sdhci: Going to __sdhci_finish_mrq in sdhci_cmd_irq, \
+then returning void\n");
 		__sdhci_finish_mrq(host, host->cmd->mrq);
 		return;
 	}
@@ -3658,16 +3701,23 @@ static void sdhci_cmd_irq(struct sdhci_host *host, u32 intmask, u32 *intmask_p)
 		int err = (auto_cmd_status & SDHCI_AUTO_CMD_TIMEOUT) ?
 			  -ETIMEDOUT :
 			  -EILSEQ;
+		pr_err("sdhci: SDHCI_INT_AUTO_CMD_ERR detected in sdhci_cmd_irq \
+The err = %d, based on auto_cmd_status\n", err);	  
 
 		if (mrq->sbc && (host->flags & SDHCI_AUTO_CMD23)) {
+			// we shouldn't have sbc but..
+			pr_info("sdhci: mrq->sbc and SDHCI_AUTO_CMD23 in cmd_irq\n");
 			mrq->sbc->error = err;
 			__sdhci_finish_mrq(host, mrq);
 			return;
 		}
 	}
 
-	if (intmask & SDHCI_INT_RESPONSE)
+	if (intmask & SDHCI_INT_RESPONSE) {
+		pr_info("sdhci: INT_RESPONSE detected in  sdhci_cmd_irq, \
+going to sdhci_finish_command\n");
 		sdhci_finish_command(host);
+	}
 }
 
 static void sdhci_adma_show_error(struct sdhci_host *host)
@@ -3735,6 +3785,9 @@ static void sdhci_data_irq(struct sdhci_host *host, u32 intmask)
 		 */
 		if (data_cmd && (data_cmd->flags & MMC_RSP_BUSY)) {
 			if (intmask & SDHCI_INT_DATA_TIMEOUT) {
+				pr_info("sdhci: SDHCI_INT_DATA_TIMEOUT seen in sdhci_data_irq with \
+MMC_RSP_BUSY, assigning data_cmd->error = -ETIMEDOUT. \
+Going to __sdhci_finish_mrq\n");
 				host->data_cmd = NULL;
 				data_cmd->error = -ETIMEDOUT;
 				__sdhci_finish_mrq(host, data_cmd->mrq);
@@ -3770,8 +3823,11 @@ static void sdhci_data_irq(struct sdhci_host *host, u32 intmask)
 		return;
 	}
 
-	if (intmask & SDHCI_INT_DATA_TIMEOUT)
+	if (intmask & SDHCI_INT_DATA_TIMEOUT) {
+		pr_info("sdhci: SDHCI_INT_DATA_TIMEOUT in sdhci_data_irq. \
+Assigning host->data->error = -ETIMEDOUT\n");
 		host->data->error = -ETIMEDOUT;
+	}
 	else if (intmask & SDHCI_INT_DATA_END_BIT)
 		host->data->error = -EILSEQ;
 	else if ((intmask & SDHCI_INT_DATA_CRC) &&
@@ -3947,8 +4003,8 @@ static irqreturn_t sdhci_irq(int irq, void *dev_id)
 cont:
 		pr_info("sdhci: I am in cont case of sdhci_thread_irq.\n");
 		if (result == IRQ_NONE) { 
-			pr_info("sdhci: IRQ_NONE in cont case of sdhci_thread_irq.\
-			result = IRQ_HANDLED.\n");
+			pr_info("sdhci: IRQ_NONE in cont case of sdhci_thread_irq. \
+result = IRQ_HANDLED.\n");
 			result = IRQ_HANDLED;
 		}
 		
@@ -3977,9 +4033,11 @@ out:
 		result = IRQ_WAKE_THREAD;
 	}
 	
-	pr_info("sdhci: Unlocking spins in sdhci_thread_irq\n");	
+	pr_info("sdhci: Unlocking spin_locks in sdhci_thread_irq\n");	
 	spin_unlock(&host->lock);
 
+	pr_info("sdhci: About to process mrqs ready for completion already \
+in sdhci_thread_irq.\n");
 	/* Process mrqs ready for immediate completion */
 	for (i = 0; i < SDHCI_MAX_MRQS; i++) {
 		if (!mrqs_done[i])
@@ -3996,7 +4054,7 @@ out:
 			   mmc_hostname(host->mmc), unexpected);
 		sdhci_dumpregs(host);
 	}
-
+	pr_info("sdhci: Returning: %d in sdhci_thread_irq\n", result); 
 	return result;
 }
 
@@ -4332,15 +4390,19 @@ bool sdhci_cqe_irq(struct sdhci_host *host, u32 intmask, int *cmd_error,
 
 	if (intmask & (SDHCI_INT_INDEX | SDHCI_INT_END_BIT | SDHCI_INT_CRC))
 		*cmd_error = -EILSEQ;
-	else if (intmask & SDHCI_INT_TIMEOUT)
+	else if (intmask & SDHCI_INT_TIMEOUT) {
+		pr_info("sdhci: SDHCI_INT_TIMEOUT in sdhci_cqe_irq. Assigning *cmd_error = -ETIMEDOUT.\n");
 		*cmd_error = -ETIMEDOUT;
+	}
 	else
 		*cmd_error = 0;
 
 	if (intmask & (SDHCI_INT_DATA_END_BIT | SDHCI_INT_DATA_CRC))
 		*data_error = -EILSEQ;
-	else if (intmask & SDHCI_INT_DATA_TIMEOUT)
+	else if (intmask & SDHCI_INT_DATA_TIMEOUT) {
+		pr_info("sdhci: SDHCI_INT_DATA_TIMEOUT in sdhci_cqe_irq. Assigning *cmd_error = -ETIMEDOUT.\n");
 		*data_error = -ETIMEDOUT;
+	}
 	else if (intmask & SDHCI_INT_ADMA_ERROR)
 		*data_error = -EIO;
 	else

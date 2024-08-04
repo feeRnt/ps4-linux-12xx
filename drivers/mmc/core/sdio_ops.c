@@ -62,6 +62,8 @@ exiting loop in mmc_send_io_op_cond.\n");
 Executing mmc_delay(10).");
 		err = -ETIMEDOUT;
 		// i need to learn ftrace
+		// it maybe breaks this kernel . . .
+		//increase?
 		mmc_delay(10);
 	}
 
@@ -128,9 +130,9 @@ mmc_io_rw_direct_host, returning err=%d", err);
 	}
 
 	if (out) {
-		pr_info("sdio_ops: out is true\n");
+		pr_info("sdio_ops: out is true in mmc_io_rw_direct_host\n");
 		if (mmc_host_is_spi(host)) {
-			pr_info("sdio_ops: host_is_spi, Assigning out.\n");
+			pr_info("sdio_ops: host_is_spi, Assigning out in mmc_io_rw_direct_host out condition\n");
 			*out = (cmd.resp[0] >> 8) & 0xFF;
 		}
 		else {
