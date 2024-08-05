@@ -231,15 +231,16 @@ Hence turning off SD Bus Power.\n"); //\\test if this quirk on/off helps
 
 	/* Wait max 100 ms */
 	pr_info("sdhci: About to wait 100 ms for sdhci_reset.\n");
-	timeout = ktime_add_ms(ktime_get(), 500); //\\increase? ===> increase to ...
+	timeout = ktime_add_ms(ktime_get(), 100); //\\increase? ===> increase to ...
 
 	/* hw clears the bit when it's done */
 	//maybe this bit is cleared sooner than it should be? or is not properly set either?
 	//manually wait 100 ms , and wait at max 500 ms, to see what happens
 	//currently it seems to wait a mere **~0.078** ms..., almost everytime, never fails.
 	// so not set properly and that's just the cpu freq/jiffy?
+
+	// ** Manual 100 ms between resets didn't seem to help much. **
 	
-	/*
 	while (1) {
 		bool timedout = ktime_after(ktime_get(), timeout);
 
@@ -257,11 +258,14 @@ not seen (hw cleared it, seemingly), exiting reset loop.\n");
 		}
 		udelay(10);
 	}
-	*/
+
+	/*
+//sleep for 100 ms, then check until 400 more ms have passed
+	//	msleep(100);
 	while (1) {
 		bool timedout = ktime_after(ktime_get(), timeout);
 		msleep(100);
-		
+//check ~4 times, each with a 100 ms sleep in between
 		if (!(sdhci_readb(host, SDHCI_SOFTWARE_RESET) & mask)) {
 			pr_debug("sdhci: Reset wait (timeout) period is over in sdhci_reset, and reset bit\
 not seen (hw cleared it, seemingly), exiting reset loop.\n");
@@ -278,6 +282,7 @@ not seen (hw cleared it, seemingly), exiting reset loop.\n");
 	pr_info("sdhci: Returning in sdhci_reset, because we apparently succeeded.\n");
 	return;
 	}
+	*/ 
 	
 }
 EXPORT_SYMBOL_GPL(sdhci_reset);
