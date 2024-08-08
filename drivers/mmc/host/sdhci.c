@@ -3119,13 +3119,15 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
 	 * block to the Host Controller. So we set the block size
 	 * to 64 here.
 	 */
+	 // we're supposed to have cmd 19 here but we never get a cmd 19?
 	if (cmd.opcode == MMC_SEND_TUNING_BLOCK_HS200 &&
 	    mmc->ios.bus_width == MMC_BUS_WIDTH_8) {
 		pr_info("sdhci: HS200 block and bus width 8 in sdhci_send_tuning\n");
 		sdhci_writew(host, SDHCI_MAKE_BLKSZ(b, 128), SDHCI_BLOCK_SIZE);
 	}
 	else {
-		pr_info("sdhci: else condition in  sdhci_send_tuning\n");
+		pr_info("sdhci: else condition in  sdhci_send_tuning, HS200 and bus width 8 not seen. \
+Setting blocksize to 64.\n");
 		sdhci_writew(host, SDHCI_MAKE_BLKSZ(b, 64), SDHCI_BLOCK_SIZE);
 	}
 	/*
@@ -3137,7 +3139,7 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
 	sdhci_writew(host, SDHCI_TRNS_READ, SDHCI_TRANSFER_MODE);
 
 	if (!sdhci_send_command_retry(host, &cmd, flags)) {
-		pr_info("sdhci: Retry not needed in sdhci_send_clock.\
+		pr_info("sdhci: Retry not needed in sdhci_send_tuning.\
 spin_unlock_irqrestore. Setting tuning_done=0.\n");	
 		spin_unlock_irqrestore(&host->lock, flags);
 		host->tuning_done = 0;
@@ -3146,10 +3148,13 @@ spin_unlock_irqrestore. Setting tuning_done=0.\n");
 
 	host->cmd = NULL;
 
+	pr_debug("sdhci: About to enter sdhci_del_timer in sdhci_send_tuning.\n");
 	sdhci_del_timer(host, &mrq);
 
+	pr_debug("sdhci: About to set host->tuning_done = 0 in sdhci_send_tuning.\n");
 	host->tuning_done = 0;
 
+	pr_debug("sdhci: About to enter sdhci_unlock_irqrestore in sdhci_send_tuning.\n");
 	spin_unlock_irqrestore(&host->lock, flags);
 
 	/* Wait for Buffer Read Ready interrupt */
@@ -3175,6 +3180,10 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 	sdhci_dumpregs(host);
 //	pr_info("The output of sdhci_host *host is:%",
 
+	pr_debug("sdhci: About to try sdhci_send_tuning %d times in __sdhci_execute_tuning\n", 
+		host->tuning_loop_count); 
+		/* from counting it seems to be 40. I wonder if increasing this will fix it after all. . It's defined at the start:
+		SDHCI_MAX_TUNING_LOOP. Used in *sdhci_alloc_host*/
 	for (i = 0; i < host->tuning_loop_count; i++) {
 		u16 ctrl;
 
@@ -3650,10 +3659,15 @@ static void sdhci_cmd_irq(struct sdhci_host *host, u32 intmask, u32 *intmask_p)
 		int data_err_bit = (auto_cmd_status & SDHCI_AUTO_CMD_TIMEOUT) ?
 				   SDHCI_INT_DATA_TIMEOUT :
 				   SDHCI_INT_DATA_CRC;
-
+		pr_err("sdhci: AUTO_CMD_ERR && data_cmd seen in sdhci_cmd_irq.\n\
+data_err_bit = auto_cmd_status (%08x) & SDHCI_INT_DATA_TIMEOUT (0x7) = %08x",
+	auto_cmd_status, data_err_bit);
 		/* Treat auto-CMD12 error the same as data error */
 		if (!mrq->sbc && (host->flags & SDHCI_AUTO_CMD12)) {
+			pr_debug("sdhci: mrq is not sbc, and host has SDHCI_AUTO_CMD12 flag.. \
+Assigning *intmask_p |= data_err_bit (%08x)\n", data_err_bit);
 			*intmask_p |= data_err_bit;
+			pr_debug("sdhci: *intmask_p after assignment = %08x\n", *intmask_p);
 			return;
 		}
 	}
@@ -3674,6 +3688,7 @@ static void sdhci_cmd_irq(struct sdhci_host *host, u32 intmask, u32 *intmask_p)
 
 	if (intmask & (SDHCI_INT_TIMEOUT | SDHCI_INT_CRC |
 		       SDHCI_INT_END_BIT | SDHCI_INT_INDEX)) {
+	//0x00010000 | 0x00020000 | 0x00040000 | 0x00080000 	   
 		if (intmask & SDHCI_INT_TIMEOUT) {
 			pr_err("sdhci: SDHCI_INT_TIMEOUT detected with mask in sdhci_cmd_irq.\
 Assigning host->cmd->error = -ETIMEDOUT in sdhci_cmd_irq.\n");
@@ -3689,6 +3704,7 @@ Assigning host->cmd->error = -ETIMEDOUT in sdhci_cmd_irq.\n");
 		     SDHCI_INT_CRC) {
 			pr_err("sdhci: data command crc /data crc error?\n");
 			host->cmd = NULL;
+			pr_info("sdhci: Assigning *intmask_p |= SDHCI_INT_DATA_CRC\n");
 			*intmask_p |= SDHCI_INT_DATA_CRC;
 			return;
 		}
@@ -3920,13 +3936,14 @@ static irqreturn_t sdhci_irq(int irq, void *dev_id)
 	spin_lock(&host->lock);
 
 	if (host->runtime_suspended) {
-		pr_err("sdhci: runtime is suspended in sdhci_irq.\
-		Returning IRQ_NONE after unlocking\n");
+		pr_err("sdhci: runtime is suspended in sdhci_irq. \
+Returning IRQ_NONE after unlocking\n");
 		spin_unlock(&host->lock);
 		return IRQ_NONE;
 	}
-
-	intmask = sdhci_readl(host, SDHCI_INT_STATUS);
+	pr_debug("sdhci: Assigning intmask = shdci_readl(host, SDHCI_INT_STATUS\n");
+	intmask = sdhci_readl(host, SDHCI_INT_STATUS); //reads the SDHCI_INT_STATUS controller register
+	pr_debug("sdhci: intmask after assignment is = %08x\n", intmask);
 	if (!intmask || intmask == 0xffffffff) {
 		pr_err("sdhci: IRQ_NONE in sdhci_irq. intmask=%d. Going to out.\n",intmask);
 		result = IRQ_NONE;
@@ -3934,17 +3951,27 @@ static irqreturn_t sdhci_irq(int irq, void *dev_id)
 	}
 
 	do {
-		DBG("IRQ status 0x%08x\n", intmask);
+	//	DBG("IRQ status 0x%08x\n", intmask);
 		// we don't see this
+		pr_debug("mmc0: sdhci: IRQ status 0x%08x\n", intmask);
+		//replaced with pr_debug in case DBG doesn't work even though it should
 		if (host->ops->irq) {
+			pr_debug("sdhci: host->ops->irq; so assigning intmask = host->ops->irq(host, intmask\n");
 			intmask = host->ops->irq(host, intmask);
-			if (!intmask)
+			pr_debug("sdhci: intmask after assignment = %08x\n", intmask);
+			if (!intmask) {
+				pr_info("sdhci: intmask not detected, going to cont in sdhci_irq\n.");
 				goto cont;
+			}
 		}
 
 		/* Clear selected interrupts. */
+		pr_debug("sdhci: Assigning mask = intmask & (CMD_MASK | DATA_MASK | BUS_POWER) .\
+ Current intmask = %08x\n", intmask);
 		mask = intmask & (SDHCI_INT_CMD_MASK | SDHCI_INT_DATA_MASK |
 				  SDHCI_INT_BUS_POWER);
+		pr_debug("sdhci: mask after assignment = %08x .\
+ Writing mask to SDHCI_INT_STATUS.\n", mask);
 		sdhci_writel(host, mask, SDHCI_INT_STATUS);
 
 		if (intmask & (SDHCI_INT_CARD_INSERT | SDHCI_INT_CARD_REMOVE)) {
@@ -3969,6 +3996,9 @@ static irqreturn_t sdhci_irq(int irq, void *dev_id)
 			sdhci_writel(host, host->ier, SDHCI_INT_ENABLE);
 			sdhci_writel(host, host->ier, SDHCI_SIGNAL_ENABLE);
 
+			pr_debug("sdhci: Writing intmask & (CARD_INSERT | CARD_REMOVE) to \
+SDHCI_INT_STATUS. intmask = %08x, and final input = %08x\n",
+		intmask, intmask & (SDHCI_INT_CARD_INSERT | SDHCI_INT_CARD_REMOVE));
 			sdhci_writel(host, intmask & (SDHCI_INT_CARD_INSERT |
 				     SDHCI_INT_CARD_REMOVE), SDHCI_INT_STATUS);
 
@@ -3977,9 +4007,14 @@ static irqreturn_t sdhci_irq(int irq, void *dev_id)
 			result = IRQ_WAKE_THREAD;
 		}
 
-		if (intmask & SDHCI_INT_CMD_MASK)
+		if (intmask & SDHCI_INT_CMD_MASK) {
+			pr_debug("sdhci: SDHCI_INT_CMD_MASK intmask in sdhci_thread_irq. \
+Going to sdhci_cmd_irq with (host, intmask & SDHCI_INT_CMD_MASK, &intmask) .\n\
+intmask & SDHCI_INT_CMD_MASK = %08x and &intmask = %08x",
+	intmask & SDHCI_INT_CMD_MASK, &intmask);
 			sdhci_cmd_irq(host, intmask & SDHCI_INT_CMD_MASK, &intmask);
-
+		}
+		
 		if (intmask & SDHCI_INT_DATA_MASK)
 			sdhci_data_irq(host, intmask & SDHCI_INT_DATA_MASK);
 
@@ -3987,22 +4022,26 @@ static irqreturn_t sdhci_irq(int irq, void *dev_id)
 			pr_err("%s: Card is consuming too much power!\n",
 				mmc_hostname(host->mmc));
 
-		if (intmask & SDHCI_INT_RETUNE)
+		if (intmask & SDHCI_INT_RETUNE) {
+			pr_debug("sdhci: SDHCI_INT_RETUNE intmask in sdhci_thread_irq. \
+Going to mmc_retune_needed(host->mmc\n");
 			mmc_retune_needed(host->mmc);
-
+		}
 		if ((intmask & SDHCI_INT_CARD_INT) &&
 		    (host->ier & SDHCI_INT_CARD_INT)) {
 			sdhci_enable_sdio_irq_nolock(host, false);
 			sdio_signal_irq(host->mmc);
 		}
-
+		pr_debug("sdhci: Assigning intmask &= a bunch of things in sdhci_thread_irq..\n");
 		intmask &= ~(SDHCI_INT_CARD_INSERT | SDHCI_INT_CARD_REMOVE |
 			     SDHCI_INT_CMD_MASK | SDHCI_INT_DATA_MASK |
 			     SDHCI_INT_ERROR | SDHCI_INT_BUS_POWER |
 			     SDHCI_INT_RETUNE | SDHCI_INT_CARD_INT);
-
+		pr_debug("sdhci: intmask after assignment = %08x\n", intmask);
 		if (intmask) {
 			unexpected |= intmask;
+			pr_debug("sdhci: Writing intmask = %08x to SDHCI_INT_STATUS in shdci_thread_irq\n",
+				intmask);
 			sdhci_writel(host, intmask, SDHCI_INT_STATUS);
 		}
 cont:
@@ -4013,8 +4052,9 @@ result = IRQ_HANDLED.\n");
 			result = IRQ_HANDLED;
 		}
 		
-		
+		pr_debug("sdhci: Assigning intmask = sdhci_readl(host, SDHCI_INT_STATUS) in thread_irq\n");
 		intmask = sdhci_readl(host, SDHCI_INT_STATUS);
+		pr_debug("sdhci: intmask after assignment = %08x\n", intmask);
 	} while (intmask && --max_loops);
 
 	/* Determine if mrqs can be completed immediately */
@@ -4414,15 +4454,20 @@ bool sdhci_cqe_irq(struct sdhci_host *host, u32 intmask, int *cmd_error,
 		*data_error = 0;
 
 	/* Clear selected interrupts. */
+	pr_debug("sdhci: Assigning mask = intmask & cqe_ier. Current intmask = %08x\n", intmask);
 	mask = intmask & host->cqe_ier;
+	pr_debug("sdhci: mask after assignment = %08x. Writing mask to SDHCI_INT_STATUS.\n", mask);
 	sdhci_writel(host, mask, SDHCI_INT_STATUS);
 
 	if (intmask & SDHCI_INT_BUS_POWER)
 		pr_err("%s: Card is consuming too much power!\n",
 		       mmc_hostname(host->mmc));
-
+	pr_debug("sdhci: Assigning intmask &= a few things, in sdhci_cqe_irq\n");
 	intmask &= ~(host->cqe_ier | SDHCI_INT_ERROR);
+	pr_debug("sdhci: intmask after assignment = %08x\n", intmask);
 	if (intmask) {
+		pr_debug("sdhci: Writing intmask = %08x to SDHCI_INT_STAUS in sdhci_cqe_irq\n", 
+			intmask);
 		sdhci_writel(host, intmask, SDHCI_INT_STATUS);
 		pr_err("%s: CQE: Unexpected interrupt 0x%08x.\n",
 		       mmc_hostname(host->mmc), intmask);
