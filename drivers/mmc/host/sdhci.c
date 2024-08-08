@@ -42,7 +42,7 @@
 #define SDHCI_DUMP(f, x...) \
 	pr_err("%s: " DRIVER_NAME ": " f, mmc_hostname(host->mmc), ## x)
 
-#define MAX_TUNING_LOOP 70
+#define MAX_TUNING_LOOP 40
 
 static unsigned int debug_quirks = 0;
 static unsigned int debug_quirks2;
@@ -1943,8 +1943,8 @@ static bool sdhci_send_command_retry(struct sdhci_host *host,
 	 
 	while (!sdhci_send_command(host, cmd)) {
 		if (!timeout--) {
-			pr_err("%s: Controller never released inhibit bit(s).\
-			Assigning cmd->error = -EIO. Returning false.\n",
+			pr_err("%s: Controller never released inhibit bit(s). \
+Assigning cmd->error = -EIO. Returning false.\n",
 			       mmc_hostname(host->mmc));
 			sdhci_dumpregs(host);
 			cmd->error = -EIO;
@@ -3106,7 +3106,7 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
 	unsigned long flags;
 	u32 b = host->sdma_boundary;
 
-	pr_info("sdhci: I am in sdhci_send_tuning.\n");
+	pr_debug("sdhci: I am in sdhci_send_tuning.\n");
 	pr_debug("sdhci: Current sdma_boundary in sdhci_send_tuning is %d\n", b); 
 	spin_lock_irqsave(&host->lock, flags);
 
@@ -3140,7 +3140,7 @@ Setting blocksize to 64.\n");
 	sdhci_writew(host, SDHCI_TRNS_READ, SDHCI_TRANSFER_MODE);
 
 	if (!sdhci_send_command_retry(host, &cmd, flags)) {
-		pr_info("sdhci: Retry not needed in sdhci_send_tuning.\
+		pr_info("sdhci: Retry needed? in sdhci_send_tuning.\
 spin_unlock_irqrestore. Setting tuning_done=0.\n");	
 		spin_unlock_irqrestore(&host->lock, flags);
 		host->tuning_done = 0;
@@ -3225,6 +3225,10 @@ in __sdhci_execute_tuning.\n");
 		}
 		else
 			pr_info("sdhci: Still executing tuning in __sdhci_execute_tuning. /n");	
+			/*   we always get this message in the logs.. 
+			//\\ Even when tuning_done should either be = 0, and maybe even a 1 if it succeeds.
+			//\\ try SDHCI_QUIRK2_TUNING_WORK_AROUND. EXEC_TUNING is set in sdhci_start_tuning
+			*/
 	}
 
 
@@ -4522,6 +4526,9 @@ struct sdhci_host *sdhci_alloc_host(struct device *dev,
 	host->max_adma = 65536;
 
 	host->max_timeout_count = 0xE;
+	
+	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; 
+	//\\Added in case card can't clear SDHCI_EXECUTE_TUNING flag in SDHCI_HOST_CONTROL2 on its own
 
 	return host;
 }
