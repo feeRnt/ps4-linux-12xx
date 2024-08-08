@@ -42,7 +42,7 @@
 #define SDHCI_DUMP(f, x...) \
 	pr_err("%s: " DRIVER_NAME ": " f, mmc_hostname(host->mmc), ## x)
 
-#define MAX_TUNING_LOOP 40
+#define MAX_TUNING_LOOP 70
 
 static unsigned int debug_quirks = 0;
 static unsigned int debug_quirks2;
@@ -3107,6 +3107,7 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
 	u32 b = host->sdma_boundary;
 
 	pr_info("sdhci: I am in sdhci_send_tuning.\n");
+	pr_debug("sdhci: Current sdma_boundary in sdhci_send_tuning is %d\n", b); 
 	spin_lock_irqsave(&host->lock, flags);
 
 	cmd.opcode = opcode;
@@ -3119,7 +3120,7 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
 	 * block to the Host Controller. So we set the block size
 	 * to 64 here.
 	 */
-	 // we're supposed to have cmd 19 here but we never get a cmd 19?
+	 //\\ We're supposed to have cmd 19 here but we never get a cmd 19?
 	if (cmd.opcode == MMC_SEND_TUNING_BLOCK_HS200 &&
 	    mmc->ios.bus_width == MMC_BUS_WIDTH_8) {
 		pr_info("sdhci: HS200 block and bus width 8 in sdhci_send_tuning\n");
@@ -3159,7 +3160,7 @@ spin_unlock_irqrestore. Setting tuning_done=0.\n");
 
 	/* Wait for Buffer Read Ready interrupt */
 	pr_info("sdhci: waiting for event timeout, buffer read ready interrupt\
-	in sdhci_send_tuning.");
+in sdhci_send_tuning.");
 	wait_event_timeout(host->buf_ready_int, (host->tuning_done == 1),
 			   msecs_to_jiffies(250));
 		// ================> from 50 to 250
@@ -3206,11 +3207,11 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 
 		/* Spec does not require a delay between tuning cycles */
 		if (host->tuning_delay > 0) {
-			pr_info("sdhci: host has delay %d between tune cycles\
+			pr_info("sdhci: host has delay %d between tune cycles \
 in __sdhci_execute_tuning.\n", host->tuning_delay);	
 			mdelay(host->tuning_delay);
 		}
-		pr_info("sdhci: Reading if tuning is done from control2 reg in\
+		pr_info("sdhci: Reading if tuning is done from control2 reg in \
 __sdhci_execute_tuning.\n");	
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
@@ -4540,6 +4541,7 @@ static int sdhci_set_dma_mask(struct sdhci_host *host)
 
 	/* Try 64-bit mask if hardware is capable  of it */
 	if (host->flags & SDHCI_USE_64_BIT_DMA) {
+		pr_info("sdhci: Using 64 bit DMA as host has USE_64_BIT_DMA flag - in sdhci_set_dma_mask.\n");
 		ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(64));
 		if (ret) {
 			pr_warn("%s: Failed to set 64-bit DMA mask.\n",
@@ -4550,6 +4552,7 @@ static int sdhci_set_dma_mask(struct sdhci_host *host)
 
 	/* 32-bit mask as default & fallback */
 	if (ret) {
+		pr_info("sdhci: Using 32 bit DMA as 64 bit mask failed, or support is absent - in.\n");
 		ret = dma_set_mask_and_coherent(dev, DMA_BIT_MASK(32));
 		if (ret)
 			pr_warn("%s: Failed to set 32-bit DMA mask.\n",
@@ -4706,7 +4709,7 @@ int sdhci_setup_host(struct sdhci_host *host)
 	unsigned int override_timeout_clk;
 	u32 max_clk;
 	int ret = 0;
-	bool enable_vqmmc = false;
+	bool enable_vqmmc = false; //\\?
 
 	pr_info("sdhci: I am in sdhci_setup_host.\n");
 	WARN_ON(host == NULL);
@@ -4863,6 +4866,7 @@ int sdhci_setup_host(struct sdhci_host *host)
 	 * mask here in that case.
 	 */
 	if (!(host->flags & (SDHCI_USE_SDMA | SDHCI_USE_ADMA))) {
+		pr_info("sdhci: Setting dma_mask to 64 bits, as SDMA or ADMA flag not seen - in sdhci_setup_host.\n");
 		host->dma_mask = DMA_BIT_MASK(64);
 		mmc_dev(mmc)->dma_mask = &host->dma_mask;
 	}

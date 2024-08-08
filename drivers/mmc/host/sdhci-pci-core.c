@@ -326,6 +326,7 @@ static const struct sdhci_pci_fixes sdhci_intel_qrk = {
 #ifdef CONFIG_X86_PS4
 static int aeolia_probe(struct sdhci_pci_chip *chip)
 {
+	pr_debug("sdhci-pci: I am in aeolia_probe\n");
 	chip->num_slots = 1;
 	chip->first_bar = 0;
 	if (apcie_status() == 0)
@@ -339,6 +340,7 @@ static int aeolia_probe(struct sdhci_pci_chip *chip)
 static int aeolia_probe_slot(struct sdhci_pci_slot *slot)
 {
 	int err = apcie_assign_irqs(slot->chip->pdev, 1);
+	pr_debug("sdhci-pci: I am in aeolia_probe_slot\n");
 	if (err <= 0) {
 		dev_err(&slot->chip->pdev->dev, "failed to get IRQ: %d\n", err);
 		return -ENODEV;
@@ -349,11 +351,13 @@ static int aeolia_probe_slot(struct sdhci_pci_slot *slot)
 
 static void aeolia_remove_slot(struct sdhci_pci_slot *slot, int dead)
 {
+	pr_info("sdhci-pci: I am in aeolia_remove_slot.\n");
 	apcie_free_irqs(slot->chip->pdev->irq, 1);
 }
 
 static int aeolia_enable_dma(struct sdhci_pci_slot *slot)
 {
+	pr_debug("sdhci-pci: I am in aeolia_enable_dma.\n");
 	if (pci_set_dma_mask(slot->chip->pdev, DMA_BIT_MASK(31))) {
 		return -EINVAL;
 	}
