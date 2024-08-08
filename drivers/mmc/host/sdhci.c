@@ -1960,8 +1960,9 @@ Assigning cmd->error = -EIO. Returning false.\n",
 		//from spinlock.h
 		
 		//do usleep.
-		usleep_range(1000, 1250);
-
+		usleep_range(1000, 1750);
+		//from 1250 to 1750
+		
 		//access sdhci_get_cd to check if card is present
 	//	pr_info("Checking ...
 		present = host->mmc->ops->get_cd(host->mmc);
@@ -3029,11 +3030,18 @@ void sdhci_start_tuning(struct sdhci_host *host)
 	u16 ctrl;
 
 	pr_info("sdhci: I am in sdhci_start_tuning. Here is a stack dump:\n");
-	dump_stack();
+//	dump_stack();
+	
+//	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; 
+	
 	ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 	ctrl |= SDHCI_CTRL_EXEC_TUNING;
-	if (host->quirks2 & SDHCI_QUIRK2_TUNING_WORK_AROUND)
+	pr_debug("sdhci: Current host->quirks2 in sdhci_start_tuning = %08x\n", host->quirks2);
+	if (host->quirks2 & SDHCI_QUIRK2_TUNING_WORK_AROUND) {
+		pr_debug("sdhci: SDHCI_QUIRK2_TUNING_WORK_AROUND detected\n");
 		ctrl |= SDHCI_CTRL_TUNED_CLK;
+	}
+	pr_debug("sdhci: Current host->quirks2 in sdhci_start_tuning = %08x\n", host->quirks2);
 	sdhci_writew(host, ctrl, SDHCI_HOST_CONTROL2);
 
 	/*
@@ -3159,11 +3167,20 @@ spin_unlock_irqrestore. Setting tuning_done=0.\n");
 	spin_unlock_irqrestore(&host->lock, flags);
 
 	/* Wait for Buffer Read Ready interrupt */
-	pr_info("sdhci: waiting for event timeout, buffer read ready interrupt\
+	pr_info("sdhci: waiting for event timeout, buffer read ready interrupt \
 in sdhci_send_tuning.");
 	wait_event_timeout(host->buf_ready_int, (host->tuning_done == 1),
-			   msecs_to_jiffies(250));
-		// ================> from 50 to 250
+			   msecs_to_jiffies(1150));
+		// ================> from 50 to 250 => 750
+		//increased to 1150 for manual setting of REG2, in case this breaks something
+	if (host->tuning_done == 1) {
+		u16 ctrl42;
+		
+		ctrl42 = sdhci_readw(host, SDHCI_HOST_CONTROL2);
+		ctrl42 &= ~SDHCI_CTRL_EXEC_TUNING;
+		sdhci_writew(host, ctrl42, SDHCI_HOST_CONTROL2); 	
+	}
+
 }
 EXPORT_SYMBOL_GPL(sdhci_send_tuning);
 
@@ -3212,8 +3229,9 @@ in __sdhci_execute_tuning.\n", host->tuning_delay);
 			mdelay(host->tuning_delay);
 		}
 		pr_info("sdhci: Reading if tuning is done from control2 reg in \
-__sdhci_execute_tuning.\n");	
+__sdhci_execute_tuning.\n");
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
+		pr_debug("sdhci: Current output of SDHCI_HOST_CONTROL2 is %08x\n", ctrl);
 		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
 			if (ctrl & SDHCI_CTRL_TUNED_CLK) {
 				pr_info("sdhci: sdhci_tuning success, returning 0\
@@ -3228,9 +3246,21 @@ in __sdhci_execute_tuning.\n");
 			/*   we always get this message in the logs.. 
 			//\\ Even when tuning_done should either be = 0, and maybe even a 1 if it succeeds.
 			//\\ try SDHCI_QUIRK2_TUNING_WORK_AROUND. EXEC_TUNING is set in sdhci_start_tuning
+			
+			//\\ So SDHCI_CTRL_EXEC_TUNING is not cleared in the register.
+			//\\ Then I'm gonna try to clear it manually after the buffer read wait.
+			//\\ But will try one more time with the increased timeout to report the value of the register first.   
+			//\\ So it returns 0000804b =  1000000001001011 
+			//\\ tuning			0x0040  =  0000000001000000
+			//\\  tuned			0x0080  =  0000000010000000
+				*	so this means it is still in tuning mode
+				*	and the tuned bit is somehow not set even though the force tuning quirk2 is on...
+				* test putting it in sdhci_setup_host.  
+				* 
 			*/
 	}
-
+	
+	
 
 	pr_err("All conditions and tests failed, nothing returned. Stack \
 and reg dump before fallback:\n");
@@ -4527,9 +4557,10 @@ struct sdhci_host *sdhci_alloc_host(struct device *dev,
 
 	host->max_timeout_count = 0xE;
 	
-	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; 
+	//host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; 
 	//\\Added in case card can't clear SDHCI_EXECUTE_TUNING flag in SDHCI_HOST_CONTROL2 on its own
-
+	//\\going to add in tuning code itself, maybe gets cancelled by quirks2 = debug_quirks2? 
+	//\\It comes after this function, but that condition doesn't get activated either . . . 
 	return host;
 }
 
@@ -4582,12 +4613,17 @@ void __sdhci_read_caps(struct sdhci_host *host, const u16 *ver,
 
 	host->read_caps = true;
 
-	if (debug_quirks)
+	if (debug_quirks) {
+		pr_debug("sdhci: debug_quirks, setting quirks = debug_quirks\n");
 		host->quirks = debug_quirks;
-
-	if (debug_quirks2)
+	}
+	if (debug_quirks2) {
+		pr_debug("sdhci: debug_quirks2, setting quirks2 = debug_quirks2\n");
 		host->quirks2 = debug_quirks2;
-
+	}
+	pr_debug("sdhci: setting host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND.\n");
+	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; //\\added
+	
 	pr_info("sdhci: Doing sdhci_do_reset.\n");
 	sdhci_do_reset(host, SDHCI_RESET_ALL);
 
