@@ -1063,8 +1063,10 @@ static u8 sdhci_calc_timeout(struct sdhci_host *host, struct mmc_command *cmd,
 	 * longer to time out, but that's much better than having a too-short
 	 * timeout value.
 	 */
-	if (host->quirks & SDHCI_QUIRK_BROKEN_TIMEOUT_VAL)
+	if (host->quirks & SDHCI_QUIRK_BROKEN_TIMEOUT_VAL) {
+		pr_debug("sdhci: BROKEN_TIMEOUT_VAL quirk1 detected in sdhci_calc_timeout, returning max_timeout_count\n");
 		return host->max_timeout_count;
+	}
 
 	/* Unspecified command, asume max */
 	if (cmd == NULL)
@@ -3035,14 +3037,25 @@ void sdhci_start_tuning(struct sdhci_host *host)
 //	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; 
 	
 	ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
+	pr_debug("sdhci: Current CONTROL2 reg = ctrl, in start_tuning = %08x\n", ctrl);
 	ctrl |= SDHCI_CTRL_EXEC_TUNING;
+	pr_debug("sdhci: Current ctrl after |= SDHCI_CTRL_EXEC_TUNING = %08x\n", ctrl);
 	pr_debug("sdhci: Current host->quirks2 in sdhci_start_tuning = %08x\n", host->quirks2);
 	if (host->quirks2 & SDHCI_QUIRK2_TUNING_WORK_AROUND) {
 		pr_debug("sdhci: SDHCI_QUIRK2_TUNING_WORK_AROUND detected\n");
 		ctrl |= SDHCI_CTRL_TUNED_CLK;
+		pr_debug("sdhci: New ctrl after |= SDHCI_CTRL_TUNED_CLOCK = %08x\n", ctrl);
 	}
 	pr_debug("sdhci: Current host->quirks2 in sdhci_start_tuning = %08x\n", host->quirks2);
+	
+	pr_debug("sdhci: Writing to SDHCI_HOST_CONTROL2 the value of ctrl = %08x\n", ctrl);
 	sdhci_writew(host, ctrl, SDHCI_HOST_CONTROL2);
+	pr_debug("sdhci: Current value of SDHCI_HOST_CONTROL2 after reading from it = %08x\n",
+			sdhci_readw(host, SDHCI_HOST_CONTROL2));
+	usleep_range(250, 260);
+	pr_debug("sdhci: Just slept 250 microsecs, the current value of SDHCI_HOST_CONTROL2 \
+after reading from it = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
+
 
 	/*
 	 * As per the Host Controller spec v3.00, tuning command
@@ -3178,8 +3191,12 @@ in sdhci_send_tuning.");
 		
 		ctrl42 = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		ctrl42 &= ~SDHCI_CTRL_EXEC_TUNING;
-		sdhci_writew(host, ctrl42, SDHCI_HOST_CONTROL2); 	
-	}
+		ctrl42 |= SDHCI_CTRL_TUNED_CLK; //risky
+		sdhci_writew(host, ctrl42, SDHCI_HOST_CONTROL2);
+		pr_debug("sdhci: Current CONTROL2 register after assigning it TUNED_CLK and removing EXEC_TUNING \
+= %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
+
+				}
 
 }
 EXPORT_SYMBOL_GPL(sdhci_send_tuning);
@@ -3250,18 +3267,19 @@ in __sdhci_execute_tuning.\n");
 			//\\ So SDHCI_CTRL_EXEC_TUNING is not cleared in the register.
 			//\\ Then I'm gonna try to clear it manually after the buffer read wait.
 			//\\ But will try one more time with the increased timeout to report the value of the register first.   
-			//\\ So it returns 0000804b =  1000000001001011 
+			//\\ So it returns 0000804b =  		   1000000001001011
 			//\\ tuning			0x0040  =  0000000001000000
 			//\\  tuned			0x0080  =  0000000010000000
-				*	so this means it is still in tuning mode
+when "TUNING" is manually unset & "TUNED" set  1000000000001011
+the reg at start_tuning when quirk is seen     0001000000000000
+		 	*	so this means it is still in tuning mode
 				*	and the tuned bit is somehow not set even though the force tuning quirk2 is on...
-				* test putting it in sdhci_setup_host.  
+				* test putting it in sdhci_setup_host. 
+				* (added it __sdhci_read_caps which is called in setup_host) 
 				* 
 			*/
 	}
 	
-	
-
 	pr_err("All conditions and tests failed, nothing returned. Stack \
 and reg dump before fallback:\n");
 	//dump_stack();
