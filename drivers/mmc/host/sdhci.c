@@ -3033,7 +3033,9 @@ void sdhci_start_tuning(struct sdhci_host *host)
 
 	pr_info("sdhci: I am in sdhci_start_tuning. Here is a stack dump:\n");
 //	dump_stack();
-	
+
+	tracing_on();
+
 //	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; 
 	
 	ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
@@ -3283,6 +3285,7 @@ the reg at start_tuning when quirk is seen     0001000000000000
 	
 	pr_err("All conditions and tests failed, nothing returned. Stack \
 and reg dump before fallback:\n");
+	trace_printk("Here is where I failed all things in trace time");
 	//dump_stack();
 	sdhci_dumpregs(host);
 	pr_info("%s: Tuning failed, falling back to fixed sampling clock\n",
@@ -3372,7 +3375,7 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 out:
 	pr_info("sdhci: out condtition in sdhci_execute_tuning. Clearing HS400 tuning flag, and returning err = %d\n", err);
 	host->flags &= ~SDHCI_HS400_TUNING;
-
+	tracing_off();
 	return err;
 }
 EXPORT_SYMBOL_GPL(sdhci_execute_tuning);
