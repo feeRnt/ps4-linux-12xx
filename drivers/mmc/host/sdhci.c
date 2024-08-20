@@ -3250,13 +3250,14 @@ __sdhci_execute_tuning.\n");
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		pr_debug("sdhci: Current output of SDHCI_HOST_CONTROL2 is %08x\n", ctrl);
 		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
-			if (ctrl & SDHCI_CTRL_TUNED_CLK) {
+		//	if (ctrl & SDHCI_CTRL_TUNED_CLK) {
 				pr_info("sdhci: sdhci_tuning success, returning 0\
 in __sdhci_execute_tuning.\n");	
 				return 0; /* Success! */
-			}
+		/*	}
 			pr_info("sdhci: breaking loop in __sdhci_execute_tuning\n.");	
 			break;
+		*/
 		}
 		else
 			pr_info("sdhci: Still executing tuning in __sdhci_execute_tuning. /n");	
