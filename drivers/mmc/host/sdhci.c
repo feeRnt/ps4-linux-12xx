@@ -3370,7 +3370,7 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 
 	sdhci_end_tuning(host);
 out:
-	pr_info("sdhci: out condtition in sdhci_execute_tuning.\n");
+	pr_info("sdhci: out condtition in sdhci_execute_tuning. Clearing HS400 tuning flag, and returning err = %d\n", err);
 	host->flags &= ~SDHCI_HS400_TUNING;
 
 	return err;
