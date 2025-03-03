@@ -3033,15 +3033,14 @@ void sdhci_start_tuning(struct sdhci_host *host)
 
 	pr_info("sdhci: I am in sdhci_start_tuning. Here is a stack dump:\n");
 //	dump_stack();
-
-	tracing_on();
-
+	
 //	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; 
 	
 	ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 	pr_debug("sdhci: Current CONTROL2 reg = ctrl, in start_tuning = %08x\n", ctrl);
 	ctrl |= SDHCI_CTRL_EXEC_TUNING;
 	pr_debug("sdhci: Current ctrl after |= SDHCI_CTRL_EXEC_TUNING = %08x\n", ctrl);
+	pr_debug("sdhci: Current host->quirks in sdhci_start_tuning = %08x\n", host->quirks);
 	pr_debug("sdhci: Current host->quirks2 in sdhci_start_tuning = %08x\n", host->quirks2);
 	if (host->quirks2 & SDHCI_QUIRK2_TUNING_WORK_AROUND) {
 		pr_debug("sdhci: SDHCI_QUIRK2_TUNING_WORK_AROUND detected\n");
@@ -3054,8 +3053,8 @@ void sdhci_start_tuning(struct sdhci_host *host)
 	sdhci_writew(host, ctrl, SDHCI_HOST_CONTROL2);
 	pr_debug("sdhci: Current value of SDHCI_HOST_CONTROL2 after reading from it = %08x\n",
 			sdhci_readw(host, SDHCI_HOST_CONTROL2));
-	usleep_range(250, 260);
-	pr_debug("sdhci: Just slept 250 microsecs, the current value of SDHCI_HOST_CONTROL2 \
+//	usleep_range(250, 260);
+	pr_debug("sdhci: Just slept 0 microsecs, the current value of SDHCI_HOST_CONTROL2 \
 after reading from it = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
 
 
@@ -3185,10 +3184,10 @@ spin_unlock_irqrestore. Setting tuning_done=0.\n");
 	pr_info("sdhci: waiting for event timeout, buffer read ready interrupt \
 in sdhci_send_tuning.");
 	wait_event_timeout(host->buf_ready_int, (host->tuning_done == 1),
-			   msecs_to_jiffies(1150));
+			   msecs_to_jiffies(50));
 		// ================> from 50 to 250 => 750
 		//increased to 1150 for manual setting of REG2, in case this breaks something
-	if (host->tuning_done == 1) {
+	/*if (host->tuning_done == 1) {
 		u16 ctrl42;
 		
 		ctrl42 = sdhci_readw(host, SDHCI_HOST_CONTROL2);
@@ -3199,7 +3198,7 @@ in sdhci_send_tuning.");
 = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
 
 				}
-
+	*/
 }
 EXPORT_SYMBOL_GPL(sdhci_send_tuning);
 
@@ -3252,14 +3251,14 @@ __sdhci_execute_tuning.\n");
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		pr_debug("sdhci: Current output of SDHCI_HOST_CONTROL2 is %08x\n", ctrl);
 		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
-		//	if (ctrl & SDHCI_CTRL_TUNED_CLK) {
+			if (ctrl & SDHCI_CTRL_TUNED_CLK) {
 				pr_info("sdhci: sdhci_tuning success, returning 0\
 in __sdhci_execute_tuning.\n");	
 				return 0; /* Success! */
-		/*	}
+			}
 			pr_info("sdhci: breaking loop in __sdhci_execute_tuning\n.");	
 			break;
-		*/
+
 		}
 		else
 			pr_info("sdhci: Still executing tuning in __sdhci_execute_tuning. /n");	
@@ -3285,7 +3284,6 @@ the reg at start_tuning when quirk is seen     0001000000000000
 	
 	pr_err("All conditions and tests failed, nothing returned. Stack \
 and reg dump before fallback:\n");
-	trace_printk("Here is where I failed all things in trace time");
 	//dump_stack();
 	sdhci_dumpregs(host);
 	pr_info("%s: Tuning failed, falling back to fixed sampling clock\n",
@@ -3375,7 +3373,7 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 out:
 	pr_info("sdhci: out condtition in sdhci_execute_tuning. Clearing HS400 tuning flag, and returning err = %d\n", err);
 	host->flags &= ~SDHCI_HS400_TUNING;
-	tracing_off();
+
 	return err;
 }
 EXPORT_SYMBOL_GPL(sdhci_execute_tuning);
@@ -3544,10 +3542,13 @@ static bool sdhci_request_done(struct sdhci_host *host)
 		}
 
 		/* Some controllers need this kick or reset won't work here */
-		if (host->quirks & SDHCI_QUIRK_CLOCK_BEFORE_RESET)
+		if (host->quirks & SDHCI_QUIRK_CLOCK_BEFORE_RESET) {
+			pr_info("sdhci: QUIRK_CLOCK_BEFORE_RESET seen, setting clock before a reset.\n");
 			/* This is to force an update */
 			host->ops->set_clock(host, host->clock);
-
+		}
+		else
+			pr_info("sdhci: QUIRK_CLOCK_BEFORE_RESET not seen, will not set clock before a reset.\n");
 		/*
 		 * Spec says we should do both at the same time, but Ricoh
 		 * controllers do not like that.
@@ -4643,8 +4644,8 @@ void __sdhci_read_caps(struct sdhci_host *host, const u16 *ver,
 		pr_debug("sdhci: debug_quirks2, setting quirks2 = debug_quirks2\n");
 		host->quirks2 = debug_quirks2;
 	}
-	pr_debug("sdhci: setting host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND.\n");
-	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; //\\added
+//	pr_debug("sdhci: setting host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND.\n");
+//	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; //\\added
 	
 	pr_info("sdhci: Doing sdhci_do_reset.\n");
 	sdhci_do_reset(host, SDHCI_RESET_ALL);
