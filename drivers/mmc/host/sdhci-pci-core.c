@@ -375,8 +375,8 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 	// Adding certain quirks that are in sdhci_RICOH_mmc
 	.quirks		= SDHCI_QUIRK_CLOCK_BEFORE_RESET |
 			  SDHCI_QUIRK_NO_CARD_NO_RESET |
-			  SDHCI_QUIRK_MISSING_CAPS
-			//  SDHCI_QUIRK_32BIT_DMA_ADDR
+			  SDHCI_QUIRK_MISSING_CAPS |
+			  SDHCI_QUIRK_32BIT_DMA_ADDR
 };
 #endif
 
