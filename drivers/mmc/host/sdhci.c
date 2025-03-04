@@ -44,7 +44,7 @@
 
 #define MAX_TUNING_LOOP 40
 
-static unsigned int debug_quirks = 0;
+static unsigned int debug_quirks = 1; //originally 0
 static unsigned int debug_quirks2;
 
 static void sdhci_enable_preset_value(struct sdhci_host *host, bool enable);

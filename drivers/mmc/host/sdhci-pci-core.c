@@ -373,11 +373,14 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 	.remove_slot	= aeolia_remove_slot,
 	.enable_dma	= aeolia_enable_dma,
 	// Adding certain quirks that are in sdhci_RICOH_mmc
-	.quirks		= SDHCI_QUIRK_CLOCK_BEFORE_RESET |
+	/*.quirks	= SDHCI_QUIRK_CLOCK_BEFORE_RESET |
 			  SDHCI_QUIRK_NO_CARD_NO_RESET |
 			  SDHCI_QUIRK_MISSING_CAPS |
 			  SDHCI_QUIRK_32BIT_DMA_ADDR
-};
+	*/
+	//missing caps causes "sdhci-pci: probe of [pci_address] rejects match -19"
+
+	};
 #endif
 
 static int mrst_hc_probe_slot(struct sdhci_pci_slot *slot)
