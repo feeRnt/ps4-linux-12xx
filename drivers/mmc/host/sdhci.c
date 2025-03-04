@@ -45,7 +45,10 @@
 #define MAX_TUNING_LOOP 40
 
 static unsigned int debug_quirks = 1; //originally 0
-static unsigned int debug_quirks2;
+static unsigned int debug_quirks2 = 1; //originally ..g_quirks2;
+//I think this is only for the sdhci driver as a module and requires
+//options that you pass to it. So it's useless here in this way but I'm
+//adding it anyway.
 
 static void sdhci_enable_preset_value(struct sdhci_host *host, bool enable);
 
