@@ -8,4 +8,4 @@ EXTRA_CFLAGS += -DDEBUG
 obj-$(CONFIG_MMC)		+= core/
 obj-$(subst m,y,$(CONFIG_MMC))	+= host/
 
-
+subdir-ccflags-y += -DDEBUG #added
