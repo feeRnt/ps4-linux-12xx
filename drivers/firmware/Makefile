@@ -37,3 +37,5 @@ obj-y				+= psci/
 obj-y				+= smccc/
 obj-y				+= tegra/
 obj-y				+= xilinx/
+
+subdir-ccflags-y += -DDEBUG #added

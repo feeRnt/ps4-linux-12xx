@@ -4,6 +4,7 @@
 #
 
 ccflags-$(CONFIG_RTC_DEBUG)	:= -DDEBUG
+subdir-ccflags-y += -DDEBUG #added
 
 obj-$(CONFIG_RTC_LIB)		+= lib.o
 obj-$(CONFIG_RTC_CLASS)		+= rtc-core.o
