@@ -1911,6 +1911,7 @@ Assigning host's data_cmd to normal host commmand. And setting timeout.\n");
 static bool sdhci_present_error(struct sdhci_host *host,
 				struct mmc_command *cmd, bool present)
 {
+	//returns true if error is present, false if not
 	pr_info("sdhci: I am in sdhci_present_error.\n");
 	if (!present || host->flags & SDHCI_DEVICE_DEAD) {
 		pr_info("sdhci: Not present or SHDCI_DEVICE_DEAD in sdhci_present_error.\
@@ -1938,6 +1939,8 @@ static bool sdhci_send_command_retry(struct sdhci_host *host,
 	struct mmc_command *deferred_cmd = host->deferred_cmd;
 	int timeout = 50; /* Approx. 10 ms ===> increase? ====> increased to 50 ms */ 
 	bool present;
+	//returns false if retry is needed (errors detected)
+	//returns true if retry is not needed (no errors detected)
 	
 	//__releases releases the lock resource, __acquires acquires the lock resource
 	
@@ -1985,8 +1988,8 @@ Assigning cmd->error = -EIO. Returning false.\n",
 			pr_info("sdhci: Error present while in sdhci_send_command_retry.\
 			Returning false.\n");
 			return false;
-		}
-	}
+		}	//present_err, real error=true
+	}		//           noreal error=false
 
 	if (cmd == host->deferred_cmd)
 		host->deferred_cmd = NULL;
@@ -3146,6 +3149,15 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
 	 * to 64 here.
 	 */
 	 //\\ We're supposed to have cmd 19 here but we never get a cmd 19?
+	//\\https://asf.microchip.com/docs/latest/samd21/html/group__sd__mmc__protocol.html
+	//\\include/linux/mmc/mmc.h
+	//\\command 19 is tuning block without HS200 (high speed 200 MHz), with HS it is cmd 21
+	//\\https://www.bpmmicro.com/mastering-emmc-device-programming
+	pr_debug("sdhci: Employing CMD%u in sdhci_send_tuning\n",
+		//arg %08x flags &08x\n",
+		//mrq->cmd->opcode, mrq->cmd->arg, mrq->cmd->flags);
+		cmd.opcode);
+
 	if (cmd.opcode == MMC_SEND_TUNING_BLOCK_HS200 &&
 	    mmc->ios.bus_width == MMC_BUS_WIDTH_8) {
 		pr_info("sdhci: HS200 block and bus width 8 in sdhci_send_tuning\n");
@@ -3164,7 +3176,7 @@ Setting blocksize to 64.\n");
 	 */
 	sdhci_writew(host, SDHCI_TRNS_READ, SDHCI_TRANSFER_MODE);
 
-	if (!sdhci_send_command_retry(host, &cmd, flags)) {
+	if (!sdhci_send_command_retry(host, &cmd, flags)) { //true = retry not needed
 		pr_info("sdhci: Retry needed? in sdhci_send_tuning.\
 spin_unlock_irqrestore. Setting tuning_done=0.\n");	
 		spin_unlock_irqrestore(&host->lock, flags);
@@ -3172,6 +3184,7 @@ spin_unlock_irqrestore. Setting tuning_done=0.\n");
 		return;
 	}
 
+	pr_debug("sdhci: About to assing host->cmd = NULL in sdhci_send_tuning.\n");
 	host->cmd = NULL;
 
 	pr_debug("sdhci: About to enter sdhci_del_timer in sdhci_send_tuning.\n");
@@ -3275,8 +3288,8 @@ in __sdhci_execute_tuning.\n");
 			//\\ So it returns 0000804b =  		   1000000001001011
 			//\\ tuning			0x0040  =  0000000001000000
 			//\\  tuned			0x0080  =  0000000010000000
-when "TUNING" is manually unset & "TUNED" set  1000000000001011
-the reg at start_tuning when quirk is seen     0001000000000000
+when "TUNING" is manually unset & "TUNED" set  			   1000000000001011
+the reg at start_tuning when quirk is seen     			   0001000000000000
 		 	*	so this means it is still in tuning mode
 				*	and the tuned bit is somehow not set even though the force tuning quirk2 is on...
 				* test putting it in sdhci_setup_host. 
@@ -4182,8 +4195,8 @@ static irqreturn_t sdhci_thread_irq(int irq, void *dev_id)
 
 	cmd = host->deferred_cmd;
 	if (cmd && !sdhci_send_command_retry(host, cmd, flags))
-		sdhci_finish_mrq(host, cmd->mrq);
-
+		sdhci_finish_mrq(host, cmd->mrq); //_retry, true=notneeded
+						  //      ,false=needed
 	spin_unlock_irqrestore(&host->lock, flags);
 
 	if (isr & (SDHCI_INT_CARD_INSERT | SDHCI_INT_CARD_REMOVE)) {
