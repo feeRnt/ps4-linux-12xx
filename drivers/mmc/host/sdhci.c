@@ -429,8 +429,8 @@ static void sdhci_reinit(struct sdhci_host *host)
 	 * rescan to check.
 	 */
 	if (cd != (host->ier & (SDHCI_INT_CARD_REMOVE | SDHCI_INT_CARD_INSERT))) {
-		pr_info("sdhci: Waiting 200:1000 ms to detect CARD_INSERT or CARD_INSERT\n");
-		mmc_detect_change(host->mmc, msecs_to_jiffies(1000));
+		pr_info("sdhci: Waiting 200 ms to detect CARD_INSERT or CARD_INSERT\n");
+		mmc_detect_change(host->mmc, msecs_to_jiffies(200));
 	}				// =============> from 200 to 1000
 }
 
@@ -1937,7 +1937,7 @@ static bool sdhci_send_command_retry(struct sdhci_host *host,
 	__acquires(host->lock)
 {
 	struct mmc_command *deferred_cmd = host->deferred_cmd;
-	int timeout = 50; /* Approx. 10 ms ===> increase? ====> increased to 50 ms */ 
+	int timeout = 10; /* Approx. 10 ms ===> increase? ====> increased to 50 ms */ 
 	bool present;
 	//returns false if retry is needed (errors detected)
 	//returns true if retry is not needed (no errors detected)
@@ -1968,7 +1968,7 @@ Assigning cmd->error = -EIO. Returning false.\n",
 		//from spinlock.h
 		
 		//do usleep.
-		usleep_range(1000, 1750);
+		usleep_range(1000, 1250);
 		//from 1250 to 1750
 		
 		//access sdhci_get_cd to check if card is present
@@ -2215,7 +2215,7 @@ void sdhci_enable_clk(struct sdhci_host *host, u16 clk)
 	sdhci_writew(host, clk, SDHCI_CLOCK_CONTROL);
 
 	/* Wait max 150 ms */
-	timeout = ktime_add_ms(ktime_get(), 750); // ====> increased to 750 ms
+	timeout = ktime_add_ms(ktime_get(), 150); // ====> increased to 750 ms
 	while (1) {
 		bool timedout = ktime_after(ktime_get(), timeout);
 
@@ -2237,7 +2237,7 @@ void sdhci_enable_clk(struct sdhci_host *host, u16 clk)
 		sdhci_writew(host, clk, SDHCI_CLOCK_CONTROL);
 
 		/* Wait max 150 ms */ // ======> increased to 750
-		timeout = ktime_add_ms(ktime_get(), 750);
+		timeout = ktime_add_ms(ktime_get(), 150);
 		while (1) {
 			bool timedout = ktime_after(ktime_get(), timeout);
 
@@ -2913,7 +2913,7 @@ mmc_regulator_set_vqmmc. returning -EIO\n",
 			pr_info("sdhci: error in mmc->supply.vqmmc; in \
 sdhci_start_signal_voltage_switch.\n");
 		/* Wait for 5ms */ 
-		usleep_range(5000, 7500); //\\increase? =====> increased to 25 ms*/ 
+		usleep_range(5000, 5500); //\\increase? =====> increased to 25 ms*/ 
 
 		/* 3.3V regulator output should be stable within 5 ms */
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
@@ -4203,9 +4203,9 @@ static irqreturn_t sdhci_thread_irq(int irq, void *dev_id)
 		struct mmc_host *mmc = host->mmc;
 
 		pr_info("sdhci: Checking for mmc_detect_change, in sdhci_thread_irq\
-		 200:1000 ms.\n");
+		 200 ms.\n");
 		mmc->ops->card_event(mmc);
-		mmc_detect_change(mmc, msecs_to_jiffies(1000));
+		mmc_detect_change(mmc, msecs_to_jiffies(200));
 		//			=====================> changed from 200 to 1000
 	
 	}
