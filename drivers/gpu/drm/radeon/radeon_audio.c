@@ -250,7 +250,7 @@ int radeon_audio_init(struct radeon_device *rdev)
 
 	rdev->audio.enabled = true;
 
-	if (ASIC_IS_DCE83(rdev))		/* KB: 2 streams, 3 endpoints */
+	if (ASIC_IS_DCE83(rdev))	/* KB: 2 streams, 3 endpoints */
 		rdev->audio.num_pins = 3;
 	else if (ASIC_IS_DCE81(rdev))	/* KV: 4 streams, 7 endpoints */
 		rdev->audio.num_pins = 7;
@@ -279,8 +279,14 @@ int radeon_audio_init(struct radeon_device *rdev)
 	radeon_audio_interface_init(rdev);
 
 	/* disable audio.  it will be set up later */
-	for (i = 0; i < rdev->audio.num_pins; i++)
-		radeon_audio_enable(rdev, &rdev->audio.pin[i], 0);
+	for (i = 0; i < rdev->audio.num_pins; i++) {
+		/* LVP has standalone S/PDIF on the third pin, always enable */
+		if (rdev->family == CHIP_LIVERPOOL) {
+			radeon_audio_enable(rdev, &rdev->audio.pin[i], 0xf);
+		} else {
+			radeon_audio_enable(rdev, &rdev->audio.pin[i], 0);
+		}
+	}
 
 	return 0;
 }
