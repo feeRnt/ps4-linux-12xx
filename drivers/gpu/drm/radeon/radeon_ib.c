@@ -259,8 +259,15 @@ int radeon_ib_ring_tests(struct radeon_device *rdev)
 {
 	unsigned i;
 	int r;
+	int num_rings = 0;
 
-	for (i = 0; i < RADEON_NUM_RINGS; ++i) {
+	if(rdev->family == CHIP_LIVERPOOL) {
+		num_rings = 1;
+	} else {
+		num_rings = RADEON_NUM_RINGS;
+	}
+
+	for (i = 0; i < num_rings; ++i) {
 		struct radeon_ring *ring = &rdev->ring[i];
 
 		if (!ring->ready)
