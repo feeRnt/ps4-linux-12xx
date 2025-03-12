@@ -2289,6 +2289,8 @@ struct sky2_hw {
 #define SKY2_HW_RSS_CHKSUM	0x00000400	/* RSS requires chksum */
 #define SKY2_HW_IRQ_SETUP	0x00000800
 
+#define SKY2_HW_USE_AEOLIA_MSI	0x00001000
+
 	u8	     	     chip_id;
 	u8		     chip_rev;
 	u8		     pmd_type;
@@ -2303,6 +2305,7 @@ struct sky2_hw {
 	struct work_struct   restart_work;
 	wait_queue_head_t    msi_wait;
 
+	u8		     phy_addr;
 	char		     irq_name[];
 };
 
