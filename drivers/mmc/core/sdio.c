@@ -89,7 +89,9 @@ static int sdio_read_fbr(struct sdio_func *func)
 	if (ret) {
 		pr_err("mmc: I was in sdio_read_fbr and detected return for ret=mmc_io_rw_direct.\n\
 				Hence going to out condition.\n");
-		goto out;
+		goto out;   //we get a return here ... enable nonstd_sdio so read_fbr is not
+			    //called? defined in
+			    //include/linux/mmc/card.h
 	}
 
 	data &= 0x0f;
@@ -481,9 +483,10 @@ static unsigned mmc_sdio_get_max_clock(struct mmc_card *card)
 		max_dtr = card->cis.max_dtr;
 	}
 
-	if (card->type == MMC_TYPE_SD_COMBO)
+	if (card->type == MMC_TYPE_SD_COMBO) {
+		pr_info("sdio: card->type is MMC_TYPE_SD_COMBO in mmc_sdio_get_max_clock.\n");
 		max_dtr = min(max_dtr, mmc_sd_get_max_clock(card));
-
+	}	//combo = IO + mem card
 	return max_dtr;
 }
 

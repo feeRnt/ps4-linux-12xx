@@ -3205,18 +3205,20 @@ in sdhci_send_tuning.");
 						  //ready interrupt
 		// ================> from 50 to 250 => 750
 		//increased to 1150 for manual setting of REG2, in case this breaks something
-	/*if (host->tuning_done == 1) {
+	if (host->tuning_done == 1) {
 		u16 ctrl42;
 		
 		ctrl42 = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		ctrl42 &= ~SDHCI_CTRL_EXEC_TUNING;
-		ctrl42 |= SDHCI_CTRL_TUNED_CLK; //risky
+	//	ctrl42 |= SDHCI_CTRL_TUNED_CLK; //risky. Not needed as TUNING_WORK_AROUND
+	//	already sets this bit. But it doesn't persist.
 		sdhci_writew(host, ctrl42, SDHCI_HOST_CONTROL2);
-		pr_debug("sdhci: Current CONTROL2 register after assigning it TUNED_CLK and removing EXEC_TUNING \
+	//	pr_debug("sdhci: Current CONTROL2 register after assigning it TUNED_CLK and removing EXEC_TUNING \
+// = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
+		pr_debug("sdhci: Current CONTROL2 register after removing EXEC_TUNING \
 = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
-
-				}
-	*/
+	}
+	
 }
 EXPORT_SYMBOL_GPL(sdhci_send_tuning);
 
@@ -3269,13 +3271,13 @@ __sdhci_execute_tuning.\n");
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		pr_debug("sdhci: Current output of SDHCI_HOST_CONTROL2 is %08x\n", ctrl);
 		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
-			if (ctrl & SDHCI_CTRL_TUNED_CLK) {
+	//		if (ctrl & SDHCI_CTRL_TUNED_CLK) {  //TUNING_WORK_AROUND is supposed to set this bit, but this bit is cleared automatically when set. So remove this check. Removing so suceeds this, but it later fails in sdio_read_fbr. So now we're doing that along with mmc_nonstd_sdio quirk in sdhci-pci-core, so it never fails at that. 			
 				pr_info("sdhci: sdhci_tuning success, returning 0\
-in __sdhci_execute_tuning.\n");	
+in __sdhci_execute_tuning.\n");
 				return 0; /* Success! */
-			}
-			pr_info("sdhci: breaking loop in __sdhci_execute_tuning\n.");	
-			break;
+	//		}
+	//		pr_info("sdhci: breaking loop in __sdhci_execute_tuning\n.");	
+	//		break;
 
 		}
 		else
@@ -3304,7 +3306,8 @@ in sdhci.h (huh, this slow?)
 	 so maybe we don't need to check for the TUNED bit in this host???
 
 //\\ in sdhci_end_tuning and reset tuning the reg is    0x800b   = 1000000000001011 
-
+//\\ with just the WORKAROUND quirk , the register is   0x804b   = 1000000001001011
+//TUNING bit is never cleared. so it fails the initial check     
 
 	*Caps 1 and Caps 2 registers have the same values post and pre reset, so those 2 are correct
 	*/
@@ -4684,8 +4687,8 @@ void __sdhci_read_caps(struct sdhci_host *host, const u16 *ver,
 		pr_debug("sdhci: debug_quirks2, setting quirks2 = debug_quirks2\n");
 		host->quirks2 = debug_quirks2;
 	}
-//	pr_debug("sdhci: setting host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND.\n");
-//	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; //\\added
+	pr_debug("sdhci: setting host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND.\n");
+	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; //\\added
 	
 	pr_info("sdhci: Doing sdhci_do_reset.\n");
 	sdhci_do_reset(host, SDHCI_RESET_ALL);

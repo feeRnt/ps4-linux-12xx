@@ -373,7 +373,8 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 	.remove_slot	= aeolia_remove_slot,
 	.enable_dma	= aeolia_enable_dma,
 	// Adding certain quirks that are in sdhci_RICOH_mmc
-	/*.quirks	= SDHCI_QUIRK_CLOCK_BEFORE_RESET |
+	.quirks	= MMC_QUIRK_NONSTD_SDIO  //this needs to be in card->quirks
+	/* SDHCI_QUIRK_CLOCK_BEFORE_RESET |
 			  SDHCI_QUIRK_NO_CARD_NO_RESET |
 			  SDHCI_QUIRK_MISSING_CAPS |
 			  SDHCI_QUIRK_32BIT_DMA_ADDR
