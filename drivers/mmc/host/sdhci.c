@@ -3148,10 +3148,11 @@ void sdhci_send_tuning(struct sdhci_host *host, u32 opcode)
 	 * block to the Host Controller. So we set the block size
 	 * to 64 here.
 	 */
-	 //\\ We're supposed to have cmd 19 here but we never get a cmd 19?
+	//\\ We're supposed to have cmd 19 here but we never get a cmd 19? (Correction: we do)
 	//\\https://asf.microchip.com/docs/latest/samd21/html/group__sd__mmc__protocol.html
 	//\\include/linux/mmc/mmc.h
 	//\\command 19 is tuning block without HS200 (high speed 200 MHz), with HS it is cmd 21
+	//\\Command 19 seems to be the appropriate one for our sdio device, 21 is for eMMC memory?
 	//\\https://www.bpmmicro.com/mastering-emmc-device-programming
 	pr_debug("sdhci: Employing CMD%u in sdhci_send_tuning\n",
 		//arg %08x flags &08x\n",
@@ -3200,7 +3201,8 @@ spin_unlock_irqrestore. Setting tuning_done=0.\n");
 	pr_info("sdhci: waiting for event timeout, buffer read ready interrupt \
 in sdhci_send_tuning.");
 	wait_event_timeout(host->buf_ready_int, (host->tuning_done == 1),
-			   msecs_to_jiffies(50));
+			   msecs_to_jiffies(50)); //set tuning_done=1 if detect get buffer read
+						  //ready interrupt
 		// ================> from 50 to 250 => 750
 		//increased to 1150 for manual setting of REG2, in case this breaks something
 	/*if (host->tuning_done == 1) {
@@ -3242,7 +3244,7 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 		pr_err("I have successfully entered the for loop in __sdhci_execute_tuning().\n");
 		sdhci_send_tuning(host, opcode);
 
-		if (!host->tuning_done) {
+		if (!host->tuning_done) { //if tuning_done=0,
 			pr_err("Stack and reg dump before tuning is aborted:\n");
 			dump_stack();
 			sdhci_dumpregs(host);
@@ -3254,12 +3256,12 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 			sdhci_dumpregs(host);
 			pr_err("sdhci: Returning -ETIMEDOUT in __sdhci_execute_tuning.\n");
 			return -ETIMEDOUT;
-		}
+		}     //we never have this 
 
 		/* Spec does not require a delay between tuning cycles */
 		if (host->tuning_delay > 0) {
 			pr_info("sdhci: host has delay %d between tune cycles \
-in __sdhci_execute_tuning.\n", host->tuning_delay);	
+in __sdhci_execute_tuning. Delaying by that amount. \n", host->tuning_delay);	
 			mdelay(host->tuning_delay);
 		}
 		pr_info("sdhci: Reading if tuning is done from control2 reg in \
@@ -3288,14 +3290,25 @@ in __sdhci_execute_tuning.\n");
 			//\\ So it returns 0000804b =  		   1000000001001011
 			//\\ tuning			0x0040  =  0000000001000000
 			//\\  tuned			0x0080  =  0000000010000000
-when "TUNING" is manually unset & "TUNED" set  			   1000000000001011
+when "TUNING" is manually unset & "TUNED" set   	0x800b  =  1000000000001011
 the reg at start_tuning when quirk is seen     			   0001000000000000
 		 	*	so this means it is still in tuning mode
-				*	and the tuned bit is somehow not set even though the force tuning quirk2 is on...
+			*	and the tuned bit is somehow not set even though the force tuning quirk2 is on...
 				* test putting it in sdhci_setup_host. 
 				* (added it __sdhci_read_caps which is called in setup_host) 
 				* 
-			*/
+//\\host_ctl2 register before it resets at card init is 0x800a   = 1000000000001010
+ 				*                        the trailing bit we see, 1, is 
+#define   SDHCI_CTRL_UHS_SDR25		0x0001
+in sdhci.h (huh, this slow?)
+	 so maybe we don't need to check for the TUNED bit in this host???
+
+//\\ in sdhci_end_tuning and reset tuning the reg is    0x800b   = 1000000000001011 
+
+
+	*Caps 1 and Caps 2 registers have the same values post and pre reset, so those 2 are correct
+	*/
+	
 	}
 	
 	pr_err("All conditions and tests failed, nothing returned. Stack \
@@ -3352,6 +3365,7 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 		 * Periodic re-tuning for HS400 is not expected to be needed, so
 		 * disable it here.
 		 */
+		pr_info("sdhci: MMC_TIMING_MMC_HS200 case in sdhci_execute_tuning.\n");
 		if (hs400_tuning) {
 			pr_info("sdhci: tuning is hs200, but actually 400\n");
 			tuning_count = 0;
@@ -3359,12 +3373,18 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 		break;
 
 	case MMC_TIMING_UHS_SDR104:
+		pr_info("sdhci: MMC_TIMING_UHS_SDR104 sdhci_execute_tuning, breaking.\n");
+		break;
 	case MMC_TIMING_UHS_DDR50:
+		pr_info("sdhci: MMC_TIMING_UHS_DDR50 in sdhci_execute_tuning, breaking.\n");
 		break;
 
 	case MMC_TIMING_UHS_SDR50:
-		if (host->flags & SDHCI_SDR50_NEEDS_TUNING)
+		pr_info("sdhci: MMC_TIMING_UHS_SDR50 in sdhci_execute_tuning.\n");
+		if (host->flags & SDHCI_SDR50_NEEDS_TUNING) {
+			pr_info("sdhci: SDHCI_SDR50_NEEDS_TUNING in sdhci_execute_tuning, breaking.\n");
 			break;
+		}
 		fallthrough;
 
 	default:
@@ -3372,6 +3392,7 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 	}
 
 	if (host->ops->platform_execute_tuning) {
+	pr_info("sdhci: host->ops->platform_execute_tuning detected, going to its function in sdhci_execute_tuning.\n");
 		err = host->ops->platform_execute_tuning(host, opcode);
 		goto out;
 	}
@@ -3381,10 +3402,13 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 	if (host->tuning_delay < 0)
 		host->tuning_delay = opcode == MMC_SEND_TUNING_BLOCK;
 
+	pr_info("sdhci: Doing sdhci_start_tuning(host) in sdhci_execute_tuning.\n");
 	sdhci_start_tuning(host);
-
+	
+	pr_info("sdhci: Going to _-sdhci_execute_tuning(host, opcode) in sdhci_execute_tuning.\n");
 	host->tuning_err = __sdhci_execute_tuning(host, opcode);
 
+	pr_info("sdhci: Going to sdhci_end_tuning(host) at the end of sdhci_execute_tuning.\n");
 	sdhci_end_tuning(host);
 out:
 	pr_info("sdhci: out condtition in sdhci_execute_tuning. Clearing HS400 tuning flag, and returning err = %d\n", err);
@@ -5520,7 +5544,7 @@ EXPORT_SYMBOL_GPL(sdhci_remove_host);
 
 void sdhci_free_host(struct sdhci_host *host)
 {
-	pr_info("I am in sdhci_drv_init. Here is reg dump before freeing:\n");
+	pr_info("I am in sdhci_free_host. Here is reg dump before freeing:\n");
 	sdhci_dumpregs(host);
 	mmc_free_host(host->mmc);
 	pr_info("Here is the reg dump after freeing:.\n");

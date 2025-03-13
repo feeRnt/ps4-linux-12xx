@@ -990,25 +990,31 @@ void mmc_set_clock(struct mmc_host *host, unsigned int hz)
 	mmc_set_ios(host);
 }
 
-int mmc_execute_tuning(struct mmc_card *card)
+int mmc_execute_tuning(struct mmc_card *card) //calls the sdhci_execute_tuning function
 {
 	struct mmc_host *host = card->host;
 	u32 opcode;
 	int err;
 
+	pr_debug("mmc-core: I am in mmc_execute_tuning.\n");
 	if (!host->ops->execute_tuning)
 		return 0;
 
 	if (host->cqe_on)
 		host->cqe_ops->cqe_off(host);
 
-	if (mmc_card_mmc(card))
-		opcode = MMC_SEND_TUNING_BLOCK_HS200;
-	else
-		opcode = MMC_SEND_TUNING_BLOCK;
-
+	if (mmc_card_mmc(card)) {
+		pr_debug("mmc-core: mmc_card_mmc(card) returned positive. Assigning CMD21 in mmc_execute_tuning.\n");
+		opcode = MMC_SEND_TUNING_BLOCK_HS200; //apparently HS200 or cmd21 is for eMMC only. (eMMC sd cards and the like)
+	}
+	else {
+		pr_debug("mmc-core: mmc_card_mmc(card) returned 0. Assigning CMD19 in mmc_execute_tuning.\n");	
+		opcode = MMC_SEND_TUNING_BLOCK; //cmd19 is for sdio devices like wifi chips?
+	}
+	
 	err = host->ops->execute_tuning(host, opcode);
 	if (!err) {
+		pr_debug("mmc-core: No error in mmc_execute_tuning, will do mmc_retune_clear and mmc_retune_enable.\n");
 		mmc_retune_clear(host);
 		mmc_retune_enable(host);
 		return 0;
