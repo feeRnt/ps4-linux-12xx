@@ -773,9 +773,11 @@ try_again:
 
 	pr_debug("sdio: Current card->quirks in sdio_init_func = %08x ."
 			,card->quirks);
-	card->quirks |= MMC_QUIRK_NONSTD_SDIO;
+/*	card->quirks |= MMC_QUIRK_NONSTD_SDIO;
 	pr_debug("sdio: Current card->quirks in sdio_init_func after assigning |= MMC_QUIRK_NONSTD_SDIO = %08x .\n"
 			,card->quirks);
+*/
+			
 	/*
 	 * If the host and card support UHS-I mode request the card
 	 * to switch to 1.8V signaling level.  No 1.8v signalling if
