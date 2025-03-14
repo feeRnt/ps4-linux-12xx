@@ -330,20 +330,21 @@ void resetBtWlan(void)
 	
 
 	/* Get bt/wlan status */
-//	ret = apcie_icc_cmd(5, 1, NULL, 0, resp, 20);
-//	printk("BT/WLAN status: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
+	ret = apcie_icc_cmd(5, 1, NULL, 0, resp, 20);
+	printk("BT/WLAN status: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
 
 	/** Turn off is done from linux-loader actually, if you want you can remove it from linux-loader and done it here **/
 	
 	//Turn OFF bt/wlan
-/*	ret = apcie_icc_cmd(5, 0, &off, sizeof(off), resp, 20);
+	ret = apcie_icc_cmd(5, 0, &off, sizeof(off), resp, 20);
 	printk("Turn OFF BT/WLAN: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
 	if(ret < 0)
 	{
 		printk("Turn off bt/wlan failed!");
-		return;
+	//	return;
+		msleep(5000);
 	}
-*/
+
 
 	//Turn ON bt/wlan
 	ret = apcie_icc_cmd(5, 0, &on, sizeof(on), resp, 20);

@@ -345,7 +345,10 @@ static int aeolia_probe_slot(struct sdhci_pci_slot *slot)
 		dev_err(&slot->chip->pdev->dev, "failed to get IRQ: %d\n", err);
 		return -ENODEV;
 	}
-	slot->host->irq = slot->chip->pdev->irq;
+	slot->host->irq = slot->chip->pdev->irq; //important
+						 //host's irq is
+						 //equated to
+						 //platform device's irq
 	return 0;
 }
 
