@@ -115,7 +115,7 @@ mmc_io_rw_direct_host, returning err=%d", err);
 		/* host driver already reported errors */
 	} else {
 		if (cmd.resp[0] & R5_ERROR) {
-			pr_err("sdio_ops: R5_ERROR. Returning -EIO in io_rw_direct_host.\n");
+			pr_err("sdio_ops: R5_ERROR. Returning -EIO in io_rw_direct_host. The relevant cmd.resp = %08x .\n", cmd.resp[0]);
 			return -EIO;
 		}
 		if (cmd.resp[0] & R5_FUNCTION_NUMBER) {

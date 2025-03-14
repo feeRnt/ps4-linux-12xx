@@ -136,7 +136,7 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 
 	if (!(card->quirks & MMC_QUIRK_NONSTD_SDIO)) {
 		pr_err("mmc: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n\
-				Hence going to try sdio_read_fbr.\n");
+				Hence going to try sdio_read_fbr. Current card->quirks = %08x .\n", 				card->quirks);
 		ret = sdio_read_fbr(func);
 		if (ret) {
 			pr_err("mmc: I am in sdio_init_func and was testing sdio_read_fbr.\n\
@@ -626,22 +626,26 @@ static int mmc_sdio_init_uhs_card(struct mmc_card *card)
 {
 	int err;
 
-	pr_err("mmc: I am in mmc_sdio_init_uhs_card.\n");
+	pr_debug("sdio: I am in mmc_sdio_init_uhs_card.\n");
 	if (!card->scr.sda_spec3)
 		return 0;
 
 	/* Switch to wider bus */
 	err = sdio_enable_4bit_bus(card);
-	if (err)
+	if (err) {
+		pr_err("sdio: err in sdio_enable_4bit_bus in mmc_sdio_init_uhs_card.\n");
 		goto out;
 
+	}
 	/* Set the driver strength for the card */
 	sdio_select_driver_type(card);
 
 	/* Set bus speed mode of the card */
 	err = sdio_set_bus_speed_mode(card);
-	if (err)
+	if (err) {
+		pr_err("sdio: err in sdio_set_bus_speed_mode in mmc_sdio_init_uhs_card.\n");
 		goto out;
+	}
 
 	/*
 	 * SPI mode doesn't define CMD19 and tuning is only valid for SDR50 and
@@ -649,8 +653,10 @@ static int mmc_sdio_init_uhs_card(struct mmc_card *card)
 	 */
 	if (!mmc_host_is_spi(card->host) &&
 	    ((card->host->ios.timing == MMC_TIMING_UHS_SDR50) ||
-	      (card->host->ios.timing == MMC_TIMING_UHS_SDR104)))
+	      (card->host->ios.timing == MMC_TIMING_UHS_SDR104))) {
+		pr_debug("sdio: going to mmc_execute_tuning in mmc_sdio_init_uhs_card.\n");
 		err = mmc_execute_tuning(card);
+	}
 out:
 	return err;
 }
@@ -765,6 +771,11 @@ try_again:
 	if (host->ops->init_card)
 		host->ops->init_card(host, card);
 
+	pr_debug("sdio: Current card->quirks in sdio_init_func = %08x ."
+			,card->quirks);
+	card->quirks |= MMC_QUIRK_NONSTD_SDIO;
+	pr_debug("sdio: Current card->quirks in sdio_init_func after assigning |= MMC_QUIRK_NONSTD_SDIO = %08x .\n"
+			,card->quirks);
 	/*
 	 * If the host and card support UHS-I mode request the card
 	 * to switch to 1.8V signaling level.  No 1.8v signalling if

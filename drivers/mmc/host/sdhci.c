@@ -3310,7 +3310,13 @@ in sdhci.h (huh, this slow?)
 //TUNING bit is never cleared. so it fails the initial check     
 
 	*Caps 1 and Caps 2 registers have the same values post and pre reset, so those 2 are correct
-	*/
+	
+On second thought, maybe all this elaborate tuning magic is not even needed as even when the tuning fails, the "fixed sampling clock" still allows for the sdio_read_fbr, and the actual error -5 or error -84 happens there in that function for sd_io_rw_direct...
+Figure out what an R5 error is.
+
+	But for now, if we forego the standards check with the NONSTD_SDIO quirk, then maybe that won't be necessary. First check if that allows for any success, and if not, then study the R5 response.
+
+	*/	
 	
 	}
 	
@@ -4687,6 +4693,9 @@ void __sdhci_read_caps(struct sdhci_host *host, const u16 *ver,
 		pr_debug("sdhci: debug_quirks2, setting quirks2 = debug_quirks2\n");
 		host->quirks2 = debug_quirks2;
 	}
+//	pr_debug("sdhci: setting host->quirks |= MMC_QUIRK_NONSTD_SDIO.\n")
+//	host->quirks |= MMC_QUIRK_NONSTD_SDIO; //\\added
+
 	pr_debug("sdhci: setting host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND.\n");
 	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; //\\added
 	
