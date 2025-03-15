@@ -957,12 +957,12 @@ static inline void mmc_set_ios(struct mmc_host *host)
 {
 	struct mmc_ios *ios = &host->ios;
 
-	pr_debug("%s: clock %uHz busmode %u powermode %u cs %u Vdd %u "
-		"width %u timing %u\n",
+	pr_debug("c%s: clock %uHz busmode %u powermode %u cs %u Vdd %u "
+		"width %u timing %u ; will do host->ops_set_ios with this value. Currently in mmc_set_ios. \n",
 		 mmc_hostname(host), ios->clock, ios->bus_mode,
 		 ios->power_mode, ios->chip_select, ios->vdd,
 		 1 << ios->bus_width, ios->timing);
-
+//this always returns clock 0 Hz. ios->clock is then 0...
 	host->ops->set_ios(host, ios);
 }
 
@@ -2118,7 +2118,7 @@ static int mmc_rescan_try_freq(struct mmc_host *host, unsigned freq)
 {
 	host->f_init = freq;
 
-	pr_debug("%s: %s: trying to init card at %u Hz\n",
+	pr_debug("core: %s: %s: trying to init card at %u Hz\n",
 		mmc_hostname(host), __func__, host->f_init);
 
 	mmc_power_up(host, host->ocr_avail);

@@ -2121,13 +2121,16 @@ u16 sdhci_calc_clk(struct sdhci_host *host, unsigned int clock,
 	u16 clk = 0;
 	bool switch_base_clk = false;
 
-	pr_info("sdhci: I am in sdhci_calc_clk.\n");
+	pr_debug("sdhci: I am in sdhci_calc_clk.\n");
 	if (host->version >= SDHCI_SPEC_300) {
 		if (host->preset_enabled) {
 			u16 pre_val;
 
+			pr_debug("sdhci: Preset enabled in sdhci_set_clock.");
 			clk = sdhci_readw(host, SDHCI_CLOCK_CONTROL);
+			pr_debug("sdhci: Current clk in sdhci_set_clock = %08x.\n", clk);
 			pre_val = sdhci_get_preset_value(host);
+			pr_debug("sdhci: Current pre_val in sdhci_set_clock = %08x.\n", pre_val);
 			div = FIELD_GET(SDHCI_PRESET_SDCLK_FREQ_MASK, pre_val);
 			if (host->clk_mul &&
 				(pre_val & SDHCI_PRESET_CLKGEN_SEL)) {
@@ -2202,6 +2205,7 @@ clock_set:
 	clk |= ((div & SDHCI_DIV_HI_MASK) >> SDHCI_DIV_MASK_LEN)
 		<< SDHCI_DIVIDER_HI_SHIFT;
 
+	pr_debug("sdhci: Current clk in sdhci_set_clock before returning it = %08x.\n", clk);
 	return clk;
 }
 EXPORT_SYMBOL_GPL(sdhci_calc_clk);
@@ -2232,6 +2236,7 @@ void sdhci_enable_clk(struct sdhci_host *host, u16 clk)
 	}
 
 	if (host->version >= SDHCI_SPEC_410 && host->v4_mode) {
+		pr_debug("sdhci: SDHCI_SPEC_410 and v4 in set_ios.\n");
 		clk |= SDHCI_CLOCK_PLL_EN;
 		clk &= ~SDHCI_CLOCK_INT_STABLE;
 		sdhci_writew(host, clk, SDHCI_CLOCK_CONTROL);
@@ -2255,6 +2260,8 @@ void sdhci_enable_clk(struct sdhci_host *host, u16 clk)
 	}
 
 	clk |= SDHCI_CLOCK_CARD_EN;
+	pr_debug("sdhci: Writing clk = %08x to SDHCI_CLOCK_CONTROL in"
+			"sdhci_set_ios.\n", clk);
 	sdhci_writew(host, clk, SDHCI_CLOCK_CONTROL);
 }
 EXPORT_SYMBOL_GPL(sdhci_enable_clk);
@@ -2263,10 +2270,13 @@ void sdhci_set_clock(struct sdhci_host *host, unsigned int clock)
 {
 	u16 clk;
 
-	pr_info("sdhci: I am in sdhci_set_clock.\n");
+	pr_debug("sdhci: I am in sdhci_set_clock.\n");
 	host->mmc->actual_clock = 0;
 
-	sdhci_writew(host, 0, SDHCI_CLOCK_CONTROL);
+	sdhci_writew(host, 0, SDHCI_CLOCK_CONTROL); //this should set
+												//SDHCI_CLOCK_CONTROL to 0
+	pr_debug("sdhci: Current value of SDHCI_CLOCK_CONTROL reg after setting to 0 = %08x. \n"
+			, sdhci_readw(host, SDHCI_CLOCK_CONTROL));
 
 	if (clock == 0)
 		return;
@@ -2365,7 +2375,7 @@ void sdhci_set_power_noreg(struct sdhci_host *host, unsigned char mode,
 		 * voltage first.
 		 */
 		 
-		 //\\check this later
+		 //\\check this later //important
 		if (host->quirks & SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER)
 			sdhci_writeb(host, pwr, SDHCI_POWER_CONTROL);
 
@@ -2572,14 +2582,19 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	struct sdhci_host *host = mmc_priv(mmc);
 	u8 ctrl;
 
-	pr_info("sdhci: I am in sdhci_get_ios.\n");
-	if (ios->power_mode == MMC_POWER_UNDEFINED)
+	pr_debug("sdhci: I am in sdhci_get_ios.\n");
+	if (ios->power_mode == MMC_POWER_UNDEFINED) {
+		pr_debug("sdhci: ios->power_mode == UNDEFINED in sdhci_get_ios. Returning.\n");
 		return;
-
+	}
 	if (host->flags & SDHCI_DEVICE_DEAD) {
+		pr_debug("sdhci: SDHCI_DEVICE_DEAD in host->flags in sdhci_get_ios. Will return.\n");
 		if (!IS_ERR(mmc->supply.vmmc) &&
-		    ios->power_mode == MMC_POWER_OFF)
+		    ios->power_mode == MMC_POWER_OFF) {
+			pr_debug("sdhci: supply.vmmc not an error and MMC_POWER_OFF in" 
+				"sdhci_get_ios. Going to mmc_regulator_set_ocr.\n");
 			mmc_regulator_set_ocr(mmc, mmc->supply.vmmc, 0);
+		}
 		return;
 	}
 
@@ -2588,39 +2603,57 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	 * Should clear out any weird states.
 	 */
 	if (ios->power_mode == MMC_POWER_OFF) {
+		pr_debug("sdhci: ios->power_mode == POWER_OFF in sdhci_get_ios. Will go to sdhci_reinit.\n");
 		sdhci_writel(host, 0, SDHCI_SIGNAL_ENABLE);
 		sdhci_reinit(host);
 	}
 
 	if (host->version >= SDHCI_SPEC_300 &&
 		(ios->power_mode == MMC_POWER_UP) &&
-		!(host->quirks2 & SDHCI_QUIRK2_PRESET_VALUE_BROKEN))
+		!(host->quirks2 & SDHCI_QUIRK2_PRESET_VALUE_BROKEN)) {
+		pr_debug("sdhci: Disabling preset_value in host in sdhci_get_ios due to conditions and SPEC >= 300.\n");
 		sdhci_enable_preset_value(host, false);
+	}
 
 	if (!ios->clock || ios->clock != host->clock) {
 		host->ops->set_clock(host, ios->clock);
 		host->clock = ios->clock;
+		pr_debug("sdhci: ios->clock empty or ios->clock not eq. host->clock in sdhci_get_ios.\n");
 
 		if (host->quirks & SDHCI_QUIRK_DATA_TIMEOUT_USES_SDCLK &&
 		    host->clock) {
+			pr_debug("sdhci: DATA_TIMEOUT_USES_SDCLK quirk in sdhci_get_ios.\n");
+			//test using this quirk . important
 			host->timeout_clk = mmc->actual_clock ?
 						mmc->actual_clock / 1000 :
 						host->clock / 1000;
+			pr_debug("sdhci: Set host->timeout_clk to %u in sdhci_get_ios.\n", 
+					host->timeout_clk);
 			mmc->max_busy_timeout =
 				host->ops->get_max_timeout_count ?
 				host->ops->get_max_timeout_count(host) :
 				1 << 27;
+			pr_debug("sdhci: Set mmc->mmc->max_busy_timeout to %u in sdhci_get_ios.\n", 
+					mmc->max_busy_timeout);
 			mmc->max_busy_timeout /= host->timeout_clk;
+			pr_debug("sdhci: Set final mmc->max_busy_timeout to %u in sdhci_get_ios.\n",
+					mmc->max_busy_timeout);
 		}
 	}
 
-	if (host->ops->set_power)
+	if (host->ops->set_power) {
+		pr_debug("sdhci: host->ops->set_power in sdhci_get_ios. going to set power to host with power mode %u and vdd %u .\n", ios->power_mode, ios->vdd);	
 		host->ops->set_power(host, ios->power_mode, ios->vdd);
-	else
+	}
+	else {
+		pr_debug("sdhci: In sdhci_get_ios. Going to set power to host with power mode %u and vdd %u .\n", ios->power_mode, ios->vdd);
 		sdhci_set_power(host, ios->power_mode, ios->vdd);
-
-	if (host->ops->platform_send_init_74_clocks)
+	}
+	
+	if (host->ops->platform_send_init_74_clocks) {
+		pr_debug("sdhci: host->ops->platform_send_init_74_clocks in sdhci_get_ios. Going to set init to host with power mode %u .\n", ios->power_mode);	
 		host->ops->platform_send_init_74_clocks(host, ios->power_mode);
+	}
 
 	host->ops->set_bus_width(host, ios->bus_width);
 
@@ -2635,16 +2668,20 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		     ios->timing == MMC_TIMING_UHS_SDR50 ||
 		     ios->timing == MMC_TIMING_UHS_SDR104 ||
 		     ios->timing == MMC_TIMING_UHS_DDR50 ||
-		     ios->timing == MMC_TIMING_UHS_SDR25)
+		     ios->timing == MMC_TIMING_UHS_SDR25) {
+			pr_debug("sdhci: Setting CTRL_HISPD in sdhci_set_ios. \n");
 			ctrl |= SDHCI_CTRL_HISPD;
+		}
 		else
 			ctrl &= ~SDHCI_CTRL_HISPD;
 	}
 
 	if (host->version >= SDHCI_SPEC_300) {
 		u16 clk, ctrl_2;
-
+		pr_debug("sdhci: SDHCI_SPEC greater than or eq. 3.00 in sdhci_set_ios.\n");	
 		if (!host->preset_enabled) {
+			pr_debug("sdhci: Preset not enabled."
+				"setting ctrl = %08x to its reg in sdhci_set_ios.\n", ctrl);
 			sdhci_writeb(host, ctrl, SDHCI_HOST_CONTROL);
 			/*
 			 * We only need to set Driver Strength if the
@@ -2665,6 +2702,8 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 					mmc_hostname(mmc));
 				ctrl_2 |= SDHCI_CTRL_DRV_TYPE_B;
 			}
+			pr_debug("sdhci: Current ctrl_2 reg after assigning drv_type = %08x "
+					"in sdhci_set_ios.\n" ,ctrl_2);
 
 			sdhci_writew(host, ctrl_2, SDHCI_HOST_CONTROL2);
 		} else {
@@ -2676,6 +2715,7 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 			 */
 
 			/* Reset SD Clock Enable */
+			pr_debug("sdhci: Preset not enabled in sdhci_set_ios.\n");
 			clk = sdhci_readw(host, SDHCI_CLOCK_CONTROL);
 			clk &= ~SDHCI_CLOCK_CARD_EN;
 			sdhci_writew(host, clk, SDHCI_CLOCK_CONTROL);
@@ -2683,15 +2723,18 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 			sdhci_writeb(host, ctrl, SDHCI_HOST_CONTROL);
 
 			/* Re-enable SD Clock */
+			pr_debug("sdhci: Going to host->ops->set_clock in sdhci_set_ios.\n");
 			host->ops->set_clock(host, host->clock);
 		}
 
-		/* Reset SD Clock Enable */
+		/* Reset SD Clock Enable */  //even without preset enabled
 		clk = sdhci_readw(host, SDHCI_CLOCK_CONTROL);
 		clk &= ~SDHCI_CLOCK_CARD_EN;
 		sdhci_writew(host, clk, SDHCI_CLOCK_CONTROL);
 
+		pr_debug("sdhci: Going to host->ops->set_uhs_signaling in sdhci_set_ios.\n");
 		host->ops->set_uhs_signaling(host, ios->timing);
+		pr_debug("sdhci: Setting host->timing to %u in sdhci_set_ios.\n", ios->timing);
 		host->timing = ios->timing;
 
 		if (!(host->quirks2 & SDHCI_QUIRK2_PRESET_VALUE_BROKEN) &&
@@ -2703,6 +2746,7 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 				 (ios->timing == MMC_TIMING_MMC_DDR52))) {
 			u16 preset;
 
+			pr_debug("sdhci: Going to on sdhci_enable_preset_value in sdhci_set_ios.\n");
 			sdhci_enable_preset_value(host, true);
 			preset = sdhci_get_preset_value(host);
 			ios->drv_type = FIELD_GET(SDHCI_PRESET_DRV_MASK,
@@ -2710,6 +2754,7 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		}
 
 		/* Re-enable SD Clock */
+		pr_debug("sdhci: Going to re-enable clock: host->ops->set_clock in sdhci_set_ios.\n");
 		host->ops->set_clock(host, host->clock);
 	} else
 		sdhci_writeb(host, ctrl, SDHCI_HOST_CONTROL);
@@ -2719,8 +2764,10 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	 * signalling timeout and CRC errors even on CMD0. Resetting
 	 * it on each ios seems to solve the problem.
 	 */
-	if (host->quirks & SDHCI_QUIRK_RESET_CMD_DATA_ON_IOS)
+	if (host->quirks & SDHCI_QUIRK_RESET_CMD_DATA_ON_IOS) { //test this?
+		pr_debug("sdhci: RESET_CMD_DATA_ON_IOS seein in sdhci_set_ios, reseting.\n");
 		sdhci_do_reset(host, SDHCI_RESET_CMD | SDHCI_RESET_DATA);
+	}
 }
 EXPORT_SYMBOL_GPL(sdhci_set_ios);
 
@@ -3210,12 +3257,14 @@ in sdhci_send_tuning.");
 		
 		ctrl42 = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		ctrl42 &= ~SDHCI_CTRL_EXEC_TUNING;
-	//	ctrl42 |= SDHCI_CTRL_TUNED_CLK; //risky. Not needed as TUNING_WORK_AROUND
-	//	already sets this bit. But it doesn't persist.
+	/*	ctrl42 |= SDHCI_CTRL_TUNED_CLK; //risky. Not needed as TUNING_WORK_AROUND
+		already sets this bit. But it doesn't persist.
+	*/	
 		sdhci_writew(host, ctrl42, SDHCI_HOST_CONTROL2);
-	//	pr_debug("sdhci: Current CONTROL2 register after assigning it TUNED_CLK and removing EXEC_TUNING \
-// = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
-		pr_debug("sdhci: Current CONTROL2 register after removing EXEC_TUNING \
+	/*	pr_debug("sdhci: Current CONTROL2 register after assigning it TUNED_CLK and removing EXEC_TUNING \
+ = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
+	*/
+	 	pr_debug("sdhci: Current CONTROL2 register after removing EXEC_TUNING \
 = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
 	}
 	

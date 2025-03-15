@@ -82,11 +82,14 @@
 
 #define SDHCI_HOST_CONTROL	0x28
 #define  SDHCI_CTRL_LED		0x01
-#define  SDHCI_CTRL_4BITBUS	0x02
-#define  SDHCI_CTRL_HISPD	0x04
+#define  SDHCI_CTRL_4BITBUS	0x02  //we see this in both
+#define  SDHCI_CTRL_HISPD	0x04  //we see this after reset but not
+				      //in initial pre reset sdhci_dumpregs
 #define  SDHCI_CTRL_DMA_MASK	0x18
 #define   SDHCI_CTRL_SDMA	0x00
-#define   SDHCI_CTRL_ADMA1	0x08
+#define   SDHCI_CTRL_ADMA1	0x08  //we see this bit in host_control
+				      //at initial sdhci_dumpregs but
+				      //not subsequently
 #define   SDHCI_CTRL_ADMA32	0x10
 #define   SDHCI_CTRL_ADMA64	0x18
 #define   SDHCI_CTRL_ADMA3	0x18
@@ -110,14 +113,18 @@
 #define SDHCI_CLOCK_CONTROL	0x2C
 #define  SDHCI_DIVIDER_SHIFT	8
 #define  SDHCI_DIVIDER_HI_SHIFT	6
-#define  SDHCI_DIV_MASK	0xFF
-#define  SDHCI_DIV_MASK_LEN	8
+#define  SDHCI_DIV_MASK	0xFF		// all the divider status info
+					// bits set to 1
+
+#define  SDHCI_DIV_MASK_LEN	8	// how many bits are part of
+					// the divider status mask
 #define  SDHCI_DIV_HI_MASK	0x300
 #define  SDHCI_PROG_CLOCK_MODE	0x0020
-#define  SDHCI_CLOCK_CARD_EN	0x0004
+#define  SDHCI_CLOCK_CARD_EN	0x0004	//  the 
 #define  SDHCI_CLOCK_PLL_EN	0x0008
-#define  SDHCI_CLOCK_INT_STABLE	0x0002
-#define  SDHCI_CLOCK_INT_EN	0x0001
+#define  SDHCI_CLOCK_INT_STABLE	0x0002  //  7 
+#define  SDHCI_CLOCK_INT_EN	0x0001  //  in       
+					//  107 (EN=ENable(d))
 
 #define SDHCI_TIMEOUT_CONTROL	0x2E
 
@@ -127,8 +134,10 @@
 #define  SDHCI_RESET_DATA	0x04
 
 #define SDHCI_INT_STATUS	0x30
-#define SDHCI_INT_ENABLE	0x34
-#define SDHCI_SIGNAL_ENABLE	0x38
+#define SDHCI_INT_ENABLE	0x34  // int enable
+#define SDHCI_SIGNAL_ENABLE	0x38  // and signal enable bits change according to the current
+				      // command / device state. so we don't to match with
+				      // pre_init, probably
 #define  SDHCI_INT_RESPONSE	0x00000001
 #define  SDHCI_INT_DATA_END	0x00000002
 #define  SDHCI_INT_BLK_GAP	0x00000004
@@ -673,7 +682,8 @@ static inline void sdhci_writel(struct sdhci_host *host, u32 val, int reg)
 static inline void sdhci_writew(struct sdhci_host *host, u16 val, int reg)
 {
 	if (unlikely(host->ops->write_w))
-		host->ops->write_w(host, val, reg);
+		host->ops->write_w(host, val, reg); //core/sdio_io.c
+						    //sdio_memcpy_toio()
 	else
 		writew(val, host->ioaddr + reg);
 }
