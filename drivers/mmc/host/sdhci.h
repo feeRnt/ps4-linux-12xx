@@ -19,6 +19,8 @@
 
 #include <linux/mmc/host.h>
 
+extern int __pre_init_cis_max_dtr; //added. Can be used across sdhci.c and core/sdio.c
+
 /*
  * Controller registers
  */

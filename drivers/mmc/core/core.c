@@ -957,11 +957,11 @@ static inline void mmc_set_ios(struct mmc_host *host)
 {
 	struct mmc_ios *ios = &host->ios;
 
-	pr_debug("c%s: clock %uHz busmode %u powermode %u cs %u Vdd %u "
-		"width %u timing %u ; will do host->ops_set_ios with this value. Currently in mmc_set_ios. \n",
+	pr_debug("core: %s: clock %uHz busmode %u powermode %u cs %u Vdd %u "
+		"width %u timing %u ; will do host->ops_set_ios with this value. Currently in %s. \n",
 		 mmc_hostname(host), ios->clock, ios->bus_mode,
 		 ios->power_mode, ios->chip_select, ios->vdd,
-		 1 << ios->bus_width, ios->timing);
+		 1 << ios->bus_width, ios->timing, __func__);
 //this always returns clock 0 Hz. ios->clock is then 0...
 	host->ops->set_ios(host, ios);
 }
@@ -982,10 +982,17 @@ void mmc_set_chip_select(struct mmc_host *host, int mode)
 void mmc_set_clock(struct mmc_host *host, unsigned int hz)
 {
 	WARN_ON(hz && hz < host->f_min);
-
-	if (hz > host->f_max)
+	//for function cross referencing check out elixir.bootlin.com .
+	
+	//this funciton is called from mmc/core/{mmc,sd,sdio}.c
+	pr_debug("core: I'm in %s.", __func__);
+	if (hz > host->f_max) {
+		pr_debug("core: hz = %d > host->f_max = %d in %s.\
+			Setting hz to f_max.\n", hz, host->f_max, __func__);
 		hz = host->f_max;
-
+	}
+	pr_debug("core: Setting host->ios.clock to hz = %d in %s.\n", 
+			hz, __func__);
 	host->ios.clock = hz;
 	mmc_set_ios(host);
 }
@@ -1253,6 +1260,8 @@ int mmc_host_set_uhs_voltage(struct mmc_host *host)
 	 * During a signal voltage level switch, the clock must be gated
 	 * for 5 ms according to the SD spec
 	 */
+	pr_debug("core: I'm in %s. Setting clock = %d \n", 
+			__func__, host->ios.clock);
 	clock = host->ios.clock;
 	host->ios.clock = 0;
 	mmc_set_ios(host);
@@ -1398,8 +1407,11 @@ int mmc_select_drive_strength(struct mmc_card *card, unsigned int max_dtr,
  */
 void mmc_power_up(struct mmc_host *host, u32 ocr)
 {
-	if (host->ios.power_mode == MMC_POWER_ON)
+	if (host->ios.power_mode == MMC_POWER_ON) {
+		pr_debug("core: MMC_POWER_ON in %s. Returning.\n", __func__);
 		return;
+	}
+	pr_debug("core: I'm in %s.\n", __func__);
 
 	mmc_pwrseq_pre_power_on(host);
 
@@ -1418,6 +1430,8 @@ void mmc_power_up(struct mmc_host *host, u32 ocr)
 
 	mmc_pwrseq_post_power_on(host);
 
+	pr_debug("core: Setting host->ios.clock to host->f_init = %d\
+			in %s.\n", host->f_init, __func__);
 	host->ios.clock = host->f_init;
 
 	host->ios.power_mode = MMC_POWER_ON;

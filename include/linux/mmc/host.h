@@ -19,6 +19,8 @@
 
 struct mmc_ios {
 	unsigned int	clock;			/* clock rate */
+	//this clock is always 0 Hz for us.
+
 	unsigned short	vdd;
 	unsigned int	power_delay_ms;		/* waiting for stable power */
 

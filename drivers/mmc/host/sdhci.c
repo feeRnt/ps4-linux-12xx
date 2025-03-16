@@ -45,10 +45,12 @@
 #define MAX_TUNING_LOOP 40
 
 static unsigned int debug_quirks = 1; //originally 0
-static unsigned int debug_quirks2 = 1; //originally ..g_quirks2;
+static unsigned int debug_quirks2; //originally ..g_quirks2;
 //I think this is only for the sdhci driver as a module and requires
 //options that you pass to it. So it's useless here in this way but I'm
-//adding it anyway.
+//adding it anyway.   [[removed]]
+
+int __pre_init_cis_max_dtr; //added .. Global var, declared using extern in sdhci.h
 
 static void sdhci_enable_preset_value(struct sdhci_host *host, bool enable);
 
@@ -4871,6 +4873,7 @@ static inline bool sdhci_can_64bit_dma(struct sdhci_host *host)
 int sdhci_setup_host(struct sdhci_host *host)
 {
 	struct mmc_host *mmc;
+	struct mmc_card *card; //added
 	u32 max_current_caps;
 	unsigned int ocr_avail;
 	unsigned int override_timeout_clk;
@@ -4886,8 +4889,39 @@ int sdhci_setup_host(struct sdhci_host *host)
 	}
 
 	mmc = host->mmc;
+	
 	pr_info("sdhci: Reg dump in sdhci_setup_host:\n");
 	sdhci_dumpregs(host);
+
+	//added vvvvvvvv
+	pr_info("sdhci: Accessing the MMC card's info before reset:::"
+	"Manufacturer ID	: %d"
+	"Product name		: %s"
+	"Product revision	: %s"
+	"Serial				: %d"
+	"OEM ID				: %hd"
+	"Hardware revision	: %s"
+	"=========================="
+	"SDIO CIS::"
+	"Vendor				: %hd"
+	"Device				: %hd"
+	"Blocksize			: %hd"
+	"Max_dtr			: %d",	
+	card->cid.manfid,
+	card->cid.prod_name,
+	card->cid.prv,
+	card->cid.serial,
+	card->cid.oemid,
+	card->cid.hwrev,
+	card->cis.vendor,
+	card->cis.device,
+	card->cis.blksize,
+	card->cis.max_dtr);
+	
+	__pre_init_cis_max_dtr = card->cis.max_dtr;
+	
+	////////////// ^
+	
 	/*
 	 * If there are external regulators, get them. Note this must be done
 	 * early before resetting the host and reading the capabilities so that
