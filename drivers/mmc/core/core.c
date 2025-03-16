@@ -691,8 +691,8 @@ int mmc_wait_for_cmd(struct mmc_host *host, struct mmc_command *cmd, int retries
 	pr_debug("mmc-core: no. of retries in mmc_wait_for_cmd is %d \n", retries);
 	//set manually? ;; this returns to 0.
 	mrq.cmd = cmd;
-	pr_debug("mmc-core: current command in mmc_wait_for_cmd is %d \
-Setting cmd->data = NULL\n", mrq.cmd);
+	pr_debug("mmc-core: current command in mmc_wait_for_cmd is %d or %08x \
+Setting cmd->data = NULL\n", mrq.cmd, cmd);
 	cmd->data = NULL;
 	//DEBUG is defined but doesn't print. Guess I needed -DDEBUG after all.
 
@@ -962,7 +962,7 @@ static inline void mmc_set_ios(struct mmc_host *host)
 		 mmc_hostname(host), ios->clock, ios->bus_mode,
 		 ios->power_mode, ios->chip_select, ios->vdd,
 		 1 << ios->bus_width, ios->timing, __func__);
-//this always returns clock 0 Hz. ios->clock is then 0...
+//this sometimes returns clock 0 Hz. ios->clock is then 0...
 	host->ops->set_ios(host, ios);
 }
 
@@ -987,8 +987,8 @@ void mmc_set_clock(struct mmc_host *host, unsigned int hz)
 	//this funciton is called from mmc/core/{mmc,sd,sdio}.c
 	pr_debug("core: I'm in %s.", __func__);
 	if (hz > host->f_max) {
-		pr_debug("core: hz = %d > host->f_max = %d in %s.\
-			Setting hz to f_max.\n", hz, host->f_max, __func__);
+		pr_debug("core: hz = %d > host->f_max = %d in %s."
+		"Setting hz to f_max.\n", hz, host->f_max, __func__);
 		hz = host->f_max;
 	}
 	pr_debug("core: Setting host->ios.clock to hz = %d in %s.\n", 
@@ -1260,7 +1260,8 @@ int mmc_host_set_uhs_voltage(struct mmc_host *host)
 	 * During a signal voltage level switch, the clock must be gated
 	 * for 5 ms according to the SD spec
 	 */
-	pr_debug("core: I'm in %s. Setting clock = %d \n", 
+	pr_debug("core: I'm in %s. Setting clock = %d, and then setting host clock to 0 temporarily. \n"
+			"Will reset host clock to this value in 10 ms after the gating.", 
 			__func__, host->ios.clock);
 	clock = host->ios.clock;
 	host->ios.clock = 0;
@@ -2287,11 +2288,12 @@ void mmc_rescan(struct work_struct *work)
 		container_of(work, struct mmc_host, detect.work);
 	int i;
 
+	pr_debug("mmc-core: I am in mmc_rescan.\n");
 	if (host->rescan_disable)
 		return;
 
 	/* If there is a non-removable card registered, only scan once */
-	if (!mmc_card_is_removable(host) && host->rescan_entered)
+	if (!mmc_card_is_removable(host) && host->rescan_entered) //important
 		return;
 	host->rescan_entered = 1;
 

@@ -2263,7 +2263,7 @@ void sdhci_enable_clk(struct sdhci_host *host, u16 clk)
 
 	clk |= SDHCI_CLOCK_CARD_EN;
 	pr_debug("sdhci: Writing clk = %08x to SDHCI_CLOCK_CONTROL in"
-			"sdhci_set_ios.\n", clk);
+			" sdhci_set_ios.\n", clk);
 	sdhci_writew(host, clk, SDHCI_CLOCK_CONTROL);
 }
 EXPORT_SYMBOL_GPL(sdhci_enable_clk);
@@ -3851,7 +3851,8 @@ Assigning *intmask_p |= data_err_bit (%08x)\n", data_err_bit);
 			pr_err("sdhci: SDHCI_INT_TIMEOUT detected with mask in sdhci_cmd_irq.\
 Assigning host->cmd->error = -ETIMEDOUT in sdhci_cmd_irq.\n");
 			host->cmd->error = -ETIMEDOUT;
-		}
+		}	//this is where we end up with the -110 errors.
+			//important
 		else {
 			pr_err("sdhci: Assigning host->cmd->error = -EILSEQ in sdhci_cmd_irq\n");
 			host->cmd->error = -EILSEQ;
@@ -4166,11 +4167,12 @@ SDHCI_INT_STATUS. intmask = %08x, and final input = %08x\n",
 		}
 
 		if (intmask & SDHCI_INT_CMD_MASK) {
-			pr_debug("sdhci: SDHCI_INT_CMD_MASK intmask in sdhci_thread_irq. \
+			pr_debug("sdhci: (SDHCI_INT_CMD_MASK & intmask) returned in sdhci_thread_irq. \
 Going to sdhci_cmd_irq with (host, intmask & SDHCI_INT_CMD_MASK, &intmask) .\n\
 intmask & SDHCI_INT_CMD_MASK = %08x and &intmask = %08x",
 	intmask & SDHCI_INT_CMD_MASK, &intmask);
 			sdhci_cmd_irq(host, intmask & SDHCI_INT_CMD_MASK, &intmask);
+		//command interrupt detected. so go to irq cmd
 		}
 		
 		if (intmask & SDHCI_INT_DATA_MASK)
@@ -4896,18 +4898,18 @@ int sdhci_setup_host(struct sdhci_host *host)
 	//added vvvvvvvv
 /*
 	pr_info("sdhci: Accessing the MMC card's info before reset:::"
-	"Manufacturer ID	: %d"
+	"Manufacturer ID	: %u"
 	"Product name		: %s"
 	"Product revision	: %s"
-	"Serial				: %d"
-	"OEM ID				: %hd"
-	"Hardware revision	: %s"
+	"Serial				: %u"
+	"OEM ID				: %hu"
+	"Hardware revision	: %s	"
 	"=========================="
 	"SDIO CIS::"
-	"Vendor				: %hd"
-	"Device				: %hd"
-	"Blocksize			: %hd"
-	"Max_dtr			: %d",	
+	"Vendor				: %hu"
+	"Device				: %hu"
+	"Blocksize			: %hu"
+	"Max_dtr			: %u",	
 	card->cid.manfid,
 	card->cid.prod_name,
 	card->cid.prv,

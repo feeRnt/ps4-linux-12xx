@@ -127,7 +127,7 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 				Returning -EINVAL.\n");
 		return -EINVAL;
 	}
-	func = sdio_alloc_func(card);
+	func = sdio_alloc_func(card); //defined in sdio_alloc_func
 	if (IS_ERR(func)) {
 		pr_err("sdio: I was in sdio_init_func and detected an erroneous function. \n\
 				Returning PTR_ERR(func).\n");
@@ -135,23 +135,42 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 	}
 	
 	func->num = fn;
+	pr_debug("sdio: Assigning func->num = %d in sdio_init_func.\n",
+			fn);
+
+	pr_debug("sdio: Vendor : %hu, Device: %hu",
+			card->cis.vendor, card->cis.device);
 
 	if (!(card->quirks & MMC_QUIRK_NONSTD_SDIO)) {
-		pr_debug("sdio: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n\
-				Hence going to try sdio_read_fbr. Current card->quirks = %08x .\n", 				card->quirks);
+		/*
+		pr_debug("sdio: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n"
+			"Hence going to try sdio_read_fbr. Current card->quirks = %08x .\n", 					card->quirks);
 		ret = sdio_read_fbr(func);
 		if (ret) {
 			pr_debug("sdio: I am in sdio_init_func and was testing sdio_read_fbr.\n\
 					It returned, hence going to fail condition.\n");
 			goto fail;
 		}
-
+		*/
+		pr_debug("sdio: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n"
+				"Hence going to sdio_read_func_cis to test.\n");
+		
 		ret = sdio_read_func_cis(func);
 		if (ret) {
 			pr_err("sdio: I was in sdio_init_func and was testing sdio_read_func_cis.\n\
 					It returned, hence going to fail condition.\n");
 			goto fail;
 		}
+
+		pr_debug("sdio: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n"
+			"Hence going to try sdio_read_fbr. Current card->quirks = %08x .\n", card->quirks);
+		ret = sdio_read_fbr(func);
+		if (ret) {
+			pr_debug("sdio: I am in sdio_init_func and was testing sdio_read_fbr.\n\
+					It returned, hence going to fail condition.\n");
+			goto fail;
+		}
+			
 	} else {
 		pr_debug("sdio: I was in sdio_init_function and no fail checks triggered.\n\
 				Hence filling up the vendor, device, and max_blksize information from func.\n");
@@ -488,6 +507,10 @@ static unsigned mmc_sdio_get_max_clock(struct mmc_card *card)
 	} else {
 		max_dtr = card->cis.max_dtr;
 	}		//this function always returns 0. so fix it
+			//nvm it does not. we never get this function.
+			//and sometimes we have 0, sometimes real values
+			//broken timeouts in __mmc_start_request?
+
 	/*
 	*CSD (Card-Specific Data): Defines the card's features and capabilities.
 	*CID (Card Identification): Holds the card’s unique identifier.
@@ -560,8 +583,8 @@ static void sdio_select_driver_type(struct mmc_card *card)
 
 	if (drv_type)
 		mmc_set_driver_type(card->host, drv_type);
-	pr_err("The card driver type, drive strength, driver type is %d, %d, %d",
-		card_drv_type, card_strength, drv_type);
+	pr_debug("The card driver type, card strength, driver type is %d, %d, %d in %s\n",
+		card_drv_type, card_strength, drv_type, __func__);
 }
 
 
