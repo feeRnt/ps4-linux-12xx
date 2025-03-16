@@ -88,7 +88,7 @@ static int mmc_io_rw_direct_host(struct mmc_host *host, int write, unsigned fn,
 	}
 	
 	/* sanity check */
-	if (addr & ~0x1FFFF) {
+	if (addr & ~0x1FFFF) {  // all 1s
 		pr_err("sdio_ops: addr & ~0x1FFFF in mmc_io_rw_direct_host,\
 		returning -EINVAL.\n");
 		return -EINVAL;
@@ -105,7 +105,7 @@ static int mmc_io_rw_direct_host(struct mmc_host *host, int write, unsigned fn,
 
 	err = mmc_wait_for_cmd(host, &cmd, 0); 
 	if (err) {
-		pr_err("sdio_ops: err = mmc_wait_for_cmd returned, in\
+		pr_err("sdio_ops: err = mmc_wait_for_cmd returned, in \
 mmc_io_rw_direct_host, returning err=%d", err);
 		return err;
 	}

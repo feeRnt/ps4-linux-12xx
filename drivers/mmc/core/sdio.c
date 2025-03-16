@@ -88,6 +88,9 @@ static int sdio_read_fbr(struct sdio_func *func)
 	pr_info("sdio: I am in sdio_read_fbr and going to test mmc_io_rw_direct.\n");
 	ret = mmc_io_rw_direct(func->card, 0, 0,
 		SDIO_FBR_BASE(func->num) + SDIO_FBR_STD_IF, 0, &data);
+	//to card, write 0, fn = 0, addr = Function Block Register: 1 * 100 + standard interface
+	//for fbr: 0, input = 0, output = &data)
+
 	if (ret) {
 		pr_err("sdio: I was in sdio_read_fbr and detected return for ret=mmc_io_rw_direct.\n\
 				Hence going to out condition.\n");
@@ -138,20 +141,32 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 	pr_debug("sdio: Assigning func->num = %d in sdio_init_func.\n",
 			fn);
 
-	pr_debug("sdio: Vendor : %hu, Device: %hu",
-			card->cis.vendor, card->cis.device);
-
+	pr_debug("sdio: Vendor : %hu, Device: %hu \n ,"
+		 "   Major rev : %u , Minor rev: %u \n",
+		 	card->cis.vendor, card->cis.device,
+			card->major_rev, card->minor_rev);
+	/*this returns::         02df	      912c
+	 after transfer to hex  (Marvell   	(something before 
+	 *		Technology Group Ltd.)  sd8897, and after 8797?)
+	https://github.com/systemd/systemd/blob/main/hwdb.d/sdio.ids
+	or include/linux/mmc/sdio_ids.h
+	*/ 
+	pr_debug("sdio: CID prod_name : %s ."
+		 " Year:  %hu \n",
+		  card->cid.prod_name,
+		  card->cid.year);
 	if (!(card->quirks & MMC_QUIRK_NONSTD_SDIO)) {
-		/*
+		
 		pr_debug("sdio: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n"
 			"Hence going to try sdio_read_fbr. Current card->quirks = %08x .\n", 					card->quirks);
-		ret = sdio_read_fbr(func);
+		ret = sdio_read_fbr(func); //read function block register (function = device,
+					   //like wifi device, bt device
 		if (ret) {
 			pr_debug("sdio: I am in sdio_init_func and was testing sdio_read_fbr.\n\
 					It returned, hence going to fail condition.\n");
 			goto fail;
 		}
-		*/
+	//doing func_cis first creates -EINVAL errors.	
 		pr_debug("sdio: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n"
 				"Hence going to sdio_read_func_cis to test.\n");
 		
@@ -162,7 +177,7 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 			goto fail;
 		}
 
-		pr_debug("sdio: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n"
+/*		pr_debug("sdio: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n"
 			"Hence going to try sdio_read_fbr. Current card->quirks = %08x .\n", card->quirks);
 		ret = sdio_read_fbr(func);
 		if (ret) {
@@ -170,7 +185,7 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 					It returned, hence going to fail condition.\n");
 			goto fail;
 		}
-			
+*/			
 	} else {
 		pr_debug("sdio: I was in sdio_init_function and no fail checks triggered.\n\
 				Hence filling up the vendor, device, and max_blksize information from func.\n");

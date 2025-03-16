@@ -3846,7 +3846,14 @@ Assigning *intmask_p |= data_err_bit (%08x)\n", data_err_bit);
 
 	if (intmask & (SDHCI_INT_TIMEOUT | SDHCI_INT_CRC |
 		       SDHCI_INT_END_BIT | SDHCI_INT_INDEX)) {
-	//0x00010000 | 0x00020000 | 0x00040000 | 0x00080000 	   
+	//0x00010000 | 0x00020000 | 0x00040000 | 0x00080000  = f0000
+	//we get CRC and INDEX errors...
+	//
+	//it's either a TIMEOUT, in which case it is just the timeout bit
+	//or it's a success, 00000001 (SDHCI_INT_RESPONSE), and only that
+	//or it's EILSEQ, in which case intmas here is a0001;
+	//		INT_INDEX and INT_CRC
+	//	invalid command index    cyclic redundancy check
 		if (intmask & SDHCI_INT_TIMEOUT) {
 			pr_err("sdhci: SDHCI_INT_TIMEOUT detected with mask in sdhci_cmd_irq.\
 Assigning host->cmd->error = -ETIMEDOUT in sdhci_cmd_irq.\n");
