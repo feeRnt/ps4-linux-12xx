@@ -4894,6 +4894,7 @@ int sdhci_setup_host(struct sdhci_host *host)
 	sdhci_dumpregs(host);
 
 	//added vvvvvvvv
+/*
 	pr_info("sdhci: Accessing the MMC card's info before reset:::"
 	"Manufacturer ID	: %d"
 	"Product name		: %s"
@@ -4921,7 +4922,7 @@ int sdhci_setup_host(struct sdhci_host *host)
 	__pre_init_cis_max_dtr = card->cis.max_dtr;
 	
 	////////////// ^
-	
+*/	
 	/*
 	 * If there are external regulators, get them. Note this must be done
 	 * early before resetting the host and reading the capabilities so that
