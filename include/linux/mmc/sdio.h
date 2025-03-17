@@ -51,16 +51,17 @@
             a valid command will clear it (with a delay of one command)
 	c : clear by read
  */
-
-#define R5_COM_CRC_ERROR	(1 << 15)	/* er, b */
-#define R5_ILLEGAL_COMMAND	(1 << 14)	/* er, b */
-#define R5_ERROR		(1 << 11)	/* erx, c */
-#define R5_FUNCTION_NUMBER	(1 << 9)	/* er, c */
+							// we get 
+#define R5_COM_CRC_ERROR	(1 << 15)	/* er, b */  //not this
+#define R5_ILLEGAL_COMMAND	(1 << 14)	/* er, b */  //not this
+#define R5_ERROR		(1 << 11)	/* erx, c */ // this
+#define R5_FUNCTION_NUMBER	(1 << 9)	/* er, c */  // this
 #define R5_OUT_OF_RANGE		(1 << 8)	/* er, c */
 #define R5_STATUS(x)		(x & 0xCB00)
 #define R5_IO_CURRENT_STATE(x)	((x & 0x3000) >> 12) /* s, b */
+//we also get 1<<10, 1<<12
 
-/*
+/*	
  * Card Common Control Registers (CCCR)
  */
 

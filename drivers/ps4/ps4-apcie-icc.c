@@ -328,7 +328,8 @@ void resetBtWlan(void)
 	u8 resp[20];
 	int ret;
 	
-
+	//                ( major, minor, command, command length,
+	//                response, response length )
 	/* Get bt/wlan status */
 	ret = apcie_icc_cmd(5, 1, NULL, 0, resp, 20);
 	printk("BT/WLAN status: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
@@ -347,6 +348,7 @@ void resetBtWlan(void)
 
 
 	//Turn ON bt/wlan
+	/*
 	ret = apcie_icc_cmd(5, 0, &on, sizeof(on), resp, 20);
 	printk("Turn ON BT/WLAN: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
 	if(ret < 0)
@@ -354,6 +356,7 @@ void resetBtWlan(void)
 		printk("Turn on bt/wlan failed");
 		return;
 	}
+	*/
 }
 
 void do_icc_init(void) {
