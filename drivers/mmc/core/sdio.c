@@ -154,11 +154,27 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 	https://github.com/systemd/systemd/blob/main/hwdb.d/sdio.ids
 	or include/linux/mmc/sdio_ids.h
 	*/ 
-	pr_debug("sdio: CID prod_name : %s ."
+
+	pr_debug("sdio: Func vendor = %u , Func device = %u,\n"
+		"  Func maxblksize = %u\n",
+		func->vendor,
+		func->device,
+		func->max_blksize);	
+	//these should be empty but checking just in case 
+
+	pr_debug("sdio: Func card vendor = %u , Func card device = %u,\n"
+		"  Func card maxblksize = %u\n",
+		func->card->cis.vendor,
+		func->card->cis.device,
+		func->card->cis.blksize);
+
+
+/*	pr_debug("sdio: CID prod_name : %s ."
 		 " Year:  %hu \n",
 		  card->cid.prod_name, 
 		  card->cid.year);
 	// these two return empty
+*/
 	if (!(card->quirks & MMC_QUIRK_NONSTD_SDIO)) {
 		
 		pr_debug("sdio: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n Hence going to try sdio_read_fbr with func = %08x."
