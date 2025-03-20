@@ -51,6 +51,8 @@ static unsigned int debug_quirks2; //originally ..g_quirks2;
 //adding it anyway.   [[removed]]
 
 int __pre_init_cis_max_dtr; //added .. Global var, declared using extern in sdhci.h
+int __pre_init_clock_use_counter = 0;
+u16 __pre_init_clock;
 
 static void sdhci_enable_preset_value(struct sdhci_host *host, bool enable);
 
@@ -2128,11 +2130,11 @@ u16 sdhci_calc_clk(struct sdhci_host *host, unsigned int clock,
 		if (host->preset_enabled) {
 			u16 pre_val;
 
-			pr_debug("sdhci: Preset enabled in sdhci_set_clock.");
+			pr_debug("sdhci: Preset enabled in sdhci_calc_clock.");
 			clk = sdhci_readw(host, SDHCI_CLOCK_CONTROL);
-			pr_debug("sdhci: Current clk in sdhci_set_clock = %08x.\n", clk);
+			pr_debug("sdhci: Current clk in sdhci_calc_clock = %08x.\n", clk);
 			pre_val = sdhci_get_preset_value(host);
-			pr_debug("sdhci: Current pre_val in sdhci_set_clock = %08x.\n", pre_val);
+			pr_debug("sdhci: Current pre_val in sdhci_calc_clock = %08x.\n", pre_val);
 			div = FIELD_GET(SDHCI_PRESET_SDCLK_FREQ_MASK, pre_val);
 			if (host->clk_mul &&
 				(pre_val & SDHCI_PRESET_CLKGEN_SEL)) {
@@ -2207,8 +2209,20 @@ clock_set:
 	clk |= ((div & SDHCI_DIV_HI_MASK) >> SDHCI_DIV_MASK_LEN)
 		<< SDHCI_DIVIDER_HI_SHIFT;
 
-	pr_debug("sdhci: Current clk in sdhci_set_clock before returning it = %08x.\n", clk);
-	return clk;
+//	pr_debug("sdhci: Current clk in sdhci_set_clock before returning it = %08x.\n", clk);
+//	return clk;
+// #ifdef x86_ps4
+	if (__pre_init_clock_use_counter <= 1) {
+		pr_debug("sdhci: Current clk in sdhci_set_clock before returning it = %08x.\n", 
+				__pre_init_clock);
+		__pre_init_clock_use_counter = __pre_init_clock_use_counter + 1; 
+		return __pre_init_clock; //the 100 in 107; in decimal
+	}
+	else {
+		pr_debug("sdhci: Current clk in sdhci_set_clock before returning it = %08x.\n", 
+				clk);
+		return clk;
+	}
 }
 EXPORT_SYMBOL_GPL(sdhci_calc_clk);
 
@@ -2269,7 +2283,7 @@ void sdhci_enable_clk(struct sdhci_host *host, u16 clk)
 EXPORT_SYMBOL_GPL(sdhci_enable_clk);
 
 void sdhci_set_clock(struct sdhci_host *host, unsigned int clock)
-{
+{	//called  by host->ops->set_clock
 	u16 clk;
 
 	pr_debug("sdhci: I am in sdhci_set_clock.\n");
@@ -4901,6 +4915,7 @@ int sdhci_setup_host(struct sdhci_host *host)
 	
 	pr_info("sdhci: Reg dump in sdhci_setup_host:\n");
 	sdhci_dumpregs(host);
+	__pre_init_clock = sdhci_readw(host, SDHCI_CLOCK_CONTROL);
 
 	//added vvvvvvvv
 /*

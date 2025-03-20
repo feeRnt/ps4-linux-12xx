@@ -391,7 +391,10 @@ static int mmc_decode_ext_csd(struct mmc_card *card, u8 *ext_csd)
 	card->ext_csd.rev = ext_csd[EXT_CSD_REV];
 
 	/* fixup device after ext_csd revision field is updated */
-	mmc_fixup_device(card, mmc_ext_csd_fixups);
+	mmc_fixup_device(card, mmc_ext_csd_fixups); 
+	//called by sdio.c using (card,sdio_fixup_methods)
+	//sdio_fixup_methods in quirks.h is a struct with all the fixes
+	//for a particular card
 
 	card->ext_csd.raw_sectors[0] = ext_csd[EXT_CSD_SEC_CNT + 0];
 	card->ext_csd.raw_sectors[1] = ext_csd[EXT_CSD_SEC_CNT + 1];

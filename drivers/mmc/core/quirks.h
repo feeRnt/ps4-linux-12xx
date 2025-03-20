@@ -159,7 +159,7 @@ static inline void mmc_fixup_device(struct mmc_card *card,
 		    (f->name == CID_NAME_ANY ||
 		     !strncmp(f->name, card->cid.prod_name,
 			      sizeof(card->cid.prod_name))) &&
-		    (f->cis_vendor == card->cis.vendor ||
+		    (f->cis_vendor == card->cis.vendor || //so one id ?
 		     f->cis_vendor == (u16) SDIO_ANY_ID) &&
 		    (f->cis_device == card->cis.device ||
 		     f->cis_device == (u16) SDIO_ANY_ID) &&
