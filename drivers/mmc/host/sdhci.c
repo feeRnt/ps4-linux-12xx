@@ -2212,11 +2212,15 @@ clock_set:
 //	pr_debug("sdhci: Current clk in sdhci_set_clock before returning it = %08x.\n", clk);
 //	return clk;
 // #ifdef x86_ps4
-	if (__pre_init_clock_use_counter <= 1) {
-		pr_debug("sdhci: Current clk in sdhci_set_clock before returning it = %08x.\n", 
+	if (__pre_init_clock_use_counter <= 2) {
+		pr_debug("sdhci: Current clk in sdhci_calc_clock before returning it = %08x.\n", 
 				__pre_init_clock);
 		__pre_init_clock_use_counter = __pre_init_clock_use_counter + 1; 
-		return __pre_init_clock; //the 100 in 107; in decimal
+//		return __pre_init_clock; //this returns 107. the 107
+//		has the clock enabled, and clock stable bits turned on
+//		, which is non standard. so just providing the hard
+//		coded value now
+		return 256;  //the 100 in 107; in decimal
 	}
 	else {
 		pr_debug("sdhci: Current clk in sdhci_set_clock before returning it = %08x.\n", 
