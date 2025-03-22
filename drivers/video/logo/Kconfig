@@ -68,4 +68,9 @@ config LOGO_SUPERH_CLUT224
 	depends on SUPERH
 	default y
 
+config LOGO_OBSIDIANX_CLUT224
+	bool "ObsidianX 224-color Linux logo"
+	default n	
+
+
 endif # LOGO

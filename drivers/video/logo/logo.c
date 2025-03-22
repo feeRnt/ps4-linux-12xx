@@ -100,7 +100,11 @@ const struct linux_logo * __ref fb_find_logo(int depth)
 		/* SuperH Linux logo */
 		logo = &logo_superh_clut224;
 #endif
+#ifdef CONFIG_LOGO_OBSIDIANX_CLUT224
+		/* ObsidianX Linux logo */
+		logo = &logo_obsidianx_clut224;
 	}
 	return logo;
+#endif
 }
 EXPORT_SYMBOL_GPL(fb_find_logo);
