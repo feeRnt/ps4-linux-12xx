@@ -142,10 +142,12 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 			"And the func(s) = %08x \n",
 			fn, func);
 
-	pr_debug("sdio: Vendor : %hu, Device: %hu \n ,"
+	/*	
+ 	pr_debug("sdio: Vendor : %hu, Device: %hu \n ,"
 		 "   Major rev : %u , Minor rev: %u \n",
 		 	card->cis.vendor, card->cis.device,
 			card->major_rev, card->minor_rev); 
+	*/
 	/*this returns::         02df	      912c
 	 after transfer to hex  (Marvell   	(something before 
 	 *		Technology Group Ltd.)  sd8897, and after 8797?)
@@ -155,6 +157,7 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 	or include/linux/mmc/sdio_ids.h
 	*/ 
 
+	/*
 	pr_debug("sdio: Func vendor = %u , Func device = %u,\n"
 		"  Func maxblksize = %u\n",
 		func->vendor,
@@ -167,14 +170,16 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 		func->card->cis.vendor,
 		func->card->cis.device,
 		func->card->cis.blksize);
+	*/
 
-
-/*	pr_debug("sdio: CID prod_name : %s ."
+	/*	
+ 	pr_debug("sdio: CID prod_name : %s ."
 		 " Year:  %hu \n",
 		  card->cid.prod_name, 
 		  card->cid.year);
 	// these two return empty
-*/
+	*/
+	
 	if (!(card->quirks & MMC_QUIRK_NONSTD_SDIO)) {
 		
 		pr_debug("sdio: I am in sdio_init_func and haven't detected NONSTD_SDIO quirk.\n Hence going to try sdio_read_fbr with func = %08x."
