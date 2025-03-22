@@ -3272,22 +3272,25 @@ in sdhci_send_tuning.");
 						  //ready interrupt
 		// ================> from 50 to 250 => 750
 		//increased to 1150 for manual setting of REG2, in case this breaks something
+
+	/*
 	if (host->tuning_done == 1) {
 		u16 ctrl42;
 		
 		ctrl42 = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		ctrl42 &= ~SDHCI_CTRL_EXEC_TUNING;
-	/*	ctrl42 |= SDHCI_CTRL_TUNED_CLK; //risky. Not needed as TUNING_WORK_AROUND
-		already sets this bit. But it doesn't persist.
-	*/	
+	//	ctrl42 |= SDHCI_CTRL_TUNED_CLK; //risky. Not needed as TUNING_WORK_AROUND
+	//	already sets this bit. But it doesn't persist.
+		
 		sdhci_writew(host, ctrl42, SDHCI_HOST_CONTROL2);
-	/*	pr_debug("sdhci: Current CONTROL2 register after assigning it TUNED_CLK and removing EXEC_TUNING \
- = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
-	*/
+	//	pr_debug("sdhci: Current CONTROL2 register after assigning it TUNED_CLK"
+	//		"and removing EXEC_TUNING \= %08x\n", 
+	//		sdhci_readw(host, SDHCI_HOST_CONTROL2));
+	
 	 	pr_debug("sdhci: Current CONTROL2 register after removing EXEC_TUNING \
 = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
 	}
-	
+	*/
 }
 EXPORT_SYMBOL_GPL(sdhci_send_tuning);
 
@@ -3340,13 +3343,13 @@ __sdhci_execute_tuning.\n");
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		pr_debug("sdhci: Current output of SDHCI_HOST_CONTROL2 is %08x\n", ctrl);
 		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
-	//		if (ctrl & SDHCI_CTRL_TUNED_CLK) {  //TUNING_WORK_AROUND is supposed to set this bit, but this bit is cleared automatically when set. So remove this check. Removing so suceeds this, but it later fails in sdio_read_fbr. So now we're doing that along with mmc_nonstd_sdio quirk in sdhci-pci-core, so it never fails at that. 			
+			if (ctrl & SDHCI_CTRL_TUNED_CLK) {  //TUNING_WORK_AROUND is supposed to set this bit, but this bit is cleared automatically when set. So remove this check. Removing so suceeds this, but it later fails in sdio_read_fbr. So now we're doing that along with mmc_nonstd_sdio quirk in sdhci-pci-core, so it never fails at that. edit:: Re-added			
 				pr_info("sdhci: sdhci_tuning success, returning 0\
 in __sdhci_execute_tuning.\n");
 				return 0; /* Success! */
-	//		}
-	//		pr_info("sdhci: breaking loop in __sdhci_execute_tuning\n.");	
-	//		break;
+			}
+			pr_info("sdhci: breaking loop in __sdhci_execute_tuning\n.");	
+			break;
 
 		}
 		else
@@ -3383,7 +3386,7 @@ in sdhci.h (huh, this slow?)
 On second thought, maybe all this elaborate tuning magic is not even needed as even when the tuning fails, the "fixed sampling clock" still allows for the sdio_read_fbr, and the actual error -5 or error -84 happens there in that function for sd_io_rw_direct...
 Figure out what an R5 error is.
 
-	But for now, if we forego the standards check with the NONSTD_SDIO quirk, then maybe that won't be necessary. First check if that allows for any success, and if not, then study the R5 response.
+	But for now, if we forego the standards check with the NONSTD_SDIO quirk, then maybe that won't be necessary. First check if that allows for any success, and if not, then study the R5 response.	edit:: NONSTD doesn't help. Fails in sdio_read_func_cis . 
 
 	*/	
 	
@@ -4771,12 +4774,19 @@ void __sdhci_read_caps(struct sdhci_host *host, const u16 *ver,
 		pr_debug("sdhci: debug_quirks2, setting quirks2 = debug_quirks2\n");
 		host->quirks2 = debug_quirks2;
 	}
-//	pr_debug("sdhci: setting host->quirks |= MMC_QUIRK_NONSTD_SDIO.\n")
-//	host->quirks |= MMC_QUIRK_NONSTD_SDIO; //\\added
 
+	/*
+	pr_debug("sdhci: setting host->quirks |= MMC_QUIRK_NONSTD_SDIO.\n")
+	host->quirks |= MMC_QUIRK_NONSTD_SDIO; //\\added. 
+		//This is a card quirk, not one for the host. Dealt with in
+		// mmc/core/...
+	*/
+	
+	/*
 	pr_debug("sdhci: setting host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND.\n");
 	host->quirks2 |= SDHCI_QUIRK2_TUNING_WORK_AROUND; //\\added
-	
+	*/
+
 	pr_info("sdhci: Doing sdhci_do_reset.\n");
 	sdhci_do_reset(host, SDHCI_RESET_ALL);
 
