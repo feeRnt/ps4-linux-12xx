@@ -1389,7 +1389,7 @@ int mmc_attach_sdio(struct mmc_host *host)
 	/*
 	 * Detect and init the card.
 	 */
-	 pr_debug("sdio: I am detecting and initing the card. \n");
+	pr_debug("sdio: I am detecting and initing the card. \n");
 	err = mmc_sdio_init_card(host, rocr, NULL);
 	if (err) {
 		pr_debug("sdio: error while detecting and initing the card.\n");
@@ -1425,12 +1425,15 @@ int mmc_attach_sdio(struct mmc_host *host)
 	 * the ocr.
 	 */
 	funcs = (ocr & 0x70000000) >> 28;
+	pr_debug("sdio: Just detected %d funcs according to card ocr in %s.\n", funcs, __func__);
 	card->sdio_funcs = 0;
+	//important: CHECK THIS
 
 	/*
 	 * Initialize (but don't add) all present functions.
 	 */
 	for (i = 0; i < funcs; i++, card->sdio_funcs++) {
+		pr_debug("sdio: Init-ing func no. %d in %s.\n", (i+1), __func__);
 		err = sdio_init_func(host->card, i + 1);
 		if (err)
 			goto remove;
@@ -1480,8 +1483,8 @@ remove_added:
 err:
 //	pr_err("Dump before bus detach:\n");
 //	sdhci_dumpregs(host); any equivalent?
-	pr_err("Stack dump before bus detach:\n");
-	dump_stack();
+//	pr_err("Stack dump before bus detach:\n");
+//	dump_stack();
 
 	pr_debug("sdio: value of err before mmc_detach_bus(host): %d \n", err);
 
@@ -1492,8 +1495,8 @@ err:
 
 	pr_err("%s: error %d whilst initialising SDIO card\n Courtesy of the sdio.c err case foundation.",
 		mmc_hostname(host), err);
-	pr_err("Stack dump after bus detach:\n");
-	dump_stack();
+//	pr_err("Stack dump after bus detach:\n");
+//	dump_stack();
 
 	return err;
 }

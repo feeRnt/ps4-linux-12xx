@@ -86,6 +86,7 @@ static const struct sdio_device_id *sdio_match_one(struct sdio_func *func,
 		return NULL;
 	if (id->device != (__u16)SDIO_ANY_ID && id->device != func->device)
 		return NULL;
+	pr_debug("sdio_bus: Returning id = %d in %s.\n", id, __func__);
 	return id;
 }
 
@@ -94,6 +95,7 @@ static const struct sdio_device_id *sdio_match_device(struct sdio_func *func,
 {
 	const struct sdio_device_id *ids;
 
+	pr_debug("sdio_bus: I am in %s.\n", __func__);
 	ids = sdrv->id_table;
 
 	if (ids) {
@@ -109,9 +111,11 @@ static const struct sdio_device_id *sdio_match_device(struct sdio_func *func,
 
 static int sdio_bus_match(struct device *dev, struct device_driver *drv)
 {
+
 	struct sdio_func *func = dev_to_sdio_func(dev);
 	struct sdio_driver *sdrv = to_sdio_driver(drv);
 
+	pr_debug("sdio_bus: I am in %s.\n", __func__);
 	if (sdio_match_device(func, sdrv))
 		return 1;
 
@@ -304,7 +308,8 @@ struct sdio_func *sdio_alloc_func(struct mmc_card *card)
 {
 	struct sdio_func *func;
 
-	func = kzalloc(sizeof(struct sdio_func), GFP_KERNEL);
+	pr_debug("sdio_bus: I am in %s.\n", __func__);
+	func = kzalloc(sizeof(struct sdio_func), GFP_KERNEL); //initializes the sdio_func struct
 	if (!func)
 		return ERR_PTR(-ENOMEM);
 
@@ -320,7 +325,7 @@ struct sdio_func *sdio_alloc_func(struct mmc_card *card)
 
 	func->card = card;
 
-	device_initialize(&func->dev);
+	device_initialize(&func->dev); //maybe creates the func->num values
 
 	func->dev.parent = &card->dev;
 	func->dev.bus = &sdio_bus_type;
@@ -355,6 +360,7 @@ int sdio_add_func(struct sdio_func *func)
 {
 	int ret;
 
+	pr_debug("sdio_bus: I am in %s. Will got dev_set_name with func->num = %d.\n", __func__, func->num);
 	dev_set_name(&func->dev, "%s:%d", mmc_card_id(func->card), func->num);
 
 	sdio_set_of_node(func);

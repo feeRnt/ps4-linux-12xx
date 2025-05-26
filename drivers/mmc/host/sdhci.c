@@ -2220,6 +2220,7 @@ clock_set:
 //		has the clock enabled, and clock stable bits turned on
 //		, which is non standard. so just providing the hard
 //		coded value now
+		pr_debug("sdhci: Actually returning = 100.\n");
 		return 256;  //the 100 in 107; in decimal
 	}
 	else {
@@ -4931,7 +4932,7 @@ int sdhci_setup_host(struct sdhci_host *host)
 	sdhci_dumpregs(host);
 	__pre_init_clock = sdhci_readw(host, SDHCI_CLOCK_CONTROL);
 
-	//added vvvvvvvv
+	//added vvvvvvvv , never finalized. This crashes the kernel afair.
 /*
 	pr_info("sdhci: Accessing the MMC card's info before reset:::"
 	"Manufacturer ID	: %u"
