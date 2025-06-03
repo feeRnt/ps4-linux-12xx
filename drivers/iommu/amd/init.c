@@ -1628,7 +1628,7 @@ static int __init init_iommu_one(struct amd_iommu *iommu, struct ivhd_header *h)
 	if (ret)
 		return ret;
 
-	if (amd_iommu_irq_remap) {
+	if (amd_iommu_irq_remap) {	//this was previously done, without amd_iommu_irq_remap test
 		ret = amd_iommu_create_irq_domain(iommu);
 		if (ret)
 			return ret;
@@ -2772,8 +2772,13 @@ static int __init early_amd_iommu_init(void)
 		disable_iommus();
 
 	#ifndef CONFIG_X86_PS4
-	if (amd_iommu_irq_remap)
-		amd_iommu_irq_remap = check_ioapic_information();
+	/*if (amd_iommu_irq_remap) 
+	*	amd_iommu_irq_remap = check_ioapic_information();
+	
+	*	Disable AMD IOMMU IOAPIC sanity check
+	*	No IOAPIC on PS4 and that's okay.
+	*	https://github.com/fail0verflow/ps4-linux/commit/260fcea07eac639c08c09fe197a33cc43f778cb7
+	*/
 	#endif
 
 	if (amd_iommu_irq_remap) {
@@ -2790,6 +2795,7 @@ static int __init early_amd_iommu_init(void)
 							remap_cache_sz,
 							DTE_INTTAB_ALIGNMENT,
 							0, NULL);
+							//DTE_INTTAB vs IRQ_TABLE (old)
 		if (!amd_iommu_irq_cache)
 			goto out;
 
@@ -2969,7 +2975,8 @@ int __init amd_iommu_prepare(void)
 
 	ret = iommu_go_to_state(IOMMU_ACPI_FINISHED);
 	if (ret) {
-		amd_iommu_irq_remap = false;
+		amd_iommu_irq_remap = false; //old code doesn't have this
+		pr_debug("amd_iommu_init: Disabling iommu_irq_remap.\n"); 
 		return ret;
 	}
 

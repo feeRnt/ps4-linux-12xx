@@ -583,8 +583,8 @@ struct amd_iommu {
 
 	/* command buffer virtual address */
 	u8 *cmd_buf;
-	u32 cmd_buf_head;
-	u32 cmd_buf_tail;
+	u32 cmd_buf_head; //new
+	u32 cmd_buf_tail; //new
 
 	/* event buffer virtual address */
 	u8 *evt_buf;
@@ -605,7 +605,7 @@ struct amd_iommu {
 	bool need_sync;
 
 	/* Handle for IOMMU core code */
-	struct iommu_device iommu;
+	struct iommu_device iommu;	//new . Used to be under device struct
 
 	/*
 	 * We can't rely on the BIOS to restore all values on reinit, so we
@@ -635,8 +635,8 @@ struct amd_iommu {
 	struct amd_irte_ops *irte_ops;
 #endif
 
-	u32 flags;
-	volatile u64 *cmd_sem;
+	u32 flags;		//new stuff here
+	volatile u64 *cmd_sem; //make it aligned?
 	u64 cmd_sem_val;
 
 #ifdef CONFIG_AMD_IOMMU_DEBUGFS
