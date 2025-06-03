@@ -28,24 +28,24 @@ extern int __pre_init_cis_max_dtr; //added. Can be used across sdhci.c and core/
 #define SDHCI_DMA_ADDRESS	0x00
 #define SDHCI_ARGUMENT2		SDHCI_DMA_ADDRESS
 #define SDHCI_32BIT_BLK_CNT	SDHCI_DMA_ADDRESS
-
-#define SDHCI_BLOCK_SIZE	0x04
+							//init	   post-init
+#define SDHCI_BLOCK_SIZE	0x04	//diff from init. 100, vs 0 or 7040
 #define  SDHCI_MAKE_BLKSZ(dma, blksz) (((dma & 0x7) << 12) | (blksz & 0xFFF))
 
 #define SDHCI_BLOCK_COUNT	0x06
 
-#define SDHCI_ARGUMENT		0x08
+#define SDHCI_ARGUMENT		0x08	//diff from init. Sometimes it is 0x80002607 
 
-#define SDHCI_TRANSFER_MODE	0x0C
-#define  SDHCI_TRNS_DMA		0x01
-#define  SDHCI_TRNS_BLK_CNT_EN	0x02
+#define SDHCI_TRANSFER_MODE	0x0C	//diff from init	init      vs     post-init
+#define  SDHCI_TRNS_DMA		0x01				//		   		   
+#define  SDHCI_TRNS_BLK_CNT_EN	0x02				//
 #define  SDHCI_TRNS_AUTO_CMD12	0x04
 #define  SDHCI_TRNS_AUTO_CMD23	0x08
 #define  SDHCI_TRNS_AUTO_SEL	0x0C
-#define  SDHCI_TRNS_READ	0x10
-#define  SDHCI_TRNS_MULTI	0x20
+#define  SDHCI_TRNS_READ	0x10				//		    //
+#define  SDHCI_TRNS_MULTI	0x20				//
 
-#define SDHCI_COMMAND		0x0E
+#define SDHCI_COMMAND		0x0E	//diff from init. obviously. current command
 #define  SDHCI_CMD_RESP_MASK	0x03
 #define  SDHCI_CMD_CRC		0x08
 #define  SDHCI_CMD_INDEX	0x10
@@ -82,7 +82,7 @@ extern int __pre_init_cis_max_dtr; //added. Can be used across sdhci.c and core/
 #define   SDHCI_DATA_0_LVL_MASK	0x00100000
 #define  SDHCI_CMD_LVL		0x01000000
 
-#define SDHCI_HOST_CONTROL	0x28
+#define SDHCI_HOST_CONTROL	0x28	//diff from init
 #define  SDHCI_CTRL_LED		0x01
 #define  SDHCI_CTRL_4BITBUS	0x02  //we see this in both
 #define  SDHCI_CTRL_HISPD	0x04  //we see this after reset but not
@@ -112,7 +112,7 @@ extern int __pre_init_cis_max_dtr; //added. Can be used across sdhci.c and core/
 #define  SDHCI_WAKE_ON_INSERT	0x02
 #define  SDHCI_WAKE_ON_REMOVE	0x04
 
-#define SDHCI_CLOCK_CONTROL	0x2C
+#define SDHCI_CLOCK_CONTROL	0x2C	//diff from init
 #define  SDHCI_DIVIDER_SHIFT	8
 #define  SDHCI_DIVIDER_HI_SHIFT	6
 #define  SDHCI_DIV_MASK	0xFF		// all the divider status info
@@ -128,7 +128,7 @@ extern int __pre_init_cis_max_dtr; //added. Can be used across sdhci.c and core/
 #define  SDHCI_CLOCK_INT_EN	0x0001  //  in       
 					//  107 (EN=ENable(d))
 
-#define SDHCI_TIMEOUT_CONTROL	0x2E
+#define SDHCI_TIMEOUT_CONTROL	0x2E	//diff from init  /important. 0 in post init
 
 #define SDHCI_SOFTWARE_RESET	0x2F
 #define  SDHCI_RESET_ALL	0x01
@@ -136,9 +136,10 @@ extern int __pre_init_cis_max_dtr; //added. Can be used across sdhci.c and core/
 #define  SDHCI_RESET_DATA	0x04
 
 #define SDHCI_INT_STATUS	0x30
-#define SDHCI_INT_ENABLE	0x34  // int enable
-#define SDHCI_SIGNAL_ENABLE	0x38  // and signal enable bits change according to the current
-				      // command / device state. so we don't to match with
+#define SDHCI_INT_ENABLE	0x34  //diff from init.
+#define SDHCI_SIGNAL_ENABLE	0x38  //diff from init.
+			//init enable and signal enable bits change according to the current
+				      // command / device state apaprently. so we don't to match with
 				      // pre_init, probably
 #define  SDHCI_INT_RESPONSE	0x00000001
 #define  SDHCI_INT_DATA_END	0x00000002
@@ -189,7 +190,7 @@ extern int __pre_init_cis_max_dtr; //added. Can be used across sdhci.c and core/
 #define  SDHCI_AUTO_CMD_END_BIT	0x00000008
 #define  SDHCI_AUTO_CMD_INDEX	0x00000010
 
-#define SDHCI_HOST_CONTROL2		0x3E
+#define SDHCI_HOST_CONTROL2		0x3E	//diff from init
 #define  SDHCI_CTRL_UHS_MASK		0x0007
 #define   SDHCI_CTRL_UHS_SDR12		0x0000
 #define   SDHCI_CTRL_UHS_SDR25		0x0001

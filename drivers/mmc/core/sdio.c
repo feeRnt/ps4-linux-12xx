@@ -139,8 +139,8 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 	
 	func->num = fn;
 	pr_debug("sdio: Assigning func->num = %d in sdio_init_func.\n"
-			"And the func(s) = %08x \n",
-			fn, func);
+			"And the func(s) = %08x \n", 
+			fn, func); //func is a struct. -Wformat
 
 	/*	
  	pr_debug("sdio: Vendor : %hu, Device: %hu \n ,"
@@ -694,7 +694,7 @@ static int sdio_set_bus_speed_mode(struct mmc_card *card)
 	max_rate = min_not_zero(card->quirk_max_rate,
 				card->sw_caps.uhs_max_dtr);
 
-	pr_debug("sdio: I am in sdio_set_bus_speed_mode.\ 
+	pr_debug("sdio: I am in sdio_set_bus_speed_mode.\
 	Doing mmc_set_timing with %d\
 	and mmc_set_clock with %d.\n", 
 		timing, max_rate);	
@@ -930,7 +930,7 @@ try_again:
 		 * It's host's responsibility to fill cccr and cis
 		 * structures in init_card().
 		 */
-		pr_debug("sdio: I am in %s.\ 
+		pr_debug("sdio: I am in %s.\
 		Doing mmc_set_clock with card->cis.max_dtr = %d .\n",
 			__func__, card->cis.max_dtr);
 
@@ -1328,7 +1328,7 @@ static int mmc_sdio_hw_reset(struct mmc_host *host)
 
 static int mmc_sdio_sw_reset(struct mmc_host *host)
 {
-	pr_debug("mmc: I am in mmc_sdio_sw_reset.\ 
+	pr_debug("mmc: I am in mmc_sdio_sw_reset.\
 	Doing mmc_set_clock with %d .\n", host->f_init);
 	mmc_set_clock(host, host->f_init);
 	sdio_reset(host);

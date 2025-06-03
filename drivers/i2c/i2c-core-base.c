@@ -1431,6 +1431,7 @@ EXPORT_SYMBOL_GPL(i2c_handle_smbus_host_notify);
 static int i2c_register_adapter(struct i2c_adapter *adap)
 {
 	int res = -EINVAL;
+	int _long_timeout_test = 1; // added
 
 	/* Can't register until after driver model init */
 	if (WARN_ON(!is_registered)) {
@@ -1457,8 +1458,10 @@ static int i2c_register_adapter(struct i2c_adapter *adap)
 	INIT_LIST_HEAD(&adap->userspace_clients);
 
 	/* Set default timeout to 1 second if not already set */
-	if (adap->timeout == 0)
+	if (adap->timeout == 0 || _long_timeout_test == 1 ) { 
 		adap->timeout = HZ;
+		pr_debug("%s: Setting adapter timeout to 1 second.\n", __func__);
+	}
 
 	/* register soft irqs for Host Notify */
 	res = i2c_setup_host_notify_irq_domain(adap);

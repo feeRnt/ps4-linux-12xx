@@ -3365,6 +3365,7 @@ in __sdhci_execute_tuning.\n");
 			//\\ So it returns 0000804b =  		   1000000001001011
 			//\\ tuning			0x0040  =  0000000001000000
 			//\\  tuned			0x0080  =  0000000010000000
+			//	 SDHCI_CTRL_UHS_SDR25	0x0001  =  0000000000000001 huh sdr25isslow 
 when "TUNING" is manually unset & "TUNED" set   	0x800b  =  1000000000001011
 the reg at start_tuning when quirk is seen     			   0001000000000000
 		 	*	so this means it is still in tuning mode
@@ -3372,10 +3373,11 @@ the reg at start_tuning when quirk is seen     			   0001000000000000
 				* test putting it in sdhci_setup_host. 
 				* (added it __sdhci_read_caps which is called in setup_host) 
 				* 
-//\\host_ctl2 register before it resets at card init is 0x800a   = 1000000000001010
- 				*                        the trailing bit we see, 1, is 
-#define   SDHCI_CTRL_UHS_SDR25		0x0001
-in sdhci.h (huh, this slow?)
+//\\host_ctl2 register before it resets at card init is  0x800a  = 1000000000001010
+//			SDHCI_CTRL_PRESET_VAL_ENABLE   = 0x8000  = 1000000000000000
+//			SDHCI_CTRL_VDD_180	       = 0x0008	 = 0000000000001000
+//	 		SDHCI_CTRL_UHS_SDR50	       = 0x0002	 = 0000000000000010
+//
 	 so maybe we don't need to check for the TUNED bit in this host???
 
 //\\ in sdhci_end_tuning and reset tuning the reg is    0x800b   = 1000000000001011 
@@ -4198,8 +4200,8 @@ SDHCI_INT_STATUS. intmask = %08x, and final input = %08x\n",
 		if (intmask & SDHCI_INT_CMD_MASK) {
 			pr_debug("sdhci: (SDHCI_INT_CMD_MASK & intmask) returned in sdhci_thread_irq. \
 Going to sdhci_cmd_irq with (host, intmask & SDHCI_INT_CMD_MASK, &intmask) .\n\
-intmask & SDHCI_INT_CMD_MASK = %08x and &intmask = %08x",
-	intmask & SDHCI_INT_CMD_MASK, &intmask);
+intmask & SDHCI_INT_CMD_MASK = %08x and &intmask = %p",
+	intmask & SDHCI_INT_CMD_MASK, &intmask); //-Wformat here. FIX: use %p for the pointer 
 			sdhci_cmd_irq(host, intmask & SDHCI_INT_CMD_MASK, &intmask);
 		//command interrupt detected. so go to irq cmd
 		}
