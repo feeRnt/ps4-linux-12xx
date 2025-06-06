@@ -1458,7 +1458,7 @@ static int i2c_register_adapter(struct i2c_adapter *adap)
 	INIT_LIST_HEAD(&adap->userspace_clients);
 
 	/* Set default timeout to 1 second if not already set */
-	if (adap->timeout == 0 || _long_timeout_test == 1 ) { 
+	if (adap->timeout == 0 || _long_timeout_test == 1 ) {
 		adap->timeout = HZ;
 		pr_debug("%s: Setting adapter timeout to 1 second.\n", __func__);
 	}

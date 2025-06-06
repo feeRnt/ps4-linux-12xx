@@ -138,31 +138,31 @@ extern int __pre_init_cis_max_dtr; //added. Can be used across sdhci.c and core/
 #define SDHCI_INT_STATUS	0x30
 #define SDHCI_INT_ENABLE	0x34  //diff from init.
 #define SDHCI_SIGNAL_ENABLE	0x38  //diff from init.
-			//init enable and signal enable bits change according to the current
-				      // command / device state apaprently. so we don't to match with
+			//int enable and signal enable bits change according to the current
+				      // command / device state apparently. so we don't to match with
 				      // pre_init, probably
-#define  SDHCI_INT_RESPONSE	0x00000001
-#define  SDHCI_INT_DATA_END	0x00000002
-#define  SDHCI_INT_BLK_GAP	0x00000004
-#define  SDHCI_INT_DMA_END	0x00000008
-#define  SDHCI_INT_SPACE_AVAIL	0x00000010
-#define  SDHCI_INT_DATA_AVAIL	0x00000020
+#define  SDHCI_INT_RESPONSE	0x00000001  //
+#define  SDHCI_INT_DATA_END	0x00000002 //*
+#define  SDHCI_INT_BLK_GAP	0x00000004 //*
+#define  SDHCI_INT_DMA_END	0x00000008 //*
+#define  SDHCI_INT_SPACE_AVAIL	0x00000010 //*
+#define  SDHCI_INT_DATA_AVAIL	0x00000020 //*
 #define  SDHCI_INT_CARD_INSERT	0x00000040
 #define  SDHCI_INT_CARD_REMOVE	0x00000080
 #define  SDHCI_INT_CARD_INT	0x00000100
 #define  SDHCI_INT_RETUNE	0x00001000
 #define  SDHCI_INT_CQE		0x00004000
 #define  SDHCI_INT_ERROR	0x00008000
-#define  SDHCI_INT_TIMEOUT	0x00010000
-#define  SDHCI_INT_CRC		0x00020000
-#define  SDHCI_INT_END_BIT	0x00040000
-#define  SDHCI_INT_INDEX	0x00080000
-#define  SDHCI_INT_DATA_TIMEOUT	0x00100000
-#define  SDHCI_INT_DATA_CRC	0x00200000
-#define  SDHCI_INT_DATA_END_BIT	0x00400000
-#define  SDHCI_INT_BUS_POWER	0x00800000
-#define  SDHCI_INT_AUTO_CMD_ERR	0x01000000
-#define  SDHCI_INT_ADMA_ERROR	0x02000000
+#define  SDHCI_INT_TIMEOUT	0x00010000  //
+#define  SDHCI_INT_CRC		0x00020000  //
+#define  SDHCI_INT_END_BIT	0x00040000  //
+#define  SDHCI_INT_INDEX	0x00080000  //
+#define  SDHCI_INT_DATA_TIMEOUT	0x00100000 //*
+#define  SDHCI_INT_DATA_CRC	0x00200000 //*
+#define  SDHCI_INT_DATA_END_BIT	0x00400000 //*
+#define  SDHCI_INT_BUS_POWER	0x00800000 //=
+#define  SDHCI_INT_AUTO_CMD_ERR	0x01000000  //
+#define  SDHCI_INT_ADMA_ERROR	0x02000000 //*
 
 #define  SDHCI_INT_NORMAL_MASK	0x00007FFF
 #define  SDHCI_INT_ERROR_MASK	0xFFFF8000
@@ -170,11 +170,22 @@ extern int __pre_init_cis_max_dtr; //added. Can be used across sdhci.c and core/
 #define  SDHCI_INT_CMD_MASK	(SDHCI_INT_RESPONSE | SDHCI_INT_TIMEOUT | \
 		SDHCI_INT_CRC | SDHCI_INT_END_BIT | SDHCI_INT_INDEX | \
 		SDHCI_INT_AUTO_CMD_ERR)
+	// == 1000011110000000000000001
+
 #define  SDHCI_INT_DATA_MASK	(SDHCI_INT_DATA_END | SDHCI_INT_DMA_END | \
 		SDHCI_INT_DATA_AVAIL | SDHCI_INT_SPACE_AVAIL | \
 		SDHCI_INT_DATA_TIMEOUT | SDHCI_INT_DATA_CRC | \
 		SDHCI_INT_DATA_END_BIT | SDHCI_INT_ADMA_ERROR | \
 		SDHCI_INT_BLK_GAP)
+	//*==10011100000000000000111110
+	
+	// (SDHCI_INT_CMD_MASK | SDHCI_INT_DATA_MASK | SDHCI_INT_BUS_POWER)
+	// ==1000011110000000000000001 |
+	//==10011100000000000000111110 |
+	//==  100000000000000000000000
+	//==11111111110000000000111111 &             
+	//==11000000000000000  .......  0x18000 .... (what we get in sdhci.. need more leading
+	//trailing digits?)
 #define SDHCI_INT_ALL_MASK	((unsigned int)-1)
 
 #define SDHCI_CQE_INT_ERR_MASK ( \

@@ -376,16 +376,23 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 	.remove_slot	= aeolia_remove_slot,
 	.enable_dma	= aeolia_enable_dma,
 	// Adding certain quirks that are in sdhci_RICOH_mmc
-	//.quirks	= MMC_QUIRK_NONSTD_SDIO  //this needs to be in card->quirks
+	.quirks		= SDHCI_QUIRK_BROKEN_TIMEOUT_VAL | // You can't use |= as this is the // initalizer
+			  SDHCI_QUIRK_DELAY_AFTER_POWER |
+			  SDHCI_QUIRK_SINGLE_POWER_WRITE,
+			//= SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER // might be unnecessary		
+			//don't need SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN
+			//Baaaaased on sdhci-tegra all above ^^^
+	
+	//		= MMC_QUIRK_NONSTD_SDIO  //this needs to be in card->quirks
 						// putting this here puts it in host->quirks only
-	/* SDHCI_QUIRK_CLOCK_BEFORE_RESET |
+	/* 		  SDHCI_QUIRK_CLOCK_BEFORE_RESET |
 			  SDHCI_QUIRK_NO_CARD_NO_RESET |
 			  SDHCI_QUIRK_MISSING_CAPS |
 			  SDHCI_QUIRK_32BIT_DMA_ADDR
 	*/
 	//missing caps causes "sdhci-pci: probe of [pci_address] rejects match -19"
-
-	};
+	.quirks2	= SDHCI_QUIRK2_PRESET_VALUE_BROKEN, //ours is broken. test w/o too	 
+};
 #endif
 
 static int mrst_hc_probe_slot(struct sdhci_pci_slot *slot)

@@ -44,7 +44,7 @@
 
 #define MAX_TUNING_LOOP 40
 
-static unsigned int debug_quirks = 1; //originally 0
+static unsigned int debug_quirks = 0; //originally 0
 static unsigned int debug_quirks2; //originally ..g_quirks2;
 //I think this is only for the sdhci driver as a module and requires
 //options that you pass to it. So it's useless here in this way but I'm
@@ -2086,27 +2086,48 @@ static u16 sdhci_get_preset_value(struct sdhci_host *host)
 	switch (host->timing) {
 	case MMC_TIMING_MMC_HS:
 	case MMC_TIMING_SD_HS:
+		pr_debug("sdhci: mmc host->timing is MMC_HS or SD_HS in %s.\
+			Taking its appropriate preset value from register.\n", __func__);
 		preset = sdhci_readw(host, SDHCI_PRESET_FOR_HIGH_SPEED);
+		pr_debug("sdhci: New value of preset = %08x.\n", preset); 
 		break;
 	case MMC_TIMING_UHS_SDR12:
+		pr_debug("sdhci: mmc host->timing is UHS_SDR12 in %s.\
+			Taking its appropriate preset value from register.\n", __func__);
 		preset = sdhci_readw(host, SDHCI_PRESET_FOR_SDR12);
+		pr_debug("sdhci: New value of preset = %08x.\n", preset); 
 		break;
 	case MMC_TIMING_UHS_SDR25:
+		pr_debug("sdhci: mmc host->timing is UHS_SDR125 in %s.\
+			Taking its appropriate preset value from register.\n", __func__);
 		preset = sdhci_readw(host, SDHCI_PRESET_FOR_SDR25);
+		pr_debug("sdhci: New value of preset = %08x.\n", preset); 
 		break;
 	case MMC_TIMING_UHS_SDR50:
+		pr_debug("sdhci: mmc host->timing is UHS_SDR50 in %s.\
+			Taking its appropriate preset value from register.\n", __func__);
 		preset = sdhci_readw(host, SDHCI_PRESET_FOR_SDR50);
+		pr_debug("sdhci: New value of preset = %08x.\n", preset);
 		break;
 	case MMC_TIMING_UHS_SDR104:
 	case MMC_TIMING_MMC_HS200:
+		pr_debug("sdhci: mmc host->timing is UHS_SDR104 or  in %s.\
+			Taking its appropriate preset value from register.\n", __func__);
 		preset = sdhci_readw(host, SDHCI_PRESET_FOR_SDR104);
+		pr_debug("sdhci: New value of preset = %08x.\n", preset); 
 		break;
 	case MMC_TIMING_UHS_DDR50:
 	case MMC_TIMING_MMC_DDR52:
+		pr_debug("sdhci: mmc host->timing is UHS_DDR50 or MMC_DDR52 in %s.\
+			Taking its appropriate preset value from register.\n", __func__);
 		preset = sdhci_readw(host, SDHCI_PRESET_FOR_DDR50);
+		pr_debug("sdhci: New value of preset = %08x.\n", preset); 
 		break;
 	case MMC_TIMING_MMC_HS400:
+		pr_debug("sdhci: mmc host->timing is MMC_HS400 in %s.\
+			Taking its appropriate preset value from register.\n", __func__);
 		preset = sdhci_readw(host, SDHCI_PRESET_FOR_HS400);
+		pr_debug("sdhci: New value of preset = %08x.\n", preset);
 		break;
 	default:
 		pr_warn("%s: Invalid UHS-I mode selected\n",
@@ -2133,7 +2154,7 @@ u16 sdhci_calc_clk(struct sdhci_host *host, unsigned int clock,
 			pr_debug("sdhci: Preset enabled in sdhci_calc_clock.");
 			clk = sdhci_readw(host, SDHCI_CLOCK_CONTROL);
 			pr_debug("sdhci: Current clk in sdhci_calc_clock = %08x.\n", clk);
-			pre_val = sdhci_get_preset_value(host);
+			pre_val = sdhci_get_preset_value(host); // this pre_val is always 0...
 			pr_debug("sdhci: Current pre_val in sdhci_calc_clock = %08x.\n", pre_val);
 			div = FIELD_GET(SDHCI_PRESET_SDCLK_FREQ_MASK, pre_val);
 			if (host->clk_mul &&
@@ -2295,7 +2316,7 @@ void sdhci_set_clock(struct sdhci_host *host, unsigned int clock)
 	host->mmc->actual_clock = 0;
 
 	sdhci_writew(host, 0, SDHCI_CLOCK_CONTROL); //this should set
-												//SDHCI_CLOCK_CONTROL to 0
+						//SDHCI_CLOCK_CONTROL to 0
 	pr_debug("sdhci: Current value of SDHCI_CLOCK_CONTROL reg after setting to 0 = %08x. \n"
 			, sdhci_readw(host, SDHCI_CLOCK_CONTROL));
 
@@ -2632,7 +2653,7 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	if (host->version >= SDHCI_SPEC_300 &&
 		(ios->power_mode == MMC_POWER_UP) &&
 		!(host->quirks2 & SDHCI_QUIRK2_PRESET_VALUE_BROKEN)) {
-		pr_debug("sdhci: Disabling preset_value in host in sdhci_get_ios due to conditions and SPEC >= 300.\n");
+		pr_debug("sdhci: Enabling preset_value in host in sdhci_get_ios due to conditions and SPEC >= 300.\n");
 		sdhci_enable_preset_value(host, false);
 	}
 
@@ -3831,6 +3852,7 @@ static void sdhci_timeout_data_timer(struct timer_list *t)
  *                                                                           *
 \*****************************************************************************/
 
+// We reach here from sdhci_irq
 static void sdhci_cmd_irq(struct sdhci_host *host, u32 intmask, u32 *intmask_p)
 {
 	pr_info("sdhci: I am in sdhci_cmd_irq.\n");
@@ -4131,7 +4153,8 @@ Returning IRQ_NONE after unlocking\n");
 		spin_unlock(&host->lock);
 		return IRQ_NONE;
 	}
-	pr_debug("sdhci: Assigning intmask = shdci_readl(host, SDHCI_INT_STATUS\n");
+	pr_debug("sdhci: Assigning intmask = shdci_readl(host, SDHCI_INT_STATUS) in %s.\n",
+			__func__);
 	intmask = sdhci_readl(host, SDHCI_INT_STATUS); //reads the SDHCI_INT_STATUS controller register
 	pr_debug("sdhci: intmask after assignment is = %08x\n", intmask);
 	if (!intmask || intmask == 0xffffffff) {
@@ -4143,7 +4166,7 @@ Returning IRQ_NONE after unlocking\n");
 	do {
 	//	DBG("IRQ status 0x%08x\n", intmask);
 		// we don't see this
-		pr_debug("mmc0: sdhci: IRQ status 0x%08x\n", intmask);
+		pr_debug("mmc0: sdhci: IRQ status 0x%08x in %s. \n", intmask, __func__);
 		//replaced with pr_debug in case DBG doesn't work even though it should
 		if (host->ops->irq) {
 			pr_debug("sdhci: host->ops->irq; so assigning intmask = host->ops->irq(host, intmask\n");
@@ -4156,12 +4179,12 @@ Returning IRQ_NONE after unlocking\n");
 		}
 
 		/* Clear selected interrupts. */
-		pr_debug("sdhci: Assigning mask = intmask & (CMD_MASK | DATA_MASK | BUS_POWER) .\
+		pr_debug("sdhci: Assigning mask = intmask & (CMD_MASK | DATA_MASK | BUS_POWER) in sdhci_irq.\
  Current intmask = %08x\n", intmask);
 		mask = intmask & (SDHCI_INT_CMD_MASK | SDHCI_INT_DATA_MASK |
 				  SDHCI_INT_BUS_POWER);
 		pr_debug("sdhci: mask after assignment = %08x .\
- Writing mask to SDHCI_INT_STATUS.\n", mask);
+ Writing mask to SDHCI_INT_STATUS.\n", mask); 
 		sdhci_writel(host, mask, SDHCI_INT_STATUS);
 
 		if (intmask & (SDHCI_INT_CARD_INSERT | SDHCI_INT_CARD_REMOVE)) {
@@ -4187,7 +4210,7 @@ Returning IRQ_NONE after unlocking\n");
 			sdhci_writel(host, host->ier, SDHCI_SIGNAL_ENABLE);
 
 			pr_debug("sdhci: Writing intmask & (CARD_INSERT | CARD_REMOVE) to \
-SDHCI_INT_STATUS. intmask = %08x, and final input = %08x\n",
+SDHCI_INT_STATUS in sdhci_irq. intmask = %08x, and final input = %08x\n",
 		intmask, intmask & (SDHCI_INT_CARD_INSERT | SDHCI_INT_CARD_REMOVE));
 			sdhci_writel(host, intmask & (SDHCI_INT_CARD_INSERT |
 				     SDHCI_INT_CARD_REMOVE), SDHCI_INT_STATUS);
@@ -4198,7 +4221,7 @@ SDHCI_INT_STATUS. intmask = %08x, and final input = %08x\n",
 		}
 
 		if (intmask & SDHCI_INT_CMD_MASK) {
-			pr_debug("sdhci: (SDHCI_INT_CMD_MASK & intmask) returned in sdhci_thread_irq. \
+			pr_debug("sdhci: (SDHCI_INT_CMD_MASK & intmask) returned in sdhci_irq. \
 Going to sdhci_cmd_irq with (host, intmask & SDHCI_INT_CMD_MASK, &intmask) .\n\
 intmask & SDHCI_INT_CMD_MASK = %08x and &intmask = %p",
 	intmask & SDHCI_INT_CMD_MASK, &intmask); //-Wformat here. FIX: use %p for the pointer 
@@ -4214,7 +4237,7 @@ intmask & SDHCI_INT_CMD_MASK = %08x and &intmask = %p",
 				mmc_hostname(host->mmc));
 
 		if (intmask & SDHCI_INT_RETUNE) {
-			pr_debug("sdhci: SDHCI_INT_RETUNE intmask in sdhci_thread_irq. \
+			pr_debug("sdhci: SDHCI_INT_RETUNE intmask in sdhci_irq. \
 Going to mmc_retune_needed(host->mmc\n");
 			mmc_retune_needed(host->mmc);
 		}
@@ -4223,7 +4246,7 @@ Going to mmc_retune_needed(host->mmc\n");
 			sdhci_enable_sdio_irq_nolock(host, false);
 			sdio_signal_irq(host->mmc);
 		}
-		pr_debug("sdhci: Assigning intmask &= a bunch of things in sdhci_thread_irq..\n");
+		pr_debug("sdhci: Assigning intmask &= a bunch of things in sdhci_irq..\n");
 		intmask &= ~(SDHCI_INT_CARD_INSERT | SDHCI_INT_CARD_REMOVE |
 			     SDHCI_INT_CMD_MASK | SDHCI_INT_DATA_MASK |
 			     SDHCI_INT_ERROR | SDHCI_INT_BUS_POWER |
@@ -4236,9 +4259,9 @@ Going to mmc_retune_needed(host->mmc\n");
 			sdhci_writel(host, intmask, SDHCI_INT_STATUS);
 		}
 cont:
-		pr_info("sdhci: I am in cont case of sdhci_thread_irq.\n");
+		pr_info("sdhci: I am in cont case of sdhci_irq.\n");
 		if (result == IRQ_NONE) { 
-			pr_info("sdhci: IRQ_NONE in cont case of sdhci_thread_irq. \
+			pr_info("sdhci: IRQ_NONE in cont case of sdhci_irq. \
 result = IRQ_HANDLED.\n");
 			result = IRQ_HANDLED;
 		}
@@ -4263,17 +4286,17 @@ result = IRQ_HANDLED.\n");
 		}
 	}
 out:
-	pr_info("sdhci: I am in out case of sdhci_thread_irq.\n");
+	pr_info("sdhci: I am in out case of sdhci_irq.\n");
 	if (host->deferred_cmd) {
-		pr_info("sdhci: host deferred cmd in out label of sdhci_thread_irq out\n");
+		pr_info("sdhci: host deferred cmd in out label of sdhci_irq out\n");
 		result = IRQ_WAKE_THREAD;
 	}
 	
-	pr_info("sdhci: Unlocking spin_locks in sdhci_thread_irq\n");	
+	pr_info("sdhci: Unlocking spin_locks in sdhci_irq\n");	
 	spin_unlock(&host->lock);
 
 	pr_info("sdhci: About to process mrqs ready for completion already \
-in sdhci_thread_irq.\n");
+in sdhci_irq.\n");
 	/* Process mrqs ready for immediate completion */
 	for (i = 0; i < SDHCI_MAX_MRQS; i++) {
 		if (!mrqs_done[i])
@@ -4290,7 +4313,7 @@ in sdhci_thread_irq.\n");
 			   mmc_hostname(host->mmc), unexpected);
 		sdhci_dumpregs(host);
 	}
-	pr_info("sdhci: Returning: %d in sdhci_thread_irq\n", result); 
+	pr_info("sdhci: Returning: %d in sdhci_irq\n", result); 
 	return result;
 }
 
@@ -4509,7 +4532,8 @@ int sdhci_runtime_resume_host(struct sdhci_host *host, int soft_reset)
 		mmc->ops->set_ios(mmc, &mmc->ios);
 
 		if ((host_flags & SDHCI_PV_ENABLED) &&
-		    !(host->quirks2 & SDHCI_QUIRK2_PRESET_VALUE_BROKEN)) {
+		    !(host->quirks2 & SDHCI_QUIRK2_PRESET_VALUE_BROKEN)) { //just enables preset
+									   //values
 			spin_lock_irqsave(&host->lock, flags);
 			sdhci_enable_preset_value(host, true);
 			spin_unlock_irqrestore(&host->lock, flags);
