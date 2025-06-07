@@ -3416,6 +3416,7 @@ in __sdhci_execute_tuning.\n");
 			//\\ Then I'm gonna try to clear it manually after the buffer read wait.
 			//\\ But will try one more time with the increased timeout to report the value of the register first.   
 			//\\ So it returns 0000804b =  		   1000000001001011
+			//		   0000004b = 		=  0000000001001011
 			//\\ tuning			0x0040  =  0000000001000000
 			//\\  tuned			0x0080  =  0000000010000000
 			//	 SDHCI_CTRL_UHS_SDR25	0x0001  =  0000000000000001 huh sdr25isslow 
