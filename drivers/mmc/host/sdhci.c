@@ -2149,7 +2149,7 @@ u16 sdhci_calc_clk(struct sdhci_host *host, unsigned int clock,
 
 	pr_debug("sdhci: I am in sdhci_calc_clk. Current host->version = %d.\n", host->version);
 	if (host->version >= SDHCI_SPEC_300) {
-		pr_debug("sdhci:host version = %u, greater or eq 3 in %s\n", host->version, __func__);
+		pr_debug("sdhci:host version = %u, greater or eq spec 300 in %s\n", host->version, __func__);
 		if (host->preset_enabled) {
 			u16 pre_val;
 
@@ -2218,8 +2218,7 @@ u16 sdhci_calc_clk(struct sdhci_host *host, unsigned int clock,
 				div = 1;
 			}
 			else {
-				pr_debug("sdhci: Not using clk_muk = %d in %s.\n", 
-						host->clk_mul, __func__);
+				pr_debug("sdhci: Not using clk_muk = %d in %s as host's max clk = %d <= clock = %d. Doing calculations using base 2.\n",host->clk_mul, __func__, host->max_clk, clock);
 				for (div = 2; div < SDHCI_MAX_DIV_SPEC_300;
 				     div += 2) {
 					if ((host->max_clk / div) <= clock)
@@ -2253,7 +2252,9 @@ clock_set:
 		pr_debug("sdhci: real_div and it is = %d in %s\n\
 				Setting actual_clock to %d\n", real_div, __func__, *actual_clock);
 	}
-	clk |= (div & SDHCI_DIV_MASK) << SDHCI_DIVIDER_SHIFT;
+	clk |= (div & SDHCI_DIV_MASK) << SDHCI_DIVIDER_SHIFT;  //this part is broken maybe?
+		//when div=1;
+		// 
 	clk |= ((div & SDHCI_DIV_HI_MASK) >> SDHCI_DIV_MASK_LEN)
 		<< SDHCI_DIVIDER_HI_SHIFT;
 
@@ -2685,9 +2686,10 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	}
 
 	if (!ios->clock || ios->clock != host->clock) {
+		pr_debug("sdhci: ios->clock = %d empty or ios->clock not eq. host->clock = %d in sdhci_get_ios.\n", ios->clock, host->clock);
 		host->ops->set_clock(host, ios->clock);
 		host->clock = ios->clock;
-		pr_debug("sdhci: ios->clock empty or ios->clock not eq. host->clock in sdhci_get_ios.\n");
+		pr_debug("sdhci: ios->clock = %d empty or ios->clock was not eq. host->clock = %d in sdhci_get_ios.\n", ios->clock, host->clock);
 
 		if (host->quirks & SDHCI_QUIRK_DATA_TIMEOUT_USES_SDCLK &&
 		    host->clock) {
@@ -2747,8 +2749,10 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 
 	if (host->version >= SDHCI_SPEC_300) {
 		u16 clk, ctrl_2;
-		pr_debug("sdhci: SDHCI_SPEC = %d greater than or eq. 3.00 in sdhci_set_ios.\n");
+		pr_debug("sdhci: SDHCI_SPEC = %d greater than or eq. 300 in sdhci_set_ios.\n");
 		// we should be version 2, but this somehow returns true???
+		//edit: version 2 is actually equal to SPEC_300... in
+		//host/sdhci.h
 		if (!host->preset_enabled) {
 			pr_debug("sdhci: Preset not enabled."
 				"setting ctrl = %08x to its reg in sdhci_set_ios.\n", ctrl);
