@@ -350,9 +350,10 @@ static void sdhci_config_dma(struct sdhci_host *host)
 	u16 ctrl2;
 
 	pr_info("sdhci: I am in sdhci_config_dma.\n");
-	if (host->version < SDHCI_SPEC_200)
+	if (host->version < SDHCI_SPEC_200) {
+		pr_debug("sdhci: host->version < 2 in %s. Returning\n", __func__);
 		return;
-
+	}
 	ctrl = sdhci_readb(host, SDHCI_HOST_CONTROL);
 
 	/*
@@ -2146,25 +2147,33 @@ u16 sdhci_calc_clk(struct sdhci_host *host, unsigned int clock,
 	u16 clk = 0;
 	bool switch_base_clk = false;
 
-	pr_debug("sdhci: I am in sdhci_calc_clk.\n");
+	pr_debug("sdhci: I am in sdhci_calc_clk. Current host->version = %d.\n", host->version);
 	if (host->version >= SDHCI_SPEC_300) {
+		pr_debug("sdhci:host version = %u, greater or eq 3 in %s\n", host->version, __func__);
 		if (host->preset_enabled) {
 			u16 pre_val;
 
 			pr_debug("sdhci: Preset enabled in sdhci_calc_clock.");
 			clk = sdhci_readw(host, SDHCI_CLOCK_CONTROL);
-			pr_debug("sdhci: Current clk in sdhci_calc_clock = %08x.\n", clk);
+			pr_debug("sdhci: Current clk in sdhci_calc_clock after reading from register = %08x. Going to sdhci_get_preset_value next.\n", clk);
 			pre_val = sdhci_get_preset_value(host); // this pre_val is always 0...
 			pr_debug("sdhci: Current pre_val in sdhci_calc_clock = %08x.\n", pre_val);
 			div = FIELD_GET(SDHCI_PRESET_SDCLK_FREQ_MASK, pre_val);
+
 			if (host->clk_mul &&
 				(pre_val & SDHCI_PRESET_CLKGEN_SEL)) {
 				clk = SDHCI_PROG_CLOCK_MODE;
 				real_div = div + 1;
 				clk_mul = host->clk_mul;
+				pr_debug("sdhci: clk_mul (software clock) and SEL in %s.\n\
+					clk = %d, real_div = %d, clk_mul = %d.\n", 
+					__func__, clk, real_div, clk_mul);
 			} else {
 				real_div = max_t(int, 1, div << 1);
+				pr_debug("sdhci: No clk_mul (software clock) and SEL in %s.\n\
+					real_div = %d.\n", __func__, real_div); 
 			}
+			pr_debug("sdhci: Going to clock_set case.\n");
 			goto clock_set;
 		}
 
@@ -2173,6 +2182,7 @@ u16 sdhci_calc_clk(struct sdhci_host *host, unsigned int clock,
 		 * Mode.
 		 */
 		if (host->clk_mul) {
+			pr_debug("sdhci: clk_mul present and = %d in %s\n", host->clk_mul, __func__);
 			for (div = 1; div <= 1024; div++) {
 				if ((host->max_clk * host->clk_mul / div)
 					<= clock)
@@ -2187,20 +2197,29 @@ u16 sdhci_calc_clk(struct sdhci_host *host, unsigned int clock,
 				real_div = div;
 				clk_mul = host->clk_mul;
 				div--;
+				pr_debug("sdhci: set programmable clock mode in register in %s.\n\
+				real_div = %d, clk_mul = %d.\n", __func__, real_div, clk_mul);
 			} else {
 				/*
 				 * Divisor can be too small to reach clock
 				 * speed requirement. Then use the base clock.
 				 */
+				pr_debug("sdhci: switching to use base_clk to true in %s\n", __func__);
 				switch_base_clk = true;
 			}
 		}
 
 		if (!host->clk_mul || switch_base_clk) {
 			/* Version 3.00 divisors must be a multiple of 2. */
-			if (host->max_clk <= clock)
+			pr_debug("sdhci: no clk_mul or using base_clk in %s.\n", __func__);
+			if (host->max_clk <= clock) {
+				pr_debug("sdhci: host's max clk = %d <= clock = %d\
+					in %s.\nSetting div to 1\n", host->max_clk, clock, __func__);
 				div = 1;
+			}
 			else {
+				pr_debug("sdhci: Not using clk_muk = %d in %s.\n", 
+						host->clk_mul, __func__);
 				for (div = 2; div < SDHCI_MAX_DIV_SPEC_300;
 				     div += 2) {
 					if ((host->max_clk / div) <= clock)
@@ -2209,9 +2228,13 @@ u16 sdhci_calc_clk(struct sdhci_host *host, unsigned int clock,
 			}
 			real_div = div;
 			div >>= 1;
+			pr_debug("sdhci: Current real_div after maths = %d in %s.\n", real_div, __func__);
 			if ((host->quirks2 & SDHCI_QUIRK2_CLOCK_DIV_ZERO_BROKEN)
-				&& !div && host->max_clk <= 25000000)
-				div = 1;
+				&& !div && host->max_clk <= 25000000) {
+				pr_debug("sdhci: quirk2_CLOCK_DIV_ZERO_BROKEN and empty div and host's max clk = %d <= 25 MHz in %s. Assinging div = 1\n", 
+				host->max_clk, __func__);
+				div = 1; 
+			}
 		}
 	} else {
 		/* Version 2.00 divisors must be a power of 2. */
@@ -2221,11 +2244,15 @@ u16 sdhci_calc_clk(struct sdhci_host *host, unsigned int clock,
 		}
 		real_div = div;
 		div >>= 1;
+		pr_debug("sdhci: SDHCI v2.00, and real_div = %d in %s\n", real_div, __func__);
 	}
 
 clock_set:
-	if (real_div)
+	if (real_div) {
 		*actual_clock = (host->max_clk * clk_mul) / real_div;
+		pr_debug("sdhci: real_div and it is = %d in %s\n\
+				Setting actual_clock to %d\n", real_div, __func__, *actual_clock);
+	}
 	clk |= (div & SDHCI_DIV_MASK) << SDHCI_DIVIDER_SHIFT;
 	clk |= ((div & SDHCI_DIV_HI_MASK) >> SDHCI_DIV_MASK_LEN)
 		<< SDHCI_DIVIDER_HI_SHIFT;
@@ -2245,7 +2272,7 @@ clock_set:
 		return 256;  //the 100 in 107; in decimal
 	}
 	else {
-		pr_debug("sdhci: Current clk in sdhci_set_clock before returning it = %08x.\n", 
+		pr_debug("sdhci: Current clk in sdhci_calc_clock before returning it = %08x.\n", 
 				clk);
 		return clk;
 	}
@@ -2653,7 +2680,7 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	if (host->version >= SDHCI_SPEC_300 &&
 		(ios->power_mode == MMC_POWER_UP) &&
 		!(host->quirks2 & SDHCI_QUIRK2_PRESET_VALUE_BROKEN)) {
-		pr_debug("sdhci: Enabling preset_value in host in sdhci_get_ios due to conditions and SPEC >= 300.\n");
+		pr_debug("sdhci: Disabling preset_value in host in sdhci_get_ios due to conditions and SPEC >= 300.\n");
 		sdhci_enable_preset_value(host, false);
 	}
 
@@ -2720,7 +2747,8 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 
 	if (host->version >= SDHCI_SPEC_300) {
 		u16 clk, ctrl_2;
-		pr_debug("sdhci: SDHCI_SPEC greater than or eq. 3.00 in sdhci_set_ios.\n");	
+		pr_debug("sdhci: SDHCI_SPEC = %d greater than or eq. 3.00 in sdhci_set_ios.\n");
+		// we should be version 2, but this somehow returns true???
 		if (!host->preset_enabled) {
 			pr_debug("sdhci: Preset not enabled."
 				"setting ctrl = %08x to its reg in sdhci_set_ios.\n", ctrl);
@@ -2744,8 +2772,8 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 					mmc_hostname(mmc));
 				ctrl_2 |= SDHCI_CTRL_DRV_TYPE_B;
 			}
-			pr_debug("sdhci: Current ctrl_2 reg after assigning drv_type = %08x "
-					"in sdhci_set_ios.\n" ,ctrl_2);
+			pr_debug("sdhci: Current ctrl_2 var after assigning drv_type = %08x "
+					"in sdhci_set_ios.\n" ,ctrl_2); //we get B
 
 			sdhci_writew(host, ctrl_2, SDHCI_HOST_CONTROL2);
 		} else {
@@ -3527,9 +3555,10 @@ static void sdhci_enable_preset_value(struct sdhci_host *host, bool enable)
 {
 	pr_info("sdhci: I am in sdhci_enable_preset_value.\n");
 	/* Host Controller v3.00 defines preset value registers */
-	if (host->version < SDHCI_SPEC_300)
+	if (host->version < SDHCI_SPEC_300) {
+		pr_debug("sdhci:host version = %u, < 3 in %s. Returning. \n", host->version, __func__);
 		return;
-
+	}
 	/*
 	 * We only enable or disable Preset Value if they are not already
 	 * enabled or disabled respectively. Otherwise, we bail out.
@@ -3537,11 +3566,15 @@ static void sdhci_enable_preset_value(struct sdhci_host *host, bool enable)
 	if (host->preset_enabled != enable) {
 		u16 ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 
-		if (enable)
+		if (enable) {
+			pr_debug("sdhci: enable bool in %s\n", __func__);
 			ctrl |= SDHCI_CTRL_PRESET_VAL_ENABLE;
-		else
-			ctrl &= ~SDHCI_CTRL_PRESET_VAL_ENABLE;
-
+		}
+		else {
+			pr_debug("sdhci: disable bool in %s\n", __func__);
+			ctrl &= ~SDHCI_CTRL_PRESET_VAL_ENABLE;	
+		}
+		//check if this writew breaks things 
 		sdhci_writew(host, ctrl, SDHCI_HOST_CONTROL2);
 
 		if (enable)
@@ -4839,9 +4872,10 @@ void __sdhci_read_caps(struct sdhci_host *host, const u16 *ver,
 		host->caps |= lower_32_bits(dt_caps);
 	}
 
-	if (host->version < SDHCI_SPEC_300)
+	if (host->version < SDHCI_SPEC_300) {
+		pr_debug("sdhci:host version = %u, in %s. Returning.\n", host->version, __func__);
 		return;
-
+	}
 	if (caps1) {
 		host->caps1 = *caps1;
 	} else {
@@ -5138,20 +5172,28 @@ int sdhci_setup_host(struct sdhci_host *host)
 		mmc_dev(mmc)->dma_mask = &host->dma_mask;
 	}
 
-	if (host->version >= SDHCI_SPEC_300)
+	if (host->version >= SDHCI_SPEC_300) {
 		host->max_clk = FIELD_GET(SDHCI_CLOCK_V3_BASE_MASK, host->caps);
-	else
+		pr_debug("sdhci:host version = %u, >= 3 in %s. Just set host max clock to %d. \n",
+				host->version, host->max_clk, __func__);
+	}
+	else {
 		host->max_clk = FIELD_GET(SDHCI_CLOCK_BASE_MASK, host->caps);
-
+		pr_debug("sdhci:host version = %u, !>= 3 in %s. Just set host max clock to %d. \n",
+				host->version, host->max_clk, __func__);
+	}
 	host->max_clk *= 1000000;
+	pr_debug("sdhci: Set new host->max_clk to %d in %s.\n", host->max_clk, __func__);
 	if (host->max_clk == 0 || host->quirks &
 			SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN) {
+		pr_debug("sdhci: host-> max_clk = %d = 0? or QUIRK clock base broken in %s.\n", host->max_clk, __func__);
 		if (!host->ops->get_max_clock) {
 			pr_err("%s: Hardware doesn't specify base clock frequency.\n",
 			       mmc_hostname(mmc));
 			ret = -ENODEV;
 			goto undma;
 		}
+		pr_debug("sdhci: Setting host->max_clk using host->ops_get_max_clock in %s.\n", __func__);
 		host->max_clk = host->ops->get_max_clock(host);
 	}
 
@@ -5174,17 +5216,26 @@ int sdhci_setup_host(struct sdhci_host *host)
 	 * Set host parameters.
 	 */
 	max_clk = host->max_clk;
+	pr_debug("sdhci: Just set max_clk to %d using value of host->max_clk in %s.\n", max_clk, __func__);
 
-	if (host->ops->get_min_clock)
+
+	if (host->ops->get_min_clock) {
 		mmc->f_min = host->ops->get_min_clock(host);
+		pr_debug("sdhci: get_min_clock seen. Just set mmc->f_min to %d in %s.\n", 
+				mmc->f_min, __func__);
+	}
 	else if (host->version >= SDHCI_SPEC_300) {
-		if (host->clk_mul)
+		if (host->clk_mul) {
 			max_clk = host->max_clk * host->clk_mul;
-		/*
+			pr_debug("sdhci: set new max_clk to %d in %s, because of clk_mul (programmable clock) = %d.\n", max_clk, __func__, host->clk_mul);
+		}
+			/*
 		 * Divided Clock Mode minimum clock rate is always less than
 		 * Programmable Clock Mode minimum clock rate.
 		 */
 		mmc->f_min = host->max_clk / SDHCI_MAX_DIV_SPEC_300;
+		pr_debug("sdhci: host->version = %d in %s. Set mmc_f_min to %d, \n", host->version, __func__, mmc->f_min);
+
 	} else
 		mmc->f_min = host->max_clk / SDHCI_MAX_DIV_SPEC_200;
 
