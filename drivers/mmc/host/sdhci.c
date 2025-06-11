@@ -3354,7 +3354,7 @@ in sdhci_send_tuning.");
 	}
 	*/
 	pr_info("sdhci: End of sdhci_send_timing, current host->buf_ready_int = %d,\n\
-			host->tuning_done = %d.\n", 
+			host->tuning_done = %u.\n", 
 			host->buf_ready_int, host->tuning_done);
 }
 EXPORT_SYMBOL_GPL(sdhci_send_tuning);

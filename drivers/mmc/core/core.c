@@ -286,6 +286,7 @@ returning void in __mmc_start_request.\n");
 	}
 	pr_info("mmc-core: Going to host-ops-request(host, mrq) in __mmc_start_request.\n");
 	host->ops->request(host, mrq);
+	pr_debug("mmc_core: End of %s\n.", __func__);
 }
 
 static void mmc_mrq_pr_debug(struct mmc_host *host, struct mmc_request *mrq,

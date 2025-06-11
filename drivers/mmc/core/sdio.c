@@ -90,7 +90,7 @@ static int sdio_read_fbr(struct sdio_func *func)
 		SDIO_FBR_BASE(func->num) + SDIO_FBR_STD_IF, 0, &data);
 	//to card, write 0, fn = 0, addr = Function Block Register: 1 * 100 + standard interface
 	//for fbr: 0, input = 0, output = &data)
-
+	pr_debug("mmc_core: &data = %s in %s.\n", data, __func__);
 	if (ret) {
 		pr_err("sdio: I was in sdio_read_fbr and detected return for ret=mmc_io_rw_direct.\n\
 				Hence going to out condition.\n");
