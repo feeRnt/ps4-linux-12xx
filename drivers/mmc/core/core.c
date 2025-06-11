@@ -458,12 +458,18 @@ void mmc_wait_for_req_done(struct mmc_host *host, struct mmc_request *mrq)
 		cmd = mrq->cmd;
 
 		if (!cmd->error || !cmd->retries ||
-		    mmc_card_removed(host->card))
+		    mmc_card_removed(host->card)) {
+			pr_debug("mmc_core: Ending infinite loop in %s. cmd->error = %d\n\
+				cmd->retries = %d. Both should be 0.\n",
+				__func__, cmd->error, cmd->retries);
 			break;
+		}		
+		//reaching here means either error, or no retrying allowed by host/card/cmd or
+		//the card has been removed.  vvvvvvvvvvvvvv
 
 		mmc_retune_recheck(host);
-		/*checks whether host requests a hold on retune. if not, sets the retune_now on host 
-		 to 1. put a pr_debug in the header file itself? (host.h)
+		/*checks whether host requests a hold on retune. if not, sets the retune_now on host
+		 * to 1. put a pr_debug in the header file itself? (host.h)
 		*/
 		pr_debug("%s: req failed (CMD%u): %d, retrying...\n",
 			 mmc_hostname(host), cmd->opcode, cmd->error);

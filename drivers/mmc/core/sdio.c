@@ -739,7 +739,7 @@ static int mmc_sdio_init_uhs_card(struct mmc_card *card)
 	if (!mmc_host_is_spi(card->host) &&
 	    ((card->host->ios.timing == MMC_TIMING_UHS_SDR50) ||
 	      (card->host->ios.timing == MMC_TIMING_UHS_SDR104))) {
-		pr_debug("sdio: going to mmc_execute_tuning in mmc_sdio_init_uhs_card.\n");
+		pr_debug("sdio: going to mmc_execute_tuning in mmc_sdio_init_uhs_card.\n"); //we get success up to this stage
 		err = mmc_execute_tuning(card);
 	}
 out:

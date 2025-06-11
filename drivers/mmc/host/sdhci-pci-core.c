@@ -394,6 +394,7 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 	//missing caps causes "sdhci-pci: probe of [pci_address] rejects match -19"
 	.quirks2	= SDHCI_QUIRK2_PRESET_VALUE_BROKEN, //ours is maybe broken. test w/o too
 			  SDHCI_QUIRK2_CLOCK_DIV_ZERO_BROKEN,
+			  SDHCI_QUIRK2_TUNING_WORK_AROUND,
 };
 #endif
 

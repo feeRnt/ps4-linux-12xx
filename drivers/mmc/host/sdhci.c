@@ -1999,7 +1999,7 @@ Assigning cmd->error = -EIO. Returning false.\n",
 	if (cmd == host->deferred_cmd)
 		host->deferred_cmd = NULL;
 
-	pr_info("sdhci: End of sdhci_send_command_retry function. Returning true.");
+	pr_info("sdhci: End of sdhci_send_command_retry function. Returning true.\n");
 	return true;
 }
 
@@ -2632,6 +2632,7 @@ void sdhci_set_uhs_signaling(struct sdhci_host *host, unsigned timing)
 
 	pr_info("sdhci: I am in sdhci_set_uhs_signaling.\n");
 	ctrl_2 = sdhci_readw(host, SDHCI_HOST_CONTROL2);
+	pr_debug("sdhci: Assigned ctrl_2 = %08x from host_control2 in %s.\n", ctrl_2, __func__);
 	/* Select Bus Speed Mode for host */
 	ctrl_2 &= ~SDHCI_CTRL_UHS_MASK;
 	if ((timing == MMC_TIMING_MMC_HS200) ||
@@ -2648,6 +2649,8 @@ void sdhci_set_uhs_signaling(struct sdhci_host *host, unsigned timing)
 		ctrl_2 |= SDHCI_CTRL_UHS_DDR50;
 	else if (timing == MMC_TIMING_MMC_HS400)
 		ctrl_2 |= SDHCI_CTRL_HS400; /* Non-standard */
+	pr_debug("sdhci: Writing ctrl_2 = %08x to register after assigning the proper timing.\
+			Match with header file, in %s.\n", ctrl_2, __func__);
 	sdhci_writew(host, ctrl_2, SDHCI_HOST_CONTROL2);
 }
 EXPORT_SYMBOL_GPL(sdhci_set_uhs_signaling);
@@ -2745,7 +2748,7 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		     ios->timing == MMC_TIMING_UHS_SDR104 ||
 		     ios->timing == MMC_TIMING_UHS_DDR50 ||
 		     ios->timing == MMC_TIMING_UHS_SDR25) {
-			pr_debug("sdhci: Setting CTRL_HISPD in sdhci_set_ios. \n");
+			pr_debug("sdhci: Setting CTRL_HISPD in sdhci_set_ios because ios->timing = %08x.\n", ios->timing);
 			ctrl |= SDHCI_CTRL_HISPD;
 		}
 		else
@@ -2811,10 +2814,10 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 		clk &= ~SDHCI_CLOCK_CARD_EN;
 		sdhci_writew(host, clk, SDHCI_CLOCK_CONTROL);
 
-		pr_debug("sdhci: Going to host->ops->set_uhs_signaling in sdhci_set_ios.\n");
+		pr_debug("sdhci: Going to host->ops->set_uhs_signaling in sdhci_set_ios with timing = %08x.\n", ios->timing);
 		host->ops->set_uhs_signaling(host, ios->timing);
-		pr_debug("sdhci: Setting host->timing to %u in sdhci_set_ios.\n", ios->timing);
-		host->timing = ios->timing;
+		pr_debug("sdhci: Setting host->timing to %08x in sdhci_set_ios.\n", ios->timing);
+		host->timing = ios->timing;              //%u?
 
 		if (!(host->quirks2 & SDHCI_QUIRK2_PRESET_VALUE_BROKEN) &&
 				((ios->timing == MMC_TIMING_UHS_SDR12) ||
@@ -3311,7 +3314,7 @@ spin_unlock_irqrestore. Setting tuning_done=0.\n");
 		return;
 	}
 
-	pr_debug("sdhci: About to assing host->cmd = NULL in sdhci_send_tuning.\n");
+	pr_debug("sdhci: About to assign host->cmd = NULL in sdhci_send_tuning.\n");
 	host->cmd = NULL;
 
 	pr_debug("sdhci: About to enter sdhci_del_timer in sdhci_send_tuning.\n");
@@ -3350,6 +3353,9 @@ in sdhci_send_tuning.");
 = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
 	}
 	*/
+	pr_info("sdhci: End of sdhci_send_timing, current host->buf_ready_int = %d,\n\
+			host->tuning_done = %d.\n", 
+			host->buf_ready_int, host->tuning_done);
 }
 EXPORT_SYMBOL_GPL(sdhci_send_tuning);
 
@@ -3412,7 +3418,7 @@ in __sdhci_execute_tuning.\n");
 
 		}
 		else
-			pr_info("sdhci: Still executing tuning in __sdhci_execute_tuning. /n");	
+			pr_info("sdhci: Still executing tuning in __sdhci_execute_tuning.\n");	
 			/*   we always get this message in the logs.. 
 			//\\ Even when tuning_done should either be = 0, and maybe even a 1 if it succeeds.
 			//\\ try SDHCI_QUIRK2_TUNING_WORK_AROUND. EXEC_TUNING is set in sdhci_start_tuning
@@ -3421,7 +3427,7 @@ in __sdhci_execute_tuning.\n");
 			//\\ Then I'm gonna try to clear it manually after the buffer read wait.
 			//\\ But will try one more time with the increased timeout to report the value of the register first.   
 			//\\ So it returns 0000804b =  		   1000000001001011
-			//		   0000004b = 		=  0000000001001011
+			//lateset kernel : 0000004b = 		=  0000000001001011
 			//\\ tuning			0x0040  =  0000000001000000
 			//\\  tuned			0x0080  =  0000000010000000
 			//	 SDHCI_CTRL_UHS_SDR25	0x0001  =  0000000000000001 huh sdr25isslow 
@@ -3516,7 +3522,7 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 		break;
 
 	case MMC_TIMING_UHS_SDR104:
-		pr_info("sdhci: MMC_TIMING_UHS_SDR104 sdhci_execute_tuning, breaking.\n");
+		pr_info("sdhci: MMC_TIMING_UHS_SDR104 in sdhci_execute_tuning, breaking.\n");
 		break;
 	case MMC_TIMING_UHS_DDR50:
 		pr_info("sdhci: MMC_TIMING_UHS_DDR50 in sdhci_execute_tuning, breaking.\n");
@@ -3542,15 +3548,18 @@ int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
 
 	mmc->retune_period = tuning_count;
 
-	if (host->tuning_delay < 0)
+	if (host->tuning_delay < 0) {
 		host->tuning_delay = opcode == MMC_SEND_TUNING_BLOCK;
+		pr_debug("sdhci: tuning_delay < 0 in %s. Assigned it to = %d.\n",
+				__func__, host->tuning_delay);
+	}
 
 	pr_info("sdhci: Doing sdhci_start_tuning(host) in sdhci_execute_tuning.\n");
 	sdhci_start_tuning(host);
 	
-	pr_info("sdhci: Going to _-sdhci_execute_tuning(host, opcode) in sdhci_execute_tuning.\n");
+	pr_info("sdhci: Going to __sdhci_execute_tuning(host, opcode) in sdhci_execute_tuning.\n");
 	host->tuning_err = __sdhci_execute_tuning(host, opcode);
-
+ 
 	pr_info("sdhci: Going to sdhci_end_tuning(host) at the end of sdhci_execute_tuning.\n");
 	sdhci_end_tuning(host);
 out:

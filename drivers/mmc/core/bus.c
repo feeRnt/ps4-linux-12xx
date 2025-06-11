@@ -60,6 +60,7 @@ ATTRIBUTE_GROUPS(mmc_dev);
  */
 static int mmc_bus_match(struct device *dev, struct device_driver *drv)
 {
+	pr_debug("mmc_core: I am in %s.\n", __func__);
 	return 1;
 }
 
@@ -318,6 +319,7 @@ int mmc_add_card(struct mmc_card *card)
 		[UHS_DDR50_BUS_SPEED] = "DDR50 ",
 	};
 
+	pr_debug("mmc_core: I am in %s.\n", __func__);
 
 	dev_set_name(&card->dev, "%s:%04x", mmc_hostname(card->host), card->rca);
 
