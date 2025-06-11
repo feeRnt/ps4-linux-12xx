@@ -856,10 +856,10 @@ try_again:
 	if (host->ops->init_card)
 		host->ops->init_card(host, card);
 
-	pr_debug("sdio: Current card->quirks in sdio_init_func = %08x ."
+	pr_debug("sdio: Current card->quirks in sdio_init_card = %08x ."
 			,card->quirks);
 /*	card->quirks |= MMC_QUIRK_NONSTD_SDIO;
-	pr_debug("sdio: Current card->quirks in sdio_init_func after assigning |= MMC_QUIRK_NONSTD_SDIO = %08x .\n"
+	pr_debug("sdio: Current card->quirks in sdio_init_card after assigning |= MMC_QUIRK_NONSTD_SDIO = %08x .\n"
 			,card->quirks); 
 			//defined in include/linux/mmc/card.h
 */
@@ -1026,7 +1026,7 @@ try_again:
 		/*
 		 * Change to the card's maximum speed.
 		 */
-		pr_debug("sdio: In sdio_init_func. Going to mmc_set_clock with the output of" 
+		pr_debug("sdio: In sdio_init_card. Going to mmc_set_clock with the output of" 
 			"mmc_sdio_get_max_clock.\n");
 		mmc_set_clock(host, mmc_sdio_get_max_clock(card));
 

@@ -378,7 +378,8 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 	// Adding certain quirks that are in sdhci_RICOH_mmc
 	.quirks		= SDHCI_QUIRK_BROKEN_TIMEOUT_VAL | // You can't use |= as this is the // initalizer
 			  SDHCI_QUIRK_DELAY_AFTER_POWER |
-			  SDHCI_QUIRK_SINGLE_POWER_WRITE,
+			  SDHCI_QUIRK_SINGLE_POWER_WRITE |
+			  SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER,
 			//= SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER // might be unnecessary		
 			//don't need SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN
 			//Baaaaased on sdhci-tegra all above ^^^
@@ -391,7 +392,8 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 			  SDHCI_QUIRK_32BIT_DMA_ADDR
 	*/
 	//missing caps causes "sdhci-pci: probe of [pci_address] rejects match -19"
-	.quirks2	= SDHCI_QUIRK2_PRESET_VALUE_BROKEN, //ours is broken. test w/o too	 
+	.quirks2	= SDHCI_QUIRK2_PRESET_VALUE_BROKEN, //ours is maybe broken. test w/o too
+			  SDHCI_QUIRK2_CLOCK_DIV_ZERO_BROKEN,
 };
 #endif
 

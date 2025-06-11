@@ -2252,16 +2252,19 @@ clock_set:
 		pr_debug("sdhci: real_div and it is = %d in %s\n\
 				Setting actual_clock to %d\n", real_div, __func__, *actual_clock);
 	}
+	pr_debug("sdhci: clk = %08x before applying div mask and shift in %s\n.", clk, __func__);
 	clk |= (div & SDHCI_DIV_MASK) << SDHCI_DIVIDER_SHIFT;  //this part is broken maybe?
 		//when div=1;
-		// 
+		//then... 
+	pr_debug("sdhci: clk = %08x before applying div hi mask, mask len and hi shift, in %s\n.", clk, __func__);
 	clk |= ((div & SDHCI_DIV_HI_MASK) >> SDHCI_DIV_MASK_LEN)
 		<< SDHCI_DIVIDER_HI_SHIFT;
 
 //	pr_debug("sdhci: Current clk in sdhci_set_clock before returning it = %08x.\n", clk);
 //	return clk;
 // #ifdef x86_ps4
-	if (__pre_init_clock_use_counter <= 2) {
+
+/*	if (__pre_init_clock_use_counter <= 2) {
 		pr_debug("sdhci: Current clk in sdhci_calc_clock before returning it = %08x.\n", 
 				__pre_init_clock);
 		__pre_init_clock_use_counter = __pre_init_clock_use_counter + 1; 
@@ -2273,10 +2276,12 @@ clock_set:
 		return 256;  //the 100 in 107; in decimal
 	}
 	else {
-		pr_debug("sdhci: Current clk in sdhci_calc_clock before returning it = %08x.\n", 
-				clk);
+*/
+		pr_debug("sdhci: Current clk in sdhci_calc_clock before returning it = %08x.\n", clk);
 		return clk;
-	}
+	//}	
+	//This just calculates the real clock, sets it, then sets
+	//enabled bit to the CLOCK_CONTROL register
 }
 EXPORT_SYMBOL_GPL(sdhci_calc_clk);
 
@@ -2749,7 +2754,7 @@ void sdhci_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 
 	if (host->version >= SDHCI_SPEC_300) {
 		u16 clk, ctrl_2;
-		pr_debug("sdhci: SDHCI_SPEC = %d greater than or eq. 300 in sdhci_set_ios.\n");
+		pr_debug("sdhci: SDHCI_SPEC = %u greater than or eq. 300 in sdhci_set_ios.\n");
 		// we should be version 2, but this somehow returns true???
 		//edit: version 2 is actually equal to SPEC_300... in
 		//host/sdhci.h
