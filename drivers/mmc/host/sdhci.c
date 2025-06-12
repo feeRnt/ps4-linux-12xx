@@ -3330,7 +3330,7 @@ spin_unlock_irqrestore. Setting tuning_done=0.\n");
 	pr_info("sdhci: waiting for event timeout, buffer read ready interrupt \
 in sdhci_send_tuning.");
 	wait_event_timeout(host->buf_ready_int, (host->tuning_done == 1),
-			   msecs_to_jiffies(50)); //set tuning_done=1 if detect get buffer read
+			   msecs_to_jiffies(1500)); //check if tuning_done=1 each time buffer read ready interrupt event occurs 
 						  //ready interrupt
 		// ================> from 50 to 250 => 750
 		//increased to 1150 for manual setting of REG2, in case this breaks something
@@ -4052,8 +4052,13 @@ static void sdhci_data_irq(struct sdhci_host *host, u32 intmask)
 	 */
 	if (intmask & SDHCI_INT_DATA_AVAIL && !host->data) {
 		command = SDHCI_GET_CMD(sdhci_readw(host, SDHCI_COMMAND));
+		pr_debug("sdhci: intmask has INT_DATA_AVAIL bit, and host->data empty in %s.\n",
+				__func__);	
 		if (command == MMC_SEND_TUNING_BLOCK ||
 		    command == MMC_SEND_TUNING_BLOCK_HS200) {
+			pr_debug("sdhci: command == MMC_SEND_TUNING_BLOCK/_HS200 and host->data in\
+				%s.\n Assigning host->tuning_done=1, and waking up host using\
+				buf_ready_int.\n", __func__);
 			host->tuning_done = 1;
 			wake_up(&host->buf_ready_int);
 			return;
@@ -4068,27 +4073,40 @@ static void sdhci_data_irq(struct sdhci_host *host, u32 intmask)
 		 * indicate that a busy state has ended. See comment
 		 * above in sdhci_cmd_irq().
 		 */
+		pr_debug("sdhci: host->data empty in %s.\n",
+				__func__);
 		if (data_cmd && (data_cmd->flags & MMC_RSP_BUSY)) {
+			pr_debug("sdhci: data_cmd and data_cmd->flags has MMC_RSP_BUSY, in %s.\n",
+				__func__);
 			if (intmask & SDHCI_INT_DATA_TIMEOUT) {
-				pr_info("sdhci: SDHCI_INT_DATA_TIMEOUT seen in sdhci_data_irq with \
-MMC_RSP_BUSY, assigning data_cmd->error = -ETIMEDOUT. \
-Going to __sdhci_finish_mrq\n");
+				pr_info("sdhci: SDHCI_INT_DATA_TIMEOUT seen in sdhci_data_irq with\
+				MMC_RSP_BUSY, assigning data_cmd->error = -ETIMEDOUT.\
+				Going to __sdhci_finish_mrq\n");
 				host->data_cmd = NULL;
 				data_cmd->error = -ETIMEDOUT;
 				__sdhci_finish_mrq(host, data_cmd->mrq);
 				return;
 			}
 			if (intmask & SDHCI_INT_DATA_END) {
+				pr_debug("sdhci: intmask has INT_DATA_END bit in %s.\n\
+					Assigning host->data_cmd=NULL.\n",
+					__func__);
 				host->data_cmd = NULL;
 				/*
 				 * Some cards handle busy-end interrupt
 				 * before the command completed, so make
 				 * sure we do things in the proper order.
 				 */
-				if (host->cmd == data_cmd)
+				if (host->cmd == data_cmd) {
+					pr_debug("sdhci: host-cmd == data_cmd in %s. Returning.\n",
+					__func__);
 					return;
-
+				}
+				pr_debug("sdhci: Going to __sdhci_finish_mrq with data_cmd->mrq in %s.\n",
+				__func__);
 				__sdhci_finish_mrq(host, data_cmd->mrq);
+				pr_debug("sdhci: returning in %s.\n",
+				__func__);
 				return;
 			}
 		}
@@ -4098,9 +4116,11 @@ Going to __sdhci_finish_mrq\n");
 		 * circuits. Until that is done, there very well might be more
 		 * interrupts, so ignore them in that case.
 		 */
-		if (host->pending_reset)
+		if (host->pending_reset) {
+			pr_debug("sdhci: host is->pending_request in %s. Returning.\n",
+				__func__);
 			return;
-
+		}
 		pr_err("%s: Got data interrupt 0x%08x even though no data operation was in progress.\n",
 		       mmc_hostname(host->mmc), (unsigned)intmask);
 		sdhci_dumpregs(host);
@@ -4113,12 +4133,18 @@ Going to __sdhci_finish_mrq\n");
 Assigning host->data->error = -ETIMEDOUT\n");
 		host->data->error = -ETIMEDOUT;
 	}
-	else if (intmask & SDHCI_INT_DATA_END_BIT)
+	else if (intmask & SDHCI_INT_DATA_END_BIT) {
+		pr_debug("sdhci: intmask has INT_DATA_END_BIT bit in %s.\n\
+				Assigning host->data->error=-EILSEQ.\n", __func__);
 		host->data->error = -EILSEQ;
+	}
 	else if ((intmask & SDHCI_INT_DATA_CRC) &&
 		SDHCI_GET_CMD(sdhci_readw(host, SDHCI_COMMAND))
-			!= MMC_BUS_TEST_R)
+			!= MMC_BUS_TEST_R) {
+		pr_debug("sdhci: intmask has INT_DATA_CRC bit and not BUS_TEST in %s.\n\
+				Assigning host->data->error=-EILSEQ.\n", __func__);
 		host->data->error = -EILSEQ;
+	}
 	else if (intmask & SDHCI_INT_ADMA_ERROR) {
 		pr_err("%s: ADMA error: 0x%08x\n", mmc_hostname(host->mmc),
 		       intmask);
@@ -4128,12 +4154,17 @@ Assigning host->data->error = -ETIMEDOUT\n");
 			host->ops->adma_workaround(host, intmask);
 	}
 
-	if (host->data->error)
+	if (host->data->error) {
+		pr_debug("sdhci: host->data error present in %s. Going to sdhci_finish_data,\n",
+				__func__);
 		sdhci_finish_data(host);
+	}
 	else {
-		if (intmask & (SDHCI_INT_DATA_AVAIL | SDHCI_INT_SPACE_AVAIL))
+		if (intmask & (SDHCI_INT_DATA_AVAIL | SDHCI_INT_SPACE_AVAIL)) {
+			pr_debug("sdhci: intmask has INT_DATA or SPACE_AVAIL bits present in %s.\
+					Going to sdhci_transfer_pio.\n", __func__);
 			sdhci_transfer_pio(host);
-
+		}
 		/*
 		 * We currently don't do anything fancy with DMA
 		 * boundaries, but as we can't disable the feature
@@ -4145,6 +4176,9 @@ Assigning host->data->error = -ETIMEDOUT\n");
 		 */
 		if (intmask & SDHCI_INT_DMA_END) {
 			dma_addr_t dmastart, dmanow;
+
+			pr_debug("sdhci: intmask has INT_DMA_END bit present in %s.\
+					WIll force update dma block boundary.\n", __func__);
 
 			dmastart = sdhci_sdma_address(host);
 			dmanow = dmastart + host->data->bytes_xfered;
@@ -4160,15 +4194,20 @@ Assigning host->data->error = -ETIMEDOUT\n");
 			sdhci_set_sdma_addr(host, dmanow);
 		}
 
-		if (intmask & SDHCI_INT_DATA_END) {
+		if (intmask & SDHCI_INT_DATA_END) { 
+			pr_debug("sdhci: intmask has INT_DATA_END bit present in %s.", __func__);
 			if (host->cmd == host->data_cmd) {
 				/*
 				 * Data managed to finish before the
 				 * command completed. Make sure we do
 				 * things in the proper order.
 				 */
+				pr_debug("sdhci: host->cmd == host->data_cmd in %s.\
+						Setting host->data_early = 1\n", __func__);
+
 				host->data_early = 1;
 			} else {
+				pr_debug("sdhci: Going to sdhci_finish_data in %s.", __func__);
 				sdhci_finish_data(host);
 			}
 		}
