@@ -184,8 +184,7 @@ extern int __pre_init_cis_max_dtr; //added. Can be used across sdhci.c and core/
 	//==10011100000000000000111110 |
 	//==  100000000000000000000000
 	//==11111111110000000000111111 &             
-	//==11000000000000000  .......  0x18000 .... (what we get in sdhci.. need more leading
-	//trailing digits?)
+	//==00000000011000000000000000.......  0x00018000 .... (what we get in sdhci..). IDk how
 #define SDHCI_INT_ALL_MASK	((unsigned int)-1)
 
 #define SDHCI_CQE_INT_ERR_MASK ( \

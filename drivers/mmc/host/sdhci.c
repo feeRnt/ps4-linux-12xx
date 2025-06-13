@@ -3363,8 +3363,8 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 {
 	int i;
 
-	pr_info("sdhci: I am in __sdhci_execute_tuning.\n");
-	pr_info("I have successfully issued the int counter i in __sdhci_execute_tuning().\n");
+	pr_info("sdhci: I am in %s.\n", __func__);
+	pr_info("I have successfully issued the int counter i in %s.\n", __func__);
 	/*
 	 * Issue opcode repeatedly till Execute Tuning is set to 0 or the number
 	 * of loops reaches tuning loop count.
@@ -3373,52 +3373,52 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 	sdhci_dumpregs(host);
 //	pr_info("The output of sdhci_host *host is:%",
 
-	pr_debug("sdhci: About to try sdhci_send_tuning %d times in __sdhci_execute_tuning\n", 
-		host->tuning_loop_count); 
+	pr_debug("sdhci: About to try sdhci_send_tuning %d times in %s\n", 
+		host->tuning_loop_count, __func__); 
 		/* from counting it seems to be 40. I wonder if increasing this will fix it after all. . It's defined at the start:
 		SDHCI_MAX_TUNING_LOOP. Used in *sdhci_alloc_host*/
 	for (i = 0; i < host->tuning_loop_count; i++) {
 		u16 ctrl;
 
-		pr_err("I have successfully entered the for loop in __sdhci_execute_tuning().\n");
+		pr_err("I have successfully entered the for loop in %s.\n", __func__);
 		sdhci_send_tuning(host, opcode);
 
 		if (!host->tuning_done) { //if tuning_done=0,
 			pr_err("Stack and reg dump before tuning is aborted:\n");
-			dump_stack();
+		//	dump_stack();
 			sdhci_dumpregs(host);
 			pr_debug("%s: Tuning timeout, falling back to fixed sampling clock\n",
 				 mmc_hostname(host->mmc));
 			sdhci_abort_tuning(host, opcode);
 			pr_err("Stack and reg dump after tuning is aborted:\n");
-			dump_stack();
+		//	dump_stack();
 			sdhci_dumpregs(host);
-			pr_err("sdhci: Returning -ETIMEDOUT in __sdhci_execute_tuning.\n");
+			pr_err("sdhci: Returning -ETIMEDOUT in %s.\n", __func__);
 			return -ETIMEDOUT;
 		}     //we never have this 
 
 		/* Spec does not require a delay between tuning cycles */
 		if (host->tuning_delay > 0) {
 			pr_info("sdhci: host has delay %d between tune cycles \
-in __sdhci_execute_tuning. Delaying by that amount. \n", host->tuning_delay);	
+			in %s. Delaying by that amount. \n", host->tuning_delay, __func__);
 			mdelay(host->tuning_delay);
 		}
 		pr_info("sdhci: Reading if tuning is done from control2 reg in \
-__sdhci_execute_tuning.\n");
+		%s.\n", __func__);
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		pr_debug("sdhci: Current output of SDHCI_HOST_CONTROL2 is %08x\n", ctrl);
 		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
 			if (ctrl & SDHCI_CTRL_TUNED_CLK) {  //TUNING_WORK_AROUND is supposed to set this bit, but this bit is cleared automatically when set. So remove this check. Removing so suceeds this, but it later fails in sdio_read_fbr. So now we're doing that along with mmc_nonstd_sdio quirk in sdhci-pci-core, so it never fails at that. edit:: Re-added			
 				pr_info("sdhci: sdhci_tuning success, returning 0\
-in __sdhci_execute_tuning.\n");
+in %s.\n", __func__);
 				return 0; /* Success! */
 			}
-			pr_info("sdhci: breaking loop in __sdhci_execute_tuning\n.");	
+			pr_info("sdhci: breaking loop in %s\n.", __func__);	
 			break;
 
 		}
 		else
-			pr_info("sdhci: Still executing tuning in __sdhci_execute_tuning.\n");	
+			pr_info("sdhci: Still executing tuning in %s.\n", __func__);	
 			/*   we always get this message in the logs.. 
 			//\\ Even when tuning_done should either be = 0, and maybe even a 1 if it succeeds.
 			//\\ try SDHCI_QUIRK2_TUNING_WORK_AROUND. EXEC_TUNING is set in sdhci_start_tuning
@@ -3474,10 +3474,8 @@ and reg dump before fallback:\n");
 	//dump_stack();
 	sdhci_dumpregs(host);
 
-	pr_err("Stack dump immediately before fallback, dump right after falling back, and reg dump after falll back ^^^\n");
+	pr_err("Stack dump immediately before fallback, dump right after falling back, and reg dump after fall back ^^^\n");
 	return -EAGAIN;
-	//dump_stack();
-	pr_err("Stack dump after 'return -EAGAIN'\n");
 }
 
 int sdhci_execute_tuning(struct mmc_host *mmc, u32 opcode)
@@ -3953,13 +3951,13 @@ Assigning *intmask_p |= data_err_bit (%08x)\n", data_err_bit);
 	//		INT_INDEX and INT_CRC
 	//	invalid command index    cyclic redundancy check
 		if (intmask & SDHCI_INT_TIMEOUT) {
-			pr_err("sdhci: SDHCI_INT_TIMEOUT detected with mask in sdhci_cmd_irq.\
+			pr_err("sdhci: SDHCI_INT_TIMEOUT detected with intmask in sdhci_cmd_irq.\
 Assigning host->cmd->error = -ETIMEDOUT in sdhci_cmd_irq.\n");
 			host->cmd->error = -ETIMEDOUT;
 		}	//this is where we end up with the -110 errors.
 			//important
 		else {
-			pr_err("sdhci: Assigning host->cmd->error = -EILSEQ in sdhci_cmd_irq\n");
+			pr_err("sdhci: Assigning host->cmd->error = -EILSEQ using intmask in sdhci_cmd_irq\n");
 			host->cmd->error = -EILSEQ;
 		}
 		/* Treat data command CRC error the same as data CRC error */

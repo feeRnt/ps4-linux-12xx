@@ -85,10 +85,10 @@ static int sdio_read_fbr(struct sdio_func *func)
 	//\\ hard change to non_standard_func?	
 	}
 
-	pr_info("sdio: I am in sdio_read_fbr and going to test mmc_io_rw_direct.\n");
+	pr_info("sdio: I am in sdio_read_fbr and going to test mmc_io_rw_direct.\n");                                                      				//cmd52
 	ret = mmc_io_rw_direct(func->card, 0, 0,
 		SDIO_FBR_BASE(func->num) + SDIO_FBR_STD_IF, 0, &data);
-	//to card, write 0, fn = 0, addr = Function Block Register: 1 * 100 + standard interface
+	//to card, write 0, into fn = 0, addr = Function Block Register: 1 * 100 + standard interface
 	//for fbr: 0, input = 0, output = &data)
 	pr_debug("mmc_core: &data = %s in %s.\n", data, __func__);
 	if (ret) {
@@ -130,7 +130,7 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 				Returning -EINVAL.\n");
 		return -EINVAL;
 	}
-	func = sdio_alloc_func(card); //defined in sdio_alloc_func
+	func = sdio_alloc_func(card); //defined in sdio_bus.c:sdio_alloc_func
 	if (IS_ERR(func)) {
 		pr_err("sdio: I was in sdio_init_func and detected an erroneous function. \n\
 				Returning PTR_ERR(func).\n");
@@ -179,6 +179,61 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 		  card->cid.year);
 	// these two return empty
 	*/
+
+/*	pr_debug("sdio: Current card->host->clock = %u, pwr (volt) = %u,\n\
+			max_clk = %u, bus_on = %d,\n\
+			pending_reset = %d, irq_wake_enabled = %d,\n\
+			timer = %u, data_timer = %u\n\
+			in %s.\n", 
+			card->host->clock, card->host->pwr, card->host->max_clk, card->host->bus_on,
+			card->host->pending_reset, card->host->irq_wake_enabled, card->host->timer,
+			card->host->data_timer, __func__);
+
+	This does not work because card->host translates to the ACTUAL host, defined in 
+	include/linux/mmc/host.h: struct mmc_host {
+	not the sdhci_host in host/sdhci.h ...     
+	Using the relevant values from that header.
+*/
+	pr_debug("sdio: Current card->host->ios.clock = %u, vdd = %u\n\ 
+			power_delay_ms = %u, bus_mode = %c\n\
+			power_mode = %c, timing = %c\n\
+			signal_voltage = %c, drv_type = %c\n\
+			card->host.caps = %08x, max_seg_size = %u\n\
+			max_req_size = %u, max_blk_size = %u\n\
+			max_busy_timeout = %u, doing_init_tune = %u\n\
+			doing_retune = %u, retune_now = %u\n\
+			regulator_enabled = %d, actual_clock = %u\n\
+			slotno = %u, cqe_enabled = %d, cqe_on = %d\n\ 
+			in %s.\n", 
+			card->host->ios.clock, card->host->ios.vdd,
+			card->host->ios.power_delay_ms, card->host->ios.bus_mode,
+			card->host->ios.power_mode, card->host->ios.timing,
+			card->host->ios.signal_voltage, card->host->ios.drv_type,
+			card->host->caps, card->host->max_seg_size,
+			card->host->max_req_size, card->host->max_blk_size,
+			card->host->max_busy_timeout, card->host->doing_init_tune,
+			card->host->doing_retune, card->host->retune_now,
+			card->host->regulator_enabled, card->host->actual_clock,
+			card->host->slotno, card->host->cqe_enabled, card->host->cqe_on,
+			__func__);
+	/*use ->item if it's present as a struct itself
+ 	 struct mmc_card *card {
+	    struct mmc_host *host { 
+	    	int item
+              }...
+	 }
+
+	 then card->host->item
+	 but if 
+	 struct mmc_card *card {
+	    struct mmc_host host {
+	 	int item
+	      }...
+	}
+	then card->host.item
+	*/
+
+	/*printing char with %s cause EFAULT)*. Use %c instead */
 	
 	if (!(card->quirks & MMC_QUIRK_NONSTD_SDIO)) {
 		
@@ -695,7 +750,7 @@ static int sdio_set_bus_speed_mode(struct mmc_card *card)
 				card->sw_caps.uhs_max_dtr);
 
 	pr_debug("sdio: I am in sdio_set_bus_speed_mode.\
-	Doing mmc_set_timing with %d\
+	Doing mmc_set_timing with %d,\
 	and mmc_set_clock with %d.\n", 
 		timing, max_rate);	
 	mmc_set_timing(card->host, timing);
@@ -1392,7 +1447,7 @@ int mmc_attach_sdio(struct mmc_host *host)
 	pr_debug("sdio: I am detecting and initing the card. \n");
 	err = mmc_sdio_init_card(host, rocr, NULL);
 	if (err) {
-		pr_debug("sdio: error while detecting and initing the card.\n");
+		pr_debug("sdio: error while detecting and initing the card.Going to err case.\n");
 		goto err;
 	}
 	card = host->card;
@@ -1435,9 +1490,10 @@ int mmc_attach_sdio(struct mmc_host *host)
 	for (i = 0; i < funcs; i++, card->sdio_funcs++) {
 		pr_debug("sdio: Init-ing func no. %d in %s.\n", (i+1), __func__);
 		err = sdio_init_func(host->card, i + 1);
-		if (err)
+		if (err) {
+			pr_debug("sdio: err while init-ing func. Going to remove case,\n");
 			goto remove;
-
+		}
 		/*
 		 * Enable Runtime PM for this func (if supported)
 		 */
@@ -1470,6 +1526,7 @@ int mmc_attach_sdio(struct mmc_host *host)
 
 
 remove:
+	pr_debug("sdio: remove case in %s. Doing mmc_release_host.\n", __func__);
 	mmc_release_host(host);
 remove_added:
 	/*
@@ -1478,6 +1535,7 @@ remove_added:
 	 * because it needs to be active to remove any function devices that
 	 * were probed, and after that it gets deleted.
 	 */
+	pr_debug("sdio: remove_added case in %s. Doing mmc_release_host.\n", __func__);
 	mmc_sdio_remove(host);
 	mmc_claim_host(host);
 err:
@@ -1486,7 +1544,7 @@ err:
 //	pr_err("Stack dump before bus detach:\n");
 //	dump_stack();
 
-	pr_debug("sdio: value of err before mmc_detach_bus(host): %d \n", err);
+	pr_debug("sdio: err case in %s. Value of err before mmc_detach_bus(host): %d \n", __func__, err);
 
 	mmc_detach_bus(host);
 
