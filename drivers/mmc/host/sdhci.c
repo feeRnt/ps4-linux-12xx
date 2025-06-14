@@ -3330,7 +3330,7 @@ spin_unlock_irqrestore. Setting tuning_done=0.\n");
 	pr_info("sdhci: waiting for event timeout, buffer read ready interrupt \
 in sdhci_send_tuning.");
 	wait_event_timeout(host->buf_ready_int, (host->tuning_done == 1),
-			   msecs_to_jiffies(1500)); //check if tuning_done=1 each time buffer read ready interrupt event occurs 
+			   msecs_to_jiffies(50)); //check if tuning_done=1 each time buffer read ready interrupt event occurs 
 						  //ready interrupt
 		// ================> from 50 to 250 => 750
 		//increased to 1150 for manual setting of REG2, in case this breaks something
@@ -3407,8 +3407,8 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 		%s.\n", __func__);
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		pr_debug("sdhci: Current output of SDHCI_HOST_CONTROL2 is %08x\n", ctrl);
-		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
-			if (ctrl & SDHCI_CTRL_TUNED_CLK) {  //TUNING_WORK_AROUND is supposed to set this bit, but this bit is cleared automatically when set. So remove this check. Removing so suceeds this, but it later fails in sdio_read_fbr. So now we're doing that along with mmc_nonstd_sdio quirk in sdhci-pci-core, so it never fails at that. edit:: Re-added			
+		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING) || host->tuning_done) {
+			if (ctrl & SDHCI_CTRL_TUNED_CLK || host->tuning_done >= 1) {  //TUNING_WORK_AROUND is supposed to set this bit, but this bit is cleared automatically when set. So remove this check. Removing so suceeds this, but it later fails in sdio_read_fbr. So now we're doing that along with mmc_nonstd_sdio quirk in sdhci-pci-core, so it never fails at that. edit:: Re-added			
 				pr_info("sdhci: sdhci_tuning success, returning 0\
 in %s.\n", __func__);
 				return 0; /* Success! */
@@ -4058,6 +4058,7 @@ static void sdhci_data_irq(struct sdhci_host *host, u32 intmask)
 				%s.\n Assigning host->tuning_done=1, and waking up host using\
 				buf_ready_int.\n", __func__);
 			host->tuning_done = 1;
+			pr_debug("sdhci: host->tuning_done = %u rn.\n", host->tuning_done);
 			wake_up(&host->buf_ready_int);
 			return;
 		}

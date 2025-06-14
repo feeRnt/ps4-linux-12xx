@@ -234,6 +234,12 @@ static int sdio_init_func(struct mmc_card *card, unsigned int fn)
 	*/
 
 	/*printing char with %s cause EFAULT)*. Use %c instead */
+
+	pr_debug("sdio: Current func->vendor = %u, device = %u, max_blksize = %u, cur_blksize = %u,\n\
+			enable_timeout = %u, state = %u, major_rev = %u, minor_rev = %u,\n\
+			num_info = %u, info = %c, in %s.\n", func->vendor, func->device, func->max_blksize, func->cur_blksize,
+			func->enable_timeout, func->state, func->major_rev, func->minor_rev,
+			func->num_info, func->info, __func__);
 	
 	if (!(card->quirks & MMC_QUIRK_NONSTD_SDIO)) {
 		
