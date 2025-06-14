@@ -160,6 +160,7 @@ static int sdio_bus_probe(struct device *dev)
 	const struct sdio_device_id *id;
 	int ret;
 
+	pr_debug("sdio_bus: I am in %s.\n", __func__);
 	id = sdio_match_device(func, drv);
 	if (!id)
 		return -ENODEV;
@@ -304,6 +305,7 @@ static void sdio_release_func(struct device *dev)
 /*
  * Allocate and initialise a new SDIO function structure.
  */
+//returns a struct type
 struct sdio_func *sdio_alloc_func(struct mmc_card *card)
 {
 	struct sdio_func *func;

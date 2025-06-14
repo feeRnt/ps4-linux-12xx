@@ -686,6 +686,8 @@ EXPORT_SYMBOL(mmc_wait_for_req);
  *	to complete.  Return any error that occurred while the command
  *	was executing.  Do not attempt to parse the response.
  */
+//Important. Called from sdio_ops.c:mmc_io_rw_direct_host, which is called from
+//                       sdio_ops.c:mmc_io_rw_direct
 int mmc_wait_for_cmd(struct mmc_host *host, struct mmc_command *cmd, int retries)
 {
 	struct mmc_request mrq = {};
@@ -697,6 +699,11 @@ int mmc_wait_for_cmd(struct mmc_host *host, struct mmc_command *cmd, int retries
 	cmd->retries = retries;
 	pr_debug("mmc-core: no. of retries in mmc_wait_for_cmd is %d \n", retries);
 	//set manually? ;; this returns to 0.
+	//
+	//jun, 2025: 
+	//https://fa.linux.kernel.narkive.com/t6hn0noQ/patch-mmc-sdio-retry-cmd52-53-when-error-happens
+	//marvell engineer calling for a default retry as they encountered it in development.
+	//Not mainlined due to lack of followup. TI person also approved.
 	mrq.cmd = cmd;
 	pr_debug("mmc-core: current command in mmc_wait_for_cmd is %d or %08x \
 Setting cmd->data = NULL\n", mrq.cmd, cmd);

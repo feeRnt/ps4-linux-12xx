@@ -154,12 +154,14 @@ EXPORT_SYMBOL_GPL(sdio_disable_func);
  *	Returns 0 on success, -EINVAL if the host does not support the
  *	requested block size, or -EIO (etc.) if one of the resultant FBR block
  *	size register writes failed.
- *
- */
+ *	
+ */	
+//IMPORTANT
 int sdio_set_block_size(struct sdio_func *func, unsigned blksz)
 {
 	int ret;
 
+	pr_debug("sdio_io: I am in %s.\n", __func__);
 	if (blksz > func->card->host->max_blk_size)
 		return -EINVAL;
 

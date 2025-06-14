@@ -81,7 +81,8 @@ static int mmc_io_rw_direct_host(struct mmc_host *host, int write, unsigned fn,
 {
 	struct mmc_command cmd = {};
 	int err;
-
+	
+	pr_debug("sdio_ops: I am in %s.\n", __func__);
 	if (fn > 7) {
 		pr_err("sdio_ops: fn > 7 in mmc_io_rw_direct_host, returning -EINVAL\n");
 		return -EINVAL;
@@ -103,7 +104,10 @@ static int mmc_io_rw_direct_host(struct mmc_host *host, int write, unsigned fn,
 	cmd.arg |= in;
 	cmd.flags = MMC_RSP_SPI_R5 | MMC_RSP_R5 | MMC_CMD_AC;
 
-	err = mmc_wait_for_cmd(host, &cmd, 0); 
+//	err = mmc_wait_for_cmd(host, &cmd, 0);  //wait for cmd using cmd and 0 (ZERO) retries.. why 0?
+	//https://fa.linux.kernel.narkive.com/t6hn0noQ/patch-mmc-sdio-retry-cmd52-53-when-error-happens
+
+	err = mmc_wait_for_cmd(host, &cmd, MMC_CMD_RETRIES); //This resolves to 3, from mmc/core/core.h
 	if (err) {
 		pr_err("sdio_ops: err = mmc_wait_for_cmd returned, in \
 mmc_io_rw_direct_host, returning err=%d", err);
@@ -161,6 +165,8 @@ int mmc_io_rw_extended(struct mmc_card *card, int write, unsigned fn,
 	unsigned int nents, left_size, i;
 	unsigned int seg_size = card->host->max_seg_size;
 	int err;
+	
+	pr_debug("sdio_ops: I am in %s.\n", __func__);
 
 	WARN_ON(blksz == 0);
 
@@ -252,5 +258,6 @@ int sdio_reset(struct mmc_host *host)
 		abort |= 0x08;
 
 	return mmc_io_rw_direct_host(host, 1, 0, SDIO_CCCR_ABORT, abort, NULL);
+		//to host, write 1, to func 0, adde=sdio_cccr_abort, write=abort, output=null
 }
 
