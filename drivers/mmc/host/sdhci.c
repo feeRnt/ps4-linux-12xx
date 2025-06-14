@@ -3353,7 +3353,7 @@ in sdhci_send_tuning.");
 = %08x\n", sdhci_readw(host, SDHCI_HOST_CONTROL2));
 	}
 	*/
-	pr_info("sdhci: End of sdhci_send_timing, current host->buf_ready_int = %d,\n\
+	pr_info("sdhci: End of sdhci_send_tuning, current host->buf_ready_int = %d,\n\
 			host->tuning_done = %u.\n", 
 			host->buf_ready_int, host->tuning_done);
 }
@@ -3362,6 +3362,7 @@ EXPORT_SYMBOL_GPL(sdhci_send_tuning);
 static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 {
 	int i;
+	int custom_delay = 200;
 
 	pr_info("sdhci: I am in %s.\n", __func__);
 	pr_info("I have successfully issued the int counter i in %s.\n", __func__);
@@ -3403,13 +3404,20 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 			in %s. Delaying by that amount. \n", host->tuning_delay, __func__);
 			mdelay(host->tuning_delay);
 		}
+
+		pr_debug("sdhci: Delaying/waiting another %d ms because of a slow host.\n",
+			custom_delay);
+		mdelay(custom_delay);
+
 		pr_info("sdhci: Reading if tuning is done from control2 reg in \
 		%s.\n", __func__);
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		pr_debug("sdhci: Current output of SDHCI_HOST_CONTROL2 is %08x\n", ctrl);
-		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING) || host->tuning_done) {
-			if (ctrl & SDHCI_CTRL_TUNED_CLK || host->tuning_done >= 1) {  //TUNING_WORK_AROUND is supposed to set this bit, but this bit is cleared automatically when set. So remove this check. Removing so suceeds this, but it later fails in sdio_read_fbr. So now we're doing that along with mmc_nonstd_sdio quirk in sdhci-pci-core, so it never fails at that. edit:: Re-added			
-				pr_info("sdhci: sdhci_tuning success, returning 0\
+		//if (!(ctrl & SDHCI_CTRL_EXEC_TUNING) || host->tuning_done) {
+		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {
+//			if (ctrl & SDHCI_CTRL_TUNED_CLK || host->tuning_done >= 1) {  //TUNING_WORK_AROUND is supposed to set this bit, but this bit is cleared automatically when set. So remove this check. Removing so suceeds this, but it later fails in sdio_read_fbr. So now we're doing that along with mmc_nonstd_sdio quirk in sdhci-pci-core, so it never fails at that. edit:: Re-added
+			if (ctrl & SDHCI_CTRL_TUNED_CLK) {
+		pr_info("sdhci: sdhci_tuning success, returning 0\
 in %s.\n", __func__);
 				return 0; /* Success! */
 			}
