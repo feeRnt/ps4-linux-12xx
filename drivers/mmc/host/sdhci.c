@@ -3407,20 +3407,21 @@ static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 			mdelay(host->tuning_delay);
 		}
 
+		/*
 		pr_debug("sdhci: Delaying/waiting another %d ms because of a slow host.\n",
 			custom_delay);
 		mdelay(custom_delay);
-
+		*/
 		pr_info("sdhci: Reading if tuning is done from control2 reg in \
 		%s.\n", __func__);
 		ctrl = sdhci_readw(host, SDHCI_HOST_CONTROL2);
 		pr_debug("sdhci: Current output of SDHCI_HOST_CONTROL2 is %08x\n", ctrl);
-		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING) || (host->tuning_done && i>= 10)){
-	//	if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {  //This is never removed, even with high
+	//	if (!(ctrl & SDHCI_CTRL_EXEC_TUNING) || (host->tuning_done && i>= 10)){
+		if (!(ctrl & SDHCI_CTRL_EXEC_TUNING)) {  //This is never removed, even with high
 	//	timeout
-			if (ctrl & SDHCI_CTRL_TUNED_CLK || host->tuning_done >= 1) {  
+	//		if (ctrl & SDHCI_CTRL_TUNED_CLK || host->tuning_done >= 1) {  
 //			//TUNING_WORK_AROUND is supposed to set the TUNED bit, but this bit is cleared automatically when set. So remove this check. Removing so suceeds this, but it later fails in sdio_read_fbr. So now we're doing that along with mmc_nonstd_sdio quirk in sdhci-pci-core, so it never fails at that. edit:: Re-added
-//			if (ctrl & SDHCI_CTRL_TUNED_CLK) {
+			if (ctrl & SDHCI_CTRL_TUNED_CLK) {
 		pr_info("sdhci: sdhci_tuning success, returning 0\
 in %s.\n", __func__);
 				return 0; /* Success! */
