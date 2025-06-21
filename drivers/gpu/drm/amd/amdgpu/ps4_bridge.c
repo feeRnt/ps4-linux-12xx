@@ -675,6 +675,13 @@ static const struct drm_display_mode mode_1080p = {
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
+/* 63 - 1920x1080@120Hz */
+static const struct drm_display_mode mode_1080p120 = {
+	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 297000, 1920, 2008,
+			2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
+		   DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
+	  .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
+};
 
 int ps4_bridge_get_modes(struct drm_connector *connector)
 {
@@ -683,6 +690,9 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	pr_info("ps4_bridge_get_modes\n");
 
 	newmode = drm_mode_duplicate(dev, &mode_1080p);
+	drm_mode_probed_add(connector, newmode);
+
+	newmode = drm_mode_duplicate(dev, &mode_1080p120);
 	drm_mode_probed_add(connector, newmode);
 
 	//newmode = drm_mode_duplicate(dev, &mode_720p);
@@ -732,7 +742,7 @@ int ps4_bridge_mode_valid(struct drm_connector *connector,
 	int vic = drm_match_cea_mode(mode);
 
 	/* Allow anything that we can match up to a VIC (CEA modes) */
-	if (!vic || (vic != 16 && vic != 4)) {
+	if (!vic || (vic != 16 && vic != 4 && vic != 63)) {
 		return MODE_BAD;
 	}
 
