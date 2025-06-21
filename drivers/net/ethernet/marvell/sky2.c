@@ -4729,7 +4729,11 @@ static struct net_device *sky2_init_netdev(struct sky2_hw *hw, unsigned port,
 
 	#ifdef CONFIG_X86_PS4
 	if (hw->pdev->vendor == PCI_VENDOR_ID_SONY) {
-		aeolia_get_mac_address(hw, dev->dev_addr);
+	{
+   	 	u8 addr[ETH_ALEN];
+   	 	aeolia_get_mac_address(hw, addr);
+   	 	eth_hw_addr_set(dev, addr);
+	}
 	} else
 	#endif
 	{
