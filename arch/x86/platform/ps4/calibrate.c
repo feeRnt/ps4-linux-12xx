@@ -15,6 +15,7 @@
 #include <asm/ps4.h>
 #include <asm/delay.h>
 #include <asm/apic.h>
+#include <linux/io.h>
 
 /* The PS4 southbridge (Aeolia) has an EMC timer that ticks at 32.768kHz,
  * which seems to be an appropriate clock reference for calibration. Both TSC
@@ -52,7 +53,7 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 
 	// This is part of the Aeolia pcie device, but it's too early to
 	// do this in a driver.
-	emc_timer = ioremap(EMC_TIMER_BASE, 0x100);
+	emc_timer = early_ioremap(EMC_TIMER_BASE, 0x100);
 	if (!emc_timer)
 		goto fail;
 
@@ -95,7 +96,7 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 	pr_info("Calibrated TSC frequency: %ld kHz\n", ret);
 fail:
 	if (emc_timer) {
-		iounmap(emc_timer);
+		early_iounmap(emc_timer, 0x100);
 		emc_timer = NULL;
 	}
 	return ret;
