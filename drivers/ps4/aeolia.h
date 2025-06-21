@@ -147,6 +147,7 @@ struct apcie_dev {
 	void __iomem *bar4;
 
 	int nvec;
+	int8_t irq_map[100];
 	int serial_line[2];
 	struct apcie_icc_dev icc;
 };
