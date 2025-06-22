@@ -790,8 +790,42 @@ static const u32 hawaii_mgcg_cgcg_init[] =
 	0x3603, 0xff000ff0, 0x00000100
 };
 
+static const u32 liverpool_golden_spm_registers[] =
+{
+	0xc200, 0xe0ffffff, 0xe0000000	/* GRBM_GFX_INDEX */
+};
+
 static const u32 liverpool_golden_common_registers[] =
 {
+	0xc200, 0xffffffff, 0xe0000000, /* GRBM_GFX_INDEX */
+	0xa0d4, 0xffffffff, 0x2a00161a, /* PA_SC_RASTER_CONFIG */
+	0xa0d5, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
+	0x2684, 0xffffffff, 0x00018208, /* CB_HW_CONTROL */
+	0x263e, 0xffffffff, 0x12011003	/* GB_ADDR_CONFIG */
+	// is this needed?
+	// 0x1401, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL */
+};
+
+static const u32 liverpool_golden_registers[] =
+{
+	0xf000, 0xffff1fff, 0x96940200, /* CGTS_SM_CTRL_REG */
+	0xf003, 0xffff0001, 0xff000000, /* CGTS_TCC_DISABLE */
+	0xf004, 0xffff0000, 0xff000000, /* CGTS_USER_TCC_DISABLE */
+	0xf080, 0xfdfc0fff, 0x00000100, /* CGTT_SPI_CLK_CTRL */
+	0x1bb6, 0x00010000, 0x00010000, /* CRTC_DOUBLE_BUFFER_CONTROL */
+	0x2684, 0x00210000, 0x00018208, /* CB_HW_CONTROL */
+	0x260d, 0xf00fffff, 0x00004400, /* DB_DEBUG2 */
+	0x16ec, 0x000000f0, 0x00000070, /* FBC_DEBUG_COMP */
+	0x263e, 0x73773777, 0x12011003, /* GB_ADDR_CONFIG */
+	0xbd2, 0x73773777, 0x12010001, 	/* HDP_ADDR_CONFIG */
+	0x2285, 0xf000003f, 0x00000007, /* PA_CL_ENHANCE */
+	0x22fc, 0x00000001, 0x00000001, /* PA_SC_ENHANCE */
+	0x22c9, 0xffffffff, 0x00ffffff, /* PA_SC_FORCE_EOV_MAX_CNTS */
+	0xc281, 0x0000ff0f, 0x00000000, /* PA_SC_LINE_STIPPLE_STATE */
+	0xa293, 0x07ffffff, 0x06000000, /* PA_SC_MODE_CNTL_1 */
+	0x136, 0x00000fff, 0x00000100, 	/* SCLK_CGTT_BLK_CTRL_REG */
+	0xf9e, 0x00000001, 0x00000002, 	/* SEM_CHICKEN_BITS */
+	0x31da, 0x00000008, 0x00000008, /* SPI_RESET_DEBUG */
 	0x31dc, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_0 */
 	0x31dd, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_1 */
 	0x31e6, 0xffffffff, 0x00ffffbf, /* SPI_RESOURCE_RESERVE_EN_CU_0 */
@@ -804,16 +838,16 @@ static const u32 liverpool_golden_common_registers[] =
 	0x31ed, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_7 */
 	0x31ee, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_8 */
 	0x31ef, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_9 */
-	0xa0d4, 0xffffffff, 0x2a00161a, /* PA_SC_RASTER_CONFIG */
-	0xa0d5, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
-	0x1401, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL */
+	0x2300, 0x000000ff, 0x00000001, /* SQ_CONFIG */
+	0x2542, 0x00010000, 0x00010000, /* TA_CNTL_AUX */
+	0x2b03, 0xffffffff, 0x76325410, /* TCP_CHAN_STEER_LO */
+	0x535, 0xffffffff, 0x00000000, 	/* VM_CONTEXTS_DISABLE */
 };
 
-static const u32 liverpool_golden_registers[] =
+static const u32 liverpool_mgcg_cgcg_init[] =
 {
 	0x3108, 0xffffffff, 0xfffffffc, /* RLC_CGTT_MGCG_OVERRIDE */
 	0xc200, 0xffffffff, 0xe0000000, /* GRBM_GFX_INDEX */
-	/* These are all setting OFF_HYSTERESIS = 0x10 */
 	0xf0a8, 0xffffffff, 0x00000100, /* CB_CGTT_SCLK_CTRL */
 	0xf082, 0xffffffff, 0x00000100, /* CGTT_BCI_CLK_CTRL */
 	0xf0b0, 0xffffffff, 0x00000100, /* CGTT_CP_CLK_CTRL */
@@ -843,7 +877,6 @@ static const u32 liverpool_golden_registers[] =
 	0xf0ad, 0xffffffff, 0x00000100, /* TCA_CGTT_SCLK_CTRL */
 	0xf0ac, 0xffffffff, 0x00000100, /* TCC_CGTT_SCLK_CTRL */
 	0xf09c, 0xffffffff, 0x00000100, /* TD_CGTT_CTRL */
-	/* */
 	0xc200, 0xffffffff, 0xe0000000, /* GRBM_GFX_INDEX */
 	0xf008, 0xffffffff, 0x00010000, /* CGTS_CU0_SP0_CTRL_REG */
 	0xf009, 0xffffffff, 0x00030002, /* CGTS_CU0_LDS_SQ_CTRL_REG */
@@ -898,45 +931,9 @@ static const u32 liverpool_golden_registers[] =
 	0xf000, 0xffffffff, 0x96940200, /* CGTS_SM_CTRL_REG */
 	0x21c2, 0xffffffff, 0x00900100, /* CP_RB_WPTR_POLL_CNTL */
 	0x3109, 0xffffffff, 0x0020003f, /* RLC_CGCG_CGLS_CTRL */
-	0x2684, 0x00210000, 0x00018208, /* CB_HW_CONTROL */
-	0xf000, 0xffff1fff, 0x96940200, /* CGTS_SM_CTRL_REG */
-	0xf003, 0xffff0001, 0xff000000, /* CGTS_TCC_DISABLE */
-	0xf004, 0xffff0000, 0xff000000, /* CGTS_USER_TCC_DISABLE */
 	0x1579, 0xff607fff, 0xfc000100, /* CGTT_DRM_CLK_CTRL0 */
-	0xf080, 0xfdfc0fff, 0x00000100, /* CGTT_SPI_CLK_CTRL */
-	0x1bb6, 0x00010000, 0x00010000, /* CRTC_DOUBLE_BUFFER_CONTROL */
-	0x260d, 0xf00fffff, 0x00004400, /* DB_DEBUG2 */
-	0x16ec, 0x000000f0, 0x00000070, /* FBC_DEBUG_COMP */
-	0x263e, 0x73773777, 0x12011003, /* GB_ADDR_CONFIG */
-	0xbd2, 0x73773777, 0x12010001, /* HDP_ADDR_CONFIG */
-	0x2285, 0xf000003f, 0x00000007, /* PA_CL_ENHANCE */
-	0x22fc, 0x00000001, 0x00000001, /* PA_SC_ENHANCE */
-	0x22c9, 0xffffffff, 0x00ffffff, /* PA_SC_FORCE_EOV_MAX_CNTS */
-	0xc281, 0x0000ff0f, 0x00000000, /* PA_SC_LINE_STIPPLE_STATE */
-	0xa293, 0x07ffffff, 0x06000000, /* PA_SC_MODE_CNTL_1 */
-	0x30df, 0xffffffff, 0x00000b00, /* RLC_PG_DELAY_2 */
-	0x136, 0x00000fff, 0x00000100, /* SCLK_CGTT_BLK_CTRL_REG */
-	0xf9e, 0x00000001, 0x00000002, /* SEM_CHICKEN_BITS */
-	0x31da, 0x00000008, 0x00000008, /* SPI_RESET_DEBUG */
-	0x2300, 0x000000ff, 0x00000001, /* SQ_CONFIG */
-	0x2542, 0x00010000, 0x00010000, /* TA_CNTL_AUX */
-	0x2b03, 0xffffffff, 0x76325410, /* TCP_CHAN_STEER_LO */
-	0x31dc, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_0 */
-	0x31dd, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_1 */
-	0x31e6, 0xffffffff, 0x00ffffbf, /* SPI_RESOURCE_RESERVE_EN_CU_0 */
-	0x31e7, 0xffffffff, 0x00ffffaf, /* SPI_RESOURCE_RESERVE_EN_CU_1  */
-	0x31e8, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_2 */
-	0x31e9, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_3 */
-	0x31ea, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_4 */
-	0x31eb, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_5*/
-	0x31ec, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_6 */
-	0x31ed, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_7 */
-	0x31ee, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_8 */
-	0x31ef, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_9 */
-	0xa0d4, 0xffffffff, 0x2a00161a, /* PA_SC_RASTER_CONFIG */
-	0xa0d5, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
-	0x1401, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL */
-	0x535, 0xffffffff, 0x00000000, /* VM_CONTEXTS_DISABLE */
+	// should be handled by gfx7 rlc
+	// 0x30df, 0xffffffff, 0x00000b00, /* RLC_PG_DELAY_2 */
 };
 
 static const u32 gladius_golden_common_registers[] =
@@ -1103,17 +1100,18 @@ static void cik_init_golden_registers(struct amdgpu_device *adev)
 							ARRAY_SIZE(hawaii_golden_spm_registers));
 		break;
 	case CHIP_LIVERPOOL:
-		// TODO (ps4patches): Why is this in comments?
-		/*amdgpu_device_program_register_sequence(adev,
+		amdgpu_device_program_register_sequence(adev,
 						 liverpool_mgcg_cgcg_init,
-						 ARRAY_SIZE(liverpool_mgcg_cgcg_init));*/
+						 ARRAY_SIZE(liverpool_mgcg_cgcg_init));
 		amdgpu_device_program_register_sequence(adev,
 						 liverpool_golden_registers,
 						 ARRAY_SIZE(liverpool_golden_registers));
 		amdgpu_device_program_register_sequence(adev,
 						 liverpool_golden_common_registers,
 						 ARRAY_SIZE(liverpool_golden_common_registers));
-		// TODO (ps4patches): no spm registers, try the bonaire ones?
+		amdgpu_device_program_register_sequence(adev,
+						 liverpool_golden_spm_registers,
+						 ARRAY_SIZE(liverpool_golden_spm_registers));
 		break;
 	case CHIP_GLADIUS:
 		amdgpu_device_program_register_sequence(adev,
