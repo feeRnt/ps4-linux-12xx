@@ -319,7 +319,7 @@ int mmc_add_card(struct mmc_card *card)
 		[UHS_DDR50_BUS_SPEED] = "DDR50 ",
 	};
 
-	pr_debug("mmc_core: I am in %s.\n", __func__);
+	pr_debug("mmc_core: I am in %s.\n", __func__); //mmc_add_card
 
 	dev_set_name(&card->dev, "%s:%04x", mmc_hostname(card->host), card->rca);
 

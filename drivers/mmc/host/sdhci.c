@@ -5041,7 +5041,7 @@ static inline bool sdhci_can_64bit_dma(struct sdhci_host *host)
 int sdhci_setup_host(struct sdhci_host *host)
 {
 	struct mmc_host *mmc;
-	struct mmc_card *card; //added
+//	struct mmc_card *card; //added
 	u32 max_current_caps;
 	unsigned int ocr_avail;
 	unsigned int override_timeout_clk;

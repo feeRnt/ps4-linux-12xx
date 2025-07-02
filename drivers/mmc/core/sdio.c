@@ -85,10 +85,12 @@ static int sdio_read_fbr(struct sdio_func *func)
 	//\\ hard change to non_standard_func?	
 	}
 
-	pr_info("sdio: I am in sdio_read_fbr and going to test mmc_io_rw_direct.\n");                                                      				//cmd52
+	pr_info("sdio: I am in sdio_read_fbr and going to test mmc_io_rw_direct.\n\
+Will io to address = %#10x.\n", (SDIO_FBR_BASE(func->num) + SDIO_FBR_STD_IF)); //address, so use hex
+								//cmd52
 	ret = mmc_io_rw_direct(func->card, 0, 0,
 		SDIO_FBR_BASE(func->num) + SDIO_FBR_STD_IF, 0, &data);
-	//to card, write 0, into fn = 0, addr = Function Block Register: 1 * 100 + standard interface
+	//to card, 2nd 0=READ? instead of write 0, into fn = 0, addr = Function Block Register: 1 * 100 + standard interface
 	//for fbr: 0, input = 0, output = &data)
 	pr_debug("mmc_core: &data = %s in %s.\n", data, __func__);
 	if (ret) {
@@ -851,6 +853,7 @@ static int mmc_sdio_init_card(struct mmc_host *host, u32 ocr,
 	int retries = 10;
 	u32 rocr = 0;
 	u32 ocr_card = ocr;
+	int tries = 0; // added
 
 	pr_debug("sdio: I am in mmc_sdio_init_card.\n");
 	WARN_ON(!host->claimed);
@@ -937,13 +940,22 @@ try_again:
 	 * to make sure which speed mode should work.
 	 */
 	if (rocr & ocr & R4_18V_PRESENT) {
+		pr_debug("sdio: R4_18V in rocr & ocr in %s. Going to set_uhs_voltage.\n",
+	   		__func__);
 		err = mmc_set_uhs_voltage(host, ocr_card);
 		if (err == -EAGAIN) {
+ 			pr_debug("sdio: err=-EAGAIN in set_uhs_voltage. Doing pre_init.\n");
 			mmc_sdio_pre_init(host, ocr_card, card);
 			retries--;
 			goto try_again;
 		} else if (err) {
+			pr_debug("sdio: err in set_uhs_voltage. Removing 1_8V flag from ocr.\n");
 			ocr &= ~R4_18V_PRESENT;
+		} else if (tries < 1) { 			// arbitrarily pre_init the card once at this function
+			mmc_sdio_pre_init(host, ocr_card, card);
+	    		tries++;
+			retries--;
+			goto try_again;
 		}
 	}
 
