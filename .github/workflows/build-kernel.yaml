@@ -1,0 +1,89 @@
+## This is a basic workflow to help you get started with Actions
+
+name: "Compile PS4-Linux Kernel-12xx 5.15"
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Github Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest # Github action variant. But docker image is of ubuntu 22.04
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository to $github.workspace=github actions directory, 
+      # so your job can access it
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }} 
+          # ${{ github.ref }} refers to the caller of the current github actions/job,
+          # for example the current branch or tag or commit.
+          #
+          # Meaning checkout (pull) the branch that is calling this github action, so we can
+          # work on it. (Inlcuding the dockerfile)
+
+
+          # Going to use Buildx which is newer and better
+#      - name: Cache Docker layers
+#        uses: actions/cache@v3
+#        with:
+#          path: /tmp/.buildx-cache  # The location where Docker caches layers (inside
+#          github.workspace root) 
+#          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}  # Cache key
+#          restore-keys: |
+#            ${{ runner.os }}-docker-
+
+#      - name: Build Docker image
+#        run: |
+#          docker build --build-arg BUILDKIT_INLINE_CACHE=1 -t kernel-linux-ps4:latest .
+ 
+
+   # Set up Docker Buildx for advanced build options and caching
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+  # Cache Docker layers
+      - name: Cache Docker layers
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ hashFiles('**/Dockerfile') }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+
+      # Build Docker image  
+      - name: Build Docker image with cache
+        run: |
+          docker buildx build \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache,mode=max \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --tag kernel-linux-ps4:latest \
+            .
+
+
+      # Build docker image with tag "kernel-linux-ps4" in the present directory
+#      - name: build docker image
+ #       run: |
+  #        docker build -t kernel-linux-ps4 .          
+
+      # Run a docker instance, interactively, with the name "kernel", using previous image
+      # kernel-linux-ps4's "latest" tag/state (the default tag name)
+      - name: retrieve artifact from docker image
+        run: |
+          docker run -it --name kernel -d kernel-linux-ps4:latest
+          docker cp kernel:/kernel.tar.gz2 ${{ github.workspace }} 
+        # Copy kernel.tar.gz to the github workspace        
+      
+      - name: Upload kernel image to github actions artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: kernel
+          path: ${{ github.workspace }}/kernel.tar.gz2
+      # This path is the github actiions root
