@@ -955,10 +955,6 @@ static const u32 gladius_golden_common_registers[] =
 	mmTCP_ADDR_CONFIG, 0x000003ff, 0x000000f7,
 	mmTCP_CHAN_STEER_HI, 0xffffffff, 0x00000000,
 	mmVGT_RESET_DEBUG, 0x00000004, 0x00000004,
-	mmDCI_CLK_CNTL, 0x00000080, 0x00000000,
-	mmFBC_DEBUG_COMP, 0x000000f0, 0x00000070,
-	mmFBC_MISC, 0x9f313fff, 0x14302008,
-	mmHDMI_CONTROL, 0x313f031f, 0x00000011,
 };
 
 static const u32 gladius_golden_registers[] =
@@ -972,19 +968,6 @@ static const u32 gladius_golden_registers[] =
 	mmSPI_RESOURCE_RESERVE_EN_CU_0, 0xffffffff, 0x00FF7FBF,
 	mmSPI_RESOURCE_RESERVE_EN_CU_1, 0xffffffff, 0x00FF7FAF,
 	0x535, 0xffffffff, 0x00000000, /* VM_CONTEXTS_DISABLE */
-
-};
-
-static const u32 gladius_mgcg_cgcg_init[] =
-{
-	0x0000313a, 0xffffffff, 0x00000003,
-	0x00003079, 0xffffffff, 0x00020201,
-	0x00003108, 0xffffffff, 0xfffffffd,
-	0x0000c200, 0xffffffff, 0xe0000000,
-	0x0000311d, 0xffffffff, 0xffffffff,
-	0x0000311e, 0xffffffff, 0xffffffff,
-	0x0000311f, 0xffffffff, 0x004000ff,
-	0x0000313a, 0xffffffff, 0x00000001,
 };
 
 static const u32 godavari_golden_registers[] =
@@ -1114,9 +1097,6 @@ static void cik_init_golden_registers(struct amdgpu_device *adev)
 						 ARRAY_SIZE(liverpool_golden_spm_registers));
 		break;
 	case CHIP_GLADIUS:
-		amdgpu_device_program_register_sequence(adev,
-						 gladius_mgcg_cgcg_init,
-						 ARRAY_SIZE(gladius_mgcg_cgcg_init));
 		amdgpu_device_program_register_sequence(adev,
 						 gladius_golden_registers,
 						 ARRAY_SIZE(gladius_golden_registers));
