@@ -33,7 +33,7 @@ COPY . .
 # syntax: COPY local-public-path-relative-to-Dockerfile remote-private-path-inside-of-Dockerimage
 
 # Compile the Linux kernel
-FROM clone-linux-source AS compile-kernel
+FROM clone-kernel-source AS compile-kernel
 
 RUN <<"EOF"
 set -e  
