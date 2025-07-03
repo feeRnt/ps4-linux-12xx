@@ -11,15 +11,18 @@ RUN <<"EOF"
 apt-get update
 apt-get install build-essential wget git -y
 apt-get build-dep linux -y
-apt-get install gcc-11 libgcc-11-dev openssl2.1-dev -y
 EOF
+
+FROM install-deps AS install-deps2
+
+RUN apt-get install gcc-11 libgcc-11-dev libssl-dev -y #openssl2.1-dev doesn't exist
 
 #OpenSSL 2.1 needed for Linux kernel version 5.15.
 #Without gcc-11 (or older), you will probably get compilation errors
 
 
 # Clone the Linux kernel source
-FROM install-deps AS clone-kernel-source
+FROM install-deps2 AS clone-kernel-source
 
 #WORKDIR /kernel-source
 #RUN git clone -b "ps4-linux-5.15.y-conservative2" --depth=1 https://github.com/feeRnt/ps4-linux-12xx.git
