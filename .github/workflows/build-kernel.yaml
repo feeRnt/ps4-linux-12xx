@@ -83,7 +83,7 @@ jobs:
         # Copy kernel.tar.gz to the github workspace        
       
       - name: Upload kernel image to github actions artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: kernel
           path: ${{ github.workspace }}/kernel.tar.gz2
