@@ -966,7 +966,7 @@ static const u32 gladius_golden_registers[] =
 	mmGRBM_GFX_INDEX, 0xffffffff, 0xe0000000,
 	mmPA_SC_RASTER_CONFIG, 0xffffffff, 0x2a00161a,
 	mmPA_SC_RASTER_CONFIG_1, 0xffffffff, 0x0000002e,
-	mmGB_ADDR_CONFIG, 0xffffffff, 0x22011003, //0x22011003,
+	mmGB_ADDR_CONFIG, 0xffffffff, 0x12011003,
 	mmSPI_RESOURCE_RESERVE_CU_0, 0xffffffff, 0x00000800,
 	mmSPI_RESOURCE_RESERVE_CU_1, 0xffffffff, 0x00000800,
 	mmSPI_RESOURCE_RESERVE_EN_CU_0, 0xffffffff, 0x00FF7FBF,
