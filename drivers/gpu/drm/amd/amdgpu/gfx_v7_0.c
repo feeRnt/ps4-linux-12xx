@@ -4836,7 +4836,7 @@ static void gfx_v7_0_gpu_early_init(struct amdgpu_device *adev)
 		adev->gfx.config.sc_prim_fifo_size_backend = 0x100;
 		adev->gfx.config.sc_hiz_tile_fifo_size = 0x30;
 		adev->gfx.config.sc_earlyz_tile_fifo_size = 0x130;
-		gb_addr_config = HAWAII_GB_ADDR_CONFIG_GOLDEN; //0x22011003; //0x12011003;
+		gb_addr_config = HAWAII_GB_ADDR_CONFIG_GOLDEN;
 		break;
 	case CHIP_KABINI:
 	case CHIP_MULLINS:
