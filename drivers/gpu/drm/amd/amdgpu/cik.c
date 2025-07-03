@@ -802,8 +802,6 @@ static const u32 liverpool_golden_common_registers[] =
 	0xa0d5, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
 	0x2684, 0xffffffff, 0x00018208, /* CB_HW_CONTROL */
 	0x263e, 0xffffffff, 0x12011003	/* GB_ADDR_CONFIG */
-	// is this needed?
-	// 0x1401, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL */
 };
 
 static const u32 liverpool_golden_registers[] =
@@ -932,8 +930,6 @@ static const u32 liverpool_mgcg_cgcg_init[] =
 	0x21c2, 0xffffffff, 0x00900100, /* CP_RB_WPTR_POLL_CNTL */
 	0x3109, 0xffffffff, 0x0020003f, /* RLC_CGCG_CGLS_CTRL */
 	0x1579, 0xff607fff, 0xfc000100, /* CGTT_DRM_CLK_CTRL0 */
-	// should be handled by gfx7 rlc
-	// 0x30df, 0xffffffff, 0x00000b00, /* RLC_PG_DELAY_2 */
 };
 
 static const u32 gladius_golden_common_registers[] =
