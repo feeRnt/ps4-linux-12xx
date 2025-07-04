@@ -1752,7 +1752,8 @@ static void ahci_init_irq(struct pci_dev *pdev, unsigned int n_ports,
 
 	#ifdef CONFIG_X86_PS4
 	if (pdev->vendor == PCI_VENDOR_ID_SONY) {
-		return apcie_assign_irqs(pdev, n_ports);
+		apcie_assign_irqs(pdev, n_ports);
+		return;
 	}
 	#endif
 	
