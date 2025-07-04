@@ -420,6 +420,8 @@ static int dce_v8_0_get_num_crtc(struct amdgpu_device *adev)
 	switch (adev->asic_type) {
 	case CHIP_BONAIRE:
 	case CHIP_HAWAII:
+	case CHIP_GLADIUS:
+	case CHIP_LIVERPOOL:
 		num_crtc = 6;
 		break;
 	case CHIP_KAVERI:
@@ -1116,6 +1118,12 @@ static void dce_v8_0_bandwidth_update(struct amdgpu_device *adev)
 	u32 num_heads = 0, lb_size;
 	int i;
 
+	if((adev->asic_type == CHIP_LIVERPOOL) ||
+	   (adev->asic_type == CHIP_GLADIUS)) {
+		// FIXME PS4 (ps4patches): this stuff is broken
+		return;
+	}
+
 	amdgpu_display_update_priority(adev);
 
 	for (i = 0; i < adev->mode_info.num_crtc; i++) {
@@ -1422,6 +1430,7 @@ static int dce_v8_0_audio_init(struct amdgpu_device *adev)
 		 (adev->asic_type == CHIP_HAWAII))/* BN/HW: 6 streams, 7 endpoints */
 		adev->mode_info.audio.num_pins = 7;
 	else
+		/* (ps4patches) - Liverpool and Gladius use 3 streams so that is fine here */
 		adev->mode_info.audio.num_pins = 3;
 
 	for (i = 0; i < adev->mode_info.audio.num_pins; i++) {
@@ -1435,7 +1444,11 @@ static int dce_v8_0_audio_init(struct amdgpu_device *adev)
 		adev->mode_info.audio.pin[i].id = i;
 		/* disable audio.  it will be set up later */
 		/* XXX remove once we switch to ip funcs */
-		dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], false);
+		/* Liverpool pin 2 is S/PDIF and should always be available */
+		if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS)
+			dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], true);
+		else
+			dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], false);
 	}
 
 	return 0;
@@ -2006,7 +2019,9 @@ static int dce_v8_0_crtc_do_set_base(struct drm_crtc *crtc,
 	}
 
 	/* Bytes per pixel may have changed */
-	dce_v8_0_bandwidth_update(adev);
+	if ((adev->asic_type != CHIP_LIVERPOOL) &&
+	    (adev->asic_type != CHIP_GLADIUS))
+		dce_v8_0_bandwidth_update(adev);
 
 	return 0;
 }
@@ -2648,10 +2663,18 @@ static int dce_v8_0_crtc_init(struct amdgpu_device *adev, int index)
 	amdgpu_crtc->crtc_id = index;
 	adev->mode_info.crtcs[index] = amdgpu_crtc;
 
-	amdgpu_crtc->max_cursor_width = CIK_CURSOR_WIDTH;
-	amdgpu_crtc->max_cursor_height = CIK_CURSOR_HEIGHT;
-	adev_to_drm(adev)->mode_config.cursor_width = amdgpu_crtc->max_cursor_width;
-	adev_to_drm(adev)->mode_config.cursor_height = amdgpu_crtc->max_cursor_height;
+	if ((adev->asic_type == CHIP_LIVERPOOL) || (adev->asic_type == CHIP_GLADIUS)) {
+		amdgpu_crtc->max_cursor_width = LVP_CURSOR_WIDTH;
+		amdgpu_crtc->max_cursor_height = LVP_CURSOR_HEIGHT;
+		adev_to_drm(adev)->mode_config.cursor_width = amdgpu_crtc->max_cursor_width;
+		adev_to_drm(adev)->mode_config.cursor_height = amdgpu_crtc->max_cursor_height;
+	}
+	else {
+		amdgpu_crtc->max_cursor_width = CIK_CURSOR_WIDTH;
+		amdgpu_crtc->max_cursor_height = CIK_CURSOR_HEIGHT;
+		adev_to_drm(adev)->mode_config.cursor_width = amdgpu_crtc->max_cursor_width;
+		adev_to_drm(adev)->mode_config.cursor_height = amdgpu_crtc->max_cursor_height;
+	}
 
 	amdgpu_crtc->crtc_offset = crtc_offsets[amdgpu_crtc->crtc_id];
 
@@ -2679,10 +2702,12 @@ static int dce_v8_0_early_init(struct amdgpu_ip_block *ip_block)
 	switch (adev->asic_type) {
 	case CHIP_BONAIRE:
 	case CHIP_HAWAII:
+	case CHIP_GLADIUS:
 		adev->mode_info.num_hpd = 6;
 		adev->mode_info.num_dig = 6;
 		break;
 	case CHIP_KAVERI:
+	case CHIP_LIVERPOOL:
 		adev->mode_info.num_hpd = 6;
 		adev->mode_info.num_dig = 7;
 		break;
@@ -2818,7 +2843,12 @@ static int dce_v8_0_hw_init(struct amdgpu_ip_block *ip_block)
 	dce_v8_0_hpd_init(adev);
 
 	for (i = 0; i < adev->mode_info.audio.num_pins; i++) {
-		dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], false);
+		// TODO (ps4patches): In original patches original disable was still here
+		// Maybe that is still needed
+		if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS)
+			dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], true);
+		else
+			dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], false);
 	}
 
 	dce_v8_0_pageflip_interrupt_init(adev);

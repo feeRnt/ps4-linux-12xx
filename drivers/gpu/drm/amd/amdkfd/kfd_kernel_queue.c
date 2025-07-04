@@ -94,6 +94,8 @@ static bool kq_initialize(struct kernel_queue *kq, struct kfd_node *dev,
 	kq->pq_gpu_addr = kq->pq->gpu_addr;
 
 	/* For CIK family asics, kq->eop_mem is not needed */
+	// TODO (ps4patches): Liverpool and Gladius were specifically added here before,
+	// this seems to be unneeded here now.
 	if (dev->adev->asic_type > CHIP_MULLINS) {
 		retval = kfd_gtt_sa_allocate(dev, PAGE_SIZE, &kq->eop_mem);
 		if (retval != 0)

@@ -136,6 +136,8 @@ static int cik_query_video_codecs(struct amdgpu_device *adev, bool encode,
 	case CHIP_KAVERI:
 	case CHIP_KABINI:
 	case CHIP_MULLINS:
+	case CHIP_LIVERPOOL:
+	case CHIP_GLADIUS:
 		if (encode)
 			*codecs = &cik_video_codecs_encode;
 		else
@@ -788,6 +790,206 @@ static const u32 hawaii_mgcg_cgcg_init[] =
 	0x3603, 0xff000ff0, 0x00000100
 };
 
+static const u32 liverpool_golden_common_registers[] =
+{
+	0x31dc, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_0 */
+	0x31dd, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_1 */
+	0x31e6, 0xffffffff, 0x00ffffbf, /* SPI_RESOURCE_RESERVE_EN_CU_0 */
+	0x31e7, 0xffffffff, 0x00ffffaf, /* SPI_RESOURCE_RESERVE_EN_CU_1 */
+	0x31e8, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_2 */
+	0x31e9, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_3*/
+	0x31ea, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_4 */
+	0x31eb, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_5 */
+	0x31ec, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_6 */
+	0x31ed, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_7 */
+	0x31ee, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_8 */
+	0x31ef, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_9 */
+	0xa0d4, 0xffffffff, 0x2a00161a, /* PA_SC_RASTER_CONFIG */
+	0xa0d5, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
+	0x1401, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL */
+};
+
+static const u32 liverpool_golden_registers[] =
+{
+	0x3108, 0xffffffff, 0xfffffffc, /* RLC_CGTT_MGCG_OVERRIDE */
+	0xc200, 0xffffffff, 0xe0000000, /* GRBM_GFX_INDEX */
+	/* These are all setting OFF_HYSTERESIS = 0x10 */
+	0xf0a8, 0xffffffff, 0x00000100, /* CB_CGTT_SCLK_CTRL */
+	0xf082, 0xffffffff, 0x00000100, /* CGTT_BCI_CLK_CTRL */
+	0xf0b0, 0xffffffff, 0x00000100, /* CGTT_CP_CLK_CTRL */
+	0xf0b2, 0xffffffff, 0x00000100, /* CGTT_CPC_CLK_CTRL */
+	0xf0b1, 0xffffffff, 0x00000100, /* CGTT_CPF_CLK_CTRL */
+	0x1579, 0xffffffff, 0x00600100, /* CGTT_DRM_CLK_CTRL0 */
+	0xf0a0, 0xffffffff, 0x00000100, /* CGTT_GDS_CLK_CTRL */
+	0xf085, 0xffffffff, 0x06000100, /* CGTT_IA_CLK_CTRL */
+	0xf088, 0xffffffff, 0x00000100, /* CGTT_PA_CLK_CTRL */
+	0xf086, 0xffffffff, 0x06000100, /* CGTT_WD_CLK_CTRL */
+	0xf081, 0xffffffff, 0x00000100, /* CGTT_PC_CLK_CTRL */
+	0xf0b8, 0xffffffff, 0x00000100, /* CGTT_RLC_CLK_CTRL */
+	0xf089, 0xffffffff, 0x00000100, /* CGTT_SC_CLK_CTRL */
+	0xf080, 0xffffffff, 0x00000100, /* CGTT_SPI_CLK_CTRL */
+	0xf08c, 0xffffffff, 0x00000100, /* CGTT_SQ_CLK_CTRL */
+	0xf08d, 0xffffffff, 0x00000100, /* CGTT_SQG_CLK_CTRL */
+	0xf094, 0xffffffff, 0x00000100, /* CGTT_SX_CLK_CTRL0 */
+	0xf095, 0xffffffff, 0x00000100, /* CGTT_SX_CLK_CTRL1 */
+	0xf096, 0xffffffff, 0x00000100, /* CGTT_SX_CLK_CTRL2 */
+	0xf097, 0xffffffff, 0x00000100, /* CGTT_SX_CLK_CTRL3 */
+	0xf098, 0xffffffff, 0x00000100, /* CGTT_SX_CLK_CTRL4 */
+	0xf09f, 0xffffffff, 0x00000100, /* CGTT_TCI_CLK_CTRL */
+	0xf09e, 0xffffffff, 0x00000100, /* CGTT_TCP_CLK_CTRL */
+	0xf084, 0xffffffff, 0x06000100, /* CGTT_VGT_CLK_CTRL */
+	0xf0a4, 0xffffffff, 0x00000100, /* DB_CGTT_CLK_CTRL_0 */
+	0xf09d, 0xffffffff, 0x00000100, /* TA_CGTT_CTRL */
+	0xf0ad, 0xffffffff, 0x00000100, /* TCA_CGTT_SCLK_CTRL */
+	0xf0ac, 0xffffffff, 0x00000100, /* TCC_CGTT_SCLK_CTRL */
+	0xf09c, 0xffffffff, 0x00000100, /* TD_CGTT_CTRL */
+	/* */
+	0xc200, 0xffffffff, 0xe0000000, /* GRBM_GFX_INDEX */
+	0xf008, 0xffffffff, 0x00010000, /* CGTS_CU0_SP0_CTRL_REG */
+	0xf009, 0xffffffff, 0x00030002, /* CGTS_CU0_LDS_SQ_CTRL_REG */
+	0xf00a, 0xffffffff, 0x00040007, /* CGTS_CU0_TA_SQC_CTRL_REG */
+	0xf00b, 0xffffffff, 0x00060005, /* CGTS_CU0_SP1_CTRL_REG */
+	0xf00c, 0xffffffff, 0x00090008, /* CGTS_CU0_TD_TCP_CTRL_REG */
+	0xf00d, 0xffffffff, 0x00010000, /* CGTS_CU1_SP0_CTRL_REG */
+	0xf00e, 0xffffffff, 0x00030002, /* CGTS_CU1_LDS_SQ_CTRL_REG */
+	0xf00f, 0xffffffff, 0x00040007, /* CGTS_CU1_TA_CTRL_REG */
+	0xf010, 0xffffffff, 0x00060005, /* CGTS_CU1_SP1_CTRL_REG */
+	0xf011, 0xffffffff, 0x00090008, /* CGTS_CU1_TD_TCP_CTRL_REG */
+	0xf012, 0xffffffff, 0x00010000, /* CGTS_CU2_SP0_CTRL_REG */
+	0xf013, 0xffffffff, 0x00030002, /* CGTS_CU2_LDS_SQ_CTRL_REG */
+	0xf014, 0xffffffff, 0x00040007, /* CGTS_CU2_TA_CTRL_REG */
+	0xf015, 0xffffffff, 0x00060005, /* CGTS_CU2_SP1_CTRL_REG */
+	0xf016, 0xffffffff, 0x00090008, /* CGTS_CU2_TD_TCP_CTRL_REG */
+	0xf017, 0xffffffff, 0x00010000, /* CGTS_CU3_SP0_CTRL_REG */
+	0xf018, 0xffffffff, 0x00030002, /* CGTS_CU3_LDS_SQ_CTRL_REG */
+	0xf019, 0xffffffff, 0x00040007, /* CGTS_CU3_TA_SQC_CTRL_REG */
+	0xf01a, 0xffffffff, 0x00060005, /* CGTS_CU3_SP1_CTRL_REG */
+	0xf01b, 0xffffffff, 0x00090008, /* CGTS_CU3_TD_TCP_CTRL_REG */
+	0xf01c, 0xffffffff, 0x00010000, /* CGTS_CU4_SP0_CTRL_REG */
+	0xf01d, 0xffffffff, 0x00030002, /* CGTS_CU4_LDS_SQ_CTRL_REG */
+	0xf01e, 0xffffffff, 0x00040007, /* CGTS_CU4_TA_CTRL_REG */
+	0xf01f, 0xffffffff, 0x00060005, /* CGTS_CU4_SP1_CTRL_REG */
+	0xf020, 0xffffffff, 0x00090008, /* CGTS_CU4_TD_TCP_CTRL_REG */
+	0xf021, 0xffffffff, 0x00010000, /* CGTS_CU5_SP0_CTRL_REG */
+	0xf022, 0xffffffff, 0x00030002, /* CGTS_CU5_LDS_SQ_CTRL_REG */
+	0xf023, 0xffffffff, 0x00040007, /* CGTS_CU5_TA_CTRL_REG */
+	0xf024, 0xffffffff, 0x00060005, /* CGTS_CU5_SP1_CTRL_REG */
+	0xf025, 0xffffffff, 0x00090008, /* CGTS_CU5_TD_TCP_CTRL_REG */
+	0xf026, 0xffffffff, 0x00010000, /* CGTS_CU6_SP0_CTRL_REG */
+	0xf027, 0xffffffff, 0x00030002, /* CGTS_CU6_LDS_SQ_CTRL_REG */
+	0xf028, 0xffffffff, 0x00040007, /* CGTS_CU6_TA_SQC_CTRL_REG */
+	0xf029, 0xffffffff, 0x00060005, /* CGTS_CU6_SP1_CTRL_REG */
+	0xf02a, 0xffffffff, 0x00090008, /* CGTS_CU6_TD_TCP_CTRL_REG */
+	0xf02b, 0xffffffff, 0x00010000, /* CGTS_CU7_SP0_CTRL_REG */
+	0xf02c, 0xffffffff, 0x00030002, /* CGTS_CU7_LDS_SQ_CTRL_REG */
+	0xf02d, 0xffffffff, 0x00040007, /* CGTS_CU7_TA_SQC_CTRL_REG */
+	0xf02e, 0xffffffff, 0x00060005, /* CGTS_CU7_SP1_CTRL_REG */
+	0xf02f, 0xffffffff, 0x00090008, /* CGTS_CU7_TD_TCP_CTRL_REG */
+	0xf030, 0xffffffff, 0x00010000, /* CGTS_CU8_SP0_CTRL_REG */
+	0xf031, 0xffffffff, 0x00030002, /* CGTS_CU8_LDS_SQ_CTRL_REG */
+	0xf032, 0xffffffff, 0x00040007, /* CGTS_CU8_TA_CTRL_REG */
+	0xf033, 0xffffffff, 0x00060005, /* CGTS_CU8_SP1_CTRL_REG */
+	0xf034, 0xffffffff, 0x00090008, /* CGTS_CU8_TD_TCP_CTRL_REG */
+	0xf035, 0xffffffff, 0x00010000, /* CGTS_CU9_SP0_CTRL_REG */
+	0xf036, 0xffffffff, 0x00030002, /* CGTS_CU9_LDS_SQ_CTRL_REG */
+	0xf037, 0xffffffff, 0x00040007, /* CGTS_CU9_TA_CTRL_REG */
+	0xf038, 0xffffffff, 0x00060005, /* CGTS_CU9_SP1_CTRL_REG */
+	0xf039, 0xffffffff, 0x00090008, /* CGTS_CU9_TD_TCP_CTRL_REG */
+	0xf000, 0xffffffff, 0x96940200, /* CGTS_SM_CTRL_REG */
+	0x21c2, 0xffffffff, 0x00900100, /* CP_RB_WPTR_POLL_CNTL */
+	0x3109, 0xffffffff, 0x0020003f, /* RLC_CGCG_CGLS_CTRL */
+	0x2684, 0x00210000, 0x00018208, /* CB_HW_CONTROL */
+	0xf000, 0xffff1fff, 0x96940200, /* CGTS_SM_CTRL_REG */
+	0xf003, 0xffff0001, 0xff000000, /* CGTS_TCC_DISABLE */
+	0xf004, 0xffff0000, 0xff000000, /* CGTS_USER_TCC_DISABLE */
+	0x1579, 0xff607fff, 0xfc000100, /* CGTT_DRM_CLK_CTRL0 */
+	0xf080, 0xfdfc0fff, 0x00000100, /* CGTT_SPI_CLK_CTRL */
+	0x1bb6, 0x00010000, 0x00010000, /* CRTC_DOUBLE_BUFFER_CONTROL */
+	0x260d, 0xf00fffff, 0x00004400, /* DB_DEBUG2 */
+	0x16ec, 0x000000f0, 0x00000070, /* FBC_DEBUG_COMP */
+	0x263e, 0x73773777, 0x12011003, /* GB_ADDR_CONFIG */
+	0xbd2, 0x73773777, 0x12010001, /* HDP_ADDR_CONFIG */
+	0x2285, 0xf000003f, 0x00000007, /* PA_CL_ENHANCE */
+	0x22fc, 0x00000001, 0x00000001, /* PA_SC_ENHANCE */
+	0x22c9, 0xffffffff, 0x00ffffff, /* PA_SC_FORCE_EOV_MAX_CNTS */
+	0xc281, 0x0000ff0f, 0x00000000, /* PA_SC_LINE_STIPPLE_STATE */
+	0xa293, 0x07ffffff, 0x06000000, /* PA_SC_MODE_CNTL_1 */
+	0x30df, 0xffffffff, 0x00000b00, /* RLC_PG_DELAY_2 */
+	0x136, 0x00000fff, 0x00000100, /* SCLK_CGTT_BLK_CTRL_REG */
+	0xf9e, 0x00000001, 0x00000002, /* SEM_CHICKEN_BITS */
+	0x31da, 0x00000008, 0x00000008, /* SPI_RESET_DEBUG */
+	0x2300, 0x000000ff, 0x00000001, /* SQ_CONFIG */
+	0x2542, 0x00010000, 0x00010000, /* TA_CNTL_AUX */
+	0x2b03, 0xffffffff, 0x76325410, /* TCP_CHAN_STEER_LO */
+	0x31dc, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_0 */
+	0x31dd, 0xffffffff, 0x00000800, /* SPI_RESOURCE_RESERVE_CU_1 */
+	0x31e6, 0xffffffff, 0x00ffffbf, /* SPI_RESOURCE_RESERVE_EN_CU_0 */
+	0x31e7, 0xffffffff, 0x00ffffaf, /* SPI_RESOURCE_RESERVE_EN_CU_1  */
+	0x31e8, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_2 */
+	0x31e9, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_3 */
+	0x31ea, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_4 */
+	0x31eb, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_5*/
+	0x31ec, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_6 */
+	0x31ed, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_7 */
+	0x31ee, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_8 */
+	0x31ef, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_9 */
+	0xa0d4, 0xffffffff, 0x2a00161a, /* PA_SC_RASTER_CONFIG */
+	0xa0d5, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
+	0x1401, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL */
+	0x535, 0xffffffff, 0x00000000, /* VM_CONTEXTS_DISABLE */
+};
+
+static const u32 gladius_golden_common_registers[] =
+{
+	mmATC_MISC_CG, 0x000c0fc0, 0x000c0200,
+	mmCB_HW_CONTROL, 0x0001f3cf, 0x00007208,	// 0x2684
+	mmCB_HW_CONTROL_2, 0x0f000000, 0x0f000000,
+	mmCB_HW_CONTROL_3, 0x000001ff, 0x00000040,
+	mmDB_DEBUG2, 0xf00fffff, 0x00000400,
+	mmPA_SC_ENHANCE, 0xffffffff, 0x20000001,
+	mmPA_SC_LINE_STIPPLE_STATE, 0x0000ff0f, 0x00000000,
+	mmPA_SC_RASTER_CONFIG, 0x3f3fffff, 0x2a00161a,
+	mmPA_SC_RASTER_CONFIG_1, 0x0000003f, 0x0000002e,
+	mmRLC_CGCG_CGLS_CTRL, 0x00000003, 0x0020003c, //0x0001003c,
+	0xec9d, 0xffffffff, 0x0001003c,//mmRLC_CGCG_CGLS_CTRL_3D, 0xffffffff, 0x0001003c,
+	mmSQ_CONFIG, 0x07f80000, 0x07180000,
+	mmTA_CNTL_AUX, 0x000f000f, 0x000b0000,
+	mmTCC_CTRL, 0x00100000, 0xf31fff7f,
+	mmTCP_ADDR_CONFIG, 0x000003ff, 0x000000f7,
+	mmTCP_CHAN_STEER_HI, 0xffffffff, 0x00000000,
+	mmVGT_RESET_DEBUG, 0x00000004, 0x00000004,
+	mmDCI_CLK_CNTL, 0x00000080, 0x00000000,
+	mmFBC_DEBUG_COMP, 0x000000f0, 0x00000070,
+	mmFBC_MISC, 0x9f313fff, 0x14302008,
+	mmHDMI_CONTROL, 0x313f031f, 0x00000011,
+};
+
+static const u32 gladius_golden_registers[] =
+{
+	mmGRBM_GFX_INDEX, 0xffffffff, 0xe0000000,
+	mmPA_SC_RASTER_CONFIG, 0xffffffff, 0x2a00161a,
+	mmPA_SC_RASTER_CONFIG_1, 0xffffffff, 0x0000002e,
+	mmGB_ADDR_CONFIG, 0xffffffff, 0x22011003, //0x22011003,
+	mmSPI_RESOURCE_RESERVE_CU_0, 0xffffffff, 0x00000800,
+	mmSPI_RESOURCE_RESERVE_CU_1, 0xffffffff, 0x00000800,
+	mmSPI_RESOURCE_RESERVE_EN_CU_0, 0xffffffff, 0x00FF7FBF,
+	mmSPI_RESOURCE_RESERVE_EN_CU_1, 0xffffffff, 0x00FF7FAF,
+	0x535, 0xffffffff, 0x00000000, /* VM_CONTEXTS_DISABLE */
+
+};
+
+static const u32 gladius_mgcg_cgcg_init[] =
+{
+	0x0000313a, 0xffffffff, 0x00000003,
+	0x00003079, 0xffffffff, 0x00020201,
+	0x00003108, 0xffffffff, 0xfffffffd,
+	0x0000c200, 0xffffffff, 0xe0000000,
+	0x0000311d, 0xffffffff, 0xffffffff,
+	0x0000311e, 0xffffffff, 0xffffffff,
+	0x0000311f, 0xffffffff, 0x004000ff,
+	0x0000313a, 0xffffffff, 0x00000001,
+};
+
 static const u32 godavari_golden_registers[] =
 {
 	0x1579, 0xff607fff, 0xfc000100,
@@ -899,6 +1101,34 @@ static void cik_init_golden_registers(struct amdgpu_device *adev)
 		amdgpu_device_program_register_sequence(adev,
 							hawaii_golden_spm_registers,
 							ARRAY_SIZE(hawaii_golden_spm_registers));
+		break;
+	case CHIP_LIVERPOOL:
+		// TODO (ps4patches): Why is this in comments?
+		/*amdgpu_device_program_register_sequence(adev,
+						 liverpool_mgcg_cgcg_init,
+						 ARRAY_SIZE(liverpool_mgcg_cgcg_init));*/
+		amdgpu_device_program_register_sequence(adev,
+						 liverpool_golden_registers,
+						 ARRAY_SIZE(liverpool_golden_registers));
+		amdgpu_device_program_register_sequence(adev,
+						 liverpool_golden_common_registers,
+						 ARRAY_SIZE(liverpool_golden_common_registers));
+		// TODO (ps4patches): no spm registers, try the bonaire ones?
+		break;
+	case CHIP_GLADIUS:
+		amdgpu_device_program_register_sequence(adev,
+						 gladius_mgcg_cgcg_init,
+						 ARRAY_SIZE(gladius_mgcg_cgcg_init));
+		amdgpu_device_program_register_sequence(adev,
+						 gladius_golden_registers,
+						 ARRAY_SIZE(gladius_golden_registers));
+		amdgpu_device_program_register_sequence(adev,
+						 gladius_golden_common_registers,
+						 ARRAY_SIZE(gladius_golden_common_registers));
+		// TODO (ps4patches): Why is this using the Hawaii golden spm registers, that seems wrong?
+		amdgpu_device_program_register_sequence(adev,
+						 hawaii_golden_spm_registers,
+						 ARRAY_SIZE(hawaii_golden_spm_registers));
 		break;
 	default:
 		break;
@@ -2116,6 +2346,63 @@ static int cik_common_early_init(struct amdgpu_ip_block *ip_block)
 		} else
 			adev->external_rev_id = adev->rev_id + 0xa1;
 		break;
+		case CHIP_LIVERPOOL:
+			adev->cg_flags =
+				AMD_CG_SUPPORT_GFX_MGCG |
+				AMD_CG_SUPPORT_GFX_MGLS |
+				/*AMD_CG_SUPPORT_GFX_CGCG |*/
+				AMD_CG_SUPPORT_GFX_CGLS |
+				AMD_CG_SUPPORT_GFX_CGTS |
+				AMD_CG_SUPPORT_GFX_CGTS_LS |
+				AMD_CG_SUPPORT_GFX_CP_LS |
+				AMD_CG_SUPPORT_SDMA_MGCG |
+				AMD_CG_SUPPORT_SDMA_LS |
+				AMD_CG_SUPPORT_BIF_LS |
+				AMD_CG_SUPPORT_VCE_MGCG |
+				AMD_CG_SUPPORT_UVD_MGCG |
+				AMD_CG_SUPPORT_HDP_LS |
+				AMD_CG_SUPPORT_HDP_MGCG;
+			adev->pg_flags =
+				/*AMD_PG_SUPPORT_GFX_PG |
+				  AMD_PG_SUPPORT_GFX_SMG | */
+				/*AMD_PG_SUPPORT_UVD | */
+				/*AMD_PG_SUPPORT_VCE |
+				  AMD_PG_SUPPORT_CP |
+				  AMD_PG_SUPPORT_GDS |
+				  AMD_PG_SUPPORT_RLC_SMU_HS |
+				  AMD_PG_SUPPORT_SAMU |*/
+				0;
+			adev->external_rev_id = adev->rev_id + 0x61;
+			break;
+
+		case CHIP_GLADIUS:
+			adev->cg_flags =
+				AMD_CG_SUPPORT_GFX_MGCG |
+				AMD_CG_SUPPORT_GFX_MGLS |
+				AMD_CG_SUPPORT_GFX_CGCG |
+				AMD_CG_SUPPORT_GFX_CGLS |
+				AMD_CG_SUPPORT_GFX_CGTS |
+				AMD_CG_SUPPORT_GFX_CGTS_LS |
+				AMD_CG_SUPPORT_GFX_CP_LS |
+				AMD_CG_SUPPORT_SDMA_MGCG |
+				AMD_CG_SUPPORT_SDMA_LS |
+				AMD_CG_SUPPORT_BIF_LS |
+				AMD_CG_SUPPORT_VCE_MGCG |
+				AMD_CG_SUPPORT_UVD_MGCG |
+				AMD_CG_SUPPORT_HDP_LS |
+				AMD_CG_SUPPORT_HDP_MGCG;
+			adev->pg_flags =
+				/*AMD_PG_SUPPORT_GFX_PG |
+					AMD_PG_SUPPORT_GFX_SMG | */
+				/*AMD_PG_SUPPORT_UVD | */
+				/*AMD_PG_SUPPORT_VCE |
+					AMD_PG_SUPPORT_CP |
+					AMD_PG_SUPPORT_GDS |
+					AMD_PG_SUPPORT_RLC_SMU_HS |
+					AMD_PG_SUPPORT_SAMU |*/
+				0;
+			adev->external_rev_id = adev->rev_id + 0x71;
+			break;
 	default:
 		/* FIXME: not supported yet */
 		return -EINVAL;
@@ -2270,6 +2557,42 @@ int cik_set_ip_blocks(struct amdgpu_device *adev)
 			amdgpu_device_ip_block_add(adev, &dce_v8_3_ip_block);
 		amdgpu_device_ip_block_add(adev, &uvd_v4_2_ip_block);
 		amdgpu_device_ip_block_add(adev, &vce_v2_0_ip_block);
+		break;
+	case CHIP_LIVERPOOL:
+		amdgpu_device_ip_block_add(adev, &cik_common_ip_block);
+		amdgpu_device_ip_block_add(adev, &gmc_v7_0_ip_block);
+		amdgpu_device_ip_block_add(adev, &cik_ih_ip_block);
+		//amdgpu_device_ip_block_add(adev, &pp_smu_ip_block);
+		if (adev->enable_virtual_display)
+			amdgpu_device_ip_block_add(adev, &amdgpu_vkms_ip_block);
+#if defined(CONFIG_DRM_AMD_DC)
+		else if (amdgpu_device_has_dc_support(adev))
+			amdgpu_device_ip_block_add(adev, &dm_ip_block);
+#endif
+		else
+			amdgpu_device_ip_block_add(adev, &dce_v8_1_ip_block);
+		amdgpu_device_ip_block_add(adev, &gfx_v7_1_ip_block);
+		amdgpu_device_ip_block_add(adev, &cik_sdma_ip_block);
+		/*amdgpu_device_ip_block_add(adev, &uvd_v4_2_ip_block)*/;
+		/*amdgpu_device_ip_block_add(adev, &vce_v2_0_ip_block)*/;
+		break;
+	case CHIP_GLADIUS:
+		amdgpu_device_ip_block_add(adev, &cik_common_ip_block);
+		amdgpu_device_ip_block_add(adev, &gmc_v7_0_ip_block);
+		amdgpu_device_ip_block_add(adev, &cik_ih_ip_block);
+		//amdgpu_device_ip_block_add(adev, &pp_smu_ip_block);
+		if (adev->enable_virtual_display)
+			amdgpu_device_ip_block_add(adev, &amdgpu_vkms_ip_block);
+#if defined(CONFIG_DRM_AMD_DC)
+		else if (amdgpu_device_has_dc_support(adev))
+			amdgpu_device_ip_block_add(adev, &dm_ip_block);
+#endif
+		else
+		amdgpu_device_ip_block_add(adev, &dce_v8_1_ip_block);
+		amdgpu_device_ip_block_add(adev, &gfx_v7_1_ip_block);
+		amdgpu_device_ip_block_add(adev, &cik_sdma_ip_block);
+		/*amdgpu_device_ip_block_add(adev, &uvd_v4_2_ip_block)*/;
+		/*amdgpu_device_ip_block_add(adev, &vce_v2_0_ip_block)*/;
 		break;
 	default:
 		/* FIXME: not supported yet */
