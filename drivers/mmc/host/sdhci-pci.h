@@ -146,6 +146,7 @@ struct sdhci_pci_fixes {
 	int			(*add_host) (struct sdhci_pci_slot *);
 	void			(*remove_slot) (struct sdhci_pci_slot *, int);
 	void			(*remove_host) (struct sdhci_pci_slot *, int);
+	int			(*enable_dma) (struct sdhci_pci_slot *);
 
 #ifdef CONFIG_PM_SLEEP
 	int			(*suspend) (struct sdhci_pci_chip *);
@@ -183,6 +184,7 @@ struct sdhci_pci_chip {
 	const struct sdhci_pci_fixes *fixes;
 
 	int			num_slots;	/* Slots on controller */
+	int			first_bar;	/* First valid BAR */
 	struct sdhci_pci_slot	*slots[MAX_SLOTS]; /* Pointers to host slots */
 };
 
