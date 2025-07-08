@@ -5,17 +5,48 @@ FROM ubuntu:22.04 AS build-env
 # Inherit everything from this first build stage onto this second stage:
 # We can have all the commands in one single stage/directive, but this is cleaner and useful
 
-FROM build-env AS install-deps
+FROM build-env AS deb-src
+
+#You can use both "EOF" and EOF in this first heredoc declaration
+RUN cat <<"EOF" > /etc/apt/sources.list
+deb http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu/ jammy main restricted universe multiverse
+
+deb http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu/ jammy-updates main restricted universe multiverse
+
+deb http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu/ jammy-security main restricted universe multiverse
+
+deb http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
+deb-src http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted universe multiverse
+
+# deb http://archive.canonical.com/ubuntu/ jammy partner
+# deb-src http://archive.canonical.com/ubuntu/ jammy partner
+EOF
+
+FROM deb-src AS install-deps
+
+ARG DEBIAN_FRONTEND=noninteractive
+#only at build time
+
+ENV TZ=Etc/UTC
+#both at build and runtime
+
 
 RUN <<"EOF"
+#DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update did not work.
+#Probably because vars were needed for apt-get install build-essential
 apt-get update
 apt-get install build-essential wget git -y
 apt-get build-dep linux -y
 EOF
 
+# Need non interactive builds and installs and TZ set for package "tzdata"
+
 FROM install-deps AS install-deps2
 
-RUN apt-get install gcc-11 libgcc-11-dev libssl-dev -y #openssl2.1-dev doesn't exist
+RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install gcc-11 libgcc-11-dev libssl-dev -y #openssl2.1-dev doesn't exist
 
 #OpenSSL 2.1 needed for Linux kernel version 5.15.
 #Without gcc-11 (or older), you will probably get compilation errors
@@ -31,8 +62,8 @@ FROM install-deps2 AS clone-kernel-source
 
 WORKDIR /kernel-source
 COPY . .
-# Copy everything (except the .dockerignore files) in the main github repository /./ to
-# /kernel-source inside of the docker image. 
+# Copy everything (except the .dockerignore files) in the main github repository /./ = / to
+# . = /kernel-source inside of the docker image. 
 # syntax: COPY local-public-path-relative-to-Dockerfile remote-private-path-inside-of-Dockerimage
 
 # Compile the Linux kernel
