@@ -19,16 +19,19 @@ jobs:
     steps:
       # Checks-out your repository to $github.workspace=github actions directory, 
       # so your job can access it
-      - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }} 
+      #- uses: actions/checkout@v4
+      #  with:
+      #    ref: ${{ github.ref }}
           # ${{ github.ref }} refers to the caller of the current github actions/job,
           # for example the current branch or tag or commit.
           #
           # Meaning checkout (pull) the branch that is calling this github action, so we can
           # work on it. (Inlcuding the dockerfile)
 
-
+      - name: Download Dockerfile
+        run: curl -fL https://raw.githubusercontent.com/feeRnt/ps4-linux-12xx/ps4-linux-5.15.y-conservative2/Dockerfile -o Dockerfile
+         # ~~-verbose~~, -fail if server error, -Links follow,
+      
         # Going to use Buildx which is newer and better
         # OLD:::::
         # Build docker image with tag "kernel-linux-ps4" in the present directory
@@ -44,7 +47,27 @@ jobs:
    # Set up Docker Buildx for advanced build options and caching
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
-    # this needs to be done before using docker buildx...
+    # this needs to be done before using docker buildx.
+    # this doesn't to be done before the caching part, but doing it anyway. It initializes the
+    # component that can utilize the cache.
+    # Downloading the cache can either happen before or after.
+
+
+      # Retrieve Cache-d Docker layers, and Save cache after job completion
+      - name: Docker Layers Caching
+        uses: actions/cache@v3
+        with:
+          path: /tmp/.buildx-cache #The location where Docker will have cache layers (inside github.workspace root) 
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}  # Cache key
+          restore-keys: |
+            ${{ runner.os }}-docker-
+      # The cache action needs to come before the Build Docker image, because this actoi is 
+      # needed for bringing the cache file into the workspace.
+      
+      # The cache files (inside /tmp/.bulidx-cache) are used internally AFTER; by docker (from/to).
+      # The cache action makes sure the buildx-cache is actually available for Docker (inside
+      # the workspace).
+
   
       # Build Docker image  
       - name: Build Docker image with cache
@@ -58,30 +81,33 @@ jobs:
             --load \
             .
       # This /tmp is not gonna be made if the directory doesn't exist already
-      # --load loads the contents the image into the workspace, otherwise only in cache
+      # --load loads the contents the image into the workspace OS, otherwise only in cache
       # --cache-to type=local caches straight to the host machine, meaning github workspace
    
  
-      # Cache Docker layers
-      - name: Cache Docker layers
-        uses: actions/cache@v3
-        with:
-          path: /tmp/.buildx-cache #The location where Docker caches layers (inside github.workspace root) 
-          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}  # Cache key
-          restore-keys: |
-            ${{ runner.os }}-docker-
-
+     
       # Run a docker instance, interactively, with the name "kernel", using previous image
       # kernel-linux-ps4's "latest" tag/state (the default tag name)
       - name: retrieve artifact from docker image
+        id: docker-run-step
         run: |
           docker run -it --name kernel -d kernel-linux-ps4:latest
-          docker cp kernel:/kernel.tar.gz2 ${{ github.workspace }} 
+          localversion=`docker exec kernel sh -c "cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'"`
+          echo "localversion is originally = $localversion"
+          echo "localversion=$localversion" >> $GITHUB_OUTPUT
+          docker cp kernel:/kernel_"$localversion".tar.gz2 ${{ github.workspace }} 
         # Copy kernel.tar.gz to the github workspace        
+      
+      - name: Use localversion env
+        env:
+          localversion: ${{ steps.docker-run-step.outputs.localversion }}
+        run: |
+          echo "Using localversion=$localversion"
+          echo "Or actually... using localversion=${{ env.localversion }}"
       
       - name: Upload kernel image to github actions artifacts
         uses: actions/upload-artifact@v4
         with:
           name: kernel
-          path: ${{ github.workspace }}/kernel.tar.gz2
+          path: ${{ github.workspace }}/kernel_${{ env.localversion }}.tar.gz2
       # This path is the github actiions root

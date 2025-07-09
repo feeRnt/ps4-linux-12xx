@@ -55,13 +55,40 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install gcc-11 libgcc-11-d
 # Clone the Linux kernel source
 FROM install-deps2 AS clone-kernel-source
 
-#WORKDIR /kernel-source
-#RUN git clone -b "ps4-linux-5.15.y-conservative2" --depth=1 https://github.com/feeRnt/ps4-linux-12xx.git
-
-# we don't need to clone anything as checkout in the github yaml action already takes care of that
-
 WORKDIR /kernel-source
-COPY . .
+RUN <<"EOF"
+if [ ! -d .git ]; then
+	echo "Git directory doesn't exist, cloning git repo."
+	git clone https://github.com/feeRnt/ps4-linux-12xx.git --depth=1 .
+	mv config .config
+ else
+	git pull origin --update-shallow --no-rebase --allow-unrelated-histories -X theirs && mv config .config
+# turning off no-rebase also works. We can switch to it in the future
+fi;
+
+mkdir -p /lib/firmware/mrvl
+cd /lib/firmware/mrvl
+wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin
+wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/pcie8897_uapsta.bin
+wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin
+cd /kernel-source
+# Extra firmware that are / might be needed for kernel compilation. 
+#
+EOF
+
+# OLD:
+# we don't need to clone anything as checkout in the github yaml action already takes care of that
+# NEW: Now clones for better speed
+
+#TODO: Remove the checkout action in yaml, and clone the source from here. 
+#That way build caching will be more robust.? (Like in a local kernel build)
+
+# Use the --strategy = ort and other flags. That way it won't have to clone the whole repo and
+# will be faster than the yaml checkout. (If caching works correctly that is.)
+
+# OLD:
+#WORKDIR /kernel-source
+#COPY . .
 # Copy everything (except the .dockerignore files) in the main github repository /./ = / to
 # . = /kernel-source inside of the docker image. 
 # syntax: COPY local-public-path-relative-to-Dockerfile remote-private-path-inside-of-Dockerimage
@@ -70,15 +97,18 @@ COPY . .
 FROM clone-kernel-source AS compile-kernel
 
 RUN <<"EOF"
-set -e  
+set -e
 # Exit immediately if any command fails
-export BRANCH=`git rev-parse --abbrev-ref HEAD | sed s/-/+/g`
-export SHA1=`git rev-parse --short HEAD`
-export LOCALVERSION=+${BRANCH}+${SHA1}+GCE
-export GCE_PKG_DIR=${PWD}/gce/${LOCALVERSION}/pkg
-export GCE_INSTALL_DIR=${PWD}/gce/${LOCALVERSION}/install
-export GCE_BUILD_DIR=${PWD}/gce/${LOCALVERSION}/build
-export KERNEL_PKG=kernel-${LOCALVERSION}.tar.gz2
+
+#export BRANCH=`git rev-parse --abbrev-ref HEAD | sed s/-/+/g`
+#export SHA1=`git rev-parse --short HEAD`
+#export localversion=+${BRANCH}+${SHA1}+GCE
+export localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '"'`
+# Using uppercase localversion will mess with your final kernel img version.
+export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
+export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
+export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
+export KERNEL_PKG=kernel-${localversion}.tar.gz2
 export MAKE_OPTS="-j`nproc` \
            INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
            INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
@@ -87,14 +117,23 @@ export MAKE_OPTS="-j`nproc` \
 mkdir -p ${GCE_BUILD_DIR}
 mkdir -p ${GCE_INSTALL_DIR}/boot
 mkdir -p ${GCE_PKG_DIR}
+echo "Debugging gce directory."
+find ${GCE_BUILD_DIR} ${GCE_INSTALL_DIR}/boot ${GCE_PKG_DIR}
+
 make ${MAKE_OPTS} olddefconfig
 make ${MAKE_OPTS} prepare
+echo "Making kernel. . ."
 make ${MAKE_OPTS}
+echo "Making modules . . ."
 make ${MAKE_OPTS} modules
+echo "Installing kernel . . ."
 make ${MAKE_OPTS} install
+echo "Installing modules . . ."
 make ${MAKE_OPTS} modules_install
+echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
+cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
 cd ${GCE_INSTALL_DIR}
-tar -cvzf /kernel.tar.gz2 boot/* lib/modules/* --owner=0 --group=0
+tar -cvzf /kernel_"$localversion".tar.gz2 boot/* lib/modules/* --owner=0 --group=0
 EOF
 
 ## GCE = Google Compute Engine, adapted from 
