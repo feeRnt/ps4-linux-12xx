@@ -52,46 +52,69 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install gcc-11 libgcc-11-d
 #Without gcc-11 (or older), you will probably get compilation errors
 
 
-# Clone the Linux kernel source
-FROM install-deps2 AS clone-kernel-source
+# Clone the Linux kernel source . . . This fails to cache as expected.
+# A slight change of git clone invalidates the whole kernel-source
+# directory cache. So use custom caching mecahnism in github.yaml
 
-WORKDIR /kernel-source
+###FROM install-deps2 AS clone-kernel-source
+
+###WORKDIR /kernel-source
+###RUN <<"EOF"
+###if [ ! -d .git ]; then
+###	echo "Git directory doesn't exist, cloning git repo."
+###	git clone https://github.com/feeRnt/ps4-linux-12xx.git --depth=1 .
+###	mv config .config
+### else
+###	git pull origin --update-shallow --no-rebase --allow-unrelated-histories -X theirs && mv config .config
+#### turning off no-rebase also works. We can switch to it in the future
+###fi;
+###
+###mkdir -p /lib/firmware/mrvl
+###cd /lib/firmware/mrvl
+###wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin
+###wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/pcie8897_uapsta.bin
+###wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin
+###cd /kernel-source
+#### Extra firmware that are / might be needed for kernel compilation. 
+####
+###EOF
+###
+#### OLD:
+#### we don't need to clone anything as checkout in the github yaml action already takes care of that
+#### NEW: Now clones for better speed
+###
+####TODO: Remove the checkout action in yaml, and clone the source from here. 
+####That way build caching will be more robust.? (Like in a local kernel build)
+###
+#### Use the --strategy = ort and other flags. That way it won't have to clone the whole repo and
+#### will be faster than the yaml checkout. (If caching works correctly that is.)
+###
+#### OLD:
+####WORKDIR /kernel-source
+####COPY . .
+#### Copy everything (except the .dockerignore files) in the main github repository /./ = / to
+#### . = /kernel-source inside of the docker image. 
+#### syntax: COPY local-public-path-relative-to-Dockerfile remote-private-path-inside-of-Dockerimage
+###
+
+#Clone source from workspace
+FROM install-deps2 AS install-extra-firmware
+
 RUN <<"EOF"
-if [ ! -d .git ]; then
-	echo "Git directory doesn't exist, cloning git repo."
-	git clone https://github.com/feeRnt/ps4-linux-12xx.git --depth=1 .
-	mv config .config
- else
-	git pull origin --update-shallow --no-rebase --allow-unrelated-histories -X theirs && mv config .config
-# turning off no-rebase also works. We can switch to it in the future
-fi;
-
 mkdir -p /lib/firmware/mrvl
 cd /lib/firmware/mrvl
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/pcie8897_uapsta.bin
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin
-cd /kernel-source
-# Extra firmware that are / might be needed for kernel compilation. 
-#
+#### Extra firmware that are / might be needed for kernel compilation. 
 EOF
 
-# OLD:
-# we don't need to clone anything as checkout in the github yaml action already takes care of that
-# NEW: Now clones for better speed
+FROM install-extra-firmware AS clone-kernel-source
 
-#TODO: Remove the checkout action in yaml, and clone the source from here. 
-#That way build caching will be more robust.? (Like in a local kernel build)
+WORKDIR /kernel-source
+COPY . .
+#Copy only the contents (not the folder) of the workspace folder into docker image.
 
-# Use the --strategy = ort and other flags. That way it won't have to clone the whole repo and
-# will be faster than the yaml checkout. (If caching works correctly that is.)
-
-# OLD:
-#WORKDIR /kernel-source
-#COPY . .
-# Copy everything (except the .dockerignore files) in the main github repository /./ = / to
-# . = /kernel-source inside of the docker image. 
-# syntax: COPY local-public-path-relative-to-Dockerfile remote-private-path-inside-of-Dockerimage
 
 # Compile the Linux kernel
 FROM clone-kernel-source AS compile-kernel
