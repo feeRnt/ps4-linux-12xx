@@ -100,7 +100,7 @@ modules.order
 # Added
 !.github
 !.dockerignore
-
+!.Dockerfile*
 
 #
 # Generated include files

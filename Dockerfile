@@ -24,80 +24,32 @@ deb-src http://archive.ubuntu.com/ubuntu/ jammy-backports main restricted univer
 # deb http://archive.canonical.com/ubuntu/ jammy partner
 # deb-src http://archive.canonical.com/ubuntu/ jammy partner
 EOF
+# List copied from 
+# https://gist.github.com/hakerdefo/9c99e140f543b5089e32176fe8721f5f
 
 FROM deb-src AS install-deps
 
 ARG DEBIAN_FRONTEND=noninteractive
-#only at build time
-
+# Used only at build time
 ENV TZ=Etc/UTC
-#both at build and runtime
-
+# Used both at build and runtime
+# Need non interactive builds and installs and TZ set for package "tzdata"
 
 RUN <<"EOF"
 #DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update did not work.
-#Probably because vars were needed for apt-get install build-essential
 apt-get update
 apt-get install build-essential wget git -y
 apt-get build-dep linux -y
 EOF
 
-# Need non interactive builds and installs and TZ set for package "tzdata"
-
 FROM install-deps AS install-deps2
 
-RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install gcc-11 libgcc-11-dev libssl-dev -y #openssl2.1-dev doesn't exist
+RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install gcc-11 libgcc-11-dev libssl-dev -y 
 
+#openssl2.1-dev doesn't exist
 #OpenSSL 2.1 needed for Linux kernel version 5.15.
 #Without gcc-11 (or older), you will probably get compilation errors
 
-
-# Clone the Linux kernel source . . . This fails to cache as expected.
-# A slight change of git clone invalidates the whole kernel-source
-# directory cache. So use custom caching mecahnism in github.yaml
-
-###FROM install-deps2 AS clone-kernel-source
-
-###WORKDIR /kernel-source
-###RUN <<"EOF"
-###if [ ! -d .git ]; then
-###	echo "Git directory doesn't exist, cloning git repo."
-###	git clone https://github.com/feeRnt/ps4-linux-12xx.git --depth=1 .
-###	mv config .config
-### else
-###	git pull origin --update-shallow --no-rebase --allow-unrelated-histories -X theirs && mv config .config
-#### turning off no-rebase also works. We can switch to it in the future
-###fi;
-###
-###mkdir -p /lib/firmware/mrvl
-###cd /lib/firmware/mrvl
-###wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin
-###wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/pcie8897_uapsta.bin
-###wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin
-###cd /kernel-source
-#### Extra firmware that are / might be needed for kernel compilation. 
-####
-###EOF
-###
-#### OLD:
-#### we don't need to clone anything as checkout in the github yaml action already takes care of that
-#### NEW: Now clones for better speed
-###
-####TODO: Remove the checkout action in yaml, and clone the source from here. 
-####That way build caching will be more robust.? (Like in a local kernel build)
-###
-#### Use the --strategy = ort and other flags. That way it won't have to clone the whole repo and
-#### will be faster than the yaml checkout. (If caching works correctly that is.)
-###
-#### OLD:
-####WORKDIR /kernel-source
-####COPY . .
-#### Copy everything (except the .dockerignore files) in the main github repository /./ = / to
-#### . = /kernel-source inside of the docker image. 
-#### syntax: COPY local-public-path-relative-to-Dockerfile remote-private-path-inside-of-Dockerimage
-###
-
-#Clone source from workspace
 FROM install-deps2 AS install-extra-firmware
 
 RUN <<"EOF"
@@ -108,70 +60,18 @@ wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin
 #### Extra firmware that are / might be needed for kernel compilation. 
 EOF
+# Wget code snippet from https://github.com/TigerClips1
 
-FROM install-extra-firmware AS clone-kernel-source
+# Clone the Linux kernel source . . . This fails to cache as expected.
+# A slight change of git clone invalidates the whole kernel source
+# directory cache. So used custom caching mecahnism in github.yaml
+FROM install-extra-firmware AS prepare-kernel-source
 
-#WORKDIR /kernel-source
-#COPY . .
-# Copy only the contents (not the folder) of the workspace folder into docker image.
-# Use bind mount to directly modify github actions files without copying.
-# Relies on buildcontext in buildx.
-RUN mkdir -p /container/workspace
-WORKDIR /container/workspace
+RUN mkdir -p /container/workspace/kernel-source-container
+WORKDIR /container/workspace/kernel-source-container
 
-# Compile the Linux kernel
-FROM clone-kernel-source AS compile-kernel
-
-RUN --mount=type=bind,from=workspace,target=/container/workspace <<"EOF"
-set -e
-# Exit immediately if any command fails
-
-echo "Testing if host directory mounting was successful."
-ls /container/workspace
-
-#export BRANCH=`git rev-parse --abbrev-ref HEAD | sed s/-/+/g`
-#export SHA1=`git rev-parse --short HEAD`
-#export localversion=+${BRANCH}+${SHA1}+GCE
-export localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '"'`
-# Using uppercase localversion will mess with your final kernel img version.
-export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
-export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
-export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
-export KERNEL_PKG=kernel-${localversion}.tar.gz2
-export MAKE_OPTS="-j`nproc` \
-           INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
-           INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
-	   HOSTCC=gcc-11 \
-	   CC=gcc-11"
-mkdir -p ${GCE_BUILD_DIR}
-mkdir -p ${GCE_INSTALL_DIR}/boot
-mkdir -p ${GCE_PKG_DIR}
-echo "Debugging gce directory."
-find ${GCE_BUILD_DIR} ${GCE_INSTALL_DIR}/boot ${GCE_PKG_DIR}
-
-make ${MAKE_OPTS} olddefconfig
-make ${MAKE_OPTS} prepare
-echo "Making kernel. . ."
-make ${MAKE_OPTS}
-echo "Making modules . . ."
-make ${MAKE_OPTS} modules
-echo "Installing kernel . . ."
-make ${MAKE_OPTS} install
-echo "Installing modules . . ."
-make ${MAKE_OPTS} modules_install
-echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
-cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
-cd ${GCE_INSTALL_DIR}
-tar -cvzf /kernel_"$localversion".tar.gz2 boot/* lib/modules/* --owner=0 --group=0
-EOF
-
-
-#FROM compile-kernel AS cache-copy-kernel
-#COPY???
-#Handled with bind mount in compile-kernel. Building directly on the host fs
-
-## GCE = Google Compute Engine, adapted from 
-#https://github.com/google/bbr/blob/v3/gce-install.sh
+# This step is no longer necessary as we are going to compile outside of the docker image build. (Outside of Dockerfile).
+###FROM prepare-kernel-source AS compile-kernel
 
 # Dockerfile adapted from 
 #https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
