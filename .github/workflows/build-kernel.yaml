@@ -24,23 +24,23 @@ jobs:
       #    ref: ${{ github.ref }}
       # ${{ github.ref }} refers to the caller of the current github actions/job,
       # for example the current branch or tag or commit.
-      
+
       # Meaning checkout (pull) the branch that is calling this github action, so we can
       # work on it. (Inlcuding the dockerfile)
-      
+
       - name: Download Dockerfile
         run: |
          curl -fL https://raw.githubusercontent.com/feeRnt/ps4-linux-12xx/ps4-linux-5.15.y-conservative2/Dockerfile -o Dockerfile
          curl -fL https://raw.githubusercontent.com/feeRnt/ps4-linux-12xx/ps4-linux-5.15.y-conservative2/.dockerignore -o .dockerignore
          echo "Current github.workspace in curl stage = ${{ github.workspace }}"
       # ~~-verbose~~, -fail if server error, -Links follow,
-      
+
       # Going to use Buildx which is newer and better
       # OLD:::::
       # Build docker image with tag "kernel-linux-ps4" in the present directory
       #- name: build docker image
       #   run: |
-      #     docker build -t kernel-linux-ps4 .          
+      #     docker build -t kernel-linux-ps4 .
 
       #- name: Build Docker image with cache (incomplete?)
       #  run: |
@@ -64,17 +64,17 @@ jobs:
             ${{ github.workspace }}
           #The location where Docker will have cache layers (inside github.workspace root)
           #And /home/runner/work/ps4-linux-12xx/ps4-linux-12xx = github.workspace
-        
+
           key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}  # Cache key
           restore-keys: |
             ${{ runner.os }}-docker-
       # The cache action needs to come before the Build Docker image, because this action is 
       # needed for bringing the cache file into the workspace.
-      
+
       # The cache files (inside /tmp/.bulidx-cache) are used internally AFTER; by docker (from/to).
       # The cache action makes sure the buildx-cache is actually available for Docker (inside
       # the workspace).
-      
+
 
       - name: Check if repo was previously cloned
         id: check_repo
@@ -105,7 +105,7 @@ jobs:
           ref: ${{ github.ref }}
           #repository: is optional. Default is the repo that triggered the event
           #ref = default branch, for us (caller).
-        
+
       - name: Move config file
         if: steps.check_repo.outputs.exists == 'false'
         run: |
@@ -120,6 +120,7 @@ jobs:
           echo "Branches in this repo"
           git branch
           mv config .config
+          # config will exist if we clone. so no need to use -f check
         #Cannot have run and action in the same step
 
       - name: Update ps4-linux-12xx repo if it exists
@@ -130,7 +131,26 @@ jobs:
           git rev-list --all --count
           echo "Branches in this repo:"
           git branch
-          git pull origin ${{ github.ref }} --update-shallow --no-rebase -X theirs && mv config .config
+          echo "github.ref is = ${{ github.ref }}, will pull that branch"
+          #git pull --depth=1 origin ${{ github.ref }} --update-shallow --no-rebase -X theirs --allow-unrelated-histories
+          #pull with depth tries to commit???
+
+          #git fetch --depth=1 origin ${{ github.ref }} 
+          #git reset --hard origin/${{ github.ref }}
+          #reference not found (origin/refs/heads/ps4-linux-5.15.y-conservative2); with reset.
+
+          #git pull origin ps4-linux-5.15.y-conservative2 --update-shallow --no-rebase -X theirs --allow-unrelated-histories
+          #still slow...
+          
+          git fetch --depth=1 origin ps4-linux-5.15.y-conservative2
+          git reset --hard origin/ps4-linux-5.15.y-conservative2
+          if [ -f config ]; then
+            echo "Renaming config to .config"
+            mv config .config
+          else
+            echo ".config already exists. Continuing."
+          # for reruns without updating the repo
+          fi;
 
         # Code:
         # _DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | awk '/HEAD branch/ {print $NF}')
@@ -139,7 +159,7 @@ jobs:
         # git reset origin/${{ github.ref }} --hard
 
         # Assigns master branch, or uses one if unset. Used for fetch and reset. Nvm unnecessary.
-         
+
         #Nvm reset is unnecessary. The slow fetch was because of pulling another branch
         #git pull origin --update-shallow --no-rebase -X theirs && mv config .config
         #git pull origin --update-shallow --no-rebase --allow-unrelated-histories -X theirs && mv config .config
@@ -166,7 +186,6 @@ jobs:
             --cache-to type=local,dest=/tmp/.buildx-cache,mode=max \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             --tag kernel-linux-ps4:latest \
-            --build-context workspace=${{ github.workspace }} \
             --load \
             .
       # This /tmp is not gonna be made if the directory doesn't exist already
@@ -175,49 +194,148 @@ jobs:
       #
       # build-context workspace=./ results in /home/runner/work/repo/repo by default
    
- 
-     
-      # Run a docker instance, interactively, with the name "kernel", using previous image
-      # kernel-linux-ps4's "latest" tag/state (the default tag name)
-      - name: retrieve artifact from docker image
-        id: docker-run-step
+      #--build-context workspace=${{ github.workspace }} \
+      # Removed because we no longer compile in the docker build.
+
+      - name: Compile the linux kernel with docker run
+        id: compile-kernel-step
         run: |
-          echo "ls -a in retrieve artifact step:"
-          ls -a
-          docker run -it --name kernel -d kernel-linux-ps4:latest
+          docker run -it --name kernel -d -v ${{ github.workspace }}:/container/workspace -w /container/workspace \
+          kernel-linux-ps4:latest tail -f /dev/null
+          # -v is volume, # -w is workdir (WORKDIR)
+
+          # without -it, you need to run some other command as well, otherwise it will fail.
+          # Not true. There was an empty space after "\" which broke the command continuation.
+
+          # Somehow it worked with both -it and -d before (after compiling kernel), 
+          # but not now. I will add a tail or bash command to keep the container running I guess. .
+          # Options:
+          # sleep 90000000000
+          # sleep infinity (GNU only) [seems this doesn't work and closes the container immediately]
+          # tail -f /dev/null
+          # Either that or specify CMD or ENTRYPOINT in Dockerfile.
+          # Maybe it is because previously, it would always (even if other steps were cached) 
+          # compile the kernel using
+          # RUN <<"EOF"
+          # set -e
+          # . . .
+          # It's possible that doing so created a default/running cmd in the dockerfile. 
+          # Using -d (detached) and -it is atypical. But it works 
+          # Just put it in one line instead of \ because I don't know what's wrong.
+          # Still didn't work. The problem was the command options and formatting. Chatgpt failed me.
+          
+          echo "Made it past running docker run -it. Will docker exec bash now."
+          #docker exec -it kernel bash <<"EOF"
+          #heredoc doesn't work directly with docker exec. you can't run a chain or quoted command. 
+          #https://docs.docker.com/reference/cli/docker/container/exec/
+          #with -t it says: input device is not a tty
+          #docker exec kernel bash -c "
+          #bash <<\"EOF\"
+          
+          #-i apparently allows stdin to the command... let's see
+          docker exec -i kernel bash <<'EOF' 
+          set -e
+          echo "Testing if host directory mounting was successful."
+          ls -a .
+          # already cd'ed
+          if [ -f persistence_test* ]; then
+            echo "Files are persisting across runs! Congratulations."
+          else
+            echo "Files are not persisting across runs, OR, this is the first uncached action run."
+          fi;
+
+          echo "File perms of mounted directory:"
+          stat /container/workspace /container/workspace/*
+          #echo "Changing perms of the mounted directory"
+          #chmod 777 -R /container/workspace
+
+          touch "write_test"
+          echo "persisting!" > persistence_test_"$(date --iso=s)".txt
+
+          export localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '"'`
+          # Using uppercase localversion will mess with your final kernel img version.
+          export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
+          export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
+          export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
+          export KERNEL_PKG=kernel-${localversion}.tar.gz2
+          export MAKE_OPTS="-j`nproc` \
+                     INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
+                     INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
+                     HOSTCC=gcc-11 \
+                     CC=gcc-11"
+          mkdir -p ${GCE_BUILD_DIR}
+          mkdir -p ${GCE_INSTALL_DIR}/boot
+          mkdir -p ${GCE_PKG_DIR}
+          echo "Debugging gce directory."
+          find ${GCE_BUILD_DIR} ${GCE_INSTALL_DIR}/boot ${GCE_PKG_DIR}
+
+          make ${MAKE_OPTS} olddefconfig
+          make ${MAKE_OPTS} prepare
+          echo "Making kernel. . ."
+          make ${MAKE_OPTS}
+          echo "Making modules . . ."
+          make ${MAKE_OPTS} modules
+          echo "Installing kernel . . ."
+          make ${MAKE_OPTS} install
+          echo "Installing modules . . ."
+          make ${MAKE_OPTS} modules_install
+          echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
+          cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
+          cd ${GCE_INSTALL_DIR}
+          #tar -cvzf /kernel_"$localversion".tar.gz2 boot/* lib/modules/* --owner=0 --group=0
+          #Move directly to the workspace. Only keeping bzImage and modules
+          tar -cvzf /container/workspace/kernel_"$localversion".tar.gz boot/bzImage lib/modules/* --owner=0 --group=0
+          EOF
+          
+
+      ### Run a docker instance, interactively, with the name "kernel", using previous image
+      ### kernel-linux-ps4's "latest" tag/state (the default tag name)
+      ##- name: retrieve artifact from docker image
+      ##  id: docker-run-step
+      ##  run: |
+      ##    docker run -it --name kernel -d kernel-linux-ps4:latest
+      ##    localversion=`cat /container/workspace/.config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'`
+      ##    echo "localversion is originally = $localversion"
+      ##    echo "localversion=$localversion" >> $GITHUB_OUTPUT
+      ##    docker cp kernel:/kernel_"$localversion".tar.gz2 ${{ github.workspace }} 
+      ##  # Copy kernel.tar.gz to the github workspace
+      ##  #localversion=`docker exec kernel sh -c "cat /container/workspace/.config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'"`
+      ##  # Unnecessary when files are on the workspace directly
+
+      ##  #- name: Cache the built kernel directory into workspace
+      ##  #run: |
+      ##  #  echo "Copying build directory to work space using r-sync"
+      ##  #  apt-get install -y rsync
+      ##  #  docker psu
+      ##  #  docker exec sh -c "rsync
+      ##  
+      ##  #  Using bind mount/volumes in docker build instead
+      ##  #  
+      ##- name: Use localversion env
+      ##  env:
+      ##    localversion: ${{ steps.docker-run-step.outputs.localversion }}
+      ##  run: |
+      ##    echo "Using localversion=$localversion"
+      ##    echo "Or actually... using localversion=${{ env.localversion }}"
+      ##
+
+      - name: Get kernel version name env
+        id: kernel-version-env
+        run: |
           localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'`
           echo "localversion is originally = $localversion"
           echo "localversion=$localversion" >> $GITHUB_OUTPUT
-          docker cp kernel:/kernel_"$localversion".tar.gz2 ${{ github.workspace }} 
-        # Copy kernel.tar.gz to the github workspace
-        #localversion=`docker exec kernel sh -c "cat /container/workspace/.config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'"`
-        # Unnecessary when files are on the workspace directly
 
-        #- name: Cache the built kernel directory into workspace
-        #run: |
-        #  echo "Copying build directory to work space using r-sync"
-        #  apt-get install -y rsync
-        #  docker psu
-        #  docker exec sh -c "rsync
-        
-        #  Using bind mount/volumes in docker build instead
-        #  
-      - name: Use localversion env
-        env:
-          localversion: ${{ steps.docker-run-step.outputs.localversion }}
-        run: |
-          echo "Using localversion=$localversion"
-          echo "Or actually... using localversion=${{ env.localversion }}"
-      
       - name: Upload kernel image to github actions artifacts
         uses: actions/upload-artifact@v4
         with:
           name: kernel
           #path: ${{ github.workspace }}/kernel_${{ env.localversion }}.tar.gz2 (doesn't work.
           #env is not exported between "run"s)
-          path: ${{ github.workspace }}/kernel_${{ steps.docker-run-step.outputs.localversion }}.tar.gz2
+          #path: ${{ github.workspace }}/kernel_${{ steps.docker-run-step.outputs.localversion }}.tar.gz2
+          path: ${{ github.workspace }}/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
           # This path is the github actiions root
-      
+
 # Some yaml facts.
  # Even if your indentation or other errors are further down
  # in the file, yaml will complain of missing "-" way up at the start.
@@ -226,12 +344,12 @@ jobs:
 
  # There is github.com/google/yamlfmt , which works decent
  # At least it tells you what is broken and what isn't
- # IMPORTANT: You CANNOT, put comments in a run block, before the block is over.
+ # IMPORTANT: You CANNOT, put comments outside a run block, before the block is over.
  # Such as:
  # run: |
  #   echo this
  #   echo that
- #   #comment
+ # #comment
  #   echo final
  #
  # This is invalid ! ^^^
@@ -240,5 +358,11 @@ jobs:
  # run: |
  #   echo this
  #   echo that
- #   echo final
- #   # Comment. On command 2. . . 
+ # # Comment. On command 2. . . 
+ #
+ # Though 
+ # run: |
+ #   echo this
+ #   # comment
+ #   echo that
+ # Seems to work

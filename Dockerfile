@@ -109,6 +109,7 @@ wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware
 #### Extra firmware that are / might be needed for kernel compilation. 
 EOF
 
+
 FROM install-extra-firmware AS clone-kernel-source
 
 #WORKDIR /kernel-source
@@ -119,74 +120,77 @@ FROM install-extra-firmware AS clone-kernel-source
 RUN mkdir -p /container/workspace
 WORKDIR /container/workspace
 
+
+# This step is no longer necessary as we are going to compile outside of the docker image build. (Outside of Dockerfile).
+# It seems the best approach. At least I tried my hardest inside here. 
+# Motivation? Laziness of not wanting to move the code over outside
 # Compile the Linux kernel
-FROM clone-kernel-source AS compile-kernel
-
-RUN --mount=type=bind,from=workspace,target=/container/workspace,rw <<"EOF"
-set -e
-# Exit immediately if any command fails
-# RUN --mount for docker build is ro by default. Not sure if the writes to this host persist.
-# Option rw allows write.
-
-echo "Testing if host directory mounting was successful."
-ls -a /container/workspace
-
-if [ -f persistence_test* ]; then
-	echo "Files are persisting across runs! Congratulations."
-else
-	echo "Files are not persisting across runs, OR, this is the first uncached action run."
-fi;
-
-echo "File perms of mounted directory:"
-stat /container/workspace /container/workspace/*
-#echo "Changing perms of the mounted directory"
-#chmod 777 -R /container/workspace
-
-touch "write_test"
-echo "persisting!" > persistence_test_"$(date --iso=s)".txt
-
-#export BRANCH=`git rev-parse --abbrev-ref HEAD | sed s/-/+/g`
-#export SHA1=`git rev-parse --short HEAD`
-#export localversion=+${BRANCH}+${SHA1}+GCE
-export localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '"'`
-# Using uppercase localversion will mess with your final kernel img version.
-export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
-export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
-export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
-export KERNEL_PKG=kernel-${localversion}.tar.gz2
-export MAKE_OPTS="-j`nproc` \
-           INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
-           INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
-	   HOSTCC=gcc-11 \
-	   CC=gcc-11"
-mkdir -p ${GCE_BUILD_DIR}
-mkdir -p ${GCE_INSTALL_DIR}/boot
-mkdir -p ${GCE_PKG_DIR}
-echo "Debugging gce directory."
-find ${GCE_BUILD_DIR} ${GCE_INSTALL_DIR}/boot ${GCE_PKG_DIR}
-
-make ${MAKE_OPTS} olddefconfig
-make ${MAKE_OPTS} prepare
-echo "Making kernel. . ."
-make ${MAKE_OPTS}
-echo "Making modules . . ."
-make ${MAKE_OPTS} modules
-echo "Installing kernel . . ."
-make ${MAKE_OPTS} install
-echo "Installing modules . . ."
-make ${MAKE_OPTS} modules_install
-echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
-cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
-cd ${GCE_INSTALL_DIR}
-#tar -cvzf /kernel_"$localversion".tar.gz2 boot/* lib/modules/* --owner=0 --group=0
-
-#Move directly to the workspace. Only keeping bzImage and modules
-#tar -cvzf /container/workspace/kernel_"$localversion".tar.gz2 boot/bzImage lib/modules/* --owner=0 --group=0
-#doesn't work.
-
-tar -cvzf /kernel_"$localversion".tar.gz2 boot/bzImage lib/modules/* --owner=0 --group=0
-EOF
-
+###FROM clone-kernel-source AS compile-kernel
+###
+###RUN --mount=type=bind,from=workspace,target=/container/workspace,rw <<"EOF"
+###set -e
+#### Exit immediately if any command fails
+#### RUN --mount for docker build is ro by default. Not sure if the writes to this host persist.
+#### Option rw allows write.
+###
+###echo "Testing if host directory mounting was successful."
+###ls -a /container/workspace
+###
+###if [ -f persistence_test* ]; then
+###	echo "Files are persisting across runs! Congratulations."
+###else
+###	echo "Files are not persisting across runs, OR, this is the first uncached action run."
+###fi;
+###
+###echo "File perms of mounted directory:"
+###stat /container/workspace /container/workspace/*
+####echo "Changing perms of the mounted directory"
+####chmod 777 -R /container/workspace
+###
+###touch "write_test"
+###echo "persisting!" > persistence_test_"$(date --iso=s)".txt
+###
+####export BRANCH=`git rev-parse --abbrev-ref HEAD | sed s/-/+/g`
+####export SHA1=`git rev-parse --short HEAD`
+####export localversion=+${BRANCH}+${SHA1}+GCE
+###export localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '"'`
+#### Using uppercase localversion will mess with your final kernel img version.
+###export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
+###export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
+###export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
+###export KERNEL_PKG=kernel-${localversion}.tar.gz2
+###export MAKE_OPTS="-j`nproc` \
+###           INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
+###           INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
+###	   HOSTCC=gcc-11 \
+###	   CC=gcc-11"
+###mkdir -p ${GCE_BUILD_DIR}
+###mkdir -p ${GCE_INSTALL_DIR}/boot
+###mkdir -p ${GCE_PKG_DIR}
+###echo "Debugging gce directory."
+###find ${GCE_BUILD_DIR} ${GCE_INSTALL_DIR}/boot ${GCE_PKG_DIR}
+###
+###make ${MAKE_OPTS} olddefconfig
+###make ${MAKE_OPTS} prepare
+###echo "Making kernel. . ."
+###make ${MAKE_OPTS}
+###echo "Making modules . . ."
+###make ${MAKE_OPTS} modules
+###echo "Installing kernel . . ."
+###make ${MAKE_OPTS} install
+###echo "Installing modules . . ."
+###make ${MAKE_OPTS} modules_install
+###echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
+###cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
+###cd ${GCE_INSTALL_DIR}
+####tar -cvzf /kernel_"$localversion".tar.gz2 boot/* lib/modules/* --owner=0 --group=0
+####Move directly to the workspace. Only keeping bzImage and modules
+####tar -cvzf /container/workspace/kernel_"$localversion".tar.gz2 boot/bzImage lib/modules/* --owner=0 --group=0
+####doesn't work
+###
+###tar -cvzf /kernel_"$localversion".tar.gz boot/bzImage lib/modules/* --owner=0 --group=0
+###EOF
+###
 
 #FROM compile-kernel AS cache-copy-kernel
 #COPY???
