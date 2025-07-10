@@ -126,17 +126,21 @@ jobs:
       # Build Docker image  
       - name: Build Docker image with cache
         run: |
+          echo "Current pwd = $PWD in docker image build"
           mkdir -p /tmp/.buildx-cache
           docker buildx build \
             --cache-from type=local,src=/tmp/.buildx-cache \
             --cache-to type=local,dest=/tmp/.buildx-cache,mode=max \
             --build-arg BUILDKIT_INLINE_CACHE=1 \
             --tag kernel-linux-ps4:latest \
+            --build-context workspace=${{ github.workspace }} \
             --load \
             .
       # This /tmp is not gonna be made if the directory doesn't exist already
       # --load loads the contents the image into the workspace OS, otherwise only in cache
       # --cache-to type=local caches straight to the host machine, meaning github workspace
+      #
+      # build-context workspace=./ results in /home/runner/work/repo/repo by default
    
  
      
@@ -150,8 +154,17 @@ jobs:
           echo "localversion is originally = $localversion"
           echo "localversion=$localversion" >> $GITHUB_OUTPUT
           docker cp kernel:/kernel_"$localversion".tar.gz2 ${{ github.workspace }} 
-        # Copy kernel.tar.gz to the github workspace        
-      
+        # Copy kernel.tar.gz to the github workspace
+
+        #- name: Cache the built kernel directory into workspace
+        #run: |
+        #  echo "Copying build directory to work space using r-sync"
+        #  apt-get install -y rsync
+        #  docker psu
+        #  docker exec sh -c "rsync
+        
+        #  Using bind mount/volumes in docker build instead
+        #  
       - name: Use localversion env
         env:
           localversion: ${{ steps.docker-run-step.outputs.localversion }}
