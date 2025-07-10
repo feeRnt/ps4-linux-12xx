@@ -122,12 +122,26 @@ WORKDIR /container/workspace
 # Compile the Linux kernel
 FROM clone-kernel-source AS compile-kernel
 
-RUN --mount=type=bind,from=workspace,target=/container/workspace <<"EOF"
+RUN --mount=type=bind,from=workspace,target=/container/workspace,rw <<"EOF"
 set -e
 # Exit immediately if any command fails
+# RUN --mount for docker build is ro by default. Not sure if the writes to this host persist.
 
 echo "Testing if host directory mounting was successful."
 ls /container/workspace
+
+if [ -f persistence_test* ]; then
+	echo "Files are persisting across runs! Congratulations."
+else
+	echo "Files are not persisting across runs, OR, this is the first uncached action run."
+fi;
+
+echo "File perms of mounted directory:"
+stat /cotainer/workspace /container/workspace/*
+#echo "Changing perms of the mounted directory"
+#chmod 777 -R /container/workspace
+
+echo "persisting!" > persistence_test_"$(date --iso=s)".txt
 
 #export BRANCH=`git rev-parse --abbrev-ref HEAD | sed s/-/+/g`
 #export SHA1=`git rev-parse --short HEAD`
