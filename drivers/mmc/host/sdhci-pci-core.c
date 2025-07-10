@@ -379,21 +379,20 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 	.quirks		= SDHCI_QUIRK_BROKEN_TIMEOUT_VAL | // You can't use |= as this is the // initalizer
 			  SDHCI_QUIRK_DELAY_AFTER_POWER |
 			  SDHCI_QUIRK_SINGLE_POWER_WRITE |
-			  SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER |
-			//= SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER // might be unnecessary		
-			//don't need SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN
+			  SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER | //= SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER // might be unnecessary		
+			  					//don't need SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN
 			//Based on sdhci-tegra all above ^^^
-	
-	//		= MMC_QUIRK_NONSTD_SDIO  //this needs to be in card->quirks
-						// putting this here puts it in host->quirks only
+//			  SDHCI_QUIRK_CLOCK_BEFORE_RESET |   //CLOCK_BEFORE_RESET_ and RESET_DATA_ON_IOS don't work together well. Never gets to
+			  				     // tuning or add func. 
+			  SDHCI_QUIRK_RESET_CMD_DATA_ON_IOS,
+
 	/* 		  SDHCI_QUIRK_CLOCK_BEFORE_RESET |
 			  SDHCI_QUIRK_NO_CARD_NO_RESET |
-			  SDHCI_QUIRK_MISSING_CAPS |
+			  SDHCI_QUIRK_MISSING_CAPS | //missing caps causes "sdhci-pci: probe of [pci_address] rejects match -19"
 			  SDHCI_QUIRK_32BIT_DMA_ADDR
 	*/
-	//missing caps causes "sdhci-pci: probe of [pci_address] rejects match -19"
-			  SDHCI_QUIRK_CLOCK_BEFORE_RESET |
-			  SDHCI_QUIRK_RESET_CMD_DATA_ON_IOS,
+	//		= MMC_QUIRK_NONSTD_SDIO  //this needs to be in card->quirks
+						// putting this here puts it in host->quirks only
 
 	.quirks2	= SDHCI_QUIRK2_PRESET_VALUE_BROKEN, //ours is maybe broken. test w/o too
 			  SDHCI_QUIRK2_CLOCK_DIV_ZERO_BROKEN,
