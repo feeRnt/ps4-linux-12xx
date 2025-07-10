@@ -126,9 +126,10 @@ RUN --mount=type=bind,from=workspace,target=/container/workspace,rw <<"EOF"
 set -e
 # Exit immediately if any command fails
 # RUN --mount for docker build is ro by default. Not sure if the writes to this host persist.
+# Option rw allows write.
 
 echo "Testing if host directory mounting was successful."
-ls /container/workspace
+ls -a /container/workspace
 
 if [ -f persistence_test* ]; then
 	echo "Files are persisting across runs! Congratulations."
@@ -137,10 +138,11 @@ else
 fi;
 
 echo "File perms of mounted directory:"
-stat /cotainer/workspace /container/workspace/*
+stat /container/workspace /container/workspace/*
 #echo "Changing perms of the mounted directory"
 #chmod 777 -R /container/workspace
 
+touch "write_test"
 echo "persisting!" > persistence_test_"$(date --iso=s)".txt
 
 #export BRANCH=`git rev-parse --abbrev-ref HEAD | sed s/-/+/g`
@@ -176,7 +178,13 @@ make ${MAKE_OPTS} modules_install
 echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
 cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
 cd ${GCE_INSTALL_DIR}
-tar -cvzf /kernel_"$localversion".tar.gz2 boot/* lib/modules/* --owner=0 --group=0
+#tar -cvzf /kernel_"$localversion".tar.gz2 boot/* lib/modules/* --owner=0 --group=0
+
+#Move directly to the workspace. Only keeping bzImage and modules
+#tar -cvzf /container/workspace/kernel_"$localversion".tar.gz2 boot/bzImage lib/modules/* --owner=0 --group=0
+#doesn't work.
+
+tar -cvzf /kernel_"$localversion".tar.gz2 boot/bzImage lib/modules/* --owner=0 --group=0
 EOF
 
 

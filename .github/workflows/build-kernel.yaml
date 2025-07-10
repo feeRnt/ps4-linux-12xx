@@ -64,6 +64,7 @@ jobs:
             ${{ github.workspace }}
           #The location where Docker will have cache layers (inside github.workspace root)
           #And /home/runner/work/ps4-linux-12xx/ps4-linux-12xx = github.workspace
+        
           key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}  # Cache key
           restore-keys: |
             ${{ runner.os }}-docker-
@@ -97,20 +98,27 @@ jobs:
         if: steps.check_repo.outputs.exists == 'false'
         uses: actions/checkout@v4
         with:
+          fetch-depth: 1
+          #fetch-depth=--depth
           #repository: feeRnt/ps4-linux-12xx
           #path: ps4-linux-12xx
           ref: ${{ github.ref }}
           #repository: is optional. Default is the repo that triggered the event
+          #ref = default branch, for us (caller).
         
       - name: Move config file
         if: steps.check_repo.outputs.exists == 'false'
         run: |
           echo "Current PWD = $PWD"
-          ls
+          ls -a
           echo "cd'ing to github.workspace = ${{ github.workspace }}"
           cd ${{ github.workspace }}
           echo "Current PWD after moving to hub.workspace = $PWD"
-          ls
+          ls -a
+          echo "Total commits in this repo = . . . "
+          git rev-list --all --count
+          echo "Branches in this repo"
+          git branch
           mv config .config
         #Cannot have run and action in the same step
 
@@ -118,10 +126,35 @@ jobs:
         if: steps.check_repo.outputs.exists == 'true'
         run: |
           cd ${{ github.workspace }}
-          git pull origin --update-shallow --no-rebase --allow-unrelated-histories -X theirs && mv config .config
+          echo "Total commits in this repo:"
+          git rev-list --all --count
+          echo "Branches in this repo:"
+          git branch
+          git pull origin ${{ github.ref }} --update-shallow --no-rebase -X theirs && mv config .config
+
+        # Code:
+        # _DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | awk '/HEAD branch/ {print $NF}')
+        # _DEFAULT_BRANCH=${DEFAULT_BRANCH:-ps4-linux-5.15.y-conservative2}
+        # git fetch --depth=1 origin ${{ github.ref }} 
+        # git reset origin/${{ github.ref }} --hard
+
+        # Assigns master branch, or uses one if unset. Used for fetch and reset. Nvm unnecessary.
+         
+        #Nvm reset is unnecessary. The slow fetch was because of pulling another branch
+        #git pull origin --update-shallow --no-rebase -X theirs && mv config .config
+        #git pull origin --update-shallow --no-rebase --allow-unrelated-histories -X theirs && mv config .config
         # git pull origin --rebase -X theirs && mv config .config
         # Rebase version. unrelated-histories not possible. Best to merge if you don't frequently sync cache with repo.
+
+        # Since I used actions/checkout, and since my repo was forked using github webpage,
+        # it contains the entire linux history up to 5.15, unlike my local clone.
+        # Which makes --allow-unrelated-histories very slow.
+
+        # Using git fetch origin; git reset HEAD --hard is probably the best option..
+        # But in case some obj files are not excluded. . .
         # cd ../ (unnecessary since the path is not saved between steps)
+
+
 
       # Build Docker image  
       - name: Build Docker image with cache
@@ -149,12 +182,16 @@ jobs:
       - name: retrieve artifact from docker image
         id: docker-run-step
         run: |
+          echo "ls -a in retrieve artifact step:"
+          ls -a
           docker run -it --name kernel -d kernel-linux-ps4:latest
-          localversion=`docker exec kernel sh -c "cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'"`
+          localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'`
           echo "localversion is originally = $localversion"
           echo "localversion=$localversion" >> $GITHUB_OUTPUT
           docker cp kernel:/kernel_"$localversion".tar.gz2 ${{ github.workspace }} 
         # Copy kernel.tar.gz to the github workspace
+        #localversion=`docker exec kernel sh -c "cat /container/workspace/.config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'"`
+        # Unnecessary when files are on the workspace directly
 
         #- name: Cache the built kernel directory into workspace
         #run: |
@@ -181,12 +218,27 @@ jobs:
           path: ${{ github.workspace }}/kernel_${{ steps.docker-run-step.outputs.localversion }}.tar.gz2
           # This path is the github actiions root
       
-          # Some yaml facts.
-          # Even if your indentation or other errors are further down
-          # in the file, yaml will complain of missing "-" way up at
-          # the start.
-          #
-          # Minor indentations fault can break your yaml, so format properly.
-          #
-          # There is github.com/google/yamlfmt , which works decent
-          # At least it tells you what is broken and what isn't
+# Some yaml facts.
+ # Even if your indentation or other errors are further down
+ # in the file, yaml will complain of missing "-" way up at the start.
+
+ # Minor indentations fault can break your yaml, so format properly.
+
+ # There is github.com/google/yamlfmt , which works decent
+ # At least it tells you what is broken and what isn't
+ # IMPORTANT: You CANNOT, put comments in a run block, before the block is over.
+ # Such as:
+ # run: |
+ #   echo this
+ #   echo that
+ #   #comment
+ #   echo final
+ #
+ # This is invalid ! ^^^
+ #
+ # It needs to be ->
+ # run: |
+ #   echo this
+ #   echo that
+ #   echo final
+ #   # Comment. On command 2. . . 
