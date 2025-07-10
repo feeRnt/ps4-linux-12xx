@@ -266,7 +266,7 @@ static int amdgpu_atombios_dp_get_dp_link_config(struct drm_connector *connector
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
 	/* Liverpool is always connected to an encoder that needs 4 lanes */
-	if (adev->asic_type == CHIP_LIVERPOOL)
+	if ((adev->asic_type == CHIP_LIVERPOOL) || (adev->asic_type == CHIP_GLADIUS))
 		min_lane_num = 4;
 
 	if (amdgpu_connector_encoder_get_dp_bridge_encoder_id(connector) ==
