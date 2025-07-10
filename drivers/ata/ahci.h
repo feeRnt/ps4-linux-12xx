@@ -247,6 +247,7 @@ enum {
 	AHCI_HFLAG_43BIT_ONLY		= BIT(27), /* 43bit DMA addr limit */
 	AHCI_HFLAG_INTEL_PCS_QUIRK	= BIT(28), /* apply Intel PCS quirk */
 	AHCI_HFLAG_ATAPI_DMA_QUIRK	= BIT(29), /* force ATAPI to use DMA */
+	AHCI_HFLAG_31BIT_ONLY 		= BIT(30), /* 31bit DMA addr limit */
 
 	/* ap->flags bits */
 
