@@ -111,17 +111,23 @@ EOF
 
 FROM install-extra-firmware AS clone-kernel-source
 
-WORKDIR /kernel-source
-COPY . .
-#Copy only the contents (not the folder) of the workspace folder into docker image.
-
+#WORKDIR /kernel-source
+#COPY . .
+# Copy only the contents (not the folder) of the workspace folder into docker image.
+# Use bind mount to directly modify github actions files without copying.
+# Relies on buildcontext in buildx.
+RUN mkdir -p /container/workspace
+WORKDIR /container/workspace
 
 # Compile the Linux kernel
 FROM clone-kernel-source AS compile-kernel
 
-RUN <<"EOF"
+RUN --mount=type=bind,from=workspace,target=/container/workspace <<"EOF"
 set -e
 # Exit immediately if any command fails
+
+echo "Testing if host directory mounting was successful."
+ls /container/workspace
 
 #export BRANCH=`git rev-parse --abbrev-ref HEAD | sed s/-/+/g`
 #export SHA1=`git rev-parse --short HEAD`
@@ -158,6 +164,11 @@ cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
 cd ${GCE_INSTALL_DIR}
 tar -cvzf /kernel_"$localversion".tar.gz2 boot/* lib/modules/* --owner=0 --group=0
 EOF
+
+
+#FROM compile-kernel AS cache-copy-kernel
+#COPY???
+#Handled with bind mount in compile-kernel. Building directly on the host fs
 
 ## GCE = Google Compute Engine, adapted from 
 #https://github.com/google/bbr/blob/v3/gce-install.sh
