@@ -3217,6 +3217,7 @@ static int sky2_init(struct sky2_hw *hw)
 			hw->chip_id);
 		return -EOPNOTSUPP;
 	}
+	dev_info(&hw->pdev->dev, "chip type 0x%x\n", hw->chip_id);
 
 	hw->pmd_type = sky2_read8(hw, B2_PMD_TYP);
 	if (hw->pmd_type == 'L' || hw->pmd_type == 'S' || hw->pmd_type == 'P')
