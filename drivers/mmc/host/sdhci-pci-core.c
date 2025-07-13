@@ -378,9 +378,11 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 	// Adding certain quirks that are in sdhci_RICOH_mmc
 	.quirks		= SDHCI_QUIRK_BROKEN_TIMEOUT_VAL | // You can't use |= as this is the // initalizer
 			  SDHCI_QUIRK_DELAY_AFTER_POWER |
-			  SDHCI_QUIRK_SINGLE_POWER_WRITE |
-			  SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER, //= SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER // might be unnecessary		
-			  					//don't need SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN
+			  SDHCI_QUIRK_SINGLE_POWER_WRITE,
+	                //= SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER // might be unnecessary. 
+			//This might've broken the sdhci stack.
+
+                        //don't need SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN
 			//Based on sdhci-tegra all above ^^^
 			//SDHCI_QUIRK_CLOCK_BEFORE_RESET |   //CLOCK_BEFORE_RESET and RESET_DATA_ON_IOS don't work together well. Never gets to
 			  				     // tuning or add func. 
