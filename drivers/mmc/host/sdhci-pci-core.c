@@ -361,9 +361,6 @@ static void aeolia_remove_slot(struct sdhci_pci_slot *slot, int dead)
 
 static int aeolia_enable_dma(struct sdhci_pci_slot *slot)
 {
-	if (dma_set_mask(&slot->chip->pdev->dev, DMA_BIT_MASK(31))) {
-		return -EINVAL;
-	}
 	if (dma_set_mask_and_coherent(&slot->chip->pdev->dev, DMA_BIT_MASK(31))) {
 		return -EINVAL;
 	}
