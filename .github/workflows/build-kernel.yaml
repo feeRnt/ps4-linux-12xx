@@ -217,6 +217,21 @@ jobs:
           # List of options from
           # https://github.com/actions/checkout/blob/main/action.yml
 
+          # Works all well except,  
+          #   Warning: you are leaving 1 commit behind, not connected to
+          # any of your branches:
+          # <hash> <commit message>
+          # If you want to keep it by creating a new branch, this may be a good time
+          #to do so with:
+          # git branch <new-branch-name> <hash>
+          # And garbage collector is disabled by checkout by default.. 
+          # 
+          #Disabling automatic garbage collection
+          #/usr/bin/git config --local gc.auto 0
+          #
+          #Can disable it manually, or can switch to git fetch with manual auth at a later date (because of
+          #headaches with action/checkout
+
       - name: Move config file after repo update
         if: steps.check_repo.outputs.exists == 'true'
         working-directory: ${{ github.workspace }}/kernel-source-host
@@ -355,8 +370,8 @@ jobs:
         # Using `--repo` makes it so that this step doesn't require checking out the repo first.
         run: |
           echo "There was a cache hit for github workspace, and we just completed the kernel compilation. Hence deleting the old cache."
-          gh cache delete --repo ${{ github.repository }} ${{ steps.compile-kernel-step.outputs.cache-primary-key }}     
-      
+          gh cache delete --repo ${{ github.repository }} ${{ steps.cache-restore-workspace.outputs.cache-primary-key }}
+
       - name: Save Cache of Github Workspace
         uses: actions/cache/save@v4
         # Save the cache even if build steps fail.
