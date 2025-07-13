@@ -44,6 +44,7 @@ jobs:
           echo "Actions Runner Group Name: $(id -gn)"
           echo "Actions Runner Group ID: $(id -g)"
           echo "Actions Runner OS: ${{ runner.os }}"
+          #echo "Actions github_token:" #Don't print this, unsafe. (though it might be starred out in logs, but still.) 
       
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -123,15 +124,19 @@ jobs:
         if: steps.check_repo.outputs.exists == 'false'
         working-directory: ${{ github.workspace }}/kernel-source-host
         run: |
+          echo "git remote show origin = $(git remote show origin)"
           _DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | awk '/HEAD branch/ {print $NF}')
           echo "_DEFAULT_BRANCH = $_DEFAULT_BRANCH"
           echo _DEFAULT_BRANCH="$_DEFAULT_BRANCH" >> $GITHUB_ENV
           mv config .config
-          # config will exist if we clone. so no need to use -f check
-          
-      - name: Manually set up cached repo/.git as a safe directory for git actions
-        if: steps.check_repo.outputs.exists == 'true' && steps.cache-restore-workspace.outputs.cache-hit == 'true'
-        run: /usr/bin/git config --global --add safe.directory /home/runner/work/ps4-linux-12xx/ps4-linux-12xx/kernel-source-host 
+          # config will exist if we checkout. so no need to use -f check
+
+
+      # TRUE::
+      #MANUAL TESTING
+      #- name: Manually set up cached repo/.git as a safe directory for git actions
+      #  if: steps.check_repo.outputs.exists == 'true' && steps.cache-restore-workspace.outputs.cache-hit == 'true'
+      #  run: /usr/bin/git config --global --add safe.directory /home/runner/work/ps4-linux-12xx/ps4-linux-12xx/kernel-source-host 
       
       #- name: Set up Github auth manually
       #  if: steps.check_repo.outputs.exists == 'true' && steps.cache-restore-workspace.outputs.cache-hit == 'true'
@@ -151,33 +156,77 @@ jobs:
       #    
       #    #/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
       #    # Sets up authorization using a secret. Command is obfuscated in github logs.
+      #    Maybe it's possible to figure out how the key is calucalted from 
+      #    https://github.com/actions/checkout/blob/09d2acae674a48949e3602304ab46fd20ae0c42f/dist/index.js#L5102
+      #    etc. but it's too complicated and a waste of time for now.
+      #    I'll use the checkout action with different options.
+      #    Huh according to copilot (keep getting surprised about how it seems pretty smart)
+      #
+      #    - name: Set up git authentication for cached repo
+      #      if: steps.check_repo.outputs.exists == 'true' && steps.cache-restore-workspace.outputs.cache-hit == 'true'
+      #      working-directory: ${{ github.workspace }}/kernel-source-host
+      #      run: |
+      #      git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x-access-token:${{ secrets.GITHUB_TOKEN }} | base64)"
+      #      I can try this next too if really needed...
 
       - name: Update ps4-linux-12xx repo if it exists
         if: steps.check_repo.outputs.exists == 'true'
+        #working-directory: ${{ github.workspace }}/kernel-source-host
+        #OLD VERSION WITHOUT CHECKOUT
+        #run: |
+        #  echo "git remote show origin = $(git remote show origin)"
+        #  _DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | awk '/HEAD branch/ {print $NF}')
+        #  echo "_DEFAULT_BRANCH = $_DEFAULT_BRANCH"
+        #  echo _DEFAULT_BRANCH="$_DEFAULT_BRANCH" >> $GITHUB_ENV
+
+        #  echo "Total commits in this repo:"
+        #  git rev-list --all --count
+        #  echo "Branches in this repo:"
+        #  git branch
+        #  echo "github.ref is = ${{ github.ref }}."
+        #  echo "git remote information:"
+        #  git remote -v
+
+        #  echo "Files in repo before fetch:"
+        #  ls -a
+        #
+        #  git fetch --depth=1 origin "$_DEFAULT_BRANCH"
+        #  git reset --hard origin/"$_DEFAULT_BRANCH"
+        #  if [ -f config ]; then
+        #    echo "Renaming config to .config"
+        #    mv config .config
+        #  else
+        #    echo ".config already exists. Continuing."
+        #  # for reruns without updating the repo
+        #  fi;
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.workspace }}/kernel-source-host
+          repository: ${{ github.repository }} #default
+          ref: ${{ github.ref }}
+          fetch-depth: 1
+          token: ${{ github.token }} #default
+          persist-credentials: false #non-default
+          #'Whether to configure the token or SSH key with the local git config'
+          #https://github.com/actions/checkout/issues/485 (might be best to keep false)
+          clean: false #non-default
+          #'Whether to execute `git clean -ffdx && git reset --hard HEAD` before fetching'
+          #This is what resets your cache. clean removes untracked files, -ffdx ensures full clean.
+
+          # Checkout should only touch tracked files
+          # List of options from
+          # https://github.com/actions/checkout/blob/main/action.yml
+
+      - name: Move config file after repo update
+        if: steps.check_repo.outputs.exists == 'true'
         working-directory: ${{ github.workspace }}/kernel-source-host
         run: |
+          echo "git remote show origin = $(git remote show origin)"
           _DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | awk '/HEAD branch/ {print $NF}')
           echo "_DEFAULT_BRANCH = $_DEFAULT_BRANCH"
           echo _DEFAULT_BRANCH="$_DEFAULT_BRANCH" >> $GITHUB_ENV
-
-          echo "Total commits in this repo:"
-          git rev-list --all --count
-          echo "Branches in this repo:"
-          git branch
-          echo "github.ref is = ${{ github.ref }}."
-          echo "git remote information:"
-          git remote -v
-          
-          git fetch --depth=1 origin "$_DEFAULT_BRANCH"
-          git reset --hard origin/"$_DEFAULT_BRANCH"
-          if [ -f config ]; then
-            echo "Renaming config to .config"
-            mv config .config
-          else
-            echo ".config already exists. Continuing."
-          # for reruns without updating the repo
-          fi;
-
+          mv config .config
+          # config will exist if we checkout. so no need to use -f check 
       
       # Build Docker image  
       - name: Build Docker image with cache
