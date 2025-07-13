@@ -11,9 +11,10 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
+    env: 
+       GITHUB_TOKEN: ${{ github.token }}
     runs-on: ubuntu-latest # Ubuntu 24.04. But Docker image I use is Ubuntu 22.04 
-    steps:
-      
+    steps: 
       - name: Set up cache env vars
         id: cache-workspace-vars
         run: |
@@ -127,6 +128,29 @@ jobs:
           echo _DEFAULT_BRANCH="$_DEFAULT_BRANCH" >> $GITHUB_ENV
           mv config .config
           # config will exist if we clone. so no need to use -f check
+          
+      - name: Manually set up cached repo/.git as a safe directory for git actions
+        if: steps.check_repo.outputs.exists == 'true' && steps.cache-restore-workspace.outputs.cache-hit == 'true'
+        run: /usr/bin/git config --global --add safe.directory /home/runner/work/ps4-linux-12xx/ps4-linux-12xx/kernel-source-host 
+      
+      #- name: Set up Github auth manually
+      #  if: steps.check_repo.outputs.exists == 'true' && steps.cache-restore-workspace.outputs.cache-hit == 'true'
+      #  working-directory: ${{ github.workspace }}/kernel-source-host
+      #  run: |
+      #    echo "Setting up auth"
+      #    # /usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+      #    # Not needed
+      #    /usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+      #    # clears all the core.sshCommand configs
+      #    
+      #    # /usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+      #    # Not needed
+      #    
+      #    #/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+      #    # Clears al the http.https://github.com/.extraheader configs
+      #    
+      #    #/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+      #    # Sets up authorization using a secret. Command is obfuscated in github logs.
 
       - name: Update ps4-linux-12xx repo if it exists
         if: steps.check_repo.outputs.exists == 'true'
