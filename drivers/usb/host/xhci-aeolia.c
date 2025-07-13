@@ -387,8 +387,7 @@ static int xhci_aeolia_probe(struct pci_dev *dev, const struct pci_device_id *id
 		pci_set_master(dev);
 	}
 
-	if (dma_set_mask(&dev->dev, DMA_BIT_MASK(31)) ||
-		dma_set_mask_and_coherent(&dev->dev, DMA_BIT_MASK(31))) {
+	if (dma_set_mask_and_coherent(&dev->dev, DMA_BIT_MASK(31))) {
 		return -ENODEV;
 	}
 
