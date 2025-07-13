@@ -951,12 +951,16 @@ try_again:
 		} else if (err) {
 			pr_debug("sdio: err in set_uhs_voltage. Removing 1_8V flag from ocr.\n");
 			ocr &= ~R4_18V_PRESENT;
-		} else if (tries < 1) { 			// arbitrarily pre_init the card once at this function
+		} 
+		/*
+		else if (tries < 1) { 			// arbitrarily pre_init the card once at this function
+			pr_debug("sdio: Doing mmc_sdio_pre_init from %s.\n", __func__);
 			mmc_sdio_pre_init(host, ocr_card, card);
 	    		tries++;
 			retries--;
 			goto try_again;
 		}
+		*/
 	}
 
 	/*

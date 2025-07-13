@@ -3364,7 +3364,7 @@ EXPORT_SYMBOL_GPL(sdhci_send_tuning);
 static int __sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 {
 	int i;
-	int custom_delay = 200;
+	//int custom_delay = 200;
 
 	pr_info("sdhci: I am in %s.\n", __func__);
 	pr_info("I have successfully issued the int counter i in %s.\n", __func__);
