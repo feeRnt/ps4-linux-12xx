@@ -164,8 +164,10 @@ void mmc_request_done(struct mmc_host *host, struct mmc_request *mrq)
 	}
 
 	if (err && cmd->retries && mmc_host_is_spi(host)) {
-		if (cmd->resp[0] & R1_SPI_ILLEGAL_COMMAND)
+		if (cmd->resp[0] & R1_SPI_ILLEGAL_COMMAND) {
+			pr_debug("core: cmd->resp[0] has R1_SPI_ILLEGAL_COMMAND in %s.\n", __func__);
 			cmd->retries = 0;
+		}
 	}
 
 	if (host->ongoing_mrq == mrq)
@@ -198,7 +200,7 @@ void mmc_request_done(struct mmc_host *host, struct mmc_request *mrq)
 				mrq->sbc->resp[0], mrq->sbc->resp[1],
 				mrq->sbc->resp[2], mrq->sbc->resp[3]);
 		}
-		//\\//err = cmd->error
+		//\\//err = cmd->error. We always have this one.
 		pr_debug("%s: req done (CMD%u): %d: %08x %08x %08x %08x\n",
 			mmc_hostname(host), cmd->opcode, err,
 			cmd->resp[0], cmd->resp[1],
@@ -245,7 +247,7 @@ ending function (return void).\n err = %d", err);
 
 	/*
 	 * For sdio rw commands we must wait for card busy otherwise some
-	 * sdio devices won't work properly. //\\note this
+	 * sdio devices won't work properly. //\\IMPORTANT: note this
 	 * And bypass I/O abort, reset and bus suspend operations.
 	 */
 	if (sdio_is_io_busy(mrq->cmd->opcode, mrq->cmd->arg) &&
@@ -254,6 +256,9 @@ ending function (return void).\n err = %d", err);
 		int tries = 500; /* Wait aprox 500ms at maximum */
 		//\\increase ... ...? 
 		pr_info("mmc-core: sdio_is_io_busy in __mmc_start_request. Waiting 500 ms\n");
+		// We always seem to have the io_busy... 
+		// In sdio_init_func, it completes after the first
+		// busy... instead of waiting 500 times. Command succeeds, but it seems with -EIO
 
 		while (host->ops->card_busy(host) && --tries)
 			mmc_delay(1);
@@ -1286,6 +1291,9 @@ int mmc_host_set_uhs_voltage(struct mmc_host *host)
 	host->ios.clock = 0;
 	mmc_set_ios(host);
 
+	//https://patchew.org/linux/20221117094859.20582-1-quic._5Fsartgarg@quicinc.com/
+	//host->doing_signal_voltage_switch = true;
+
 	if (mmc_set_signal_voltage(host, MMC_SIGNAL_VOLTAGE_180))
 		return -EAGAIN;
 
@@ -1293,6 +1301,8 @@ int mmc_host_set_uhs_voltage(struct mmc_host *host)
 	mmc_delay(10);
 	host->ios.clock = clock;
 	mmc_set_ios(host);
+
+  	//host->doing_signal_voltage_switch = true;
 
 	return 0;
 }
@@ -1321,9 +1331,11 @@ int mmc_set_uhs_voltage(struct mmc_host *host, u32 ocr)
 	if (err)
 		goto power_cycle;
 
-	if (!mmc_host_is_spi(host) && (cmd.resp[0] & R1_ERROR))
+	if (!mmc_host_is_spi(host) && (cmd.resp[0] & R1_ERROR)) {
+		pr_debug("core: returning EIO in %s because not spi, and rsp[0] has R1_error.\n",
+				__func__);
 		return -EIO;
-
+	}
 	/*
 	 * The card should drive cmd and dat[0:3] low immediately
 	 * after the response of cmd11, but wait 1 ms to be sure
@@ -2195,6 +2207,7 @@ static int mmc_rescan_try_freq(struct mmc_host *host, unsigned freq)
 			return 0;
 
 out:
+	pr_debug("core: out case in %s. Returning EIO after mmc_power_off(host).\n", __func__);
 	mmc_power_off(host);
 	return -EIO;
 }

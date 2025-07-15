@@ -145,7 +145,7 @@ static inline bool mmc_op_multi(u32 opcode)
 #define R1_CARD_ECC_DISABLED	(1 << 14)	/* sx, a */
 #define R1_ERASE_RESET		(1 << 13)	/* sr, c */
 #define R1_STATUS(x)            (x & 0xFFF9A000)
-#define R1_CURRENT_STATE(x)	((x & 0x00001E00) >> 9)	/* sx, b (4 bits) */
+#define R1_CURRENT_STATE(x)	((x & 0x00001E00) >> 9)	/* sx, b (4 bits) */ /*Take 1<<[9,12], and flip them on. This is later used for comparing using & with u32 status, to only keep the valid bits.*/
 #define R1_READY_FOR_DATA	(1 << 8)	/* sx, a */
 #define R1_SWITCH_ERROR		(1 << 7)	/* sx, c */
 #define R1_EXCEPTION_EVENT	(1 << 6)	/* sr, a */
@@ -169,6 +169,7 @@ static inline bool mmc_ready_for_data(u32 status)
 	 */
 	return status & R1_READY_FOR_DATA &&
 	       R1_CURRENT_STATE(status) == R1_STATE_TRAN;
+	/* return 1 if status has READY_FOR_DATA, and CURRENT_STATE == STATE_TRAN */
 }
 
 /*

@@ -1443,15 +1443,17 @@ int mmc_attach_sdio(struct mmc_host *host)
 	pr_debug("sdio: I am in mmc_attach_sdio.\n");
 	WARN_ON(!host->claimed);
 
+	pr_debug("sdio: Going to mmc_send_io_op_cond from %s.\n", __func__);
 	err = mmc_send_io_op_cond(host, 0, &ocr);
 	if (err)
 		return err;
 
+	pr_debug("sdio: Going to mmc_attach_bus from %s.\n", __func__);
 	mmc_attach_bus(host, &mmc_sdio_ops);
 	if (host->ocr_avail_sdio)
 		host->ocr_avail = host->ocr_avail_sdio;
-
-
+	
+	pr_debug("sdio: Going to mmc_select_voltage from %s.\n", __func__);
 	rocr = mmc_select_voltage(host, ocr);
 
 	/*
@@ -1481,8 +1483,13 @@ int mmc_attach_sdio(struct mmc_host *host)
 		/*
 		 * Do not allow runtime suspend until after SDIO function
 		 * devices are added.
-		 */
-		pm_runtime_get_noresume(&card->dev);
+		 * https://groups.google.com/g/linux.kernel/c/Oj4sCtFXJHY/m/38HwaOgEiucJ
+		 * We don't have MMC_CAP_POWER_OFF_CARD == 1 << 13
+		 * host->caps = 100101111110001100100010110010
+		 * 				 1
+		 *				 3th bit
+		*/
+		 pm_runtime_get_noresume(&card->dev);
 
 		/*
 		 * Let runtime PM core know our card is active

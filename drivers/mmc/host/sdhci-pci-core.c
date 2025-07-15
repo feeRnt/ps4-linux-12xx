@@ -380,7 +380,7 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 			  SDHCI_QUIRK_DELAY_AFTER_POWER |
 			  SDHCI_QUIRK_SINGLE_POWER_WRITE,
 	                //= SDHCI_QUIRK_NO_SIMULT_VDD_AND_POWER // might be unnecessary. 
-			//This might've broken the sdhci stack.
+			//This might've broken the sdhci stack. (Probably not)
 
                         //don't need SDHCI_QUIRK_CAP_CLOCK_BASE_BROKEN
 			//Based on sdhci-tegra all above ^^^

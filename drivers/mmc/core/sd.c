@@ -204,6 +204,7 @@ static int mmc_decode_scr(struct mmc_card *card)
 	unsigned int scr_struct;
 	u32 resp[4];
 
+	pr_debug("sd: I am in %s.\n", __func__);
 	resp[3] = card->raw_scr[1];
 	resp[2] = card->raw_scr[0];
 

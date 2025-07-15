@@ -1528,6 +1528,7 @@ static inline bool sdhci_manual_cmd23(struct sdhci_host *host,
 {
 	pr_info("sdhci: I am in sdhci_manual_cmd32.\n");
 	return mrq->sbc && !(host->flags & SDHCI_AUTO_CMD23);
+	// if mrq->sbc exists, and host->flags *doesn't* have auto_cmd. If it does, then return is 0.
 }
 
 static inline void sdhci_auto_cmd_select(struct sdhci_host *host,
@@ -1999,7 +2000,7 @@ Assigning cmd->error = -EIO. Returning false.\n",
 	if (cmd == host->deferred_cmd)
 		host->deferred_cmd = NULL;
 
-	pr_info("sdhci: End of sdhci_send_command_retry function. Returning true.\n");
+	pr_info("sdhci: End of sdhci_send_command_retry function. Returning true. No need to retry the command.\n");
 	return true;
 }
 
@@ -2544,16 +2545,16 @@ void sdhci_request(struct mmc_host *mmc, struct mmc_request *mrq)
 	/* check if sdhci_manual_cmd23() returns true or false.
 	 * If  true, cmd = mrq->sbc ; if false, cmd = mrq->cmd
 	*/
-	pr_info("Just tested manual_cmd23. cmd = mrq->sbc? %d. If no, then mrq->cmd\n",
+	pr_info("Just tested manual_cmd23. cmd = mrq->sbc? %08u. If no, then mrq->cmd\n",
 		cmd);
 		/*calling the function again in the pr_info will damage the logging
-		this return seems to be in binary, not hex or decimal, but it returns negative,
-		so no mrq->sbc for our case*/
+		it returns negative with decimal %d.*/
 	if (!sdhci_send_command_retry(host, cmd, flags)) { 
 		pr_info("sdhci: sdhci_send_command_retry is false, going to out_finish.\n");
 		goto out_finish;
 	}
-	pr_info("sdhci: Doing spin_unlock_irqrestore in sdhci_request. Returning void.\n");
+	pr_info("sdhci: Doing spin_unlock_irqrestore in sdhci_request. MMC Request never finished.."
+			"Returning void.\n");
 	spin_unlock_irqrestore(&host->lock, flags);
 
 	return;
@@ -2561,6 +2562,7 @@ void sdhci_request(struct mmc_host *mmc, struct mmc_request *mrq)
 out_finish:
 	pr_err("sdhci: out_finish label in sdhci_request.\
 	Doing sdhci_finish_mrq.\n");
+	// IMPORTANT: we never get this. . . 
 	sdhci_finish_mrq(host, mrq);
 	
 	pr_err("sdhci: out_finish label in sdhci_request.\
@@ -3306,7 +3308,7 @@ Setting blocksize to 64.\n");
 	 */
 	sdhci_writew(host, SDHCI_TRNS_READ, SDHCI_TRANSFER_MODE);
 
-	if (!sdhci_send_command_retry(host, &cmd, flags)) { //true = retry not needed
+	if (!sdhci_send_command_retry(host, &cmd, flags)) { //true = retry not needed, false = ret needed
 		pr_info("sdhci: Retry needed? in sdhci_send_tuning.\
 spin_unlock_irqrestore. Setting tuning_done=0.\n");	
 		spin_unlock_irqrestore(&host->lock, flags);
@@ -4440,6 +4442,8 @@ static irqreturn_t sdhci_thread_irq(int irq, void *dev_id)
 	if (cmd && !sdhci_send_command_retry(host, cmd, flags))
 		sdhci_finish_mrq(host, cmd->mrq); //_retry, true=notneeded
 						  //      ,false=needed
+        //if there is cmd, and _retry func returned false, then sdhci_finish_mrq
+
 	spin_unlock_irqrestore(&host->lock, flags);
 
 	if (isr & (SDHCI_INT_CARD_INSERT | SDHCI_INT_CARD_REMOVE)) {
