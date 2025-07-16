@@ -248,6 +248,8 @@ int sdio_reset(struct mmc_host *host)
 {
 	int ret;
 	u8 abort;
+	
+	pr_debug("sdio_ops: I am in %s.\n", __func__);
 
 	/* SDIO Simplified Specification V2.0, 4.4 Reset for SDIO */
 
@@ -258,6 +260,6 @@ int sdio_reset(struct mmc_host *host)
 		abort |= 0x08;
 
 	return mmc_io_rw_direct_host(host, 1, 0, SDIO_CCCR_ABORT, abort, NULL);
-		//to host, write 1, to func 0, adde=sdio_cccr_abort, write=abort, output=null
+		//to host, 1=write, to func 0, adde=sdio_cccr_abort, write=abort, output=null
 }
 

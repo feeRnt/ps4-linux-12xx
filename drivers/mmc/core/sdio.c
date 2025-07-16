@@ -813,8 +813,16 @@ static int mmc_sdio_pre_init(struct mmc_host *host, u32 ocr,
 			     struct mmc_card *card)
 {
 	pr_debug("sdio: I am in mmc_sdio_pre_init.\n");
-	if (card)
-		mmc_remove_card(card);
+	
+   	//if pre_init is enabled, it reduces the dev entry count from linux.  Meaning makes it able to free the
+	//memory Everything after was a ETIMEDOUT. Except for cmd0
+	/*
+	 * if (card)
+	 *	mmc_remove_card(card);
+	*/
+	//based on 
+	//https://linux-mmc.vger.kernel.narkive.com/yRhKhxX4/patch-mmc-sdio-reset-card-during-power-restore
+	//initially they never had the mmc_remove_card. So commenting that out.
 
 	/*
 	 * Reset the card by performing the same steps that are taken by
@@ -833,8 +841,11 @@ static int mmc_sdio_pre_init(struct mmc_host *host, u32 ocr,
 	 *
 	 */
 
+	pr_debug("sdio: Going to sdio_reset in %s.\n", __func__);
 	sdio_reset(host);
+	pr_debug("sdio: Going to mmc_go_idle in %s.\n", __func__);
 	mmc_go_idle(host);
+	pr_debug("sdio: Going to mmc_send_if_cond in %s.\n", __func__);
 	mmc_send_if_cond(host, ocr);
 	return mmc_send_io_op_cond(host, 0, NULL);
 }
@@ -952,7 +963,6 @@ try_again:
 			pr_debug("sdio: err in set_uhs_voltage. Removing 1_8V flag from ocr.\n");
 			ocr &= ~R4_18V_PRESENT;
 		} 
-		/*
 		else if (tries < 1) { 			// arbitrarily pre_init the card once at this function
 			pr_debug("sdio: Doing mmc_sdio_pre_init from %s.\n", __func__);
 			mmc_sdio_pre_init(host, ocr_card, card);
@@ -960,7 +970,6 @@ try_again:
 			retries--;
 			goto try_again;
 		}
-		*/
 	}
 
 	/*

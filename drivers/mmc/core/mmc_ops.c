@@ -140,7 +140,7 @@ int mmc_go_idle(struct mmc_host *host)
 {
 	int err;
 	struct mmc_command cmd = {};
-
+	pr_debug("mmc_ops: I am in %s.\n", __func__);
 	/*
 	 * Non-SPI hosts need to prevent chipselect going active during
 	 * GO_IDLE; that would put chips into SPI mode.  Remind them of
@@ -151,6 +151,7 @@ int mmc_go_idle(struct mmc_host *host)
 	 * won't even know about.
 	 */
 	if (!mmc_host_is_spi(host)) {
+		pr_debug("mmc_ops: !mmc_host_is_spi in %s.\n", __func__);
 		mmc_set_chip_select(host, MMC_CS_HIGH);
 		mmc_delay(1);
 	}
@@ -164,6 +165,7 @@ int mmc_go_idle(struct mmc_host *host)
 	mmc_delay(1);
 
 	if (!mmc_host_is_spi(host)) {
+		pr_debug("mmc_ops: !mmc_host_is_spi in %s. Set MMC_CS_DONTCARE.\n", __func__);
 		mmc_set_chip_select(host, MMC_CS_DONTCARE);
 		mmc_delay(1);
 	}
