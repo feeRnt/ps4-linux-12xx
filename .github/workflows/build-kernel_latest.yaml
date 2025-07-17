@@ -245,6 +245,10 @@ jobs:
           mv config .config
           # config will exist if we checkout. so no need to use -f check 
       
+      - name: Move .github directory to workspace
+        run: mv ${{ github.workspace }}/kernel-source-host/.github ${{ github.workspace }}/.github
+        # Needed for simplified problem-matching, future rules, etc.
+      
       # Build Docker image  
       - name: Build Docker image with cache
         run: |
@@ -266,15 +270,19 @@ jobs:
       # Based on:
       # https://lca-kernel.ozlabs.org/2022-Currey-Abusing-GitHub-Actions-for-building-and-testing-kernels.pdf
       - name: Setup compile error problem-matching for kernel compilation
-        run: echo "::add-matcher::.github/problem-matchers/kernel-compile-errors.json"
-      # Fields and their meaning:
-      # regex: regex to match annotation, file: capture group that has file name
-      # line: capture group that gives the line number, column: capture group for column number
-      # severity: capture group that states if error or warning, message: capture group that has problem msg
+        run: |
+          echo "::add-matcher::.github/problem-matchers/kernel-compile-errors.json"
+          # Fields and their meaning:
+          # regex: regex to match annotation, file: capture group that has file name
+          # line: capture group that gives the line number, column: capture group for column number
+          # severity: capture group that states if error or warning, message: capture group that has problem msg
 
       - name: Compile the linux kernel with docker run
         id: compile-kernel-step
         run: |
+          set +e
+          #temporarily disable exit on fail for the bash run (doesn't apply to the set -e inside the docker run)
+
           docker run -i --name kernel -d -v ${{ github.workspace }}/kernel-source-host:/container/workspace/kernel-source-container \
           -w /container/workspace/kernel-source-container kernel-linux-ps4:latest tail -f /dev/null
           # -v is volume, # -w is workdir (WORKDIR)
@@ -345,8 +353,11 @@ jobs:
           echo "compile-kernel-complete=true" >> $GITHUB_OUTPUT
           #We just want to ensure that we reached the end of this stage before deleting the old cached rud run.
           
+          set -e
+          # Reset exit on fail. Not needed but proof of concept
+
       - name: Remove compile error problem-matching
-        run: echo "::remove-matcher:: owner=kernel-compile-docker"
+        run: echo "::remove-matcher owner=kernel-compile-docker::"
 
 
 
@@ -354,7 +365,7 @@ jobs:
         id: kernel-version-env
         working-directory: ${{ github.workspace }}/kernel-source-host
         run: |
-          localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=-||p' | tr -d '\"'`
+          localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*="-||p' | tr -d '\"'`
           echo "localversion is originally = $localversion"
           echo "localversion=$localversion" >> $GITHUB_OUTPUT
 
