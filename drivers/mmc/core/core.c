@@ -1478,9 +1478,12 @@ void mmc_power_up(struct mmc_host *host, u32 ocr)
 
 void mmc_power_off(struct mmc_host *host)
 {
-	if (host->ios.power_mode == MMC_POWER_OFF)
-		return;
 
+	pr_debug("core: I am in %s.\n", __func__);
+	if (host->ios.power_mode == MMC_POWER_OFF) {
+		pr_debug("core: Power already off. returning.\n");
+		return;
+	}
 	mmc_pwrseq_power_off(host);
 
 	host->ios.clock = 0;
@@ -1500,6 +1503,7 @@ void mmc_power_off(struct mmc_host *host)
 
 void mmc_power_cycle(struct mmc_host *host, u32 ocr)
 {
+	pr_debug("core: I am in %s.\n", __func__);
 	mmc_power_off(host);
 	/* Wait at least 1 ms according to SD spec */
 	mmc_delay(1);
