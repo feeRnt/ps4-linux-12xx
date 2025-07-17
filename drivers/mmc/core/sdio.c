@@ -864,7 +864,7 @@ static int mmc_sdio_init_card(struct mmc_host *host, u32 ocr,
 	int retries = 10;
 	u32 rocr = 0;
 	u32 ocr_card = ocr;
-	int tries = 0; // added
+	//int tries = 0; // added
 
 	pr_debug("sdio: I am in mmc_sdio_init_card.\n");
 	WARN_ON(!host->claimed);
@@ -970,8 +970,9 @@ try_again:
 	    		tries++;
 			retries--;
 			goto try_again;
-		*/ //still fails, without mmc_remove_card. Times out
+		    //still fails, without mmc_remove_card. Times out
 		}
+		*/
 	}
 
 	/*
