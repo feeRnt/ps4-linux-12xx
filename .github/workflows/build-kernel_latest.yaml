@@ -31,6 +31,8 @@ jobs:
         run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
         #SUID allows the bin to be ran as the user who owns the file, instead of the default: the uid of the caller
       
+      #  Technically unnnecessary now since we do the checkout into workspace anyway. Would have to move
+      #  dockerx build after cache-workspace-restore step
       - name: Download Dockerfile
         run: |
          curl -fL https://raw.githubusercontent.com/feeRnt/ps4-linux-12xx/ps4-linux-5.15.y-conservative2/Dockerfile -o Dockerfile
@@ -261,6 +263,15 @@ jobs:
       #
       # build-context workspace=./ results in /home/runner/work/repo/repo by default
    
+      # Based on:
+      # https://lca-kernel.ozlabs.org/2022-Currey-Abusing-GitHub-Actions-for-building-and-testing-kernels.pdf
+      - name: Setup compile error problem-matching for kernel compilation
+        run: echo "::add-matcher::.github/problem-matchers/kernel-compile-errors.json"
+      # Fields and their meaning:
+      # regex: regex to match annotation, file: capture group that has file name
+      # line: capture group that gives the line number, column: capture group for column number
+      # severity: capture group that states if error or warning, message: capture group that has problem msg
+
       - name: Compile the linux kernel with docker run
         id: compile-kernel-step
         run: |
@@ -289,7 +300,8 @@ jobs:
           echo "files available after test..."
           ls -a
 
-          export localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '"'`
+          export localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*="-||p' | tr -d '"'`
+          # Removes everything up to =, and then the '"' and '-' 
           # Using uppercase localversion will mess with your final kernel img version.
           export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
@@ -320,6 +332,8 @@ jobs:
           cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
           cd ${GCE_INSTALL_DIR}
           tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion".tar.gz boot/bzImage lib/modules/* --owner=0 --group=0
+          # I assume it'll never package the kernel, unless the compile succeeds, since -e is set
+
           ## GCE = Google Compute Engine, adapted from 
           #https://github.com/google/bbr/blob/v3/gce-install.sh
           EOF
@@ -329,14 +343,18 @@ jobs:
           echo "Available files in runner after docker compile..."
           ls -la
           echo "compile-kernel-complete=true" >> $GITHUB_OUTPUT
-          #This is set even if there are compile errors. 
           #We just want to ensure that we reached the end of this stage before deleting the old cached rud run.
+          
+      - name: Remove compile error problem-matching
+        run: echo "::remove-matcher:: owner=kernel-compile-docker"
+
+
 
       - name: Get kernel version name env
         id: kernel-version-env
         working-directory: ${{ github.workspace }}/kernel-source-host
         run: |
-          localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'`
+          localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=-||p' | tr -d '\"'`
           echo "localversion is originally = $localversion"
           echo "localversion=$localversion" >> $GITHUB_OUTPUT
 
