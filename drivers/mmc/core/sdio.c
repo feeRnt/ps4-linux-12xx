@@ -964,13 +964,13 @@ try_again:
 			ocr &= ~R4_18V_PRESENT;
 		}
 		
-		else if (tries < 1) { 			// arbitrarily pre_init the card once at this function
+		/* else if (tries < 1) { 			// arbitrarily pre_init the card once at this function
 			pr_debug("sdio: Doing mmc_sdio_pre_init from %s.\n", __func__);
 			mmc_sdio_pre_init(host, ocr_card, card);
 	    		tries++;
 			retries--;
 			goto try_again;
-		//still fails, without mmc_remove_card. Times out
+		*/ //still fails, without mmc_remove_card. Times out
 		}
 	}
 

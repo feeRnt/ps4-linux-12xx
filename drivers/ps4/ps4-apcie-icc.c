@@ -331,12 +331,12 @@ void resetBtWlan(void)
 	//                ( major, minor, command, command length,
 	//                response, response length )
 	/* Get bt/wlan status */
-//	ret = apcie_icc_cmd(5, 1, NULL, 0, resp, 20);
-//	printk("BT/WLAN status: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
+	ret = apcie_icc_cmd(5, 1, NULL, 0, resp, 20);
+	printk("BT/WLAN status: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
 
 	/** Turn off is done from linux-loader actually, if you want you can remove it from linux-loader and done it here **/
 	
-/*
+
 	//Turn OFF bt/wlan
 	ret = apcie_icc_cmd(5, 0, &off, sizeof(off), resp, 20);
 	printk("Turn OFF BT/WLAN: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
@@ -345,7 +345,11 @@ void resetBtWlan(void)
 		printk("Turn off bt/wlan failed!");
 		return;
 	}
-*/
+
+	msleep(20000);
+	/* Sleep 20 seconds after turning off wlan. To give it time to
+	 * turn off properly */
+	
 
 	//Turn ON bt/wlan
 	ret = apcie_icc_cmd(5, 0, &on, sizeof(on), resp, 20);
@@ -355,6 +359,12 @@ void resetBtWlan(void)
 		printk("Turn on bt/wlan failed");
 		return;
 	}
+
+	msleep(20000);
+	/* Sleep 20 seconds after turning on wlan. To give it time to
+	 * initialize properly. Probably too much but testing */
+
+	
 }
 
 void do_icc_init(void) {
