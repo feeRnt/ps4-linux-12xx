@@ -346,10 +346,13 @@ void resetBtWlan(void)
 		return;
 	}
 
-	msleep(20000);
+	//msleep(20000);
 	/* Sleep 20 seconds after turning off wlan. To give it time to
 	 * turn off properly */
+	//Causes kernel panic - not syncing: Fatal exception in interrupt
 	
+	msleep(3400);
+        //3.4 seconds
 
 	//Turn ON bt/wlan
 	ret = apcie_icc_cmd(5, 0, &on, sizeof(on), resp, 20);
@@ -360,10 +363,13 @@ void resetBtWlan(void)
 		return;
 	}
 
-	msleep(20000);
+	//msleep(20000);
 	/* Sleep 20 seconds after turning on wlan. To give it time to
 	 * initialize properly. Probably too much but testing */
+	//Causes kernel panic - not syncing: Fatal exception in interrupt
 
+	msleep(3400);
+	//3.4 seconds
 	
 }
 
