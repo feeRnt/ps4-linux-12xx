@@ -351,7 +351,7 @@ void resetBtWlan(void)
 	 * turn off properly */
 	//Causes kernel panic - not syncing: Fatal exception in interrupt
 	
-	msleep(3400);
+	//msleep(3400);
         //3.4 seconds
 
 	//Turn ON bt/wlan
@@ -368,7 +368,7 @@ void resetBtWlan(void)
 	 * initialize properly. Probably too much but testing */
 	//Causes kernel panic - not syncing: Fatal exception in interrupt
 
-	msleep(3400);
+	//msleep(3400);
 	//3.4 seconds
 	
 }
