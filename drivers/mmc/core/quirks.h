@@ -155,6 +155,8 @@ static const struct mmc_fixup __maybe_unused sdio_fixup_methods[] = {
 	// https://patchwork.kernel.org/project/linux-mmc/patch/1522661038-25870-2-git-send-email-harish_kandiga@mentor.com/
 	// https://patchwork.kernel.org/project/linux-mmc/patch/1523343632-9518-3-git-send-email-harish_kandiga@mentor.com/
 	// https://github.com/torvalds/linux/commit/4bc90f492230af6661bc2021dddd501f7c842334
+	SDIO_FIXUP(SDIO_VENDOR_ID_MARVELL, SDIO_DEVICE_ID_MARVELL_8897_F0,
+		   add_quirk, MMC_QUIRK_LONG_READ_TIME),
 	END_FIXUP
 };
 
