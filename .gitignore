@@ -117,6 +117,10 @@ modules.order
 !.pylintrc
 !.rustfmt.toml
 
+# Added:
+!.github
+!.dockerignore
+
 #
 # Generated include files
 #
