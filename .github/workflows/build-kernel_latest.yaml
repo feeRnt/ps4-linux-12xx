@@ -21,8 +21,11 @@ jobs:
           echo "List of files in workdir, right after Github build job start:"
           ls -a
           echo "CACHE_WORKSPACE_KEY=${{ runner.os }}-workspace-${{ github.run_id }}" >> $GITHUB_ENV
-          echo "CACHE_WORKSPACE_RESTORE_KEY=${{ runner.os }}-workspace-" >> $GITHUB_ENV
-          #Use $RESTORE_KEY in your other steps. 
+          #echo "CACHE_WORKSPACE_RESTORE_KEY=${{ runner.os }}-workspace-" >> $GITHUB_ENV
+          echo "github.ref_name in cache-workspace-vars = ${{ github.ref_name }}" 
+          echo "CACHE_WORKSPACE_RESTORE_KEY=${{ runner.os }}-workspace-${{ github.ref_name }}" >> $GITHUB_ENV
+          #Better handles multi-branch caching
+          #Use $CACHE_WORKSPACE_RESTORE_KEY in your other steps. 
 
       #Based on:
       #https://github.com/actions/toolkit/issues/946#issuecomment-1590016041
@@ -35,8 +38,8 @@ jobs:
       #  dockerx build after cache-workspace-restore step
       - name: Download Dockerfile
         run: |
-         curl -fL https://raw.githubusercontent.com/feeRnt/ps4-linux-12xx/ps4-linux-5.15.y-conservative2/Dockerfile -o Dockerfile
-         curl -fL https://raw.githubusercontent.com/feeRnt/ps4-linux-12xx/ps4-linux-5.15.y-conservative2/.dockerignore -o .dockerignore
+         curl -fL https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/Dockerfile -o Dockerfile
+         curl -fL https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/.dockerignore -o .dockerignore
          # -verbose, -fail if server error, -Links follow,
 
       - name: Show username and group info
