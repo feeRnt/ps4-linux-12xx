@@ -115,6 +115,10 @@ modules.order
 !.mailmap
 !.rustfmt.toml
 
+# Added:
+!.github
+!.dockerignore
+
 #
 # Generated include files
 #
