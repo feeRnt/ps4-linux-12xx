@@ -311,9 +311,15 @@ jobs:
           echo "files available after test..."
           ls -a
 
-          export localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*="-||p' | tr -d '"'`
+          export localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'`
           # Removes everything up to =, and then the '"' and '-' 
           # Using uppercase localversion will mess with your final kernel img version.
+          # if empty...
+          if [ -z "$localversion" ]; then
+            sed -iE 's|^CONFIG_LOCALVERSION=".*|CONFIG_LOCALVERSION="-'$(date +%Y_%m_%d_%H%M)'"|' .config
+            export localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'`
+          fi;
+
           export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
           export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
