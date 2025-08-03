@@ -1,7 +1,7 @@
 ## This is a basic workflow to help you get started with Actions 
 ## Adapted from https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
 
-name: "Compile PS4-Linux Kernel-12xx 5.15: Latest"
+name: "Compile PS4-Linux Kernel-12xx; Unified Version: Latest"
 
 # Controls when the workflow will run
 on:
@@ -56,6 +56,11 @@ jobs:
       # this needs to be done before using docker buildx.
       # this doesn't need to be done before the caching part, but doing it anyway.
       # Downloading the cache can either happen before or after.
+
+
+      # TODO: Either manually restore, delete, save dockerx caches like we did with the workspace cache
+      # OR
+      # Pin a specific Docker Base OS Image Digest, so that the caches are never invalidated.
 
       # Retrieve Cache-d Docker layers, and Save cache after job completion
       - name: Cache Docker Layers
@@ -311,9 +316,17 @@ jobs:
           echo "files available after test..."
           ls -a
 
-          export localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*="-||p' | tr -d '"'`
+          export localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'`
           # Removes everything up to =, and then the '"' and '-' 
           # Using uppercase localversion will mess with your final kernel img version.
+          
+          # if empty...
+          #if [ -z "$localversion" ]; then
+          #  sed -iE 's|^CONFIG_LOCALVERSION=".*|CONFIG_LOCALVERSION="-'$(date +%Y_%m_%d_%H%M)'"|' .config
+          #  export localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'`
+          #fi;
+          #Removed for now; directly fixed the case where GH wouldn't upload artifact because of missing localversion variable.
+
           export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
           export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
@@ -375,8 +388,7 @@ jobs:
       - name: Upload kernel image to github actions artifacts
         uses: actions/upload-artifact@v4
         with:
-          #name: kernel
-          name: ${{ steps.kernel-version-env.outputs.localversion }}
+          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}
           path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
           # This path is the github actiions root
 
