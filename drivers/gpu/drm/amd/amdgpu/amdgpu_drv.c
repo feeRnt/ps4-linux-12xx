@@ -39,6 +39,9 @@
 #include <linux/suspend.h>
 #include <linux/fb.h>
 
+#include <drm/drm_aperture.h>
+// Added to fix implicit function declaration of drm_aperture_remove_conflicting_pci_framebuffers()
+
 #include "amdgpu.h"
 #include "amdgpu_irq.h"
 #include "amdgpu_dma_buf.h"
