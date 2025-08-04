@@ -777,6 +777,9 @@ EXPORT_SYMBOL_GPL(handle_fasteoi_nmi);
  */
 void handle_edge_irq(struct irq_desc *desc)
 {
+	if(desc->irq_data.hwirq > 0x14e0 && desc->irq_data.hwirq < 0x14ef) {
+		printk("edgeirq, %lx\n", desc->irq_data.hwirq);
+	}
 	raw_spin_lock(&desc->lock);
 
 	desc->istate &= ~(IRQS_REPLAY | IRQS_WAITING);

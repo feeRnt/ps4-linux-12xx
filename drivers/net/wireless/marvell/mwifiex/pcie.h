@@ -110,7 +110,11 @@
 #define MWIFIEX_BD_FLAG_TX_ROLLOVER_IND			BIT(26)
 
 /* Max retry number of command write */
-#define MAX_WRITE_IOMEM_RETRY				2
+// #define MAX_WRITE_IOMEM_RETRY				2
+#define MAX_WRITE_IOMEM_RETRY				10
+// (TODO): codedwrench increased this value to 10 from 2; in Baikal branch patches. I wonder if it
+// is necessary. Will respect that choice and keep on 10.
+
 /* Define PCIE block size for firmware download */
 #define MWIFIEX_PCIE_BLOCK_SIZE_FW_DNLD		256
 /* FW awake cookie after FW ready */

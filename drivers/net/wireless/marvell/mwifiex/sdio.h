@@ -99,7 +99,9 @@
 #define DN_LD_CARD_RDY                  (0x1U << 0)
 
 /* Max retry number of CMD53 write */
-#define MAX_WRITE_IOMEM_RETRY		2
+//#define MAX_WRITE_IOMEM_RETRY		2
+#define MAX_WRITE_IOMEM_RETRY		10
+// codedwrench patch; cf. mwifiex/pcie.h
 
 /* SDIO Tx aggregation in progress ? */
 #define MP_TX_AGGR_IN_PROGRESS(a) (a->mpa_tx.pkt_cnt > 0)
