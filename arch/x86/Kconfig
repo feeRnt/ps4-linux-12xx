@@ -553,7 +553,22 @@ config X86_PS4
 	depends on PCI
 	help
 	  Select to include support for the Sony PlayStation 4 game console.
- 
+
+choice
+	prompt "Platform:" if X86_PS4
+	default X86_PS4_AEOLIA_BELIZE
+	depends on X86_64
+    depends on X86_EXTENDED_PLATFORM
+    depends on PCI
+	help
+	  Select the desired ps4 platform to build this kernel for.
+
+	config X86_PS4_AEOLIA_BELIZE
+		bool "aeolia/belize"
+	config X86_PS4_BAIKAL
+		bool "baikal"
+endchoice
+
 config X86_VSMP
 	bool "ScaleMP vSMP"
 	select HYPERVISOR_GUEST

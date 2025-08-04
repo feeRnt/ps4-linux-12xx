@@ -2550,6 +2550,14 @@ void __irq_msi_compose_msg(struct irq_cfg *cfg, struct msi_msg *msg,
 		msg->arch_addr_lo.virt_destid_8_14 = cfg->dest_apicid >> 8;
 	else
 		WARN_ON_ONCE(cfg->dest_apicid > 0xFF);
+
+	// PlayStation 4:
+	pr_info("apcie_irq_msi_compose_msg %x %x %x %x %x\n", msg->data,
+		msg->address_hi,
+		msg->arch_addr_lo.base_address,
+		msg->arch_addr_lo.destid_0_7,
+		cfg->vector);
+
 }
 
 u32 x86_msi_msg_get_destid(struct msi_msg *msg, bool extid)

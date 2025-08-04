@@ -677,7 +677,7 @@ static int i2cdev_attach_adapter(struct device *dev, void *dummy)
 	if (res)
 		goto err_put_i2c_dev;
 
-	pr_debug("adapter [%s] registered as minor %d\n", adap->name, adap->nr);
+	pr_info("adapter [%s] registered as minor %d\n", adap->name, adap->nr);
 	return 0;
 
 err_put_i2c_dev:

@@ -449,7 +449,7 @@ int msi_domain_prepare_irqs(struct irq_domain *domain, struct device *dev,
 	int ret;
 
 	ret = ops->msi_check(domain, info, dev);
-	if (ret == 0)
+	if (ret == 0 && ops->msi_prepare)
 		ret = ops->msi_prepare(domain, dev, nvec, arg);
 
 	return ret;
@@ -587,7 +587,7 @@ int __msi_domain_alloc_irqs(struct irq_domain *domain, struct device *dev,
 	for_each_msi_vector(desc, i, dev) {
 		if (desc->irq == i) {
 			virq = desc->irq;
-			dev_dbg(dev, "irq [%d-%d] for MSI\n",
+			dev_info(dev, "irq [%d-%d] for MSI\n",
 				virq, virq + desc->nvec_used - 1);
 		}
 
@@ -651,10 +651,19 @@ void __msi_domain_free_irqs(struct irq_domain *domain, struct device *dev)
 	struct msi_desc *desc;
 	int i;
 
+	pr_info("ps4patches: testing free irqs\n");
 	for_each_msi_vector(desc, i, dev) {
+		dev_info(dev, "freeing %d for domain %s, device has domain %s, has %d irqs used\n",
+			 i, domain->name, dev_get_msi_domain(dev)->name, desc->nvec_used);
+
 		irq_data = irq_domain_get_irq_data(domain, i);
+
+		if(irq_data == NULL) {
+			pr_info("irq_data was NULL\n");
+		}
 		if (irqd_is_activated(irq_data))
 			irq_domain_deactivate_irq(irq_data);
+
 	}
 
 	for_each_msi_entry(desc, dev) {

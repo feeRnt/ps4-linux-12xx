@@ -156,8 +156,15 @@ static struct ps4_bridge g_bridge = {
 	.mutex = __MUTEX_INITIALIZER(g_bridge.mutex)
 };
 
+static int first = true;
+void icc_do_pulse_orange(void);
 static void cq_init(struct i2c_cmdqueue *q, u8 code)
 {
+    if(first) {
+        first = false;
+        icc_do_pulse_orange();
+    }
+
 	q->req.code = code;
 	q->req.count = 0;
 	q->p = q->req.cmdbuf;

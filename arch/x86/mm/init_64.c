@@ -1368,8 +1368,18 @@ int __init deferred_page_init_max_threads(const struct cpumask *node_cpumask)
 
 int kernel_set_to_readonly;
 
+// Playstation 4:
+static int first = true;
+void icc_do_pulse_orange_with_white(void);
+
 void mark_rodata_ro(void)
 {
+    if(first) {
+        first = false;
+        icc_do_pulse_orange_with_white();
+	// PlayStation 4 ^
+    }
+
 	unsigned long start = PFN_ALIGN(_text);
 	unsigned long rodata_start = PFN_ALIGN(__start_rodata);
 	unsigned long end = (unsigned long)__end_rodata_hpage_align;

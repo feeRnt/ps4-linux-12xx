@@ -22,9 +22,9 @@ int apcie_uart_init(struct apcie_dev *sc)
 		uart.port.uartclk	= 58500000;
 		uart.port.flags		= UPF_SHARE_IRQ;
 		uart.port.iotype	= UPIO_MEM32;
-		uart.port.mapbase	= pci_resource_start(sc->pdev, 4) + off;
-		uart.port.membase	= sc->bar4 + off;
-		uart.port.regshift	= 2;
+		uart.port.mapbase	= pci_resource_start(sc->pdev, sc->glue_bar_to_use_num) + off;
+		uart.port.membase	= sc->glue_bar_to_use + off;
+		uart.port.regshift	= sc->glue_bar_to_use_num;
 		uart.port.dev		= &sc->pdev->dev;
 
 		sc->serial_line[i] = serial8250_register_8250_port(&uart);
