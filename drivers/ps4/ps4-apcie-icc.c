@@ -35,19 +35,8 @@ void icc_i2c_remove(struct apcie_dev *sc);
 int icc_pwrbutton_init(struct apcie_dev *sc);
 void icc_pwrbutton_remove(struct apcie_dev *sc);
 void icc_pwrbutton_trigger(struct apcie_dev *sc, int state);
-
-#define ICC_MAJOR	'I'
-
- struct icc_cmd {
- 	u8 major;
- 	u16 minor;
- 	void __user *data;
- 	u16 length;
- 	void __user *reply;
- 	u16 reply_length;
- };
-
-#define ICC_IOCTL_CMD _IOWR(ICC_MAJOR, 1, struct icc_cmd)
+void icc_do_pulse_orange(void);
+void icc_do_pulse_orange_with_white(void);
 
 static u16 checksum(const void *p, int length)
 {
@@ -168,22 +157,22 @@ static irqreturn_t icc_interrupt(int irq, void *arg)
 	u32 ret = IRQ_NONE;
 
 	do {
-		status = ioread32(sc->bar4 + APCIE_REG_ICC_STATUS);
+		status = ioread32(sc->glue_bar_to_use + APCIE_REG_ICC_STATUS);
 
 		if (status & APCIE_ICC_ACK) {
 			iowrite32(APCIE_ICC_ACK,
-				  sc->bar4 + APCIE_REG_ICC_STATUS);
+				  sc->glue_bar_to_use + APCIE_REG_ICC_STATUS);
 			ret = IRQ_HANDLED;
 		}
 
 		if (status & APCIE_ICC_SEND) {
 			iowrite32(APCIE_ICC_SEND,
-				  sc->bar4 + APCIE_REG_ICC_STATUS);
+				  sc->glue_bar_to_use + APCIE_REG_ICC_STATUS);
 			handle_message(sc);
 			iowrite32(0, REPLY + BUF_FULL);
 			iowrite32(1, REPLY + BUF_EMPTY);
 			iowrite32(APCIE_ICC_ACK,
-				  sc->bar4 + APCIE_REG_ICC_DOORBELL);
+				  sc->glue_bar_to_use + APCIE_REG_ICC_DOORBELL);
 			ret = IRQ_HANDLED;
 		}
 	} while (status);
@@ -238,7 +227,7 @@ static int _apcie_icc_cmd(struct apcie_dev *sc, u8 major, u16 minor, const void 
 	sc->icc.reply_pending = true;
 	spin_unlock_irq(&sc->icc.reply_lock);
 
-	iowrite32(APCIE_ICC_SEND, sc->bar4 + APCIE_REG_ICC_DOORBELL);
+	iowrite32(APCIE_ICC_SEND, sc->glue_bar_to_use + APCIE_REG_ICC_DOORBELL);
 
 	if (intr)
 		ret = wait_event_interruptible_timeout(sc->icc.wq,
@@ -283,35 +272,74 @@ static int _apcie_icc_cmd(struct apcie_dev *sc, u8 major, u16 minor, const void 
 int apcie_icc_cmd(u8 major, u16 minor, const void *data, u16 length,
 		   void *reply, u16 reply_length)
 {
-	int ret;
+	int ret = -EAGAIN;
 
 	mutex_lock(&icc_mutex);
 	if (!icc_sc) {
 		pr_err("icc: not ready\n");
 		return -EAGAIN;
 	}
-	ret = _apcie_icc_cmd(icc_sc, major, minor, data, length, reply, reply_length,
-		       false);
+
+		ret = _apcie_icc_cmd(icc_sc, major, minor, data, length, reply,
+				     reply_length, false);
+
 	mutex_unlock(&icc_mutex);
 	return ret;
 }
 EXPORT_SYMBOL_GPL(apcie_icc_cmd);
 
-void resetUsbPort(void)
+// baikal
+static void bpcie_init_usb(struct apcie_dev *sc, int usb_no) {
+	u32 value_to_write;
+	u32 addr;
+	u32 offset;
+
+	offset = usb_no ? 0x68 : 0x64;
+
+	addr = sc->bar2 + BPCIE_USB_BASE + offset;
+	value_to_write = ioread32(addr) | 1;
+	iowrite32(value_to_write, addr);
+
+	offset = usb_no ? 0x28 : 0x24;
+
+	addr = sc->bar2 + BPCIE_USB_BASE + offset;
+	value_to_write = ioread32(addr) | 1;
+	iowrite32(value_to_write, addr);
+
+	offset = usb_no ? 0x68 : 0x64;
+
+	addr = sc->bar2 + BPCIE_USB_BASE + offset;
+	value_to_write = ioread32(addr) | ~1;
+	iowrite32(value_to_write, addr);
+	//TODO: ??? MISSING TODO. Missing something? Important?
+}
+
+static void resetUsbPort(void)
 {
 	u8 off = 0, on = 1;
 	u8 resp[20];
 	int ret;
-	
-	//Turn OFF Usb
-	ret = apcie_icc_cmd(5, 0x10, &off, sizeof(off), resp, 20);
-	printk("Turn OFF USB: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
-	if(ret < 0)
-	{
-		printk("Turn off USB failed!");
+
+	// TODO (ps4patches): added from baikal patches, seems universal
+	/* Get usb 0 status */
+	ret = apcie_icc_cmd(5, 0x11, NULL, 0, resp, 20);
+	printk("usb0 status: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
+	if(ret < 0) {
+		printk("USB status failed");
+	} else if (resp[2]) {
+		printk("USB is already turned ON!");
 		return;
 	}
-	
+
+	//Turn OFF Usb
+//	ret = apcie_icc_cmd(5, 0x10, &off, sizeof(off), resp, 20);
+//	printk("Turn OFF USB: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
+//	if(ret < 0)
+//	{
+//		printk("Turn off USB failed!");
+//		return;
+//	}
+
 	//Turn ON Usb
 	ret = apcie_icc_cmd(5, 0x10, &on, sizeof(on), resp, 20);
 	printk("Turn ON USB: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
@@ -322,19 +350,17 @@ void resetUsbPort(void)
 	}
 }
 
-void resetBtWlan(void)
+static void resetBtWlan(void)
 {
 	u8 off = 2, on = 3;
 	u8 resp[20];
 	int ret;
-	
 
 	/* Get bt/wlan status */
 //	ret = apcie_icc_cmd(5, 1, NULL, 0, resp, 20);
 //	printk("BT/WLAN status: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
 
 	/** Turn off is done from linux-loader actually, if you want you can remove it from linux-loader and done it here **/
-	
 	//Turn OFF bt/wlan
 /*	ret = apcie_icc_cmd(5, 0, &off, sizeof(off), resp, 20);
 	printk("Turn OFF BT/WLAN: ret=%d, reply %02x %02x %02x %02x", ret, resp[0], resp[1], resp[2], resp[3]);
@@ -355,7 +381,7 @@ void resetBtWlan(void)
 	}
 }
 
-void do_icc_init(void) {
+static void do_icc_init(void) {
 	u8 svc = 0x10;
 	u8 reply[0x30];
 	static const u8 led_config[] = {
@@ -379,6 +405,70 @@ void do_icc_init(void) {
 	printk("ret=%d, reply %02x %02x %02x %02x %02x %02x %02x %02x\n", ret,
 		reply[0], reply[1], reply[2], reply[3],
 		reply[4], reply[5], reply[6], reply[7]);
+
+    /* Set the LED to something nice */
+    ret = apcie_icc_cmd(9, 0x20, led_config, ARRAY_SIZE(led_config), reply, 0x30);
+    printk("ret=%d, reply %02x %02x %02x %02x %02x %02x %02x %02x\n", ret,
+           reply[0], reply[1], reply[2], reply[3],
+           reply[4], reply[5], reply[6], reply[7]);
+}
+
+void icc_do_pulse_orange(void) {
+    u8 svc = 0x10;
+    u8 reply[0x30];
+    u8 led_config[] = {
+            3, 1, 0, 0,
+            0x10, 1, /* Blue: off */
+            2, 0x00, 2, 1, 0x00,
+            0x11, 1, /* White: off */
+            2, 0x00, 2, 1, 0x00,
+            0x02, 3, /* Orange: delay and pulse, loop forever */
+            1, 0x00, 4, 1, 0xbf,
+            2, 0xff, 5, 1, 0xff,
+            2, 0x00, 5, 1, 0xff,
+    };
+    int ret;
+    // test: get FW version
+//	ret = apcie_icc_cmd(2, 6, NULL, 0, reply, 0x30);
+//	printk("ret=%d, reply %02x %02x %02x %02x %02x %02x %02x %02x\n", ret,
+//		reply[0], reply[1], reply[2], reply[3],
+//		reply[4], reply[5], reply[6], reply[7]);
+//	ret = apcie_icc_cmd(1, 0, &svc, 1, reply, 0x30);
+//	printk("ret=%d, reply %02x %02x %02x %02x %02x %02x %02x %02x\n", ret,
+//		reply[0], reply[1], reply[2], reply[3],
+//		reply[4], reply[5], reply[6], reply[7]);
+
+    /* Set the LED to something nice */
+    ret = apcie_icc_cmd(9, 0x20, led_config, ARRAY_SIZE(led_config), reply, 0x30);
+    printk("ret=%d, reply %02x %02x %02x %02x %02x %02x %02x %02x\n", ret,
+           reply[0], reply[1], reply[2], reply[3],
+           reply[4], reply[5], reply[6], reply[7]);
+}
+
+void icc_do_pulse_orange_with_white(void) {
+	u8 svc = 0x10;
+	u8 reply[0x30];
+	u8 led_config[] = {
+		3, 1, 0, 0,
+			0x10, 1, /* Blue: off */
+				2, 0x00, 2, 1, 0x00,
+			0x11, 1, /* White: on */
+				2, 0xff, 2, 1, 0x00,
+			0x02, 3, /* Orange: delay and pulse, loop forever */
+				1, 0x00, 4, 1, 0xbf,
+				2, 0xff, 5, 1, 0xff,
+				2, 0x00, 5, 1, 0xff,
+	};
+	int ret;
+	// test: get FW version
+//	ret = apcie_icc_cmd(2, 6, NULL, 0, reply, 0x30);
+//	printk("ret=%d, reply %02x %02x %02x %02x %02x %02x %02x %02x\n", ret,
+//		reply[0], reply[1], reply[2], reply[3],
+//		reply[4], reply[5], reply[6], reply[7]);
+//	ret = apcie_icc_cmd(1, 0, &svc, 1, reply, 0x30);
+//	printk("ret=%d, reply %02x %02x %02x %02x %02x %02x %02x %02x\n", ret,
+//		reply[0], reply[1], reply[2], reply[3],
+//		reply[4], reply[5], reply[6], reply[7]);
 
 	/* Set the LED to something nice */
 	ret = apcie_icc_cmd(9, 0x20, led_config, ARRAY_SIZE(led_config), reply, 0x30);
@@ -472,11 +562,14 @@ int apcie_icc_init(struct apcie_dev *sc)
 		return -ENODEV;
 	}
 
-	if (!request_mem_region(pci_resource_start(sc->pdev, 4) +
-				APCIE_RGN_ICC_BASE, APCIE_RGN_ICC_SIZE,
-				"apcie.icc")) {
-		sc_err("icc: failed to request ICC register region\n");
-		return -EBUSY;
+	// For baikal the whole of bar 2 is requested in glue_init
+	if(!sc->is_baikal) {
+		if (!request_mem_region(pci_resource_start(sc->pdev, 4) +
+						APCIE_RGN_ICC_BASE,
+					APCIE_RGN_ICC_SIZE, "apcie.icc")) {
+			sc_err("icc: failed to request ICC register region\n");
+			return -EBUSY;
+		}
 	}
 
 	sc->icc.spm_base = pci_resource_start(mem_dev, 5) + APCIE_SPM_ICC_BASE;
@@ -499,7 +592,7 @@ int apcie_icc_init(struct apcie_dev *sc)
 
 	/* Clear flags */
 	iowrite32(APCIE_ICC_SEND | APCIE_ICC_ACK,
-		  sc->bar4 + APCIE_REG_ICC_STATUS);
+		  sc->glue_bar_to_use + APCIE_REG_ICC_STATUS);
 
 	ret = request_irq(apcie_irqnum(sc, APCIE_SUBFUNC_ICC),
 			  icc_interrupt, IRQF_SHARED, "icc", sc);
@@ -523,7 +616,7 @@ int apcie_icc_init(struct apcie_dev *sc)
 
 	/* Enable IRQs */
 	iowrite32(APCIE_ICC_SEND | APCIE_ICC_ACK,
-		  sc->bar4 + APCIE_REG_ICC_IRQ_MASK);
+		  sc->glue_bar_to_use + APCIE_REG_ICC_IRQ_MASK);
 	mutex_unlock(&icc_mutex);
 
 	ret = icc_i2c_init(sc);
@@ -531,10 +624,14 @@ int apcie_icc_init(struct apcie_dev *sc)
 		sc_err("icc: i2c init failed: %d\n", ret);
 		goto unassign_global;
 	}
-	
+
 	resetBtWlan();
-//	resetUsbPort();
-	
+
+	// TODO (ps4patches): Aeolia/Belize has this originally in comments
+	// why can't we use it there?
+	if(sc->is_baikal)
+		resetUsbPort();
+
 	ret = icc_pwrbutton_init(sc);
 	/* Not fatal */
 	if (ret)
@@ -559,7 +656,7 @@ int apcie_icc_init(struct apcie_dev *sc)
 
 unassign_global:
 	mutex_lock(&icc_mutex);
-	iowrite32(0, sc->bar4 + APCIE_REG_ICC_IRQ_MASK);
+	iowrite32(0, sc->glue_bar_to_use + APCIE_REG_ICC_IRQ_MASK);
 	icc_sc = NULL;
 	mutex_unlock(&icc_mutex);
 free_irq:
@@ -569,8 +666,8 @@ iounmap:
 release_spm:
 	release_mem_region(sc->icc.spm_base, APCIE_SPM_ICC_SIZE);
 release_icc:
-	release_mem_region(pci_resource_start(sc->pdev, 4) +
-			   APCIE_RGN_ICC_BASE, APCIE_RGN_ICC_SIZE);
+	release_mem_region(pci_resource_start(sc->pdev, sc->glue_bar_to_use_num) +
+				   APCIE_RGN_ICC_BASE, APCIE_RGN_ICC_SIZE);
 	return ret;
 }
 
@@ -581,14 +678,14 @@ void apcie_icc_remove(struct apcie_dev *sc)
 	icc_pwrbutton_remove(sc);
 	icc_i2c_remove(sc);
 	mutex_lock(&icc_mutex);
-	iowrite32(0, sc->bar4 + APCIE_REG_ICC_IRQ_MASK);
+	iowrite32(0, sc->glue_bar_to_use + APCIE_REG_ICC_IRQ_MASK);
 	icc_sc = NULL;
 	mutex_unlock(&icc_mutex);
 	free_irq(apcie_irqnum(sc, APCIE_SUBFUNC_ICC), sc);
 	iounmap(sc->icc.spm);
 	release_mem_region(sc->icc.spm_base, APCIE_SPM_ICC_SIZE);
-	release_mem_region(pci_resource_start(sc->pdev, 4) +
-			   APCIE_RGN_ICC_BASE, APCIE_RGN_ICC_SIZE);
+	release_mem_region(pci_resource_start(sc->pdev, sc->glue_bar_to_use_num) +
+				   APCIE_RGN_ICC_BASE, APCIE_RGN_ICC_SIZE);
 }
 
 #ifdef CONFIG_PM

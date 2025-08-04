@@ -448,28 +448,82 @@ static inline int ahci_nr_ports(u32 cap)
 }
 
 #ifdef CONFIG_X86_PS4
-struct f_resource{
-	u64 resource_i_ptr;
-	u64 r_bustag;
+#define __int64 long
+#define __int32 int
+#define __int16 short
+#define __int8 char
+#define _DWORD u32
+#define _QWORD u64
+#define _BOOL8 u8
+
+//#define __outdword(u, u)
+struct f_resource
+{
+	__int64 resource_i_ptr;
+	__int64 r_bustag;
 	void __iomem * r_bushandle;
 };
 
-struct ahci_controller{
+struct ahci_controller
+{
 	void *dev;
 	int dev_id;
+	//int r_rid;
+	//int align;
 	struct f_resource *r_mem;
+	//struct rman sc_iomem;
+	//struct ahci_controller_irq irqs[16];
 	u32 trace_len;
+	u32 caps;
+	u32 caps2;
+	u32 capsem;
+	u32 emloc;
+	int quirks;
+	int numirqs;
+	int channels;
+	u32 ichannels;
+	int ccc;
+	int cccv;
+	//ahci_interrupt ainterrupt[32];
+	//struct mtx em_mtx;
+	void *apcie_bpcie_buffer;
 };
 
-void bpcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr);
+void baikal_pcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr);
+static inline u32 __indword(u32 port) {return 0;}
+static inline void __outdword(u32 port, u32 val) {}
+
+struct bpcie_dev {
+	struct pci_dev *pdev;
+	struct irq_domain *irqdomain;
+	void __iomem *bar0;
+	void __iomem *bar2;
+	void __iomem *bar4;
+};
+
+static struct bpcie_dev *sc;
+static inline void bpcie_write_to_bar2_and_0x180000_and_offset(u32 offset, u32 val) {
+	iowrite32(val, sc->bar2 + (0x180000 + offset));
+}
+static inline u32 bpcie_read_from_bar4_and_0xC000_and_offset(u32 offset) {
+	return ioread32(sc->bar4 + (0xC000 + offset));
+}
+static inline void delay(int microseconds) {
+	msleep(microseconds * 1000);
+}
+static inline unsigned int get_subsys_id(void) {
+	return 0x30201;
+}
 
 static inline void bpcie_ahci_write(struct f_resource *r_mem, u32 offset, u32 val) {
 	iowrite32(val, r_mem->r_bushandle + offset);
 }
-
 static inline u32 bpcie_ahci_read(struct f_resource *r_mem, u32 offset) {
-		return ioread32(r_mem->r_bushandle + offset);
+	return ioread32(r_mem->r_bushandle + offset);
 }
+
+void belize_pcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr);
+
 #endif
 
 

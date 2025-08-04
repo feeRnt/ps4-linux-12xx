@@ -676,7 +676,7 @@ static int i2cdev_attach_adapter(struct device *dev, void *dummy)
 		return res;
 	}
 
-	pr_debug("adapter [%s] registered as minor %d\n", adap->name, adap->nr);
+	pr_info("adapter [%s] registered as minor %d\n", adap->name, adap->nr);
 	return 0;
 }
 

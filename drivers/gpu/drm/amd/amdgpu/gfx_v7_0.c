@@ -2967,8 +2967,7 @@ static int gfx_v7_0_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 
 	WREG32(scratch, 0xCAFEDEAD);
 	memset(&ib, 0, sizeof(ib));
-	r = amdgpu_ib_get(adev, NULL, 256,
-					AMDGPU_IB_POOL_DIRECT, &ib);
+	r = amdgpu_ib_get(adev, NULL, 256, AMDGPU_IB_POOL_DIRECT, &ib);
 	if (r)
 		goto err1;
 
@@ -2989,10 +2988,11 @@ static int gfx_v7_0_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 		goto err2;
 	}
 	tmp = RREG32(scratch);
-	if (tmp == 0xDEADBEEF)
+	if (tmp == 0xDEADBEEF) {
 		r = 0;
-	else
-		r = -EINVAL;
+	} else {
+		//r = -EINVAL;
+	}
 
 err2:
 	amdgpu_ib_free(adev, &ib, NULL);

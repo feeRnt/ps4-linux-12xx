@@ -44,25 +44,50 @@ static __init inline u32 emctimer_read(void)
 	}
 }
 
-static __init unsigned long ps4_measure_tsc_freq(void)
+static __init unsigned long ps4_measure_tsc_freq(bool isBaikal)
 {
 	unsigned long ret = 0;
 	u32 t1, t2;
 	u64 tsc1, tsc2;
 
-	// This is part of the Aeolia pcie device, but it's too early to
-	// do this in a driver.
-	emc_timer = ioremap(EMC_TIMER_BASE, 0x100);
-	if (!emc_timer)
-		goto fail;
-
 	// reset/start the timer
-	emctimer_write32(0x84, emctimer_read32(0x84) & (~0x01));
+	if (isBaikal) {
+		// This is part of the Aeolia pcie device, but it's too early to
+		// do this in a driver.
+		emc_timer = ioremap(BPCIE_EMC_TIMER_BASE, 0x100);
+		if (!emc_timer)
+			goto fail;
+
+		emctimer_write32(BPCIE_EMC_TIMER_ON_OFF,
+				 (emctimer_read32(BPCIE_EMC_TIMER_ON_OFF) &
+				  0xFFFFFFC8) |
+					 0x32);
+	} else {
+		// This is part of the Aeolia pcie device, but it's too early to
+		// do this in a driver.
+		emc_timer = ioremap(EMC_TIMER_BASE, 0x100);
+		if (!emc_timer)
+			goto fail;
+
+		emctimer_write32(0x84, emctimer_read32(0x84) & (~0x01));
+	}
+
 	// udelay is not calibrated yet, so this is likely wildly off, but good
 	// enough to work.
 	udelay(300);
-	emctimer_write32(0x00, emctimer_read32(0x00) | 0x01);
-	emctimer_write32(0x84, emctimer_read32(0x84) | 0x01);
+
+	if (isBaikal) {
+		emctimer_write32(BPCIE_EMC_TIMER_RESET_VALUE,
+				 (emctimer_read32(BPCIE_EMC_TIMER_RESET_VALUE) &
+						 0xFFFFFFE0) |
+					 0x10);
+		emctimer_write32(BPCIE_EMC_TIMER_ON_OFF,
+				 emctimer_read32(BPCIE_EMC_TIMER_ON_OFF) |
+					 0x33);
+	} else {
+		emctimer_write32(0x00, emctimer_read32(0x00) | 0x01);
+		emctimer_write32(0x84, emctimer_read32(0x84) | 0x01);
+	}
 
 	t1 = emctimer_read();
 	tsc1 = tsc2 = rdtsc();
@@ -103,7 +128,12 @@ fail:
 
 unsigned long __init ps4_calibrate_tsc(void)
 {
-	unsigned long tsc_freq = ps4_measure_tsc_freq();
+	// TODO (ps4patches): is there not any other way to differentiate baikal
+	#ifdef CONFIG_X86_PS4_BAIKAL
+	unsigned long tsc_freq = ps4_measure_tsc_freq(true);
+	#else
+	unsigned long tsc_freq = ps4_measure_tsc_freq(false);
+	#endif
 
 	if (!tsc_freq) {
 		pr_warn("Unable to measure TSC frequency, assuming default.\n");
