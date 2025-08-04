@@ -10,7 +10,7 @@ This fork aims to make the internal WiFi+Bluetooth modules on specific PlayStati
 The console models that are known to have the Torus 2 module, and their testing results from this patched kernel are:
 ``` 
 CUH-1216(A/B) { WiFi: Functional | Bluetooth: Functional }    
-CUH-1215(A/B) { WiFi: Untested   | Bluetooth: Untested   }    
+CUH-1215(A/B) { WiFi: Functional | Bluetooth: Functional }    
 [A and B are just hard-drive specification: 500 GB vs 1000GB].   
 ```
 
@@ -43,10 +43,10 @@ There are different branches that you can select on the repo,
 
 The primary release branches are:    
 `ps4-linux-5.15.y-fix-clean` : The clean WiFi fix branch for Kernel version 5.15.15    
-`ps4-linux-5.15.189-fix-clean` : The clean WiFi fix branch for Kernel version 5.15.189    
+`ps4-linux-5.15.189-fix-clean` : The clean WiFi fix branch for Kernel version 5.15.189 (Still broken, causes white LED on the PS4 during boot)    
 `ps4-linux-6.15.y-crashniels`: The clean WiFi fix branch for Kernel version 6.15.4.
 
-To compile them, you can simply fork the repo, go to the Actions tab and run the Workflow file for `build-kernel_latest.yaml`.
+To compile them, you can simply fork the repo, go to the Actions tab and run the Workflow file for `build-kernel_latest.yaml` for a particular branch.
 
 Or if you would like to build locally, just clone the repo for your desired branch and run:
 ```bash
@@ -55,6 +55,7 @@ mv config .config
 export MAKE_OPTS="-j`nproc` \
               HOSTCC=gcc-11 \
               CC=gcc-11"
+# gcc-11 is ideal for compiling the 5.15.y kernels, otherwise you will have many typecheck and compile errors 
 make ${MAKE_OPTS} olddefconfig
 make ${MAKE_OPTS} prepare
 echo "making kernel. . ."
