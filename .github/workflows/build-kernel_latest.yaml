@@ -1,7 +1,7 @@
 ## This is a basic workflow to help you get started with Actions 
 ## Adapted from https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
 
-name: "Compile PS4-Linux Kernel-12xx 6.15: Latest"
+name: "Compile PS4-Linux Kernel-12xx; Unified Version: Latest"
 
 # Controls when the workflow will run
 on:
