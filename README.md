@@ -11,19 +11,20 @@ The console models that are known to have the Torus 2 module, and their testing 
 ``` 
 CUH-1216(A/B) { WiFi: Functional | Bluetooth: Functional }    
 CUH-1215(A/B) { WiFi: Functional | Bluetooth: Functional }    
+CUH-1003      { WiFi: Functional? | Bluetooth: Functional? } 
 [A and B are just hard-drive specification: 500 GB vs 1000GB].   
 ```
 
 <br>
 
-The primary patches which in combination fix the module are:     
-[150 MHz rate limit quirk on the 88w8897 card's Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/df7f7dbb1b0fff6026e159540f029988c8067b70)
+The main patches which in combination fix the module are:     
+[150 MHz rate limit quirk on the 88w8897 card's Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/df7f7dbb1b0fff6026e159540f029988c8067b70).
 
-relying on the [patch for added sdio_id for the Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/f4835fb020010acff2b70e4c5fa9430e07f0073b)
+relying on the [patch for added sdio_id for the Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/f4835fb020010acff2b70e4c5fa9430e07f0073b),
 
-Then a [few SDHCI Host quirks for the PlayStation SDHCI host; a couple of which might be unnecessary \(haven't tested the redundancy yet\)](https://github.com/feeRnt/ps4-linux-12xx/commit/e6f342df7737722d5e27f0ae3974e493c5fe4ca4)
+Then a [few SDHCI Host quirks for the PlayStation SDHCI host; a couple of which might be unnecessary \(haven't tested the redundancy yet\)](https://github.com/feeRnt/ps4-linux-12xx/commit/e6f342df7737722d5e27f0ae3974e493c5fe4ca4),
 
-additionally with [extra retries for MMC CMD 52 or 53, which it would usually fail on.](https://github.com/feeRnt/ps4-linux-12xx/commit/c57162e5ec7a4aa3af3310a36dc963b5c0298dfe)
+additionally with [extra retries for MMC CMD 52 or 53, which it would usually fail on](https://github.com/feeRnt/ps4-linux-12xx/commit/c57162e5ec7a4aa3af3310a36dc963b5c0298dfe).
 
 The primary culprit behind the failed SDIO initialization, seems to be that the card doesn't properly support 208 or 200 MHz clock rate on this PS4 SDHCI host, causing the card to show tuning and other command failures.    
 Through much trial and error, I was able to reach such an arcane fix,     
@@ -39,12 +40,19 @@ and here is an image with working internal WiFi and Bluetooth as shown in the lo
 Hard work paid off!
 
 There are different branches that you can select on the repo,    
-`ps4-linux-5.15.y` and `ps4-linux-5.15.y-conservative2` are branches with excessive debug logs, that helped me pinpoint the issue on the whole MMC stack. Due to the logging, it is not advisable to use those kernel branches.
+`ps4-linux-5.15.y` and `ps4-linux-5.15.y-conservative2` are branches with excessive debug logs, that helped me pinpoint the issue on the whole MMC stack. Due to the logging, it is not advisable to use those kernel branches.    
 
-The primary release branches are:    
-`ps4-linux-5.15.y-fix-clean` : The clean WiFi fix branch for Kernel version 5.15.15    
-`ps4-linux-5.15.189-fix-clean` : The clean WiFi fix branch for Kernel version 5.15.189 (Still broken, causes white LED on the PS4 during boot)    
-`ps4-linux-6.15.y-crashniels`: The clean WiFi fix branch for Kernel version 6.15.4.
+The `ps4-linux-5.15.y-fix` is a branch without the PS4 patches from codedwrench's Baikal branch. It still
+runs, but you will get bad errors, even on Aeolia/Belize consoles. Should be used for testing only.
+
+
+The main release branches are:    
+`ps4-linux-5.15.15-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.15 on Aeolia/Belize southbridges.    
+`ps4-linux-5.15.15-fix-baikal` : The clean WiFi fix branch for Kernel version 5.15.15 on Baikal southbridges.    
+Baikals don't have the WiFi/BT issue fixed here, but it's kept for testing only.    
+`ps4-linux-5.15.189-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.189 on Aeolia/Belize southbridges.   
+`ps4-linux-6.15.y-crashniels` : The clean WiFi fix branch for Kernel version 6.15.4, on Aeolia/Belize southbridges.    
+Based on crashniels' source, it causes display issues on certain monitors without 1080p or proper EDID exchange support. 
 
 To compile them, you can simply fork the repo, go to the Actions tab and run the Workflow file for `build-kernel_latest.yaml` for a particular branch.
 
