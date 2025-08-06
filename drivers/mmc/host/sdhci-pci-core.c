@@ -375,7 +375,8 @@ static const struct sdhci_pci_fixes sdhci_aeolia = {
 	.probe_slot	= aeolia_probe_slot,
 	.remove_slot	= aeolia_remove_slot,
 	.enable_dma	= aeolia_enable_dma,
-	.quirks2	= SDHCI_QUIRK2_TUNING_WORK_AROUND,
+	.quirks2	= SDHCI_QUIRK2_PRESET_VALUE_BROKEN,
+			  SDHCI_QUIRK2_TUNING_WORK_AROUND,
 };
 #endif
 
