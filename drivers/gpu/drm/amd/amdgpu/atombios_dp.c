@@ -199,6 +199,7 @@ void amdgpu_atombios_dp_aux_init(struct amdgpu_connector *amdgpu_connector)
 #define DP_VOLTAGE_MAX         DP_TRAIN_VOLTAGE_SWING_LEVEL_3
 #define DP_PRE_EMPHASIS_MAX    DP_TRAIN_PRE_EMPH_LEVEL_3
 
+// Function that probably fails
 static void amdgpu_atombios_dp_get_adjust_train(const u8 link_status[DP_LINK_STATUS_SIZE],
 						int lane_count,
 						u8 train_set[4])
@@ -207,11 +208,12 @@ static void amdgpu_atombios_dp_get_adjust_train(const u8 link_status[DP_LINK_STA
 	u8 p = 0;
 	int lane;
 
+	pr_debug("atombios_dp: In %s.\n", __func__);
 	for (lane = 0; lane < lane_count; lane++) {
 		u8 this_v = drm_dp_get_adjust_request_voltage(link_status, lane);
 		u8 this_p = drm_dp_get_adjust_request_pre_emphasis(link_status, lane);
-
-		DRM_DEBUG_KMS("requested signal parameters: lane %d voltage %s pre_emph %s\n",
+		
+		pr_info("requested signal parameters: lane %d voltage %s pre_emph %s\n",
 			  lane,
 			  voltage_names[this_v >> DP_TRAIN_VOLTAGE_SWING_SHIFT],
 			  pre_emph_names[this_p >> DP_TRAIN_PRE_EMPHASIS_SHIFT]);
@@ -609,6 +611,9 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 	u8 voltage;
 	int i;
 	int iter = 0;
+	unsigned swing;
+	unsigned emph;
+	int max_count = 0;
 	
 	amdgpu_atombios_dp_set_tp(dp_info, DP_TRAINING_PATTERN_1);
 	memset(dp_info->train_set, 0, 4);
@@ -627,6 +632,7 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 	voltage = 0xff;
 	while (1) {
 		iter++;
+		max_count++;
 		drm_dp_link_train_clock_recovery_delay(dp_info->aux, dp_info->dpcd);
 		//defined in drivers/gpu/drm/drm_dp_helper.c 
 		//~ 100 usecs typically I think
@@ -644,8 +650,8 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 		}
 		
 		// print if the voltage swing and pre_emphasis is actually updating 
-		u8 swing = dp_info->train_set[0] & DP_TRAIN_VOLTAGE_SWING_MASK;
-		u8 emph  = (dp_info->train_set[0] & DP_TRAIN_PRE_EMPHASIS_MASK) >> DP_TRAIN_PRE_EMPHASIS_SHIFT;
+		swing = dp_info->train_set[0] & DP_TRAIN_VOLTAGE_SWING_MASK;
+		emph  = (dp_info->train_set[0] & DP_TRAIN_PRE_EMPHASIS_MASK) >> DP_TRAIN_PRE_EMPHASIS_SHIFT;
 
 		pr_info("[drm:amdgpu_atombios_dp_link_train]: current iter=%d, swing=%u, emph=%u, in tries=%d after non-successful train.\n",
          		iter, swing, emph, dp_info->tries);
@@ -668,16 +674,42 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 		} else
 			dp_info->tries = 0;
 
+		
+		// Unsafe and unsmart approach?:
+		if (swing < DP_TRAIN_VOLTAGE_SWING_LEVEL_3 && dp_info->tries < 2) {
+		    swing = swing + 1; //SWING_LEVEL_0 = 0, LEVEL_1 = 1, LEVEL_2 = 2, LEVEL_3 = 3
+		    pr_info("[drm:amdgpu_atombios_dp_link_train] CR failed, forcing swing to %u\n", swing);
+		    for (i = 0; i < dp_info->dp_lane_count; i++) {
+		        dp_info->train_set[i] &= ~DP_TRAIN_VOLTAGE_SWING_MASK;
+		        dp_info->train_set[i] |= swing;
+		    }
+		    amdgpu_atombios_dp_update_vs_emph(dp_info);
+		    dp_info->tries = 0;  //reset tries on voltage change 
+		    voltage = swing;
+		    continue; // try again immediately
+		}
+		
+		if (max_count = 13) {
+			pr_info("atombios_dp: reached 13 tries in clock recovery.. Breaking.\n");
+			break;
+		}
+
+		
+		/* Commented out code that is supposed to take the voltage from the monitor:
+
 		voltage = dp_info->train_set[0] & DP_TRAIN_VOLTAGE_SWING_MASK;
 		// If failed, remember voltage as the latest requested voltage by train_set. then try 5 times.
 		// if it switches to new voltage (new voltage asked by sink (monitor), the n-tries is reset to 0
 
-		/* Compute new train_set as requested by sink */
+		* Compute new train_set as requested by sink 
 		amdgpu_atombios_dp_get_adjust_train(dp_info->link_status, dp_info->dp_lane_count,
 					     dp_info->train_set);
 		// adjust train_set, for x dp_link_count, on link_status
+		// defined in this atmobios_dp.c
 
 		amdgpu_atombios_dp_update_vs_emph(dp_info);
+		// defined in drivers/gpu/drm/drm_dp_helper.c
+		*/
 	}
 	if (!clock_recovery) {
 		DRM_ERROR("clock recovery failed\n");

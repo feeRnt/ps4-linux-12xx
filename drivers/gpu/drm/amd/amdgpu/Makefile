@@ -253,3 +253,5 @@ amdgpu-y += $(AMD_DISPLAY_FILES)
 endif
 
 obj-$(CONFIG_DRM_AMDGPU)+= amdgpu.o
+
+subdir-ccflags-y += -DDEBUG
