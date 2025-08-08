@@ -608,30 +608,47 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 	bool clock_recovery;
 	u8 voltage;
 	int i;
-
+	int iter = 0;
+	
 	amdgpu_atombios_dp_set_tp(dp_info, DP_TRAINING_PATTERN_1);
 	memset(dp_info->train_set, 0, 4);
 	amdgpu_atombios_dp_update_vs_emph(dp_info);
 
 	udelay(400);
-
+	
+	/* PS4-Linux fails at this loop.
+	 * *ERROR* clock recovery tried 5 times
+ 	 * *ERROR* clock recovery failed
+	*/
+	
 	/* clock recovery loop */
 	clock_recovery = false;
 	dp_info->tries = 0;
 	voltage = 0xff;
 	while (1) {
+		iter++;
 		drm_dp_link_train_clock_recovery_delay(dp_info->aux, dp_info->dpcd);
+		//defined in drivers/gpu/drm/drm_dp_helper.c 
+		//~ 100 usecs typically I think
 
 		if (drm_dp_dpcd_read_link_status(dp_info->aux,
 						 dp_info->link_status) <= 0) {
-			DRM_ERROR("displayport link status failed\n");
+			DRM_ERROR("displayport link status failed\n"); //Status is never never 0 or less for aux? for us
 			break;
 		}
-
+	
 		if (drm_dp_clock_recovery_ok(dp_info->link_status, dp_info->dp_lane_count)) {
 			clock_recovery = true;
+			pr_info("[drm:amdgpu_atombios_dp_link_train] *SUCCESS* clock recovery completed\n");
 			break;
 		}
+		
+		// print if the voltage swing and pre_emphasis is actually updating 
+		u8 swing = dp_info->train_set[0] & DP_TRAIN_VOLTAGE_SWING_MASK;
+		u8 emph  = (dp_info->train_set[0] & DP_TRAIN_PRE_EMPHASIS_MASK) >> DP_TRAIN_PRE_EMPHASIS_SHIFT;
+
+		pr_info("[drm:amdgpu_atombios_dp_link_train]: current iter=%d, swing=%u, emph=%u, in tries=%d after non-successful train.\n",
+         		iter, swing, emph, dp_info->tries);
 
 		for (i = 0; i < dp_info->dp_lane_count; i++) {
 			if ((dp_info->train_set[i] & DP_TRAIN_MAX_SWING_REACHED) == 0)
@@ -652,10 +669,13 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 			dp_info->tries = 0;
 
 		voltage = dp_info->train_set[0] & DP_TRAIN_VOLTAGE_SWING_MASK;
+		// If failed, remember voltage as the latest requested voltage by train_set. then try 5 times.
+		// if it switches to new voltage (new voltage asked by sink (monitor), the n-tries is reset to 0
 
 		/* Compute new train_set as requested by sink */
 		amdgpu_atombios_dp_get_adjust_train(dp_info->link_status, dp_info->dp_lane_count,
 					     dp_info->train_set);
+		// adjust train_set, for x dp_link_count, on link_status
 
 		amdgpu_atombios_dp_update_vs_emph(dp_info);
 	}
@@ -663,10 +683,11 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 		DRM_ERROR("clock recovery failed\n");
 		return -1;
 	} else {
-		DRM_DEBUG_KMS("clock recovery at voltage %d pre-emphasis %d\n",
+		pr_info("clock recovery at voltage %d pre-emphasis %d\n",
 			  dp_info->train_set[0] & DP_TRAIN_VOLTAGE_SWING_MASK,
 			  (dp_info->train_set[0] & DP_TRAIN_PRE_EMPHASIS_MASK) >>
 			  DP_TRAIN_PRE_EMPHASIS_SHIFT);
+		//switched from DRM_DEBUG_KMS, for logging
 		return 0;
 	}
 }

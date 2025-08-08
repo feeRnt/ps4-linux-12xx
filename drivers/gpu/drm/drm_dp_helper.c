@@ -155,6 +155,8 @@ void drm_dp_link_train_clock_recovery_delay(const struct drm_dp_aux *aux,
 	else
 		rd_interval *= 4 * USEC_PER_MSEC;
 
+	pr_info("drm_dp_helper: Delaying for %ld microsecs.\n", (rd_interval*2 - rd_interval)); 
+	// %ld for long decimal 
 	usleep_range(rd_interval, rd_interval * 2);
 }
 EXPORT_SYMBOL(drm_dp_link_train_clock_recovery_delay);
