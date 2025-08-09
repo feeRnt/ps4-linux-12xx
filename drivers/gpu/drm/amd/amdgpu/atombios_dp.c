@@ -613,7 +613,7 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 	int iter = 0;
 	unsigned swing;
 	unsigned emph;
-	int max_count = 0;
+	//int max_count = 0;
 	
 	amdgpu_atombios_dp_set_tp(dp_info, DP_TRAINING_PATTERN_1);
 	memset(dp_info->train_set, 0, 4);
@@ -632,7 +632,7 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 	voltage = 0xff;
 	while (1) {
 		iter++;
-		max_count++;
+		//max_count++;
 		drm_dp_link_train_clock_recovery_delay(dp_info->aux, dp_info->dpcd);
 		//defined in drivers/gpu/drm/drm_dp_helper.c 
 		//~ 100 usecs typically I think
@@ -676,6 +676,8 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 
 		
 		// Unsafe and unsmart approach?:
+		// Edit: Causes blackscreen: Removed
+		/*
 		if (swing < DP_TRAIN_VOLTAGE_SWING_LEVEL_3 && dp_info->tries < 2) {
 		    swing = swing + 1; //SWING_LEVEL_0 = 0, LEVEL_1 = 1, LEVEL_2 = 2, LEVEL_3 = 3
 		    pr_info("[drm:amdgpu_atombios_dp_link_train] CR failed, forcing swing to %u\n", swing);
@@ -693,15 +695,16 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 			pr_info("atombios_dp: reached 13 tries in clock recovery.. Breaking.\n");
 			break;
 		}
-
+		*/
 		
-		/* Commented out code that is supposed to take the voltage from the monitor:
+		//Commented out code that is supposed to take the voltage from the monitor:
+		//Uncommented
 
 		voltage = dp_info->train_set[0] & DP_TRAIN_VOLTAGE_SWING_MASK;
 		// If failed, remember voltage as the latest requested voltage by train_set. then try 5 times.
 		// if it switches to new voltage (new voltage asked by sink (monitor), the n-tries is reset to 0
 
-		* Compute new train_set as requested by sink 
+		// Compute new train_set as requested by sink 
 		amdgpu_atombios_dp_get_adjust_train(dp_info->link_status, dp_info->dp_lane_count,
 					     dp_info->train_set);
 		// adjust train_set, for x dp_link_count, on link_status
@@ -709,7 +712,6 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 
 		amdgpu_atombios_dp_update_vs_emph(dp_info);
 		// defined in drivers/gpu/drm/drm_dp_helper.c
-		*/
 	}
 	if (!clock_recovery) {
 		DRM_ERROR("clock recovery failed\n");

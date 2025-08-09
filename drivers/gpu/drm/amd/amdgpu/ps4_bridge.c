@@ -688,10 +688,12 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *newmode;
 	pr_info("ps4_bridge_get_modes\n");
+	// Function that fails on PS4-Linux
 
 	newmode = drm_mode_duplicate(dev, &mode_1080p);
 	drm_mode_probed_add(connector, newmode);
-
+	//both defined in drivers/gpu/drm/drm_modes.c
+	
 	//newmode = drm_mode_duplicate(dev, &mode_720p);
 	//drm_mode_probed_add(connector, newmode);
 	//newmode = drm_mode_duplicate(dev, &mode_480p);
