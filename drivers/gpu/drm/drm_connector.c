@@ -2038,7 +2038,7 @@ int drm_connector_update_edid_property(struct drm_connector *connector,
 
 	/* ignore requests to set edid when overridden */
 	if (connector->override_edid)
-		return 0;
+		return 0; //test this?
 
 	if (edid)
 		size = EDID_LENGTH * (1 + edid->extensions);

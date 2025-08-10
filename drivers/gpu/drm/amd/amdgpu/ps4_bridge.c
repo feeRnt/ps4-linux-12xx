@@ -693,13 +693,15 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	newmode = drm_mode_duplicate(dev, &mode_1080p);
 	drm_mode_probed_add(connector, newmode);
 	//both defined in drivers/gpu/drm/drm_modes.c
-	
+	//both should return
+
 	//newmode = drm_mode_duplicate(dev, &mode_720p);
 	//drm_mode_probed_add(connector, newmode);
 	//newmode = drm_mode_duplicate(dev, &mode_480p);
 	//drm_mode_probed_add(connector, newmode);
 
 	drm_connector_update_edid_property(connector, NULL);
+	//defined in drivers/gpu/drm/drm_connector.c
 
 	return 0;
 }

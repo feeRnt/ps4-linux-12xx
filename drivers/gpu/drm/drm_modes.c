@@ -70,7 +70,8 @@ EXPORT_SYMBOL(drm_mode_debug_printmodeline);
 struct drm_display_mode *drm_mode_create(struct drm_device *dev)
 {
 	struct drm_display_mode *nmode;
-
+	
+	//should return
 	nmode = kzalloc(sizeof(struct drm_display_mode), GFP_KERNEL);
 	if (!nmode)
 		return NULL;
@@ -108,6 +109,7 @@ void drm_mode_probed_add(struct drm_connector *connector,
 			 struct drm_display_mode *mode)
 {
 	WARN_ON(!mutex_is_locked(&connector->dev->mode_config.mutex));
+	//should return
 
 	list_add_tail(&mode->head, &connector->probed_modes);
 }
@@ -886,6 +888,7 @@ EXPORT_SYMBOL(drm_mode_set_crtcinfo);
 void drm_mode_copy(struct drm_display_mode *dst, const struct drm_display_mode *src)
 {
 	struct list_head head = dst->head;
+	// Should return
 
 	*dst = *src;
 	dst->head = head;
@@ -909,10 +912,12 @@ struct drm_display_mode *drm_mode_duplicate(struct drm_device *dev,
 	struct drm_display_mode *nmode;
 
 	nmode = drm_mode_create(dev);
+	//should return
 	if (!nmode)
 		return NULL;
 
 	drm_mode_copy(nmode, mode);
+	//should return
 
 	return nmode;
 }

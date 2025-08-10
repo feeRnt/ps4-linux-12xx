@@ -47,9 +47,14 @@ void amdgpu_connector_hotplug(struct drm_connector *connector)
 
 	/* bail if the connector does not have hpd pin, e.g.,
 	 * VGA, TV, etc.
+	 * Additionally, bail hotplug sequence on PlayStation 4 and PlayStation 4 Pros.
+	 * Even on an HDMI Monitor connection, the hotplug causes blackscreen issues.
 	 */
-	if (amdgpu_connector->hpd.hpd == AMDGPU_HPD_NONE)
+	if (amdgpu_connector->hpd.hpd == AMDGPU_HPD_NONE || adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS ) {
+		pr_info("amdgpu_connectors: Not going to hotplug in %s;\
+				because connector does not have hotplug detect pin, or it is a PS4 GPU.\n");
 		return;
+	}
 
 	amdgpu_display_hpd_set_polarity(adev, amdgpu_connector->hpd.hpd);
 
@@ -80,6 +85,8 @@ void amdgpu_connector_hotplug(struct drm_connector *connector)
 
 			/* Turn the connector off and back on immediately, which
 			 * will trigger link training
+			 * 
+			 * This link training causes the "*ERROR* clock recovery failed on PS4s, probably.
 			 */
 			drm_helper_connector_dpms(connector, DRM_MODE_DPMS_OFF);
 			drm_helper_connector_dpms(connector, DRM_MODE_DPMS_ON);
@@ -1508,6 +1515,7 @@ static const struct drm_connector_funcs amdgpu_connector_dp_funcs = {
 	.late_register = amdgpu_connector_late_register,
 };
 
+// Place where all the PS4 specific functions are declared and enumerated
 #ifdef CONFIG_X86_PS4
 int ps4_bridge_get_modes(struct drm_connector *connector);
 int ps4_bridge_mode_valid(struct drm_connector *connector,
@@ -1544,6 +1552,7 @@ static const struct drm_connector_funcs amdgpu_connector_edp_funcs = {
 	.late_register = amdgpu_connector_late_register,
 };
 
+// has ps4_specific patches
 void
 amdgpu_connector_add(struct amdgpu_device *adev,
 		      uint32_t connector_id,
