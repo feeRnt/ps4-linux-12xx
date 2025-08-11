@@ -1,0 +1,448 @@
+## This is a basic workflow to help you get started with Actions 
+## Adapted from https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
+
+name: "Compile PS4-Linux Kernel-12xx; Unified Version: Latest - Ignore Errors"
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Github Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build:
+    env: 
+       GITHUB_TOKEN: ${{ github.token }}
+    runs-on: ubuntu-latest # Ubuntu 24.04. But Docker image I use is Ubuntu 22.04 
+    steps: 
+      - name: Set up cache env vars
+        id: cache-workspace-vars
+        run: |
+          echo "List of files in workdir, right after Github build job start:"
+          ls -a
+          echo "CACHE_WORKSPACE_KEY=${{ runner.os }}-workspace-${{ github.run_id }}" >> $GITHUB_ENV
+          #echo "CACHE_WORKSPACE_RESTORE_KEY=${{ runner.os }}-workspace-" >> $GITHUB_ENV
+          echo "github.ref_name in cache-workspace-vars = ${{ github.ref_name }}" 
+          echo "CACHE_WORKSPACE_RESTORE_KEY=${{ runner.os }}-workspace-${{ github.ref_name }}" >> $GITHUB_ENV
+          #Better handles multi-branch caching
+          #Use $CACHE_WORKSPACE_RESTORE_KEY in your other steps. 
+
+      #Based on:
+      #https://github.com/actions/toolkit/issues/946#issuecomment-1590016041
+      #https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
+      - name: Set SUID to tar binary #Allows saving (and recovering)? cache of restricted files
+        run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
+        #SUID allows the bin to be ran as the user who owns the file, instead of the default: the uid of the caller
+      
+      #  Technically unnnecessary now since we do the checkout into workspace anyway. Would have to move
+      #  dockerx build after cache-workspace-restore step
+      - name: Download Dockerfile
+        run: |
+         curl -fL https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/Dockerfile -o Dockerfile
+         curl -fL https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/.dockerignore -o .dockerignore
+         # -verbose, -fail if server error, -Links follow,
+
+      - name: Show username and group info
+        run: |
+          echo "Actions Runner Username: $(whoami)"
+          echo "Actions Runner User ID: $(id -u)"
+          echo "Actions Runner Group Name: $(id -gn)"
+          echo "Actions Runner Group ID: $(id -g)"
+          echo "Actions Runner OS: ${{ runner.os }}"
+          #echo "Actions github_token:" #Don't print this, unsafe. (though it might be starred out in logs, but still.) 
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      # this needs to be done before using docker buildx.
+      # this doesn't need to be done before the caching part, but doing it anyway.
+      # Downloading the cache can either happen before or after.
+
+
+      # TODO: Either manually restore, delete, save dockerx caches like we did with the workspace cache
+      # OR
+      # Pin a specific Docker Base OS Image Digest, so that the caches are never invalidated.
+
+      # Retrieve Cache-d Docker layers, and Save cache after job completion
+      - name: Cache Docker Layers
+        uses: actions/cache@v3
+        with:
+          path: |
+            /tmp/.buildx-cache 
+          #The location where Docker will save and read cache layers (on the host)
+          #Which is set in the buildx build launch parameters
+
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}  # Cache key
+          restore-keys: |
+            ${{ runner.os }}-docker-
+      
+      # Proper cache handling and overwriting; for build artifacts. Based on:
+      #1: https://github.com/actions/cache/issues/342#issuecomment-1363953531 (original. ulterzlw)
+      #2: https://github.com/actions/cache/issues/342#issuecomment-1711054115 (azu)
+      #3: https://github.com/actions/cache/issues/342#issuecomment-2773231159 (langston-barett, Apr '25)
+      - name: Restore Cache of Github Workspace
+        uses: actions/cache/restore@v4 #uses is actually a macro for a github repo that you will use.
+        id: cache-restore-workspace
+        #env:
+        #  cache-workspace-restore-key: $CACHE_WORKSPACE_RESTORE_KEY
+        # Doesn't work, takes $expr literally without expansion
+        with:
+          path: ${{ github.workspace }}/kernel-source-host
+          #key:  ${{ env.cache-workspace-restore-key }}
+          key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}
+      
+      - name: Check and make kernel-source-host directory
+        run: | 
+          cd ${{ github.workspace }}
+          if [ -d kernel-source-host ]; then
+            echo "Build directory already exists! Continuing."
+          else
+            mkdir kernel-source-host
+          fi
+
+      - name: Check if repo was previously cloned
+        id: check_repo
+        run: |
+          cd ${{ github.workspace }}/kernel-source-host
+          if [ -d .git ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo ".git directory exists. Setting exists=true."
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo ".git directory doesn't exist. Setting exists=false" 
+          fi
+
+        # the default pwd in github actions is /home/runner/work/repo/repo (even before checkout of
+        # your repo). SO mind the paths
+        # It's a variable, and it is your default shell path. But it is empty unless you check
+        # it out.
+        # The .github files don't exist there either. They are loaded into memory from the repo.
+        # Unless you checkout, then they are acquired obviously.
+
+      - name: Checkout ps4-linux-12xx repo
+        if: steps.check_repo.outputs.exists == 'false'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          #repository: feeRnt/ps4-linux-12xx
+          path: ${{ github.workspace }}/kernel-source-host
+          ref: ${{ github.ref }}
+          #repository: is optional. Default is the repo that triggered the event
+          #path is path at which we want to check it out
+          #ref = default branch, for us (caller).
+
+      - name: Move config file
+        if: steps.check_repo.outputs.exists == 'false'
+        working-directory: ${{ github.workspace }}/kernel-source-host
+        run: |
+          echo "git remote show origin = $(git remote show origin)"
+          _DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | awk '/HEAD branch/ {print $NF}')
+          echo "_DEFAULT_BRANCH = $_DEFAULT_BRANCH"
+          echo _DEFAULT_BRANCH="$_DEFAULT_BRANCH" >> $GITHUB_ENV
+          mv config .config
+          # config will exist if we checkout. so no need to use -f check
+
+
+      # TRUE::
+      #MANUAL TESTING
+      #- name: Manually set up cached repo/.git as a safe directory for git actions
+      #  if: steps.check_repo.outputs.exists == 'true' && steps.cache-restore-workspace.outputs.cache-hit == 'true'
+      #  run: /usr/bin/git config --global --add safe.directory /home/runner/work/ps4-linux-12xx/ps4-linux-12xx/kernel-source-host 
+      
+      #- name: Set up Github auth manually
+      #  if: steps.check_repo.outputs.exists == 'true' && steps.cache-restore-workspace.outputs.cache-hit == 'true'
+      #  working-directory: ${{ github.workspace }}/kernel-source-host
+      #  run: |
+      #    echo "Setting up auth"
+      #    # /usr/bin/git config --local --name-only --get-regexp core\.sshCommand
+      #    # Not needed
+      #    /usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'core\.sshCommand' && git config --local --unset-all 'core.sshCommand' || :"
+      #    # clears all the core.sshCommand configs
+      #    
+      #    # /usr/bin/git config --local --name-only --get-regexp http\.https\:\/\/github\.com\/\.extraheader
+      #    # Not needed
+      #    
+      #    #/usr/bin/git submodule foreach --recursive sh -c "git config --local --name-only --get-regexp 'http\.https\:\/\/github\.com\/\.extraheader' && git config --local --unset-all 'http.https://github.com/.extraheader' || :"
+      #    # Clears al the http.https://github.com/.extraheader configs
+      #    
+      #    #/usr/bin/git config --local http.https://github.com/.extraheader AUTHORIZATION: basic ***
+      #    # Sets up authorization using a secret. Command is obfuscated in github logs.
+      #    Maybe it's possible to figure out how the key is calucalted from 
+      #    https://github.com/actions/checkout/blob/09d2acae674a48949e3602304ab46fd20ae0c42f/dist/index.js#L5102
+      #    etc. but it's too complicated and a waste of time for now.
+      #    I'll use the checkout action with different options.
+      #    Huh according to copilot (keep getting surprised about how it seems pretty smart)
+      #
+      #    - name: Set up git authentication for cached repo
+      #      if: steps.check_repo.outputs.exists == 'true' && steps.cache-restore-workspace.outputs.cache-hit == 'true'
+      #      working-directory: ${{ github.workspace }}/kernel-source-host
+      #      run: |
+      #      git config --local http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n x-access-token:${{ secrets.GITHUB_TOKEN }} | base64)"
+      #      I can try this next too if really needed...
+
+      - name: Update ps4-linux-12xx repo if it exists
+        if: steps.check_repo.outputs.exists == 'true'
+        #working-directory: ${{ github.workspace }}/kernel-source-host
+        #OLD VERSION WITHOUT CHECKOUT
+        #run: |
+        #  echo "git remote show origin = $(git remote show origin)"
+        #  _DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | awk '/HEAD branch/ {print $NF}')
+        #  echo "_DEFAULT_BRANCH = $_DEFAULT_BRANCH"
+        #  echo _DEFAULT_BRANCH="$_DEFAULT_BRANCH" >> $GITHUB_ENV
+
+        #  echo "Total commits in this repo:"
+        #  git rev-list --all --count
+        #  echo "Branches in this repo:"
+        #  git branch
+        #  echo "github.ref is = ${{ github.ref }}."
+        #  echo "git remote information:"
+        #  git remote -v
+
+        #  echo "Files in repo before fetch:"
+        #  ls -a
+        #
+        #  git fetch --depth=1 origin "$_DEFAULT_BRANCH"
+        #  git reset --hard origin/"$_DEFAULT_BRANCH"
+        #  if [ -f config ]; then
+        #    echo "Renaming config to .config"
+        #    mv config .config
+        #  else
+        #    echo ".config already exists. Continuing."
+        #  # for reruns without updating the repo
+        #  fi;
+        uses: actions/checkout@v4
+        with:
+          path: ${{ github.workspace }}/kernel-source-host
+          repository: ${{ github.repository }} #default
+          ref: ${{ github.ref }}
+          fetch-depth: 1
+          token: ${{ github.token }} #default
+          persist-credentials: false #non-default
+          #'Whether to configure the token or SSH key with the local git config'
+          #https://github.com/actions/checkout/issues/485 (might be best to keep false)
+          clean: false #non-default
+          #'Whether to execute `git clean -ffdx && git reset --hard HEAD` before fetching'
+          #This is what resets your cache. clean removes untracked files, -ffdx ensures full clean.
+
+          # Checkout should only touch tracked files
+          # List of options from
+          # https://github.com/actions/checkout/blob/main/action.yml
+
+          # Works all well except,  
+          #   Warning: you are leaving 1 commit behind, not connected to
+          # any of your branches:
+          # <hash> <commit message>
+          # If you want to keep it by creating a new branch, this may be a good time
+          #to do so with:
+          # git branch <new-branch-name> <hash>
+          # And garbage collector is disabled by checkout by default.. 
+          # 
+          #Disabling automatic garbage collection
+          #/usr/bin/git config --local gc.auto 0
+          #
+          #Can disable it manually, or can switch to git fetch with manual auth at a later date (because of
+          #headaches with action/checkout
+
+      - name: Move config file after repo update
+        if: steps.check_repo.outputs.exists == 'true'
+        working-directory: ${{ github.workspace }}/kernel-source-host
+        run: |
+          echo "git remote show origin = $(git remote show origin)"
+          _DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | awk '/HEAD branch/ {print $NF}')
+          echo "_DEFAULT_BRANCH = $_DEFAULT_BRANCH"
+          echo _DEFAULT_BRANCH="$_DEFAULT_BRANCH" >> $GITHUB_ENV
+          mv config .config
+          # config will exist if we checkout. so no need to use -f check 
+      
+      - name: Move .github directory to workspace
+        run: mv ${{ github.workspace }}/kernel-source-host/.github ${{ github.workspace }}/.github
+        # Needed for simplified problem-matching, future rules, etc.
+      
+      # Build Docker image  
+      - name: Build Docker image with cache
+        run: |
+          echo "Current pwd = $PWD in docker image build"
+          mkdir -p /tmp/.buildx-cache
+          docker buildx build \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache,mode=max \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --tag kernel-linux-ps4:latest \
+            --load \
+            .
+      # This /tmp is not gonna be made if the directory doesn't exist already
+      # --load loads the contents the image into the workspace OS, otherwise only in cache
+      # --cache-to type=local caches straight to the host machine, meaning github workspace
+      #
+      # build-context workspace=./ results in /home/runner/work/repo/repo by default
+   
+      # Based on:
+      # https://lca-kernel.ozlabs.org/2022-Currey-Abusing-GitHub-Actions-for-building-and-testing-kernels.pdf
+      - name: Setup compile error problem-matching for kernel compilation
+        run: |
+          echo "::add-matcher::.github/problem-matchers/kernel-compile-errors.json"
+          # Fields and their meaning:
+          # regex: regex to match annotation, file: capture group that has file name
+          # line: capture group that gives the line number, column: capture group for column number
+          # severity: capture group that states if error or warning, message: capture group that has problem msg
+
+      - name: Compile the linux kernel with docker run
+        id: compile-kernel-step
+        run: |
+          set +e
+          #temporarily disable exit on fail for the bash run (doesn't apply to the set -e inside the docker run)
+
+          docker run -i --name kernel -d -v ${{ github.workspace }}/kernel-source-host:/container/workspace/kernel-source-container \
+          -w /container/workspace/kernel-source-container kernel-linux-ps4:latest tail -f /dev/null
+          # -v is volume, # -w is workdir (WORKDIR)
+          # -d is detached. Is useful for when you are starting the initial docker image and you don't need its output.
+          # -i keeps stdin of container open, for piping commands
+
+          echo "Made it past running docker run -it. Will docker exec bash now."
+          
+          docker exec -i kernel bash <<'EOF' 
+          set -e
+          echo "Testing if host directory mounting was successful."
+          ls -a .
+          
+          if [ -f persistence_test* ]; then
+            echo "Files are persisting across runs! Congratulations."
+          else
+            echo "Files are not persisting across runs, OR, this is the first uncached action run."
+          fi;
+
+          echo "Doing persistence tests!"
+          touch "write_test"
+          echo "persisting! $(date --iso=s)" > persistence_test_"$(date --iso=s)".txt: 
+          echo "files available after test..."
+          ls -a
+
+          export localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'`
+          # Removes everything up to =, and then the '"' and '-' 
+          # Using uppercase localversion will mess with your final kernel img version.
+          
+          # if empty...
+          #if [ -z "$localversion" ]; then
+          #  sed -iE 's|^CONFIG_LOCALVERSION=".*|CONFIG_LOCALVERSION="-'$(date +%Y_%m_%d_%H%M)'"|' .config
+          #  export localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'`
+          #fi;
+          #Removed for now; directly fixed the case where GH wouldn't upload artifact because of missing localversion variable.
+
+          export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
+          export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
+          export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
+          export KERNEL_PKG=kernel-${localversion}.tar.gz
+          export MAKE_OPTS="-j`nproc` \
+                     INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
+                     INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
+                     HOSTCC=gcc-11 \
+                     CC=gcc-11 \
+                     --ignore-errors"
+                     # --keep-going" --ignore-errors is better for checking all the code errors.
+                     # Will not stop if one target depends on another.
+          mkdir -p ${GCE_BUILD_DIR}
+          mkdir -p ${GCE_INSTALL_DIR}/boot
+          mkdir -p ${GCE_PKG_DIR}
+          echo "Debugging gce directory."
+          find ${GCE_BUILD_DIR} ${GCE_INSTALL_DIR}/boot ${GCE_PKG_DIR}
+
+          make ${MAKE_OPTS} olddefconfig
+          make ${MAKE_OPTS} prepare
+          echo "Making kernel. . ."
+          make ${MAKE_OPTS}
+          echo "Making modules . . ."
+          make ${MAKE_OPTS} modules
+          echo "Installing kernel . . ."
+          make ${MAKE_OPTS} install
+          echo "Installing modules . . ."
+          make ${MAKE_OPTS} modules_install
+          echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
+          cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
+          cd ${GCE_INSTALL_DIR}
+          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion".tar.gz boot/bzImage lib/modules/* --owner=0 --group=0
+          # I assume it'll never package the kernel, unless the compile succeeds, since -e is set
+
+          ## GCE = Google Compute Engine, adapted from 
+          #https://github.com/google/bbr/blob/v3/gce-install.sh
+          EOF
+          
+          # Now in runner.
+          cd ${{ github.workspace }}/kernel-source-host 
+          echo "Available files in runner after docker compile..."
+          ls -la
+          echo "compile-kernel-complete=true" >> $GITHUB_OUTPUT
+          #We just want to ensure that we reached the end of this stage before deleting the old cached rud run.
+          
+          set -e
+          # Reset exit on fail. Not needed but proof of concept
+
+      - name: Remove compile error problem-matching
+        run: echo "::remove-matcher owner=kernel-compile-docker::"
+
+
+
+      - name: Get kernel version name env
+        id: kernel-version-env
+        working-directory: ${{ github.workspace }}/kernel-source-host
+        run: |
+          localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*="-||p' | tr -d '\"'`
+          echo "localversion is originally = $localversion"
+          echo "localversion=$localversion" >> $GITHUB_OUTPUT
+
+      - name: Upload kernel image to github actions artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}
+          path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
+          # This path is the github actiions root
+
+      # - name: Delete the kernel image artifact from workspace
+      #  run: |
+      #   #if [ -n $(grep 10 ./build_counter) ]; ... then
+      #    # for file in ... <<< ls --sort time; do
+      #    #rm ${{ github.workspace }}/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
+      #    #done
+      #    #fi
+
+      - name: Testing Cache Hit Bools
+        run: |
+          echo "Current steps.cache-restore-workspace.outputs.cache-hit = ${{ steps.cache-restore-workspace.outputs.cache-hit }}"
+          echo "and"
+          echo "Current steps.compile-kernel-step.outputs.compile-kernel-complete = ${{ steps.compile-kernel-step.outputs.compile-kernel-complete }}"
+
+      #3: https://github.com/actions/cache/issues/342#issuecomment-2773231159 (langston-barett, Apr '25)
+      - name: Delete Cache of Github Workspace
+        env:
+          GH_TOKEN: ${{ github.token }}
+        if: steps.cache-restore-workspace.outputs.cache-hit && steps.compile-kernel-step.outputs.compile-kernel-complete
+        # Using `--repo` makes it so that this step doesn't require checking out the repo first.
+        run: |
+          echo "There was a cache hit for github workspace, and we just completed the kernel compilation. Hence deleting the old cache."
+          gh cache delete --repo ${{ github.repository }} ${{ steps.cache-restore-workspace.outputs.cache-primary-key }}
+
+      - name: Save Cache of Github Workspace
+        uses: actions/cache/save@v4
+        # Save the cache even if build steps fail.
+        #if: always()
+
+        # If we at least get to the end of compile step, then attempt to save.
+        # If the cache has not been deleted in delete cache step, then this won't save anyway, saying "Cache already in use,"
+        # but still keeping this if conditional.
+        if: steps.compile-kernel-step.outputs.compile-kernel-complete
+        with:
+          path: ${{ github.workspace }}/kernel-source-host
+          #it will cache things in this dir. Not where it is storing the cache (they may be same though?).
+          key: ${{ steps.cache-restore-workspace.outputs.cache-primary-key }}
+          # Warning, this will also save the bulit artifacts themselves (the kernel.tar.gz)
+          # We can remove those tar.gzs by uncommenting the above run block, or by having a conditional delete every 10 compiles or so.
+          # Additionally by deleting the caches entirely from gh or web-interface.
+      
+
+# Some yaml facts.
+ # Even if your indentation or other errors are further down
+ # in the file, yaml will complain of missing "-" way up at the start.
+
+ # Minor indentation faults can break your yaml, so format properly.
+
+ # There is github.com/google/yamlfmt , which works decent
+ # At least it tells you what is broken and what isn't
+ # IMPORTANT: You CANNOT, put comments outside a run block, before the block is over; Unless it is aligned with the commands.
