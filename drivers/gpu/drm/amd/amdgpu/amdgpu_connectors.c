@@ -47,12 +47,18 @@ void amdgpu_connector_hotplug(struct drm_connector *connector)
 
 	/* bail if the connector does not have hpd pin, e.g.,
 	 * VGA, TV, etc.
-	 * Additionally, bail hotplug sequence on PlayStation 4 and PlayStation 4 Pros.
-	 * Even on an HDMI Monitor connection, the hotplug causes blackscreen issues.
+	 * Additionally, bail hotplug sequence on PlayStation 4 and PlayStation 4 Pros?
+	 * Even on an HDMI Monitor connection, the hotplug seems to cause blackscreen issues.
+	 * EDIT: It's not the hotplug, the blackscreen happens before any hotplugs
 	 */
-	if (amdgpu_connector->hpd.hpd == AMDGPU_HPD_NONE || adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS ) {
+	//if (amdgpu_connector->hpd.hpd == AMDGPU_HPD_NONE || adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS ) {
+	if (amdgpu_connector->hpd.hpd == AMDGPU_HPD_NONE) {
 		pr_info("amdgpu_connectors: Not going to hotplug in %s;\
-				because connector does not have hotplug detect pin, or it is a PS4 GPU.\n");
+				because connector does not have hotplug detect pin, or it is a PS4 GPU.\n",
+				__func__);
+		//this somehow causes an unfixable blackscreen, even though this conditional is never
+		//executed? Reverting
+		//I didn't have the __func__ originally, so maybe that prevented it from printing out.
 		return;
 	}
 
