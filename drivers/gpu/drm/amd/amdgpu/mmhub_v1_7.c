@@ -36,6 +36,7 @@
 
 static u64 mmhub_v1_7_get_fb_location(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	u64 base = RREG32_SOC15(MMHUB, 0, regMC_VM_FB_LOCATION_BASE);
 	u64 top = RREG32_SOC15(MMHUB, 0, regMC_VM_FB_LOCATION_TOP);
 
@@ -54,6 +55,7 @@ static u64 mmhub_v1_7_get_fb_location(struct amdgpu_device *adev)
 static void mmhub_v1_7_setup_vm_pt_regs(struct amdgpu_device *adev, uint32_t vmid,
 				uint64_t page_table_base)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 
 	WREG32_SOC15_OFFSET(MMHUB, 0, regVM_CONTEXT0_PAGE_TABLE_BASE_ADDR_LO32,
@@ -65,6 +67,7 @@ static void mmhub_v1_7_setup_vm_pt_regs(struct amdgpu_device *adev, uint32_t vmi
 
 static void mmhub_v1_7_init_gart_aperture_regs(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	uint64_t pt_base;
 
 	if (adev->gmc.pdb0_bo)
@@ -103,6 +106,7 @@ static void mmhub_v1_7_init_gart_aperture_regs(struct amdgpu_device *adev)
 
 static void mmhub_v1_7_init_system_aperture_regs(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	uint64_t value;
 	uint32_t tmp;
 
@@ -154,6 +158,7 @@ static void mmhub_v1_7_init_system_aperture_regs(struct amdgpu_device *adev)
 
 static void mmhub_v1_7_init_tlb_regs(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* Setup TLB control */
@@ -174,6 +179,7 @@ static void mmhub_v1_7_init_tlb_regs(struct amdgpu_device *adev)
 
 static void mmhub_v1_7_init_cache_regs(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	uint32_t tmp;
 
 	if (amdgpu_sriov_vf(adev))
@@ -225,6 +231,7 @@ static void mmhub_v1_7_init_cache_regs(struct amdgpu_device *adev)
 
 static void mmhub_v1_7_enable_system_domain(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	uint32_t tmp;
 
 	tmp = RREG32_SOC15(MMHUB, 0, regVM_CONTEXT0_CNTL);
@@ -240,6 +247,7 @@ static void mmhub_v1_7_enable_system_domain(struct amdgpu_device *adev)
 
 static void mmhub_v1_7_disable_identity_aperture(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	if (amdgpu_sriov_vf(adev))
 		return;
 
@@ -261,6 +269,7 @@ static void mmhub_v1_7_disable_identity_aperture(struct amdgpu_device *adev)
 
 static void mmhub_v1_7_setup_vmid_config(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 	unsigned num_level, block_size;
 	uint32_t tmp;
@@ -319,6 +328,7 @@ static void mmhub_v1_7_setup_vmid_config(struct amdgpu_device *adev)
 
 static void mmhub_v1_7_program_invalidation(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 	unsigned i;
 
@@ -332,6 +342,7 @@ static void mmhub_v1_7_program_invalidation(struct amdgpu_device *adev)
 
 static int mmhub_v1_7_gart_enable(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	/* GART Enable. */
 	mmhub_v1_7_init_gart_aperture_regs(adev);
 	mmhub_v1_7_init_system_aperture_regs(adev);
@@ -348,6 +359,7 @@ static int mmhub_v1_7_gart_enable(struct amdgpu_device *adev)
 
 static void mmhub_v1_7_gart_disable(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 	u32 tmp;
 	u32 i;
@@ -383,6 +395,7 @@ static void mmhub_v1_7_gart_disable(struct amdgpu_device *adev)
  */
 static void mmhub_v1_7_set_fault_enable_default(struct amdgpu_device *adev, bool value)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	u32 tmp;
 
 	if (amdgpu_sriov_vf(adev))
@@ -425,6 +438,7 @@ static void mmhub_v1_7_set_fault_enable_default(struct amdgpu_device *adev, bool
 
 static void mmhub_v1_7_init(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 
 	hub->ctx0_ptb_addr_lo32 =
@@ -456,6 +470,7 @@ static void mmhub_v1_7_init(struct amdgpu_device *adev)
 static void mmhub_v1_7_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 							bool enable)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	uint32_t def, data, def1, data1, def2 = 0, data2 = 0;
 
 	def  = data  = RREG32_SOC15(MMHUB, 0, regATC_L2_MISC_CG);
@@ -510,6 +525,7 @@ static void mmhub_v1_7_update_medium_grain_clock_gating(struct amdgpu_device *ad
 static void mmhub_v1_7_update_medium_grain_light_sleep(struct amdgpu_device *adev,
 						       bool enable)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	uint32_t def, data;
 
 	def = data = RREG32_SOC15(MMHUB, 0, regATC_L2_MISC_CG);
@@ -526,6 +542,7 @@ static void mmhub_v1_7_update_medium_grain_light_sleep(struct amdgpu_device *ade
 static int mmhub_v1_7_set_clockgating(struct amdgpu_device *adev,
 			       enum amd_clockgating_state state)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	if (amdgpu_sriov_vf(adev))
 		return 0;
 
@@ -544,6 +561,7 @@ static int mmhub_v1_7_set_clockgating(struct amdgpu_device *adev,
 
 static void mmhub_v1_7_get_clockgating(struct amdgpu_device *adev, u32 *flags)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	int data, data1;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1209,6 +1227,7 @@ static int mmhub_v1_7_get_ras_error_count(struct amdgpu_device *adev,
 					  uint32_t *sec_count,
 					  uint32_t *ded_count)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	uint32_t i;
 	uint32_t sec_cnt, ded_cnt;
 
@@ -1243,6 +1262,7 @@ static int mmhub_v1_7_get_ras_error_count(struct amdgpu_device *adev,
 static void mmhub_v1_7_query_ras_error_count(struct amdgpu_device *adev,
 					     void *ras_error_status)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 	uint32_t sec_count = 0, ded_count = 0;
 	uint32_t i;
@@ -1265,6 +1285,7 @@ static void mmhub_v1_7_query_ras_error_count(struct amdgpu_device *adev,
 
 static void mmhub_v1_7_reset_ras_error_count(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	uint32_t i;
 
 	/* write 0 to reset the edc counters */
@@ -1285,6 +1306,7 @@ static const struct soc15_reg_entry mmhub_v1_7_ea_err_status_regs[] = {
 
 static void mmhub_v1_7_query_ras_error_status(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	int i;
 	uint32_t reg_value;
 
@@ -1305,6 +1327,7 @@ static void mmhub_v1_7_query_ras_error_status(struct amdgpu_device *adev)
 
 static void mmhub_v1_7_reset_ras_error_status(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v1_7: called %s\n", __func__);
 	int i;
 	uint32_t reg_value;
 

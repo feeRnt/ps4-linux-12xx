@@ -212,6 +212,7 @@ static struct attribute *amdgpu_xgmi_hive_attrs[] = {
 static ssize_t amdgpu_xgmi_show_attrs(struct kobject *kobj,
 	struct attribute *attr, char *buf)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct amdgpu_hive_info *hive = container_of(
 		kobj, struct amdgpu_hive_info, kobj);
 
@@ -223,6 +224,7 @@ static ssize_t amdgpu_xgmi_show_attrs(struct kobject *kobj,
 
 static void amdgpu_xgmi_hive_release(struct kobject *kobj)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct amdgpu_hive_info *hive = container_of(
 		kobj, struct amdgpu_hive_info, kobj);
 
@@ -244,6 +246,7 @@ static ssize_t amdgpu_xgmi_show_device_id(struct device *dev,
 				     struct device_attribute *attr,
 				     char *buf)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 
@@ -256,6 +259,7 @@ static ssize_t amdgpu_xgmi_show_error(struct device *dev,
 				      struct device_attribute *attr,
 				      char *buf)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	uint32_t ficaa_pie_ctl_in, ficaa_pie_status_in;
@@ -286,6 +290,7 @@ static DEVICE_ATTR(xgmi_error, S_IRUGO, amdgpu_xgmi_show_error, NULL);
 static int amdgpu_xgmi_sysfs_add_dev_info(struct amdgpu_device *adev,
 					 struct amdgpu_hive_info *hive)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	int ret = 0;
 	char node[10] = { 0 };
 
@@ -336,6 +341,7 @@ success:
 static void amdgpu_xgmi_sysfs_rem_dev_info(struct amdgpu_device *adev,
 					  struct amdgpu_hive_info *hive)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	char node[10];
 	memset(node, 0, sizeof(node));
 
@@ -354,6 +360,7 @@ static void amdgpu_xgmi_sysfs_rem_dev_info(struct amdgpu_device *adev,
 
 struct amdgpu_hive_info *amdgpu_get_xgmi_hive(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct amdgpu_hive_info *hive = NULL;
 	int ret;
 
@@ -417,12 +424,14 @@ pro_end:
 
 void amdgpu_put_xgmi_hive(struct amdgpu_hive_info *hive)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	if (hive)
 		kobject_put(&hive->kobj);
 }
 
 int amdgpu_xgmi_set_pstate(struct amdgpu_device *adev, int pstate)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	int ret = 0;
 	struct amdgpu_hive_info *hive;
 	struct amdgpu_device *request_adev;
@@ -483,6 +492,7 @@ out:
 
 int amdgpu_xgmi_update_topology(struct amdgpu_hive_info *hive, struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	int ret;
 
 	/* Each psp need to set the latest topology */
@@ -508,6 +518,7 @@ int amdgpu_xgmi_update_topology(struct amdgpu_hive_info *hive, struct amdgpu_dev
 int amdgpu_xgmi_get_hops_count(struct amdgpu_device *adev,
 		struct amdgpu_device *peer_adev)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct psp_xgmi_topology_info *top = &adev->psp.xgmi_context.top_info;
 	uint8_t num_hops_mask = 0x7;
 	int i;
@@ -521,6 +532,7 @@ int amdgpu_xgmi_get_hops_count(struct amdgpu_device *adev,
 int amdgpu_xgmi_get_num_links(struct amdgpu_device *adev,
 		struct amdgpu_device *peer_adev)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct psp_xgmi_topology_info *top = &adev->psp.xgmi_context.top_info;
 	int i;
 
@@ -539,6 +551,7 @@ int amdgpu_xgmi_get_num_links(struct amdgpu_device *adev,
 static int amdgpu_xgmi_initialize_hive_get_data_partition(struct amdgpu_hive_info *hive,
 							bool set_extended_data)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct amdgpu_device *tmp_adev;
 	int ret;
 
@@ -558,6 +571,7 @@ static int amdgpu_xgmi_initialize_hive_get_data_partition(struct amdgpu_hive_inf
 
 int amdgpu_xgmi_add_device(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct psp_xgmi_topology_info *top_info;
 	struct amdgpu_hive_info *hive;
 	struct amdgpu_xgmi	*entry;
@@ -695,6 +709,7 @@ exit:
 
 int amdgpu_xgmi_remove_device(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct amdgpu_hive_info *hive = adev->hive;
 
 	if (!adev->gmc.xgmi.supported)
@@ -728,6 +743,7 @@ int amdgpu_xgmi_remove_device(struct amdgpu_device *adev)
 
 static int amdgpu_xgmi_ras_late_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	int r;
 	struct ras_ih_if ih_info = {
 		.cb = NULL,
@@ -763,6 +779,7 @@ static int amdgpu_xgmi_ras_late_init(struct amdgpu_device *adev)
 
 static void amdgpu_xgmi_ras_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	if (amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__XGMI_WAFL) &&
 			adev->gmc.xgmi.ras_if) {
 		struct ras_common_if *ras_if = adev->gmc.xgmi.ras_if;
@@ -778,18 +795,21 @@ static void amdgpu_xgmi_ras_fini(struct amdgpu_device *adev)
 uint64_t amdgpu_xgmi_get_relative_phy_addr(struct amdgpu_device *adev,
 					   uint64_t addr)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct amdgpu_xgmi *xgmi = &adev->gmc.xgmi;
 	return (addr + xgmi->physical_node_id * xgmi->node_segment_size);
 }
 
 static void pcs_clear_status(struct amdgpu_device *adev, uint32_t pcs_status_reg)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	WREG32_PCIE(pcs_status_reg, 0xFFFFFFFF);
 	WREG32_PCIE(pcs_status_reg, 0);
 }
 
 static void amdgpu_xgmi_reset_ras_error_count(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	uint32_t i;
 
 	switch (adev->asic_type) {
@@ -825,6 +845,7 @@ static int amdgpu_xgmi_query_pcs_error_status(struct amdgpu_device *adev,
 					      uint32_t *ce_count,
 					      bool is_xgmi_pcs)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	int i;
 	int ue_cnt;
 
@@ -862,6 +883,7 @@ static int amdgpu_xgmi_query_pcs_error_status(struct amdgpu_device *adev,
 static int amdgpu_xgmi_query_ras_error_count(struct amdgpu_device *adev,
 					     void *ras_error_status)
 {
+    pr_info("amdgpu_xgmi: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 	int i;
 	uint32_t data;

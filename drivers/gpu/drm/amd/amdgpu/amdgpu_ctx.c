@@ -46,6 +46,7 @@ const unsigned int amdgpu_ctx_num_entities[AMDGPU_HW_IP_NUM] = {
 static int amdgpu_ctx_priority_permit(struct drm_file *filp,
 				      enum drm_sched_priority priority)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	if (priority < 0 || priority >= DRM_SCHED_PRIORITY_COUNT)
 		return -EINVAL;
 
@@ -64,6 +65,7 @@ static int amdgpu_ctx_priority_permit(struct drm_file *filp,
 
 static enum gfx_pipe_priority amdgpu_ctx_sched_prio_to_compute_prio(enum drm_sched_priority prio)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	switch (prio) {
 	case DRM_SCHED_PRIORITY_HIGH:
 	case DRM_SCHED_PRIORITY_KERNEL:
@@ -77,6 +79,7 @@ static unsigned int amdgpu_ctx_prio_sched_to_hw(struct amdgpu_device *adev,
 						 enum drm_sched_priority prio,
 						 u32 hw_ip)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	unsigned int hw_prio;
 
 	hw_prio = (hw_ip == AMDGPU_HW_IP_COMPUTE) ?
@@ -92,6 +95,7 @@ static unsigned int amdgpu_ctx_prio_sched_to_hw(struct amdgpu_device *adev,
 static int amdgpu_ctx_init_entity(struct amdgpu_ctx *ctx, u32 hw_ip,
 				   const u32 ring)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_device *adev = ctx->adev;
 	struct amdgpu_ctx_entity *entity;
 	struct drm_gpu_scheduler **scheds = NULL, *sched = NULL;
@@ -143,6 +147,7 @@ static int amdgpu_ctx_init(struct amdgpu_device *adev,
 			   struct drm_file *filp,
 			   struct amdgpu_ctx *ctx)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_ctx_priority_permit(filp, priority);
@@ -168,6 +173,7 @@ static int amdgpu_ctx_init(struct amdgpu_device *adev,
 
 static void amdgpu_ctx_fini_entity(struct amdgpu_ctx_entity *entity)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 
 	int i;
 
@@ -182,6 +188,7 @@ static void amdgpu_ctx_fini_entity(struct amdgpu_ctx_entity *entity)
 
 static void amdgpu_ctx_fini(struct kref *ref)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx *ctx = container_of(ref, struct amdgpu_ctx, refcount);
 	struct amdgpu_device *adev = ctx->adev;
 	unsigned i, j;
@@ -203,6 +210,7 @@ static void amdgpu_ctx_fini(struct kref *ref)
 int amdgpu_ctx_get_entity(struct amdgpu_ctx *ctx, u32 hw_ip, u32 instance,
 			  u32 ring, struct drm_sched_entity **entity)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	int r;
 
 	if (hw_ip >= AMDGPU_HW_IP_NUM) {
@@ -237,6 +245,7 @@ static int amdgpu_ctx_alloc(struct amdgpu_device *adev,
 			    enum drm_sched_priority priority,
 			    uint32_t *id)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx_mgr *mgr = &fpriv->ctx_mgr;
 	struct amdgpu_ctx *ctx;
 	int r;
@@ -266,6 +275,7 @@ static int amdgpu_ctx_alloc(struct amdgpu_device *adev,
 
 static void amdgpu_ctx_do_release(struct kref *ref)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx *ctx;
 	u32 i, j;
 
@@ -284,6 +294,7 @@ static void amdgpu_ctx_do_release(struct kref *ref)
 
 static int amdgpu_ctx_free(struct amdgpu_fpriv *fpriv, uint32_t id)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx_mgr *mgr = &fpriv->ctx_mgr;
 	struct amdgpu_ctx *ctx;
 
@@ -299,6 +310,7 @@ static int amdgpu_ctx_query(struct amdgpu_device *adev,
 			    struct amdgpu_fpriv *fpriv, uint32_t id,
 			    union drm_amdgpu_ctx_out *out)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx *ctx;
 	struct amdgpu_ctx_mgr *mgr;
 	unsigned reset_counter;
@@ -337,6 +349,7 @@ static int amdgpu_ctx_query2(struct amdgpu_device *adev,
 			     struct amdgpu_fpriv *fpriv, uint32_t id,
 			     union drm_amdgpu_ctx_out *out)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct amdgpu_ctx *ctx;
 	struct amdgpu_ctx_mgr *mgr;
@@ -395,6 +408,7 @@ static int amdgpu_ctx_query2(struct amdgpu_device *adev,
 int amdgpu_ctx_ioctl(struct drm_device *dev, void *data,
 		     struct drm_file *filp)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	int r;
 	uint32_t id;
 	enum drm_sched_priority priority;
@@ -434,6 +448,7 @@ int amdgpu_ctx_ioctl(struct drm_device *dev, void *data,
 
 struct amdgpu_ctx *amdgpu_ctx_get(struct amdgpu_fpriv *fpriv, uint32_t id)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx *ctx;
 	struct amdgpu_ctx_mgr *mgr;
 
@@ -452,6 +467,7 @@ struct amdgpu_ctx *amdgpu_ctx_get(struct amdgpu_fpriv *fpriv, uint32_t id)
 
 int amdgpu_ctx_put(struct amdgpu_ctx *ctx)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	if (ctx == NULL)
 		return -EINVAL;
 
@@ -463,6 +479,7 @@ void amdgpu_ctx_add_fence(struct amdgpu_ctx *ctx,
 			  struct drm_sched_entity *entity,
 			  struct dma_fence *fence, uint64_t *handle)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx_entity *centity = to_amdgpu_ctx_entity(entity);
 	uint64_t seq = centity->sequence;
 	struct dma_fence *other = NULL;
@@ -489,6 +506,7 @@ struct dma_fence *amdgpu_ctx_get_fence(struct amdgpu_ctx *ctx,
 				       struct drm_sched_entity *entity,
 				       uint64_t seq)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx_entity *centity = to_amdgpu_ctx_entity(entity);
 	struct dma_fence *fence;
 
@@ -519,6 +537,7 @@ static void amdgpu_ctx_set_entity_priority(struct amdgpu_ctx *ctx,
 					    int hw_ip,
 					    enum drm_sched_priority priority)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_device *adev = ctx->adev;
 	unsigned int hw_prio;
 	struct drm_gpu_scheduler **scheds = NULL;
@@ -542,6 +561,7 @@ static void amdgpu_ctx_set_entity_priority(struct amdgpu_ctx *ctx,
 void amdgpu_ctx_priority_override(struct amdgpu_ctx *ctx,
 				  enum drm_sched_priority priority)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	enum drm_sched_priority ctx_prio;
 	unsigned i, j;
 
@@ -563,6 +583,7 @@ void amdgpu_ctx_priority_override(struct amdgpu_ctx *ctx,
 int amdgpu_ctx_wait_prev_fence(struct amdgpu_ctx *ctx,
 			       struct drm_sched_entity *entity)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx_entity *centity = to_amdgpu_ctx_entity(entity);
 	struct dma_fence *other;
 	unsigned idx;
@@ -586,12 +607,14 @@ int amdgpu_ctx_wait_prev_fence(struct amdgpu_ctx *ctx,
 
 void amdgpu_ctx_mgr_init(struct amdgpu_ctx_mgr *mgr)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	mutex_init(&mgr->lock);
 	idr_init(&mgr->ctx_handles);
 }
 
 long amdgpu_ctx_mgr_entity_flush(struct amdgpu_ctx_mgr *mgr, long timeout)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx *ctx;
 	struct idr *idp;
 	uint32_t id, i, j;
@@ -618,6 +641,7 @@ long amdgpu_ctx_mgr_entity_flush(struct amdgpu_ctx_mgr *mgr, long timeout)
 
 void amdgpu_ctx_mgr_entity_fini(struct amdgpu_ctx_mgr *mgr)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx *ctx;
 	struct idr *idp;
 	uint32_t id, i, j;
@@ -646,6 +670,7 @@ void amdgpu_ctx_mgr_entity_fini(struct amdgpu_ctx_mgr *mgr)
 
 void amdgpu_ctx_mgr_fini(struct amdgpu_ctx_mgr *mgr)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct amdgpu_ctx *ctx;
 	struct idr *idp;
 	uint32_t id;
@@ -666,6 +691,7 @@ void amdgpu_ctx_mgr_fini(struct amdgpu_ctx_mgr *mgr)
 static void amdgpu_ctx_fence_time(struct amdgpu_ctx *ctx,
 		struct amdgpu_ctx_entity *centity, ktime_t *total, ktime_t *max)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	ktime_t now, t1;
 	uint32_t i;
 
@@ -705,6 +731,7 @@ static void amdgpu_ctx_fence_time(struct amdgpu_ctx *ctx,
 ktime_t amdgpu_ctx_mgr_fence_usage(struct amdgpu_ctx_mgr *mgr, uint32_t hwip,
 		uint32_t idx, uint64_t *elapsed)
 {
+    pr_info("amdgpu_ctx: called %s\n", __func__);
 	struct idr *idp;
 	struct amdgpu_ctx *ctx;
 	uint32_t id;

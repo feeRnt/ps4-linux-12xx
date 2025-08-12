@@ -32,6 +32,7 @@
 
 static enum drm_gpu_sched_stat amdgpu_job_timedout(struct drm_sched_job *s_job)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	struct amdgpu_ring *ring = to_amdgpu_ring(s_job->sched);
 	struct amdgpu_job *job = to_amdgpu_job(s_job);
 	struct amdgpu_task_info ti;
@@ -78,6 +79,7 @@ exit:
 int amdgpu_job_alloc(struct amdgpu_device *adev, unsigned num_ibs,
 		     struct amdgpu_job **job, struct amdgpu_vm *vm)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	size_t size = sizeof(struct amdgpu_job);
 
 	if (num_ibs == 0)
@@ -110,6 +112,7 @@ int amdgpu_job_alloc_with_ib(struct amdgpu_device *adev, unsigned size,
 		enum amdgpu_ib_pool_type pool_type,
 		struct amdgpu_job **job)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_job_alloc(adev, 1, job, NULL);
@@ -125,6 +128,7 @@ int amdgpu_job_alloc_with_ib(struct amdgpu_device *adev, unsigned size,
 
 void amdgpu_job_free_resources(struct amdgpu_job *job)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	struct amdgpu_ring *ring = to_amdgpu_ring(job->base.sched);
 	struct dma_fence *f;
 	struct dma_fence *hw_fence;
@@ -143,6 +147,7 @@ void amdgpu_job_free_resources(struct amdgpu_job *job)
 
 static void amdgpu_job_free_cb(struct drm_sched_job *s_job)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	struct amdgpu_job *job = to_amdgpu_job(s_job);
 
 	drm_sched_job_cleanup(s_job);
@@ -159,6 +164,7 @@ static void amdgpu_job_free_cb(struct drm_sched_job *s_job)
 
 void amdgpu_job_free(struct amdgpu_job *job)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	amdgpu_job_free_resources(job);
 	amdgpu_sync_free(&job->sync);
 	amdgpu_sync_free(&job->sched_sync);
@@ -173,6 +179,7 @@ void amdgpu_job_free(struct amdgpu_job *job)
 int amdgpu_job_submit(struct amdgpu_job *job, struct drm_sched_entity *entity,
 		      void *owner, struct dma_fence **f)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	int r;
 
 	if (!f)
@@ -192,6 +199,7 @@ int amdgpu_job_submit(struct amdgpu_job *job, struct drm_sched_entity *entity,
 int amdgpu_job_submit_direct(struct amdgpu_job *job, struct amdgpu_ring *ring,
 			     struct dma_fence **fence)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	int r;
 
 	job->base.sched = &ring->sched;
@@ -210,6 +218,7 @@ int amdgpu_job_submit_direct(struct amdgpu_job *job, struct amdgpu_ring *ring,
 static struct dma_fence *amdgpu_job_dependency(struct drm_sched_job *sched_job,
 					       struct drm_sched_entity *s_entity)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	struct amdgpu_ring *ring = to_amdgpu_ring(s_entity->rq->sched);
 	struct amdgpu_job *job = to_amdgpu_job(sched_job);
 	struct amdgpu_vm *vm = job->vm;
@@ -238,6 +247,7 @@ static struct dma_fence *amdgpu_job_dependency(struct drm_sched_job *sched_job,
 
 static struct dma_fence *amdgpu_job_run(struct drm_sched_job *sched_job)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	struct amdgpu_ring *ring = to_amdgpu_ring(sched_job->sched);
 	struct dma_fence *fence = NULL, *finished;
 	struct amdgpu_job *job;
@@ -278,6 +288,7 @@ static struct dma_fence *amdgpu_job_run(struct drm_sched_job *sched_job)
 
 void amdgpu_job_stop_all_jobs_on_sched(struct drm_gpu_scheduler *sched)
 {
+    pr_info("amdgpu_job: called %s\n", __func__);
 	struct drm_sched_job *s_job;
 	struct drm_sched_entity *s_entity = NULL;
 	int i;

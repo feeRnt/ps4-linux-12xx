@@ -39,6 +39,7 @@
 
 bool amdgpu_virt_mmio_blocked(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	/* By now all MMIO pages except mailbox are blocked */
 	/* if blocking is enabled in hypervisor. Choose the */
 	/* SCRATCH_REG0 to test. */
@@ -47,6 +48,7 @@ bool amdgpu_virt_mmio_blocked(struct amdgpu_device *adev)
 
 void amdgpu_virt_init_setting(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct drm_device *ddev = adev_to_drm(adev);
 
 	/* enable virtual display */
@@ -65,6 +67,7 @@ void amdgpu_virt_kiq_reg_write_reg_wait(struct amdgpu_device *adev,
 					uint32_t reg0, uint32_t reg1,
 					uint32_t ref, uint32_t mask)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_kiq *kiq = &adev->gfx.kiq;
 	struct amdgpu_ring *ring = &kiq->ring;
 	signed long r, cnt = 0;
@@ -116,6 +119,7 @@ failed_kiq:
  */
 int amdgpu_virt_request_full_gpu(struct amdgpu_device *adev, bool init)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 	int r;
 
@@ -139,6 +143,7 @@ int amdgpu_virt_request_full_gpu(struct amdgpu_device *adev, bool init)
  */
 int amdgpu_virt_release_full_gpu(struct amdgpu_device *adev, bool init)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 	int r;
 
@@ -160,6 +165,7 @@ int amdgpu_virt_release_full_gpu(struct amdgpu_device *adev, bool init)
  */
 int amdgpu_virt_reset_gpu(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 	int r;
 
@@ -176,6 +182,7 @@ int amdgpu_virt_reset_gpu(struct amdgpu_device *adev)
 
 void amdgpu_virt_request_init_data(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 
 	if (virt->ops && virt->ops->req_init_data)
@@ -195,6 +202,7 @@ void amdgpu_virt_request_init_data(struct amdgpu_device *adev)
  */
 int amdgpu_virt_wait_reset(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 
 	if (!virt->ops || !virt->ops->wait_reset)
@@ -211,6 +219,7 @@ int amdgpu_virt_wait_reset(struct amdgpu_device *adev)
  */
 int amdgpu_virt_alloc_mm_table(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	int r;
 
 	if (!amdgpu_sriov_vf(adev) || adev->virt.mm_table.gpu_addr)
@@ -240,6 +249,7 @@ int amdgpu_virt_alloc_mm_table(struct amdgpu_device *adev)
  */
 void amdgpu_virt_free_mm_table(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	if (!amdgpu_sriov_vf(adev) || !adev->virt.mm_table.gpu_addr)
 		return;
 
@@ -255,6 +265,7 @@ unsigned int amd_sriov_msg_checksum(void *obj,
 				unsigned int key,
 				unsigned int checksum)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	unsigned int ret = key;
 	unsigned long i = 0;
 	unsigned char *pos;
@@ -272,6 +283,7 @@ unsigned int amd_sriov_msg_checksum(void *obj,
 
 static int amdgpu_virt_init_ras_err_handler_data(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 	struct amdgpu_virt_ras_err_handler_data **data = &virt->virt_eh_data;
 	/* GPU will be marked bad on host if bp count more then 10,
@@ -307,6 +319,7 @@ static int amdgpu_virt_init_ras_err_handler_data(struct amdgpu_device *adev)
 
 static void amdgpu_virt_ras_release_bp(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 	struct amdgpu_virt_ras_err_handler_data *data = virt->virt_eh_data;
 	struct amdgpu_bo *bo;
@@ -325,6 +338,7 @@ static void amdgpu_virt_ras_release_bp(struct amdgpu_device *adev)
 
 void amdgpu_virt_release_ras_err_handler_data(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 	struct amdgpu_virt_ras_err_handler_data *data = virt->virt_eh_data;
 
@@ -344,6 +358,7 @@ void amdgpu_virt_release_ras_err_handler_data(struct amdgpu_device *adev)
 static void amdgpu_virt_ras_add_bps(struct amdgpu_device *adev,
 		struct eeprom_table_record *bps, int pages)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 	struct amdgpu_virt_ras_err_handler_data *data = virt->virt_eh_data;
 
@@ -356,6 +371,7 @@ static void amdgpu_virt_ras_add_bps(struct amdgpu_device *adev,
 
 static void amdgpu_virt_ras_reserve_bps(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 	struct amdgpu_virt_ras_err_handler_data *data = virt->virt_eh_data;
 	struct amdgpu_bo *bo = NULL;
@@ -388,6 +404,7 @@ static void amdgpu_virt_ras_reserve_bps(struct amdgpu_device *adev)
 static bool amdgpu_virt_ras_check_bad_page(struct amdgpu_device *adev,
 		uint64_t retired_page)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_virt *virt = &adev->virt;
 	struct amdgpu_virt_ras_err_handler_data *data = virt->virt_eh_data;
 	int i;
@@ -405,6 +422,7 @@ static bool amdgpu_virt_ras_check_bad_page(struct amdgpu_device *adev,
 static void amdgpu_virt_add_bad_page(struct amdgpu_device *adev,
 		uint64_t bp_block_offset, uint32_t bp_block_size)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct eeprom_table_record bp;
 	uint64_t retired_page;
 	uint32_t bp_idx, bp_cnt;
@@ -428,6 +446,7 @@ static void amdgpu_virt_add_bad_page(struct amdgpu_device *adev,
 
 static int amdgpu_virt_read_pf2vf_data(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amd_sriov_msg_pf2vf_info_header *pf2vf_info = adev->virt.fw_reserve.p_pf2vf;
 	uint32_t checksum;
 	uint32_t checkval;
@@ -513,6 +532,7 @@ static int amdgpu_virt_read_pf2vf_data(struct amdgpu_device *adev)
 
 static void amdgpu_virt_populate_vf2pf_ucode_info(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amd_sriov_msg_vf2pf_info *vf2pf_info;
 	vf2pf_info = (struct amd_sriov_msg_vf2pf_info *) adev->virt.fw_reserve.p_vf2pf;
 
@@ -544,6 +564,7 @@ static void amdgpu_virt_populate_vf2pf_ucode_info(struct amdgpu_device *adev)
 
 static int amdgpu_virt_write_vf2pf_data(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amd_sriov_msg_vf2pf_info *vf2pf_info;
 	struct ttm_resource_manager *vram_man = ttm_manager_type(&adev->mman.bdev, TTM_PL_VRAM);
 
@@ -590,6 +611,7 @@ static int amdgpu_virt_write_vf2pf_data(struct amdgpu_device *adev)
 
 static void amdgpu_virt_update_vf2pf_work_item(struct work_struct *work)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	struct amdgpu_device *adev = container_of(work, struct amdgpu_device, virt.vf2pf_work.work);
 	int ret;
 
@@ -604,6 +626,7 @@ out:
 
 void amdgpu_virt_fini_data_exchange(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	if (adev->virt.vf2pf_update_interval_ms != 0) {
 		DRM_INFO("clean up the vf2pf work item\n");
 		cancel_delayed_work_sync(&adev->virt.vf2pf_work);
@@ -613,6 +636,7 @@ void amdgpu_virt_fini_data_exchange(struct amdgpu_device *adev)
 
 void amdgpu_virt_init_data_exchange(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	uint64_t bp_block_offset = 0;
 	uint32_t bp_block_size = 0;
 	struct amd_sriov_msg_pf2vf_info *pf2vf_v2 = NULL;
@@ -666,6 +690,7 @@ void amdgpu_virt_init_data_exchange(struct amdgpu_device *adev)
 
 void amdgpu_detect_virtualization(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	uint32_t reg;
 
 	switch (adev->asic_type) {
@@ -727,16 +752,19 @@ void amdgpu_detect_virtualization(struct amdgpu_device *adev)
 
 static bool amdgpu_virt_access_debugfs_is_mmio(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	return amdgpu_sriov_is_debug(adev) ? true : false;
 }
 
 static bool amdgpu_virt_access_debugfs_is_kiq(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	return amdgpu_sriov_is_normal(adev) ? true : false;
 }
 
 int amdgpu_virt_enable_access_debugfs(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	if (!amdgpu_sriov_vf(adev) ||
 	    amdgpu_virt_access_debugfs_is_kiq(adev))
 		return 0;
@@ -751,12 +779,14 @@ int amdgpu_virt_enable_access_debugfs(struct amdgpu_device *adev)
 
 void amdgpu_virt_disable_access_debugfs(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	if (amdgpu_sriov_vf(adev))
 		adev->virt.caps |= AMDGPU_SRIOV_CAPS_RUNTIME;
 }
 
 enum amdgpu_sriov_vf_mode amdgpu_virt_get_sriov_vf_mode(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	enum amdgpu_sriov_vf_mode mode;
 
 	if (amdgpu_sriov_vf(adev)) {
@@ -775,6 +805,7 @@ void amdgpu_virt_update_sriov_video_codec(struct amdgpu_device *adev,
 			struct amdgpu_video_codec_info *encode, uint32_t encode_array_size,
 			struct amdgpu_video_codec_info *decode, uint32_t decode_array_size)
 {
+    pr_info("amdgpu_virt: called %s\n", __func__);
 	uint32_t i;
 
 	if (!adev->virt.is_mm_bw_enabled)

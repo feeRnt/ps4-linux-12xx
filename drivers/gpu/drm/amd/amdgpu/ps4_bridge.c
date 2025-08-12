@@ -160,6 +160,7 @@ static int first = true;
 void icc_do_pulse_orange(void);
 static void cq_init(struct i2c_cmdqueue *q, u8 code)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
     if(first) {
         first = false;
         icc_do_pulse_orange();
@@ -173,6 +174,7 @@ static void cq_init(struct i2c_cmdqueue *q, u8 code)
 
 static void cq_cmd(struct i2c_cmdqueue *q, u8 major, u8 minor)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	if (!q->cmd || q->cmd->major != major || q->cmd->minor != minor) {
 		if (q->cmd)
 			q->cmd->length = q->p - (u8 *)q->cmd;
@@ -190,6 +192,7 @@ static void cq_cmd(struct i2c_cmdqueue *q, u8 major, u8 minor)
 
 static int cq_exec(struct i2c_cmdqueue *q)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	int res;
 
 	if (!q->cmd)
@@ -216,6 +219,7 @@ static int cq_exec(struct i2c_cmdqueue *q)
 
 static void cq_read(struct i2c_cmdqueue *q, u16 addr, u8 count)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_READ);
 	*q->p++ = count;
 	*q->p++ = addr >> 8;
@@ -225,6 +229,7 @@ static void cq_read(struct i2c_cmdqueue *q, u16 addr, u8 count)
 
 static void cq_writereg(struct i2c_cmdqueue *q, u16 addr, u8 data)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_WRITE);
 	*q->p++ = 1;
 	*q->p++ = addr >> 8;
@@ -246,6 +251,7 @@ static void cq_write(struct i2c_cmdqueue *q, u16 addr, u8 *data, u8 count)
 
 static void cq_mask(struct i2c_cmdqueue *q, u16 addr, u8 value, u8 mask)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_MASK);
 	*q->p++ = 1;
 	*q->p++ = addr >> 8;
@@ -257,6 +263,7 @@ static void cq_mask(struct i2c_cmdqueue *q, u16 addr, u8 value, u8 mask)
 #if 1
 static void cq_delay(struct i2c_cmdqueue *q, u16 time)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_DELAY);
 	*q->p++ = 0;
 	*q->p++ = time & 0xff;
@@ -267,6 +274,7 @@ static void cq_delay(struct i2c_cmdqueue *q, u16 time)
 
 static void cq_wait_set(struct i2c_cmdqueue *q, u16 addr, u8 mask)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_WAIT_SET);
 	*q->p++ = 0;
 	*q->p++ = addr >> 8;
@@ -276,6 +284,7 @@ static void cq_wait_set(struct i2c_cmdqueue *q, u16 addr, u8 mask)
 
 static void cq_wait_clear(struct i2c_cmdqueue *q, u16 addr, u8 mask)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_WAIT_CLEAR);
 	*q->p++ = 0;
 	*q->p++ = addr >> 8;
@@ -286,6 +295,7 @@ static void cq_wait_clear(struct i2c_cmdqueue *q, u16 addr, u8 mask)
 static inline struct ps4_bridge *
 		bridge_to_ps4_bridge(struct drm_bridge *bridge)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	return container_of(bridge, struct ps4_bridge, bridge);
 }
 
@@ -293,6 +303,7 @@ void ps4_bridge_mode_set(struct drm_bridge *bridge,
 			 const struct drm_display_mode *mode,
 			 const struct drm_display_mode *adjusted_mode)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 
 	/* This gets called before pre_enable/enable, so we just stash
@@ -306,6 +317,7 @@ void ps4_bridge_mode_set(struct drm_bridge *bridge,
 
 static void ps4_bridge_pre_enable(struct drm_bridge *bridge)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 	DRM_DEBUG_KMS("ps4_bridge_pre_enable\n");
 	DRM_DEBUG("Enable ps4_bridge_pre_enable\n");
@@ -375,6 +387,7 @@ static void ps4_bridge_pre_enable(struct drm_bridge *bridge)
 
 static void ps4_bridge_enable(struct drm_bridge *bridge)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 	struct drm_connector *connector = mn_bridge->connector;
 	struct drm_device *dev = connector->dev;
@@ -636,6 +649,7 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 
 static void ps4_bridge_disable(struct drm_bridge *bridge)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 	DRM_DEBUG_KMS("ps4_bridge_disable\n");
 
@@ -651,6 +665,7 @@ static void ps4_bridge_disable(struct drm_bridge *bridge)
 
 static void ps4_bridge_post_disable(struct drm_bridge *bridge)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	/* struct ps4_bridge *mn_bridge = bridge_to_mn864729(bridge); */
 	DRM_DEBUG_KMS("ps4_bridge_post_disable\n");
 }
@@ -685,6 +700,7 @@ static const struct drm_display_mode mode_1080p = {
 
 int ps4_bridge_get_modes(struct drm_connector *connector)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *newmode;
 	pr_info("ps4_bridge_get_modes\n");
@@ -709,6 +725,7 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 		bool force)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	struct ps4_bridge *mn_bridge = &g_bridge;
 	u8 reg;
 
@@ -740,6 +757,7 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 int ps4_bridge_mode_valid(struct drm_connector *connector,
 				  struct drm_display_mode *mode)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	int vic = drm_match_cea_mode(mode);
 
 	/* Allow anything that we can match up to a VIC (CEA modes) */
@@ -753,6 +771,7 @@ int ps4_bridge_mode_valid(struct drm_connector *connector,
 static int ps4_bridge_attach(struct drm_bridge *bridge,
 			     enum drm_bridge_attach_flags flags)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	/* struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge); */
 
 	return 0;
@@ -770,6 +789,7 @@ static struct drm_bridge_funcs ps4_bridge_funcs = {
 int ps4_bridge_register(struct drm_connector *connector,
 			     struct drm_encoder *encoder)
 {
+    pr_info("ps4_bridge: called %s\n", __func__);
 	int ret;
 	struct ps4_bridge *mn_bridge = &g_bridge;
 

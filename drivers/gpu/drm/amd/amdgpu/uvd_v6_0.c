@@ -62,6 +62,7 @@ static void uvd_v6_0_enable_mgcg(struct amdgpu_device *adev,
 */
 static inline bool uvd_v6_0_enc_support(struct amdgpu_device *adev)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	return ((adev->asic_type >= CHIP_POLARIS10) &&
 			(adev->asic_type <= CHIP_VEGAM) &&
 			(!adev->uvd.fw_version || adev->uvd.fw_version >= FW_1_130_16));
@@ -76,6 +77,7 @@ static inline bool uvd_v6_0_enc_support(struct amdgpu_device *adev)
  */
 static uint64_t uvd_v6_0_ring_get_rptr(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	return RREG32(mmUVD_RBC_RB_RPTR);
@@ -90,6 +92,7 @@ static uint64_t uvd_v6_0_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t uvd_v6_0_enc_ring_get_rptr(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring == &adev->uvd.inst->ring_enc[0])
@@ -106,6 +109,7 @@ static uint64_t uvd_v6_0_enc_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t uvd_v6_0_ring_get_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	return RREG32(mmUVD_RBC_RB_WPTR);
@@ -120,6 +124,7 @@ static uint64_t uvd_v6_0_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static uint64_t uvd_v6_0_enc_ring_get_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring == &adev->uvd.inst->ring_enc[0])
@@ -137,6 +142,7 @@ static uint64_t uvd_v6_0_enc_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static void uvd_v6_0_ring_set_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	WREG32(mmUVD_RBC_RB_WPTR, lower_32_bits(ring->wptr));
@@ -151,6 +157,7 @@ static void uvd_v6_0_ring_set_wptr(struct amdgpu_ring *ring)
  */
 static void uvd_v6_0_enc_ring_set_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring == &adev->uvd.inst->ring_enc[0])
@@ -169,6 +176,7 @@ static void uvd_v6_0_enc_ring_set_wptr(struct amdgpu_ring *ring)
  */
 static int uvd_v6_0_enc_ring_test_ring(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t rptr;
 	unsigned i;
@@ -209,6 +217,7 @@ static int uvd_v6_0_enc_get_create_msg(struct amdgpu_ring *ring, uint32_t handle
 				       struct amdgpu_bo *bo,
 				       struct dma_fence **fence)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	const unsigned ib_size_dw = 16;
 	struct amdgpu_job *job;
 	struct amdgpu_ib *ib;
@@ -273,6 +282,7 @@ static int uvd_v6_0_enc_get_destroy_msg(struct amdgpu_ring *ring,
 					struct amdgpu_bo *bo,
 					struct dma_fence **fence)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	const unsigned ib_size_dw = 16;
 	struct amdgpu_job *job;
 	struct amdgpu_ib *ib;
@@ -331,6 +341,7 @@ err:
  */
 static int uvd_v6_0_enc_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct dma_fence *fence = NULL;
 	struct amdgpu_bo *bo = NULL;
 	long r;
@@ -365,6 +376,7 @@ error:
 
 static int uvd_v6_0_early_init(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	adev->uvd.num_uvd_inst = 1;
 
@@ -386,6 +398,7 @@ static int uvd_v6_0_early_init(void *handle)
 
 static int uvd_v6_0_sw_init(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	int i, r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -448,6 +461,7 @@ static int uvd_v6_0_sw_init(void *handle)
 
 static int uvd_v6_0_sw_fini(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	int i, r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -472,6 +486,7 @@ static int uvd_v6_0_sw_fini(void *handle)
  */
 static int uvd_v6_0_hw_init(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct amdgpu_ring *ring = &adev->uvd.inst->ring;
 	uint32_t tmp;
@@ -541,6 +556,7 @@ done:
  */
 static int uvd_v6_0_hw_fini(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	cancel_delayed_work_sync(&adev->uvd.idle_work);
@@ -553,6 +569,7 @@ static int uvd_v6_0_hw_fini(void *handle)
 
 static int uvd_v6_0_suspend(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -589,6 +606,7 @@ static int uvd_v6_0_suspend(void *handle)
 
 static int uvd_v6_0_resume(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -608,6 +626,7 @@ static int uvd_v6_0_resume(void *handle)
  */
 static void uvd_v6_0_mc_resume(struct amdgpu_device *adev)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	uint64_t offset;
 	uint32_t size;
 
@@ -728,6 +747,7 @@ static void cz_set_uvd_clock_gating_branches(struct amdgpu_device *adev,
  */
 static int uvd_v6_0_start(struct amdgpu_device *adev)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_ring *ring = &adev->uvd.inst->ring;
 	uint32_t rb_bufsz, tmp;
 	uint32_t lmi_swap_cntl;
@@ -895,6 +915,7 @@ static int uvd_v6_0_start(struct amdgpu_device *adev)
  */
 static void uvd_v6_0_stop(struct amdgpu_device *adev)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	/* force RBC into idle state */
 	WREG32(mmUVD_RBC_RB_CNTL, 0x11010101);
 
@@ -928,6 +949,7 @@ static void uvd_v6_0_stop(struct amdgpu_device *adev)
 static void uvd_v6_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				     unsigned flags)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	WARN_ON(flags & AMDGPU_FENCE_FLAG_64BIT);
 
 	amdgpu_ring_write(ring, PACKET0(mmUVD_CONTEXT_ID, 0));
@@ -960,6 +982,7 @@ static void uvd_v6_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq
 static void uvd_v6_0_enc_ring_emit_fence(struct amdgpu_ring *ring, u64 addr,
 			u64 seq, unsigned flags)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	WARN_ON(flags & AMDGPU_FENCE_FLAG_64BIT);
 
 	amdgpu_ring_write(ring, HEVC_ENC_CMD_FENCE);
@@ -976,6 +999,7 @@ static void uvd_v6_0_enc_ring_emit_fence(struct amdgpu_ring *ring, u64 addr,
  */
 static void uvd_v6_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	/* The firmware doesn't seem to like touching registers at this point. */
 }
 
@@ -988,6 +1012,7 @@ static void uvd_v6_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
  */
 static int uvd_v6_0_ring_test_ring(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t tmp = 0;
 	unsigned i;
@@ -1029,6 +1054,7 @@ static void uvd_v6_0_ring_emit_ib(struct amdgpu_ring *ring,
 				  struct amdgpu_ib *ib,
 				  uint32_t flags)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
 
 	amdgpu_ring_write(ring, PACKET0(mmUVD_LMI_RBC_IB_VMID, 0));
@@ -1057,6 +1083,7 @@ static void uvd_v6_0_enc_ring_emit_ib(struct amdgpu_ring *ring,
 					struct amdgpu_ib *ib,
 					uint32_t flags)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
 
 	amdgpu_ring_write(ring, HEVC_ENC_CMD_IB_VM);
@@ -1069,6 +1096,7 @@ static void uvd_v6_0_enc_ring_emit_ib(struct amdgpu_ring *ring,
 static void uvd_v6_0_ring_emit_wreg(struct amdgpu_ring *ring,
 				    uint32_t reg, uint32_t val)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, PACKET0(mmUVD_GPCOM_VCPU_DATA0, 0));
 	amdgpu_ring_write(ring, reg << 2);
 	amdgpu_ring_write(ring, PACKET0(mmUVD_GPCOM_VCPU_DATA1, 0));
@@ -1080,6 +1108,7 @@ static void uvd_v6_0_ring_emit_wreg(struct amdgpu_ring *ring,
 static void uvd_v6_0_ring_emit_vm_flush(struct amdgpu_ring *ring,
 					unsigned vmid, uint64_t pd_addr)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	amdgpu_gmc_emit_flush_gpu_tlb(ring, vmid, pd_addr);
 
 	amdgpu_ring_write(ring, PACKET0(mmUVD_GPCOM_VCPU_DATA0, 0));
@@ -1094,6 +1123,7 @@ static void uvd_v6_0_ring_emit_vm_flush(struct amdgpu_ring *ring,
 
 static void uvd_v6_0_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	uint32_t seq = ring->fence_drv.sync_seq;
 	uint64_t addr = ring->fence_drv.gpu_addr;
 
@@ -1111,6 +1141,7 @@ static void uvd_v6_0_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
 
 static void uvd_v6_0_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	int i;
 
 	WARN_ON(ring->wptr % 2 || count % 2);
@@ -1123,6 +1154,7 @@ static void uvd_v6_0_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 
 static void uvd_v6_0_enc_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	uint32_t seq = ring->fence_drv.sync_seq;
 	uint64_t addr = ring->fence_drv.gpu_addr;
 
@@ -1134,12 +1166,14 @@ static void uvd_v6_0_enc_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
 
 static void uvd_v6_0_enc_ring_insert_end(struct amdgpu_ring *ring)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, HEVC_ENC_CMD_END);
 }
 
 static void uvd_v6_0_enc_ring_emit_vm_flush(struct amdgpu_ring *ring,
 					    unsigned int vmid, uint64_t pd_addr)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, HEVC_ENC_CMD_UPDATE_PTB);
 	amdgpu_ring_write(ring, vmid);
 	amdgpu_ring_write(ring, pd_addr >> 12);
@@ -1150,6 +1184,7 @@ static void uvd_v6_0_enc_ring_emit_vm_flush(struct amdgpu_ring *ring,
 
 static bool uvd_v6_0_is_idle(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return !(RREG32(mmSRBM_STATUS) & SRBM_STATUS__UVD_BUSY_MASK);
@@ -1157,6 +1192,7 @@ static bool uvd_v6_0_is_idle(void *handle)
 
 static int uvd_v6_0_wait_for_idle(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	unsigned i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1170,6 +1206,7 @@ static int uvd_v6_0_wait_for_idle(void *handle)
 #define AMDGPU_UVD_STATUS_BUSY_MASK    0xfd
 static bool uvd_v6_0_check_soft_reset(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 srbm_soft_reset = 0;
 	u32 tmp = RREG32(mmSRBM_STATUS);
@@ -1190,6 +1227,7 @@ static bool uvd_v6_0_check_soft_reset(void *handle)
 
 static int uvd_v6_0_pre_soft_reset(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (!adev->uvd.inst->srbm_soft_reset)
@@ -1201,6 +1239,7 @@ static int uvd_v6_0_pre_soft_reset(void *handle)
 
 static int uvd_v6_0_soft_reset(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 srbm_soft_reset;
 
@@ -1232,6 +1271,7 @@ static int uvd_v6_0_soft_reset(void *handle)
 
 static int uvd_v6_0_post_soft_reset(void *handle)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (!adev->uvd.inst->srbm_soft_reset)
@@ -1247,6 +1287,7 @@ static int uvd_v6_0_set_interrupt_state(struct amdgpu_device *adev,
 					unsigned type,
 					enum amdgpu_interrupt_state state)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	// TODO
 	return 0;
 }
@@ -1255,6 +1296,7 @@ static int uvd_v6_0_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	bool int_handled = true;
 	DRM_DEBUG("IH: UVD TRAP\n");
 
@@ -1285,6 +1327,7 @@ static int uvd_v6_0_process_interrupt(struct amdgpu_device *adev,
 
 static void uvd_v6_0_enable_clock_gating(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	uint32_t data1, data3;
 
 	data1 = RREG32(mmUVD_SUVD_CGC_GATE);
@@ -1340,6 +1383,7 @@ static void uvd_v6_0_enable_clock_gating(struct amdgpu_device *adev, bool enable
 
 static void uvd_v6_0_set_sw_clock_gating(struct amdgpu_device *adev)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	uint32_t data, data2;
 
 	data = RREG32(mmUVD_CGC_CTRL);
@@ -1432,6 +1476,7 @@ static void uvd_v6_0_set_hw_clock_gating(struct amdgpu_device *adev)
 static void uvd_v6_0_enable_mgcg(struct amdgpu_device *adev,
 				 bool enable)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	u32 orig, data;
 
 	if (enable && (adev->cg_flags & AMD_CG_SUPPORT_UVD_MGCG)) {
@@ -1458,6 +1503,7 @@ static void uvd_v6_0_enable_mgcg(struct amdgpu_device *adev,
 static int uvd_v6_0_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	bool enable = (state == AMD_CG_STATE_GATE);
 
@@ -1479,6 +1525,7 @@ static int uvd_v6_0_set_clockgating_state(void *handle,
 static int uvd_v6_0_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	/* This doesn't actually powergate the UVD block.
 	 * That's done in the dpm code via the SMC.  This
 	 * just re-inits the block as necessary.  The actual
@@ -1505,6 +1552,7 @@ out:
 
 static void uvd_v6_0_get_clockgating_state(void *handle, u32 *flags)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int data;
 
@@ -1634,6 +1682,7 @@ static const struct amdgpu_ring_funcs uvd_v6_0_enc_ring_vm_funcs = {
 
 static void uvd_v6_0_set_ring_funcs(struct amdgpu_device *adev)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	if (adev->asic_type >= CHIP_POLARIS10) {
 		adev->uvd.inst->ring.funcs = &uvd_v6_0_ring_vm_funcs;
 		DRM_INFO("UVD is enabled in VM mode\n");
@@ -1645,6 +1694,7 @@ static void uvd_v6_0_set_ring_funcs(struct amdgpu_device *adev)
 
 static void uvd_v6_0_set_enc_ring_funcs(struct amdgpu_device *adev)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->uvd.num_enc_rings; ++i)
@@ -1660,6 +1710,7 @@ static const struct amdgpu_irq_src_funcs uvd_v6_0_irq_funcs = {
 
 static void uvd_v6_0_set_irq_funcs(struct amdgpu_device *adev)
 {
+    pr_info("uvd_v6_0: called %s\n", __func__);
 	if (uvd_v6_0_enc_support(adev))
 		adev->uvd.inst->irq.num_types = adev->uvd.num_enc_rings + 1;
 	else

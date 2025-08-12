@@ -59,6 +59,7 @@ struct amdgpu_pasid_cb {
  */
 int amdgpu_pasid_alloc(unsigned int bits)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	int pasid = -EINVAL;
 
 	for (bits = min(bits, 31U); bits > 0; bits--) {
@@ -81,6 +82,7 @@ int amdgpu_pasid_alloc(unsigned int bits)
  */
 void amdgpu_pasid_free(u32 pasid)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	trace_amdgpu_pasid_freed(pasid);
 	ida_simple_remove(&amdgpu_pasid_ida, pasid);
 }
@@ -88,6 +90,7 @@ void amdgpu_pasid_free(u32 pasid)
 static void amdgpu_pasid_free_cb(struct dma_fence *fence,
 				 struct dma_fence_cb *_cb)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	struct amdgpu_pasid_cb *cb =
 		container_of(_cb, struct amdgpu_pasid_cb, cb);
 
@@ -107,6 +110,7 @@ static void amdgpu_pasid_free_cb(struct dma_fence *fence,
 void amdgpu_pasid_free_delayed(struct dma_resv *resv,
 			       u32 pasid)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	struct dma_fence *fence, **fences;
 	struct amdgpu_pasid_cb *cb;
 	unsigned count;
@@ -177,6 +181,7 @@ fallback:
 bool amdgpu_vmid_had_gpu_reset(struct amdgpu_device *adev,
 			       struct amdgpu_vmid *id)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	return id->current_gpu_reset_count !=
 		atomic_read(&adev->gpu_reset_counter);
 }
@@ -197,6 +202,7 @@ static int amdgpu_vmid_grab_idle(struct amdgpu_vm *vm,
 				 struct amdgpu_sync *sync,
 				 struct amdgpu_vmid **idle)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned vmhub = ring->funcs->vmhub;
 	struct amdgpu_vmid_mgr *id_mgr = &adev->vm_manager.id_mgr[vmhub];
@@ -273,6 +279,7 @@ static int amdgpu_vmid_grab_reserved(struct amdgpu_vm *vm,
 				     struct amdgpu_job *job,
 				     struct amdgpu_vmid **id)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned vmhub = ring->funcs->vmhub;
 	uint64_t fence_context = adev->fence_context + ring->idx;
@@ -342,6 +349,7 @@ static int amdgpu_vmid_grab_used(struct amdgpu_vm *vm,
 				 struct amdgpu_job *job,
 				 struct amdgpu_vmid **id)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned vmhub = ring->funcs->vmhub;
 	struct amdgpu_vmid_mgr *id_mgr = &adev->vm_manager.id_mgr[vmhub];
@@ -410,6 +418,7 @@ int amdgpu_vmid_grab(struct amdgpu_vm *vm, struct amdgpu_ring *ring,
 		     struct amdgpu_sync *sync, struct dma_fence *fence,
 		     struct amdgpu_job *job)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned vmhub = ring->funcs->vmhub;
 	struct amdgpu_vmid_mgr *id_mgr = &adev->vm_manager.id_mgr[vmhub];
@@ -470,6 +479,7 @@ int amdgpu_vmid_alloc_reserved(struct amdgpu_device *adev,
 			       struct amdgpu_vm *vm,
 			       unsigned vmhub)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	struct amdgpu_vmid_mgr *id_mgr;
 	struct amdgpu_vmid *idle;
 	int r = 0;
@@ -501,6 +511,7 @@ void amdgpu_vmid_free_reserved(struct amdgpu_device *adev,
 			       struct amdgpu_vm *vm,
 			       unsigned vmhub)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	struct amdgpu_vmid_mgr *id_mgr = &adev->vm_manager.id_mgr[vmhub];
 
 	mutex_lock(&id_mgr->lock);
@@ -525,6 +536,7 @@ void amdgpu_vmid_free_reserved(struct amdgpu_device *adev,
 void amdgpu_vmid_reset(struct amdgpu_device *adev, unsigned vmhub,
 		       unsigned vmid)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	struct amdgpu_vmid_mgr *id_mgr = &adev->vm_manager.id_mgr[vmhub];
 	struct amdgpu_vmid *id = &id_mgr->ids[vmid];
 
@@ -548,6 +560,7 @@ void amdgpu_vmid_reset(struct amdgpu_device *adev, unsigned vmhub,
  */
 void amdgpu_vmid_reset_all(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	unsigned i, j;
 
 	for (i = 0; i < AMDGPU_MAX_VMHUBS; ++i) {
@@ -568,6 +581,7 @@ void amdgpu_vmid_reset_all(struct amdgpu_device *adev)
  */
 void amdgpu_vmid_mgr_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	unsigned i, j;
 
 	for (i = 0; i < AMDGPU_MAX_VMHUBS; ++i) {
@@ -599,6 +613,7 @@ void amdgpu_vmid_mgr_init(struct amdgpu_device *adev)
  */
 void amdgpu_vmid_mgr_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ids: called %s\n", __func__);
 	unsigned i, j;
 
 	for (i = 0; i < AMDGPU_MAX_VMHUBS; ++i) {

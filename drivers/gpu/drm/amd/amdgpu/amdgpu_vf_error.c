@@ -30,6 +30,7 @@ void amdgpu_vf_error_put(struct amdgpu_device *adev,
 			 uint16_t error_flags,
 			 uint64_t error_data)
 {
+    pr_info("amdgpu_vf_error: called %s\n", __func__);
 	int index;
 	uint16_t error_code;
 
@@ -50,6 +51,7 @@ void amdgpu_vf_error_put(struct amdgpu_device *adev,
 
 void amdgpu_vf_error_trans_all(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_vf_error: called %s\n", __func__);
 	/* u32 pf2vf_flags = 0; */
 	u32 data1, data2, data3;
 	int index;

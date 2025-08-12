@@ -41,6 +41,7 @@
 
 void amdgpu_connector_hotplug(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
@@ -102,6 +103,7 @@ void amdgpu_connector_hotplug(struct drm_connector *connector)
 
 static void amdgpu_connector_property_change_mode(struct drm_encoder *encoder)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_crtc *crtc = encoder->crtc;
 
 	if (crtc && crtc->enabled) {
@@ -112,6 +114,7 @@ static void amdgpu_connector_property_change_mode(struct drm_encoder *encoder)
 
 int amdgpu_connector_get_monitor_bpc(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *dig_connector;
 	int bpc = 8;
@@ -227,6 +230,7 @@ static void
 amdgpu_connector_update_scratch_regs(struct drm_connector *connector,
 				      enum drm_connector_status status)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_encoder *best_encoder;
 	struct drm_encoder *encoder;
 	const struct drm_connector_helper_funcs *connector_funcs = connector->helper_private;
@@ -248,6 +252,7 @@ static struct drm_encoder *
 amdgpu_connector_find_encoder(struct drm_connector *connector,
 			       int encoder_type)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	drm_connector_for_each_possible_encoder(connector, encoder) {
@@ -260,6 +265,7 @@ amdgpu_connector_find_encoder(struct drm_connector *connector,
 
 struct edid *amdgpu_connector_edid(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct drm_property_blob *edid_blob = connector->edid_blob_ptr;
 
@@ -276,6 +282,7 @@ struct edid *amdgpu_connector_edid(struct drm_connector *connector)
 static struct edid *
 amdgpu_connector_get_hardcoded_edid(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct edid *edid;
 
 	if (adev->mode_info.bios_hardcoded_edid) {
@@ -292,6 +299,7 @@ amdgpu_connector_get_hardcoded_edid(struct amdgpu_device *adev)
 
 static void amdgpu_connector_get_edid(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
@@ -335,6 +343,7 @@ static void amdgpu_connector_get_edid(struct drm_connector *connector)
 
 static void amdgpu_connector_free_edid(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 
 	kfree(amdgpu_connector->edid);
@@ -343,6 +352,7 @@ static void amdgpu_connector_free_edid(struct drm_connector *connector)
 
 static int amdgpu_connector_ddc_get_modes(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	int ret;
 
@@ -358,6 +368,7 @@ static int amdgpu_connector_ddc_get_modes(struct drm_connector *connector)
 static struct drm_encoder *
 amdgpu_connector_best_single_encoder(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	/* pick the first one */
@@ -369,6 +380,7 @@ amdgpu_connector_best_single_encoder(struct drm_connector *connector)
 
 static void amdgpu_get_native_mode(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_encoder *encoder = amdgpu_connector_best_single_encoder(connector);
 	struct amdgpu_encoder *amdgpu_encoder;
 
@@ -391,6 +403,7 @@ static void amdgpu_get_native_mode(struct drm_connector *connector)
 static struct drm_display_mode *
 amdgpu_connector_lcd_native_mode(struct drm_encoder *encoder)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct drm_display_mode *mode = NULL;
@@ -423,6 +436,7 @@ amdgpu_connector_lcd_native_mode(struct drm_encoder *encoder)
 static void amdgpu_connector_add_common_modes(struct drm_encoder *encoder,
 					       struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct drm_display_mode *mode = NULL;
@@ -476,6 +490,7 @@ static int amdgpu_connector_set_property(struct drm_connector *connector,
 					  struct drm_property *property,
 					  uint64_t val)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct drm_encoder *encoder;
@@ -621,6 +636,7 @@ static void
 amdgpu_connector_fixup_lcd_native_mode(struct drm_encoder *encoder,
 					struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder =	to_amdgpu_encoder(encoder);
 	struct drm_display_mode *native_mode = &amdgpu_encoder->native_mode;
 	struct drm_display_mode *t, *mode;
@@ -655,6 +671,7 @@ amdgpu_connector_fixup_lcd_native_mode(struct drm_encoder *encoder,
 
 static int amdgpu_connector_lvds_get_modes(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	int ret = 0;
 	struct drm_display_mode *mode;
@@ -693,6 +710,7 @@ static int amdgpu_connector_lvds_get_modes(struct drm_connector *connector)
 static enum drm_mode_status amdgpu_connector_lvds_mode_valid(struct drm_connector *connector,
 					     struct drm_display_mode *mode)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_encoder *encoder = amdgpu_connector_best_single_encoder(connector);
 
 	if ((mode->hdisplay < 320) || (mode->vdisplay < 240))
@@ -723,6 +741,7 @@ static enum drm_mode_status amdgpu_connector_lvds_mode_valid(struct drm_connecto
 static enum drm_connector_status
 amdgpu_connector_lvds_detect(struct drm_connector *connector, bool force)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct drm_encoder *encoder = amdgpu_connector_best_single_encoder(connector);
 	enum drm_connector_status ret = connector_status_disconnected;
@@ -764,6 +783,7 @@ amdgpu_connector_lvds_detect(struct drm_connector *connector, bool force)
 
 static void amdgpu_connector_unregister(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 
 	if (amdgpu_connector->ddc_bus && amdgpu_connector->ddc_bus->has_aux) {
@@ -774,6 +794,7 @@ static void amdgpu_connector_unregister(struct drm_connector *connector)
 
 static void amdgpu_connector_destroy(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 
 	amdgpu_connector_free_edid(connector);
@@ -787,6 +808,7 @@ static int amdgpu_connector_set_lcd_property(struct drm_connector *connector,
 					      struct drm_property *property,
 					      uint64_t value)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_encoder *amdgpu_encoder;
 	enum amdgpu_rmx_type rmx_type;
@@ -836,6 +858,7 @@ static const struct drm_connector_funcs amdgpu_connector_lvds_funcs = {
 
 static int amdgpu_connector_vga_get_modes(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	int ret;
 
 	amdgpu_connector_get_edid(connector);
@@ -848,6 +871,7 @@ static int amdgpu_connector_vga_get_modes(struct drm_connector *connector)
 static enum drm_mode_status amdgpu_connector_vga_mode_valid(struct drm_connector *connector,
 					    struct drm_display_mode *mode)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
@@ -862,6 +886,7 @@ static enum drm_mode_status amdgpu_connector_vga_mode_valid(struct drm_connector
 static enum drm_connector_status
 amdgpu_connector_vga_detect(struct drm_connector *connector, bool force)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct drm_encoder *encoder;
 	const struct drm_encoder_helper_funcs *encoder_funcs;
@@ -955,6 +980,7 @@ static const struct drm_connector_funcs amdgpu_connector_vga_funcs = {
 static bool
 amdgpu_connector_check_hpd_status_unchanged(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
@@ -986,6 +1012,7 @@ amdgpu_connector_check_hpd_status_unchanged(struct drm_connector *connector)
 static enum drm_connector_status
 amdgpu_connector_dvi_detect(struct drm_connector *connector, bool force)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
@@ -1137,6 +1164,7 @@ exit:
 static struct drm_encoder *
 amdgpu_connector_dvi_encoder(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct drm_encoder *encoder;
 
@@ -1163,6 +1191,7 @@ amdgpu_connector_dvi_encoder(struct drm_connector *connector)
 
 static void amdgpu_connector_dvi_force(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	if (connector->force == DRM_FORCE_ON)
 		amdgpu_connector->use_digital = false;
@@ -1173,6 +1202,7 @@ static void amdgpu_connector_dvi_force(struct drm_connector *connector)
 static enum drm_mode_status amdgpu_connector_dvi_mode_valid(struct drm_connector *connector,
 					    struct drm_display_mode *mode)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
@@ -1220,6 +1250,7 @@ static const struct drm_connector_funcs amdgpu_connector_dvi_funcs = {
 
 static int amdgpu_connector_dp_get_modes(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *amdgpu_dig_connector = amdgpu_connector->con_priv;
 	struct drm_encoder *encoder = amdgpu_connector_best_single_encoder(connector);
@@ -1290,6 +1321,7 @@ static int amdgpu_connector_dp_get_modes(struct drm_connector *connector)
 
 u16 amdgpu_connector_encoder_get_dp_bridge_encoder_id(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	struct amdgpu_encoder *amdgpu_encoder;
 
@@ -1310,6 +1342,7 @@ u16 amdgpu_connector_encoder_get_dp_bridge_encoder_id(struct drm_connector *conn
 
 static bool amdgpu_connector_encoder_is_hbr2(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	struct amdgpu_encoder *amdgpu_encoder;
 	bool found = false;
@@ -1325,6 +1358,7 @@ static bool amdgpu_connector_encoder_is_hbr2(struct drm_connector *connector)
 
 bool amdgpu_connector_is_dp12_capable(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
@@ -1339,6 +1373,7 @@ bool amdgpu_connector_is_dp12_capable(struct drm_connector *connector)
 static enum drm_connector_status
 amdgpu_connector_dp_detect(struct drm_connector *connector, bool force)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
@@ -1440,6 +1475,7 @@ out:
 static enum drm_mode_status amdgpu_connector_dp_mode_valid(struct drm_connector *connector,
 					   struct drm_display_mode *mode)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *amdgpu_dig_connector = amdgpu_connector->con_priv;
 
@@ -1493,6 +1529,7 @@ static enum drm_mode_status amdgpu_connector_dp_mode_valid(struct drm_connector 
 static int
 amdgpu_connector_late_register(struct drm_connector *connector)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	int r = 0;
 
@@ -1569,6 +1606,7 @@ amdgpu_connector_add(struct amdgpu_device *adev,
 		      struct amdgpu_hpd *hpd,
 		      struct amdgpu_router *router)
 {
+    pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct drm_device *dev = adev_to_drm(adev);
 	struct drm_connector *connector;
 	struct drm_connector_list_iter iter;

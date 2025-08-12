@@ -44,6 +44,7 @@
 static void amdgpu_display_flip_callback(struct dma_fence *f,
 					 struct dma_fence_cb *cb)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct amdgpu_flip_work *work =
 		container_of(cb, struct amdgpu_flip_work, cb);
 
@@ -54,6 +55,7 @@ static void amdgpu_display_flip_callback(struct dma_fence *f,
 static bool amdgpu_display_flip_handle_fence(struct amdgpu_flip_work *work,
 					     struct dma_fence **f)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct dma_fence *fence= *f;
 
 	if (fence == NULL)
@@ -71,6 +73,7 @@ static bool amdgpu_display_flip_handle_fence(struct amdgpu_flip_work *work,
 
 static void amdgpu_display_flip_work_func(struct work_struct *__work)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct delayed_work *delayed_work =
 		container_of(__work, struct delayed_work, work);
 	struct amdgpu_flip_work *work =
@@ -126,6 +129,7 @@ static void amdgpu_display_flip_work_func(struct work_struct *__work)
  */
 static void amdgpu_display_unpin_work_func(struct work_struct *__work)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct amdgpu_flip_work *work =
 		container_of(__work, struct amdgpu_flip_work, unpin_work);
 	int r;
@@ -149,6 +153,7 @@ int amdgpu_display_crtc_page_flip_target(struct drm_crtc *crtc,
 				uint32_t page_flip_flags, uint32_t target,
 				struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
@@ -265,6 +270,7 @@ cleanup:
 int amdgpu_display_crtc_set_config(struct drm_mode_set *set,
 				   struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct drm_device *dev;
 	struct amdgpu_device *adev;
 	struct drm_crtc *crtc;
@@ -363,6 +369,7 @@ static const char *hpd_names[6] = {
 
 void amdgpu_display_print_display_setup(struct drm_device *dev)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct amdgpu_connector *amdgpu_connector;
 	struct drm_encoder *encoder;
@@ -443,6 +450,7 @@ void amdgpu_display_print_display_setup(struct drm_device *dev)
 bool amdgpu_display_ddc_probe(struct amdgpu_connector *amdgpu_connector,
 			      bool use_aux)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	u8 out = 0x0;
 	u8 buf[8];
 	int ret;
@@ -495,6 +503,7 @@ static const struct drm_framebuffer_funcs amdgpu_fb_funcs = {
 uint32_t amdgpu_display_supported_domains(struct amdgpu_device *adev,
 					  uint64_t bo_flags)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	uint32_t domain = AMDGPU_GEM_DOMAIN_VRAM;
 
 #if defined(CONFIG_DRM_AMD_DC)
@@ -595,6 +604,7 @@ static const struct drm_format_info *
 lookup_format_info(const struct drm_format_info formats[],
 		  int num_formats, u32 format)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < num_formats; i++) {
@@ -608,6 +618,7 @@ lookup_format_info(const struct drm_format_info formats[],
 const struct drm_format_info *
 amdgpu_lookup_format_info(u32 format, uint64_t modifier)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	if (!IS_AMD_FMT_MOD(modifier))
 		return NULL;
 
@@ -634,6 +645,7 @@ extract_render_dcc_offset(struct amdgpu_device *adev,
 			  struct drm_gem_object *obj,
 			  uint64_t *offset)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct amdgpu_bo *rbo;
 	int r = 0;
 	uint32_t metadata[10]; /* Something that fits a descriptor + header. */
@@ -677,6 +689,7 @@ extract_render_dcc_offset(struct amdgpu_device *adev,
 
 static int convert_tiling_flags_to_modifier(struct amdgpu_framebuffer *afb)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(afb->base.dev);
 	uint64_t modifier = 0;
 
@@ -840,6 +853,7 @@ static int convert_tiling_flags_to_modifier(struct amdgpu_framebuffer *afb)
 /* Mirrors the is_displayable check in radeonsi's gfx6_compute_surface */
 static int check_tiling_flags_gfx6(struct amdgpu_framebuffer *afb)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	u64 micro_tile_mode;
 
 	/* Zero swizzle mode means linear */
@@ -862,6 +876,7 @@ static int check_tiling_flags_gfx6(struct amdgpu_framebuffer *afb)
 static void get_block_dimensions(unsigned int block_log2, unsigned int cpp,
 				 unsigned int *width, unsigned int *height)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	unsigned int cpp_log2 = ilog2(cpp);
 	unsigned int pixel_log2 = block_log2 - cpp_log2;
 	unsigned int width_log2 = (pixel_log2 + 1) / 2;
@@ -874,6 +889,7 @@ static void get_block_dimensions(unsigned int block_log2, unsigned int cpp,
 static unsigned int get_dcc_block_size(uint64_t modifier, bool rb_aligned,
 				       bool pipe_aligned)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	unsigned int ver = AMD_FMT_MOD_GET(TILE_VERSION, modifier);
 
 	switch (ver) {
@@ -905,6 +921,7 @@ static int amdgpu_display_verify_plane(struct amdgpu_framebuffer *rfb, int plane
 				       unsigned int block_width, unsigned int block_height,
 				       unsigned int block_size_log2)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	unsigned int width = rfb->base.width /
 		((plane && plane < format->num_planes) ? format->hsub : 1);
 	unsigned int height = rfb->base.height /
@@ -953,6 +970,7 @@ static int amdgpu_display_verify_plane(struct amdgpu_framebuffer *rfb, int plane
 
 static int amdgpu_display_verify_sizes(struct amdgpu_framebuffer *rfb)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	const struct drm_format_info *format_info = drm_format_info(rfb->base.format->format);
 	uint64_t modifier = rfb->base.modifier;
 	int ret;
@@ -1030,6 +1048,7 @@ static int amdgpu_display_verify_sizes(struct amdgpu_framebuffer *rfb)
 static int amdgpu_display_get_fb_info(const struct amdgpu_framebuffer *amdgpu_fb,
 				      uint64_t *tiling_flags, bool *tmz_surface)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct amdgpu_bo *rbo;
 	int r;
 
@@ -1065,6 +1084,7 @@ int amdgpu_display_gem_fb_init(struct drm_device *dev,
 			       const struct drm_mode_fb_cmd2 *mode_cmd,
 			       struct drm_gem_object *obj)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	int ret;
 
 	rfb->base.obj[0] = obj;
@@ -1090,6 +1110,7 @@ int amdgpu_display_gem_fb_verify_and_init(
 	struct drm_file *file_priv, const struct drm_mode_fb_cmd2 *mode_cmd,
 	struct drm_gem_object *obj)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	int ret;
 
 	rfb->base.obj[0] = obj;
@@ -1125,6 +1146,7 @@ int amdgpu_display_framebuffer_init(struct drm_device *dev,
 				    const struct drm_mode_fb_cmd2 *mode_cmd,
 				    struct drm_gem_object *obj)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	int ret, i;
 
@@ -1180,6 +1202,7 @@ amdgpu_display_user_framebuffer_create(struct drm_device *dev,
 				       struct drm_file *file_priv,
 				       const struct drm_mode_fb_cmd2 *mode_cmd)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct amdgpu_framebuffer *amdgpu_fb;
 	struct drm_gem_object *obj;
 	struct amdgpu_bo *bo;
@@ -1245,6 +1268,7 @@ static const struct drm_prop_enum_list amdgpu_dither_enum_list[] =
 
 int amdgpu_display_modeset_create_props(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	int sz;
 
 	adev->mode_info.coherent_mode_property =
@@ -1302,6 +1326,7 @@ int amdgpu_display_modeset_create_props(struct amdgpu_device *adev)
 
 void amdgpu_display_update_priority(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	/* adjustment options for the display watermarks */
 	if ((amdgpu_disp_priority == 0) || (amdgpu_disp_priority > 2))
 		adev->mode_info.disp_priority = 0;
@@ -1312,6 +1337,7 @@ void amdgpu_display_update_priority(struct amdgpu_device *adev)
 
 static bool amdgpu_display_is_hdtv_mode(const struct drm_display_mode *mode)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	/* try and guess if this is a tv or a monitor */
 	if ((mode->vdisplay == 480 && mode->hdisplay == 720) || /* 480p */
 	    (mode->vdisplay == 576) || /* 576p */
@@ -1326,6 +1352,7 @@ bool amdgpu_display_crtc_scaling_mode_fixup(struct drm_crtc *crtc,
 					const struct drm_display_mode *mode,
 					struct drm_display_mode *adjusted_mode)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_encoder *encoder;
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
@@ -1438,6 +1465,7 @@ int amdgpu_display_get_crtc_scanoutpos(struct drm_device *dev,
 			int *hpos, ktime_t *stime, ktime_t *etime,
 			const struct drm_display_mode *mode)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	u32 vbl = 0, position = 0;
 	int vbl_start, vbl_end, vtotal, ret = 0;
 	bool in_vbl = true;
@@ -1535,6 +1563,7 @@ int amdgpu_display_get_crtc_scanoutpos(struct drm_device *dev,
 
 int amdgpu_display_crtc_idx_to_irq_type(struct amdgpu_device *adev, int crtc)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	if (crtc < 0 || crtc >= adev->mode_info.num_crtc)
 		return AMDGPU_CRTC_IRQ_NONE;
 
@@ -1561,6 +1590,7 @@ bool amdgpu_crtc_get_scanout_position(struct drm_crtc *crtc,
 			int *hpos, ktime_t *stime, ktime_t *etime,
 			const struct drm_display_mode *mode)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = crtc->index;
 
@@ -1570,6 +1600,7 @@ bool amdgpu_crtc_get_scanout_position(struct drm_crtc *crtc,
 
 int amdgpu_display_suspend_helper(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct drm_device *dev = adev_to_drm(adev);
 	struct drm_crtc *crtc;
 	struct drm_connector *connector;
@@ -1617,6 +1648,7 @@ int amdgpu_display_suspend_helper(struct amdgpu_device *adev)
 
 int amdgpu_display_resume_helper(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_display: called %s\n", __func__);
 	struct drm_device *dev = adev_to_drm(adev);
 	struct drm_connector *connector;
 	struct drm_connector_list_iter iter;

@@ -46,6 +46,7 @@ MODULE_FIRMWARE("amdgpu/raven_ta.bin");
 
 static int psp_v10_0_init_microcode(struct psp_context *psp)
 {
+    pr_info("psp_v10_0: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	const char *chip_name;
 	char fw_name[30];
@@ -129,6 +130,7 @@ out:
 static int psp_v10_0_ring_init(struct psp_context *psp,
 			       enum psp_ring_type ring_type)
 {
+    pr_info("psp_v10_0: called %s\n", __func__);
 	int ret = 0;
 	struct psp_ring *ring;
 	struct amdgpu_device *adev = psp->adev;
@@ -155,6 +157,7 @@ static int psp_v10_0_ring_init(struct psp_context *psp,
 static int psp_v10_0_ring_create(struct psp_context *psp,
 				 enum psp_ring_type ring_type)
 {
+    pr_info("psp_v10_0: called %s\n", __func__);
 	int ret = 0;
 	unsigned int psp_ring_reg = 0;
 	struct psp_ring *ring = &psp->km_ring;
@@ -187,6 +190,7 @@ static int psp_v10_0_ring_create(struct psp_context *psp,
 static int psp_v10_0_ring_stop(struct psp_context *psp,
 			       enum psp_ring_type ring_type)
 {
+    pr_info("psp_v10_0: called %s\n", __func__);
 	int ret = 0;
 	unsigned int psp_ring_reg = 0;
 	struct amdgpu_device *adev = psp->adev;
@@ -208,6 +212,7 @@ static int psp_v10_0_ring_stop(struct psp_context *psp,
 static int psp_v10_0_ring_destroy(struct psp_context *psp,
 				  enum psp_ring_type ring_type)
 {
+    pr_info("psp_v10_0: called %s\n", __func__);
 	int ret = 0;
 	struct psp_ring *ring = &psp->km_ring;
 	struct amdgpu_device *adev = psp->adev;
@@ -225,12 +230,14 @@ static int psp_v10_0_ring_destroy(struct psp_context *psp,
 
 static int psp_v10_0_mode1_reset(struct psp_context *psp)
 {
+    pr_info("psp_v10_0: called %s\n", __func__);
 	DRM_INFO("psp mode 1 reset not supported now! \n");
 	return -EINVAL;
 }
 
 static uint32_t psp_v10_0_ring_get_wptr(struct psp_context *psp)
 {
+    pr_info("psp_v10_0: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 
 	return RREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_67);
@@ -238,6 +245,7 @@ static uint32_t psp_v10_0_ring_get_wptr(struct psp_context *psp)
 
 static void psp_v10_0_ring_set_wptr(struct psp_context *psp, uint32_t value)
 {
+    pr_info("psp_v10_0: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 
 	WREG32_SOC15(MP0, 0, mmMP0_SMN_C2PMSG_67, value);
@@ -256,5 +264,6 @@ static const struct psp_funcs psp_v10_0_funcs = {
 
 void psp_v10_0_set_psp_funcs(struct psp_context *psp)
 {
+    pr_info("psp_v10_0: called %s\n", __func__);
 	psp->funcs = &psp_v10_0_funcs;
 }

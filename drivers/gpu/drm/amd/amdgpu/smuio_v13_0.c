@@ -29,16 +29,19 @@
 
 static u32 smuio_v13_0_get_rom_index_offset(struct amdgpu_device *adev)
 {
+    pr_info("smuio_v13_0: called %s\n", __func__);
 	return SOC15_REG_OFFSET(SMUIO, 0, regROM_INDEX);
 }
 
 static u32 smuio_v13_0_get_rom_data_offset(struct amdgpu_device *adev)
 {
+    pr_info("smuio_v13_0: called %s\n", __func__);
 	return SOC15_REG_OFFSET(SMUIO, 0, regROM_DATA);
 }
 
 static void smuio_v13_0_update_rom_clock_gating(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("smuio_v13_0: called %s\n", __func__);
 	u32 def, data;
 
 	/* enable/disable ROM CG is not supported on APU */
@@ -60,6 +63,7 @@ static void smuio_v13_0_update_rom_clock_gating(struct amdgpu_device *adev, bool
 
 static void smuio_v13_0_get_clock_gating_state(struct amdgpu_device *adev, u32 *flags)
 {
+    pr_info("smuio_v13_0: called %s\n", __func__);
 	u32 data;
 
 	/* CGTT_ROM_CLK_CTRL0 is not available for APU */
@@ -80,6 +84,7 @@ static void smuio_v13_0_get_clock_gating_state(struct amdgpu_device *adev, u32 *
  */
 static u32 smuio_v13_0_get_die_id(struct amdgpu_device *adev)
 {
+    pr_info("smuio_v13_0: called %s\n", __func__);
 	u32 data, die_id;
 
 	data = RREG32_SOC15(SMUIO, 0, regSMUIO_MCM_CONFIG);
@@ -97,6 +102,7 @@ static u32 smuio_v13_0_get_die_id(struct amdgpu_device *adev)
  */
 static u32 smuio_v13_0_get_socket_id(struct amdgpu_device *adev)
 {
+    pr_info("smuio_v13_0: called %s\n", __func__);
 	u32 data, socket_id;
 
 	data = RREG32_SOC15(SMUIO, 0, regSMUIO_MCM_CONFIG);
@@ -114,6 +120,7 @@ static u32 smuio_v13_0_get_socket_id(struct amdgpu_device *adev)
  */
 static bool smuio_v13_0_is_host_gpu_xgmi_supported(struct amdgpu_device *adev)
 {
+    pr_info("smuio_v13_0: called %s\n", __func__);
 	u32 data;
 
 	data = RREG32_SOC15(SMUIO, 0, regSMUIO_MCM_CONFIG);

@@ -59,6 +59,7 @@ static void iceland_ih_set_interrupt_funcs(struct amdgpu_device *adev);
  */
 static void iceland_ih_enable_interrupts(struct amdgpu_device *adev)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	u32 ih_cntl = RREG32(mmIH_CNTL);
 	u32 ih_rb_cntl = RREG32(mmIH_RB_CNTL);
 
@@ -78,6 +79,7 @@ static void iceland_ih_enable_interrupts(struct amdgpu_device *adev)
  */
 static void iceland_ih_disable_interrupts(struct amdgpu_device *adev)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	u32 ih_rb_cntl = RREG32(mmIH_RB_CNTL);
 	u32 ih_cntl = RREG32(mmIH_CNTL);
 
@@ -105,6 +107,7 @@ static void iceland_ih_disable_interrupts(struct amdgpu_device *adev)
  */
 static int iceland_ih_irq_init(struct amdgpu_device *adev)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	struct amdgpu_ih_ring *ih = &adev->irq.ih;
 	int rb_bufsz;
 	u32 interrupt_cntl, ih_cntl, ih_rb_cntl;
@@ -169,6 +172,7 @@ static int iceland_ih_irq_init(struct amdgpu_device *adev)
  */
 static void iceland_ih_irq_disable(struct amdgpu_device *adev)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	iceland_ih_disable_interrupts(adev);
 
 	/* Wait and acknowledge irq */
@@ -190,6 +194,7 @@ static void iceland_ih_irq_disable(struct amdgpu_device *adev)
 static u32 iceland_ih_get_wptr(struct amdgpu_device *adev,
 			       struct amdgpu_ih_ring *ih)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	u32 wptr, tmp;
 
 	wptr = le32_to_cpu(*ih->wptr_cpu);
@@ -234,6 +239,7 @@ static void iceland_ih_decode_iv(struct amdgpu_device *adev,
 				 struct amdgpu_ih_ring *ih,
 				 struct amdgpu_iv_entry *entry)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	/* wptr/rptr are in bytes! */
 	u32 ring_index = ih->rptr >> 2;
 	uint32_t dw[4];
@@ -265,11 +271,13 @@ static void iceland_ih_decode_iv(struct amdgpu_device *adev,
 static void iceland_ih_set_rptr(struct amdgpu_device *adev,
 				struct amdgpu_ih_ring *ih)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	WREG32(mmIH_RB_RPTR, ih->rptr);
 }
 
 static int iceland_ih_early_init(void *handle)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int ret;
 
@@ -284,6 +292,7 @@ static int iceland_ih_early_init(void *handle)
 
 static int iceland_ih_sw_init(void *handle)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -298,6 +307,7 @@ static int iceland_ih_sw_init(void *handle)
 
 static int iceland_ih_sw_fini(void *handle)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	amdgpu_irq_fini_sw(adev);
@@ -308,6 +318,7 @@ static int iceland_ih_sw_fini(void *handle)
 
 static int iceland_ih_hw_init(void *handle)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -320,6 +331,7 @@ static int iceland_ih_hw_init(void *handle)
 
 static int iceland_ih_hw_fini(void *handle)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	iceland_ih_irq_disable(adev);
@@ -329,6 +341,7 @@ static int iceland_ih_hw_fini(void *handle)
 
 static int iceland_ih_suspend(void *handle)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return iceland_ih_hw_fini(adev);
@@ -336,6 +349,7 @@ static int iceland_ih_suspend(void *handle)
 
 static int iceland_ih_resume(void *handle)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return iceland_ih_hw_init(adev);
@@ -343,6 +357,7 @@ static int iceland_ih_resume(void *handle)
 
 static bool iceland_ih_is_idle(void *handle)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 tmp = RREG32(mmSRBM_STATUS);
 
@@ -354,6 +369,7 @@ static bool iceland_ih_is_idle(void *handle)
 
 static int iceland_ih_wait_for_idle(void *handle)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	unsigned i;
 	u32 tmp;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -370,6 +386,7 @@ static int iceland_ih_wait_for_idle(void *handle)
 
 static int iceland_ih_soft_reset(void *handle)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	u32 srbm_soft_reset = 0;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 tmp = RREG32(mmSRBM_STATUS);
@@ -401,12 +418,14 @@ static int iceland_ih_soft_reset(void *handle)
 static int iceland_ih_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	return 0;
 }
 
 static int iceland_ih_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	return 0;
 }
 
@@ -435,6 +454,7 @@ static const struct amdgpu_ih_funcs iceland_ih_funcs = {
 
 static void iceland_ih_set_interrupt_funcs(struct amdgpu_device *adev)
 {
+    pr_info("iceland_ih: called %s\n", __func__);
 	adev->irq.ih_funcs = &iceland_ih_funcs;
 }
 

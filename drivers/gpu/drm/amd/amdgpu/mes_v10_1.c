@@ -43,6 +43,7 @@ static int mes_v10_1_hw_fini(void *handle);
 
 static void mes_v10_1_ring_set_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring->use_doorbell) {
@@ -56,11 +57,13 @@ static void mes_v10_1_ring_set_wptr(struct amdgpu_ring *ring)
 
 static u64 mes_v10_1_ring_get_rptr(struct amdgpu_ring *ring)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	return ring->adev->wb.wb[ring->rptr_offs];
 }
 
 static u64 mes_v10_1_ring_get_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	u64 wptr;
 
 	if (ring->use_doorbell)
@@ -85,6 +88,7 @@ static const struct amdgpu_ring_funcs mes_v10_1_ring_funcs = {
 static int mes_v10_1_submit_pkt_and_poll_completion(struct amdgpu_mes *mes,
 						    void *pkt, int size)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int ndw = size / 4;
 	signed long r;
 	union MESAPI__ADD_QUEUE *x_pkt = pkt;
@@ -114,6 +118,7 @@ static int mes_v10_1_submit_pkt_and_poll_completion(struct amdgpu_mes *mes,
 
 static int convert_to_mes_queue_type(int queue_type)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	if (queue_type == AMDGPU_RING_TYPE_GFX)
 		return MES_QUEUE_TYPE_GFX;
 	else if (queue_type == AMDGPU_RING_TYPE_COMPUTE)
@@ -128,6 +133,7 @@ static int convert_to_mes_queue_type(int queue_type)
 static int mes_v10_1_add_hw_queue(struct amdgpu_mes *mes,
 				  struct mes_add_queue_input *input)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	struct amdgpu_device *adev = mes->adev;
 	union MESAPI__ADD_QUEUE mes_add_queue_pkt;
 
@@ -169,6 +175,7 @@ static int mes_v10_1_add_hw_queue(struct amdgpu_mes *mes,
 static int mes_v10_1_remove_hw_queue(struct amdgpu_mes *mes,
 				     struct mes_remove_queue_input *input)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	union MESAPI__REMOVE_QUEUE mes_remove_queue_pkt;
 
 	memset(&mes_remove_queue_pkt, 0, sizeof(mes_remove_queue_pkt));
@@ -192,17 +199,20 @@ static int mes_v10_1_remove_hw_queue(struct amdgpu_mes *mes,
 static int mes_v10_1_suspend_gang(struct amdgpu_mes *mes,
 				  struct mes_suspend_gang_input *input)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	return 0;
 }
 
 static int mes_v10_1_resume_gang(struct amdgpu_mes *mes,
 				 struct mes_resume_gang_input *input)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	return 0;
 }
 
 static int mes_v10_1_query_sched_status(struct amdgpu_mes *mes)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	union MESAPI__QUERY_MES_STATUS mes_status_pkt;
 
 	memset(&mes_status_pkt, 0, sizeof(mes_status_pkt));
@@ -222,6 +232,7 @@ static int mes_v10_1_query_sched_status(struct amdgpu_mes *mes)
 
 static int mes_v10_1_set_hw_resources(struct amdgpu_mes *mes)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int i;
 	struct amdgpu_device *adev = mes->adev;
 	union MESAPI_SET_HW_RESOURCES mes_set_hw_res_pkt;
@@ -272,6 +283,7 @@ static const struct amdgpu_mes_funcs mes_v10_1_funcs = {
 
 static int mes_v10_1_init_microcode(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	const char *chip_name;
 	char fw_name[30];
 	int err;
@@ -333,12 +345,14 @@ static int mes_v10_1_init_microcode(struct amdgpu_device *adev)
 
 static void mes_v10_1_free_microcode(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	release_firmware(adev->mes.fw);
 	adev->mes.fw = NULL;
 }
 
 static int mes_v10_1_allocate_ucode_buffer(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int r;
 	const struct mes_firmware_header_v1_0 *mes_hdr;
 	const __le32 *fw_data;
@@ -371,6 +385,7 @@ static int mes_v10_1_allocate_ucode_buffer(struct amdgpu_device *adev)
 
 static int mes_v10_1_allocate_ucode_data_buffer(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int r;
 	const struct mes_firmware_header_v1_0 *mes_hdr;
 	const __le32 *fw_data;
@@ -403,6 +418,7 @@ static int mes_v10_1_allocate_ucode_data_buffer(struct amdgpu_device *adev)
 
 static void mes_v10_1_free_ucode_buffers(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	amdgpu_bo_free_kernel(&adev->mes.data_fw_obj,
 			      &adev->mes.data_fw_gpu_addr,
 			      (void **)&adev->mes.data_fw_ptr);
@@ -414,6 +430,7 @@ static void mes_v10_1_free_ucode_buffers(struct amdgpu_device *adev)
 
 static void mes_v10_1_enable(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	uint32_t data = 0;
 
 	if (enable) {
@@ -448,6 +465,7 @@ static void mes_v10_1_enable(struct amdgpu_device *adev, bool enable)
 /* This function is for backdoor MES firmware */
 static int mes_v10_1_load_microcode(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int r;
 	uint32_t data;
 
@@ -541,6 +559,7 @@ static int mes_v10_1_load_microcode(struct amdgpu_device *adev)
 
 static int mes_v10_1_allocate_eop_buf(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int r;
 	u32 *eop;
 
@@ -564,6 +583,7 @@ static int mes_v10_1_allocate_eop_buf(struct amdgpu_device *adev)
 
 static int mes_v10_1_allocate_mem_slots(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_device_wb_get(adev, &adev->mes.sch_ctx_offs);
@@ -593,6 +613,7 @@ static int mes_v10_1_allocate_mem_slots(struct amdgpu_device *adev)
 
 static int mes_v10_1_mqd_init(struct amdgpu_ring *ring)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct v10_compute_mqd *mqd = ring->mqd_ptr;
 	uint64_t hqd_gpu_addr, wb_gpu_addr, eop_base_addr;
@@ -723,6 +744,7 @@ static int mes_v10_1_mqd_init(struct amdgpu_ring *ring)
 
 static void mes_v10_1_queue_init_register(struct amdgpu_ring *ring)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	struct v10_compute_mqd *mqd = ring->mqd_ptr;
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t data = 0;
@@ -812,6 +834,7 @@ static int mes_v10_1_kiq_enable_queue(struct amdgpu_device *adev)
 
 static int mes_v10_1_queue_init(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int r;
 
 	r = mes_v10_1_mqd_init(&adev->mes.ring);
@@ -831,6 +854,7 @@ static int mes_v10_1_queue_init(struct amdgpu_device *adev)
 
 static int mes_v10_1_ring_init(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 
 	ring = &adev->mes.ring;
@@ -854,6 +878,7 @@ static int mes_v10_1_ring_init(struct amdgpu_device *adev)
 
 static int mes_v10_1_mqd_sw_init(struct amdgpu_device *adev)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int r, mqd_size = sizeof(struct v10_compute_mqd);
 	struct amdgpu_ring *ring = &adev->mes.ring;
 
@@ -880,6 +905,7 @@ static int mes_v10_1_mqd_sw_init(struct amdgpu_device *adev)
 
 static int mes_v10_1_sw_init(void *handle)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -911,6 +937,7 @@ static int mes_v10_1_sw_init(void *handle)
 
 static int mes_v10_1_sw_fini(void *handle)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	amdgpu_device_wb_free(adev, adev->mes.sch_ctx_offs);
@@ -933,6 +960,7 @@ static int mes_v10_1_sw_fini(void *handle)
 
 static int mes_v10_1_hw_init(void *handle)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -969,6 +997,7 @@ failure:
 
 static int mes_v10_1_hw_fini(void *handle)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	mes_v10_1_enable(adev, false);
@@ -981,11 +1010,13 @@ static int mes_v10_1_hw_fini(void *handle)
 
 static int mes_v10_1_suspend(void *handle)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	return 0;
 }
 
 static int mes_v10_1_resume(void *handle)
 {
+    pr_info("mes_v10_1: called %s\n", __func__);
 	return 0;
 }
 

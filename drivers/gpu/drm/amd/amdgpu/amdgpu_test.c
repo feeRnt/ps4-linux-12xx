@@ -31,6 +31,7 @@
 /* Test BO GTT->VRAM and VRAM->GTT GPU copies across the whole GTT aperture */
 static void amdgpu_do_test_moves(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_test: called %s\n", __func__);
 	struct amdgpu_ring *ring = adev->mman.buffer_funcs_ring;
 	struct amdgpu_bo *vram_obj = NULL;
 	struct amdgpu_bo **gtt_obj = NULL;
@@ -245,6 +246,7 @@ out_cleanup:
 
 void amdgpu_test_moves(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_test: called %s\n", __func__);
 	if (adev->mman.buffer_funcs)
 		amdgpu_do_test_moves(adev);
 }

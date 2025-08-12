@@ -76,6 +76,7 @@ u32 amdgpu_cik_gpu_check_soft_reset(struct amdgpu_device *adev);
 
 static void cik_sdma_free_microcode(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	int i;
 	for (i = 0; i < adev->sdma.num_instances; i++) {
 			release_firmware(adev->sdma.instance[i].fw);
@@ -111,6 +112,7 @@ static void cik_sdma_free_microcode(struct amdgpu_device *adev)
  */
 static int cik_sdma_init_microcode(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	const char *chip_name;
 	char fw_name[30];
 	int err = 0, i;
@@ -172,6 +174,7 @@ out:
  */
 static uint64_t cik_sdma_ring_get_rptr(struct amdgpu_ring *ring)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u32 rptr;
 
 	rptr = ring->adev->wb.wb[ring->rptr_offs];
@@ -188,6 +191,7 @@ static uint64_t cik_sdma_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t cik_sdma_ring_get_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	return (RREG32(mmSDMA0_GFX_RB_WPTR + sdma_offsets[ring->me]) & 0x3fffc) >> 2;
@@ -202,6 +206,7 @@ static uint64_t cik_sdma_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static void cik_sdma_ring_set_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	WREG32(mmSDMA0_GFX_RB_WPTR + sdma_offsets[ring->me],
@@ -210,6 +215,7 @@ static void cik_sdma_ring_set_wptr(struct amdgpu_ring *ring)
 
 static void cik_sdma_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_sdma_instance *sdma = amdgpu_sdma_get_instance_from_ring(ring);
 	int i;
 
@@ -236,6 +242,7 @@ static void cik_sdma_ring_emit_ib(struct amdgpu_ring *ring,
 				  struct amdgpu_ib *ib,
 				  uint32_t flags)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
 	u32 extra_bits = vmid & 0xf;
 
@@ -258,6 +265,7 @@ static void cik_sdma_ring_emit_ib(struct amdgpu_ring *ring,
  */
 static void cik_sdma_ring_emit_hdp_flush(struct amdgpu_ring *ring)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u32 extra_bits = (SDMA_POLL_REG_MEM_EXTRA_OP(1) |
 			  SDMA_POLL_REG_MEM_EXTRA_FUNC(3)); /* == */
 	u32 ref_and_mask;
@@ -290,6 +298,7 @@ static void cik_sdma_ring_emit_hdp_flush(struct amdgpu_ring *ring)
 static void cik_sdma_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				     unsigned flags)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	bool write64bit = flags & AMDGPU_FENCE_FLAG_64BIT;
 	/* write the fence */
 	amdgpu_ring_write(ring, SDMA_PACKET(SDMA_OPCODE_FENCE, 0, 0));
@@ -319,6 +328,7 @@ static void cik_sdma_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq
  */
 static void cik_sdma_gfx_stop(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_ring *sdma0 = &adev->sdma.instance[0].ring;
 	struct amdgpu_ring *sdma1 = &adev->sdma.instance[1].ring;
 	u32 rb_cntl;
@@ -345,6 +355,7 @@ static void cik_sdma_gfx_stop(struct amdgpu_device *adev)
  */
 static void cik_sdma_rlc_stop(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	/* XXX todo */
 }
 
@@ -358,6 +369,7 @@ static void cik_sdma_rlc_stop(struct amdgpu_device *adev)
  */
 static void cik_ctx_switch_enable(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u32 f32_cntl, phase_quantum = 0;
 	int i;
 
@@ -415,6 +427,7 @@ static void cik_ctx_switch_enable(struct amdgpu_device *adev, bool enable)
  */
 static void cik_sdma_enable(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u32 me_cntl;
 	int i;
 
@@ -443,6 +456,7 @@ static void cik_sdma_enable(struct amdgpu_device *adev, bool enable)
  */
 static int cik_sdma_gfx_resume(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	u32 rb_cntl, ib_cntl;
 	u32 rb_bufsz;
@@ -538,6 +552,7 @@ static int cik_sdma_gfx_resume(struct amdgpu_device *adev)
  */
 static int cik_sdma_rlc_resume(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	/* XXX todo */
 	return 0;
 }
@@ -552,6 +567,7 @@ static int cik_sdma_rlc_resume(struct amdgpu_device *adev)
  */
 static int cik_sdma_load_microcode(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	const struct sdma_firmware_header_v1_0 *hdr;
 	const __le32 *fw_data;
 	u32 fw_size;
@@ -591,6 +607,7 @@ static int cik_sdma_load_microcode(struct amdgpu_device *adev)
  */
 static int cik_sdma_start(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	int r;
 
 	r = cik_sdma_load_microcode(adev);
@@ -624,6 +641,7 @@ static int cik_sdma_start(struct amdgpu_device *adev)
  */
 static int cik_sdma_ring_test_ring(struct amdgpu_ring *ring)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned i;
 	unsigned index;
@@ -685,6 +703,7 @@ error_free_wb:
  */
 static int cik_sdma_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct amdgpu_ib ib;
 	struct dma_fence *f = NULL;
@@ -752,6 +771,7 @@ static void cik_sdma_vm_copy_pte(struct amdgpu_ib *ib,
 				 uint64_t pe, uint64_t src,
 				 unsigned count)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	unsigned bytes = count * 8;
 
 	ib->ptr[ib->length_dw++] = SDMA_PACKET(SDMA_OPCODE_COPY,
@@ -779,6 +799,7 @@ static void cik_sdma_vm_write_pte(struct amdgpu_ib *ib, uint64_t pe,
 				  uint64_t value, unsigned count,
 				  uint32_t incr)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	unsigned ndw = count * 2;
 
 	ib->ptr[ib->length_dw++] = SDMA_PACKET(SDMA_OPCODE_WRITE,
@@ -809,6 +830,7 @@ static void cik_sdma_vm_set_pte_pde(struct amdgpu_ib *ib, uint64_t pe,
 				    uint64_t addr, unsigned count,
 				    uint32_t incr, uint64_t flags)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	/* for physically contiguous pages (vram) */
 	ib->ptr[ib->length_dw++] = SDMA_PACKET(SDMA_OPCODE_GENERATE_PTE_PDE, 0, 0);
 	ib->ptr[ib->length_dw++] = lower_32_bits(pe); /* dst addr */
@@ -831,6 +853,7 @@ static void cik_sdma_vm_set_pte_pde(struct amdgpu_ib *ib, uint64_t pe,
  */
 static void cik_sdma_ring_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_sdma_instance *sdma = amdgpu_sdma_get_instance_from_ring(ring);
 	u32 pad_count;
 	int i;
@@ -855,6 +878,7 @@ static void cik_sdma_ring_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib)
  */
 static void cik_sdma_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	uint32_t seq = ring->fence_drv.sync_seq;
 	uint64_t addr = ring->fence_drv.gpu_addr;
 
@@ -883,6 +907,7 @@ static void cik_sdma_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
 static void cik_sdma_ring_emit_vm_flush(struct amdgpu_ring *ring,
 					unsigned vmid, uint64_t pd_addr)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u32 extra_bits = (SDMA_POLL_REG_MEM_EXTRA_OP(0) |
 			  SDMA_POLL_REG_MEM_EXTRA_FUNC(0)); /* always */
 
@@ -899,6 +924,7 @@ static void cik_sdma_ring_emit_vm_flush(struct amdgpu_ring *ring,
 static void cik_sdma_ring_emit_wreg(struct amdgpu_ring *ring,
 				    uint32_t reg, uint32_t val)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	amdgpu_ring_write(ring, SDMA_PACKET(SDMA_OPCODE_SRBM_WRITE, 0, 0xf000));
 	amdgpu_ring_write(ring, reg);
 	amdgpu_ring_write(ring, val);
@@ -907,6 +933,7 @@ static void cik_sdma_ring_emit_wreg(struct amdgpu_ring *ring,
 static void cik_enable_sdma_mgcg(struct amdgpu_device *adev,
 				 bool enable)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u32 orig, data;
 
 	if (enable && (adev->cg_flags & AMD_CG_SUPPORT_SDMA_MGCG)) {
@@ -928,6 +955,7 @@ static void cik_enable_sdma_mgcg(struct amdgpu_device *adev,
 static void cik_enable_sdma_mgls(struct amdgpu_device *adev,
 				 bool enable)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u32 orig, data;
 
 	if (enable && (adev->cg_flags & AMD_CG_SUPPORT_SDMA_LS)) {
@@ -955,6 +983,7 @@ static void cik_enable_sdma_mgls(struct amdgpu_device *adev,
 
 static int cik_sdma_early_init(void *handle)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	adev->sdma.num_instances = SDMA_MAX_INSTANCE;
@@ -969,6 +998,7 @@ static int cik_sdma_early_init(void *handle)
 
 static int cik_sdma_sw_init(void *handle)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r, i;
@@ -1015,6 +1045,7 @@ static int cik_sdma_sw_init(void *handle)
 
 static int cik_sdma_sw_fini(void *handle)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int i;
 
@@ -1027,6 +1058,7 @@ static int cik_sdma_sw_fini(void *handle)
 
 static int cik_sdma_hw_init(void *handle)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1039,6 +1071,7 @@ static int cik_sdma_hw_init(void *handle)
 
 static int cik_sdma_hw_fini(void *handle)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	cik_ctx_switch_enable(adev, false);
@@ -1049,6 +1082,7 @@ static int cik_sdma_hw_fini(void *handle)
 
 static int cik_sdma_suspend(void *handle)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return cik_sdma_hw_fini(adev);
@@ -1056,6 +1090,7 @@ static int cik_sdma_suspend(void *handle)
 
 static int cik_sdma_resume(void *handle)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	cik_sdma_soft_reset(handle);
@@ -1065,6 +1100,7 @@ static int cik_sdma_resume(void *handle)
 
 static bool cik_sdma_is_idle(void *handle)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 tmp = RREG32(mmSRBM_STATUS2);
 
@@ -1077,6 +1113,7 @@ static bool cik_sdma_is_idle(void *handle)
 
 static int cik_sdma_wait_for_idle(void *handle)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	unsigned i;
 	u32 tmp;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -1094,6 +1131,7 @@ static int cik_sdma_wait_for_idle(void *handle)
 
 static int cik_sdma_soft_reset(void *handle)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u32 srbm_soft_reset = 0;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 tmp;
@@ -1135,6 +1173,7 @@ static int cik_sdma_set_trap_irq_state(struct amdgpu_device *adev,
 				       unsigned type,
 				       enum amdgpu_interrupt_state state)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u32 sdma_cntl;
 
 	switch (type) {
@@ -1180,6 +1219,7 @@ static int cik_sdma_process_trap_irq(struct amdgpu_device *adev,
 				     struct amdgpu_irq_src *source,
 				     struct amdgpu_iv_entry *entry)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u8 instance_id, queue_id;
 
 	instance_id = (entry->ring_id & 0x3) >> 0;
@@ -1221,6 +1261,7 @@ static int cik_sdma_process_illegal_inst_irq(struct amdgpu_device *adev,
 					     struct amdgpu_irq_src *source,
 					     struct amdgpu_iv_entry *entry)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	u8 instance_id;
 
 	DRM_ERROR("Illegal instruction in SDMA command stream\n");
@@ -1232,6 +1273,7 @@ static int cik_sdma_process_illegal_inst_irq(struct amdgpu_device *adev,
 static int cik_sdma_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	bool gate = false;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1247,6 +1289,7 @@ static int cik_sdma_set_clockgating_state(void *handle,
 static int cik_sdma_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	return 0;
 }
 
@@ -1296,6 +1339,7 @@ static const struct amdgpu_ring_funcs cik_sdma_ring_funcs = {
 
 static void cik_sdma_set_ring_funcs(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->sdma.num_instances; i++) {
@@ -1315,6 +1359,7 @@ static const struct amdgpu_irq_src_funcs cik_sdma_illegal_inst_irq_funcs = {
 
 static void cik_sdma_set_irq_funcs(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	adev->sdma.trap_irq.num_types = AMDGPU_SDMA_IRQ_LAST;
 	adev->sdma.trap_irq.funcs = &cik_sdma_trap_irq_funcs;
 	adev->sdma.illegal_inst_irq.funcs = &cik_sdma_illegal_inst_irq_funcs;
@@ -1339,6 +1384,7 @@ static void cik_sdma_emit_copy_buffer(struct amdgpu_ib *ib,
 				      uint32_t byte_count,
 				      bool tmz)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	ib->ptr[ib->length_dw++] = SDMA_PACKET(SDMA_OPCODE_COPY, SDMA_COPY_SUB_OPCODE_LINEAR, 0);
 	ib->ptr[ib->length_dw++] = byte_count;
 	ib->ptr[ib->length_dw++] = 0; /* src/dst endian swap */
@@ -1363,6 +1409,7 @@ static void cik_sdma_emit_fill_buffer(struct amdgpu_ib *ib,
 				      uint64_t dst_offset,
 				      uint32_t byte_count)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	ib->ptr[ib->length_dw++] = SDMA_PACKET(SDMA_OPCODE_CONSTANT_FILL, 0, 0);
 	ib->ptr[ib->length_dw++] = lower_32_bits(dst_offset);
 	ib->ptr[ib->length_dw++] = upper_32_bits(dst_offset);
@@ -1382,6 +1429,7 @@ static const struct amdgpu_buffer_funcs cik_sdma_buffer_funcs = {
 
 static void cik_sdma_set_buffer_funcs(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	adev->mman.buffer_funcs = &cik_sdma_buffer_funcs;
 	adev->mman.buffer_funcs_ring = &adev->sdma.instance[0].ring;
 }
@@ -1396,6 +1444,7 @@ static const struct amdgpu_vm_pte_funcs cik_sdma_vm_pte_funcs = {
 
 static void cik_sdma_set_vm_pte_funcs(struct amdgpu_device *adev)
 {
+    pr_info("cik_sdma: called %s\n", __func__);
 	unsigned i;
 
 	adev->vm_manager.vm_pte_funcs = &cik_sdma_vm_pte_funcs;

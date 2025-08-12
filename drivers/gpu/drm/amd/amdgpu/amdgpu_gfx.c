@@ -40,6 +40,7 @@
 int amdgpu_gfx_mec_queue_to_bit(struct amdgpu_device *adev, int mec,
 				int pipe, int queue)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	int bit = 0;
 
 	bit += mec * adev->gfx.mec.num_pipe_per_mec
@@ -53,6 +54,7 @@ int amdgpu_gfx_mec_queue_to_bit(struct amdgpu_device *adev, int mec,
 void amdgpu_queue_mask_bit_to_mec_queue(struct amdgpu_device *adev, int bit,
 				 int *mec, int *pipe, int *queue)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	*queue = bit % adev->gfx.mec.num_queue_per_pipe;
 	*pipe = (bit / adev->gfx.mec.num_queue_per_pipe)
 		% adev->gfx.mec.num_pipe_per_mec;
@@ -64,6 +66,7 @@ void amdgpu_queue_mask_bit_to_mec_queue(struct amdgpu_device *adev, int bit,
 bool amdgpu_gfx_is_mec_queue_enabled(struct amdgpu_device *adev,
 				     int mec, int pipe, int queue)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	return test_bit(amdgpu_gfx_mec_queue_to_bit(adev, mec, pipe, queue),
 			adev->gfx.mec.queue_bitmap);
 }
@@ -71,6 +74,7 @@ bool amdgpu_gfx_is_mec_queue_enabled(struct amdgpu_device *adev,
 int amdgpu_gfx_me_queue_to_bit(struct amdgpu_device *adev,
 			       int me, int pipe, int queue)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	int bit = 0;
 
 	bit += me * adev->gfx.me.num_pipe_per_me
@@ -84,6 +88,7 @@ int amdgpu_gfx_me_queue_to_bit(struct amdgpu_device *adev,
 void amdgpu_gfx_bit_to_me_queue(struct amdgpu_device *adev, int bit,
 				int *me, int *pipe, int *queue)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	*queue = bit % adev->gfx.me.num_queue_per_pipe;
 	*pipe = (bit / adev->gfx.me.num_queue_per_pipe)
 		% adev->gfx.me.num_pipe_per_me;
@@ -94,6 +99,7 @@ void amdgpu_gfx_bit_to_me_queue(struct amdgpu_device *adev, int bit,
 bool amdgpu_gfx_is_me_queue_enabled(struct amdgpu_device *adev,
 				    int me, int pipe, int queue)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	return test_bit(amdgpu_gfx_me_queue_to_bit(adev, me, pipe, queue),
 			adev->gfx.me.queue_bitmap);
 }
@@ -109,6 +115,7 @@ bool amdgpu_gfx_is_me_queue_enabled(struct amdgpu_device *adev,
  */
 int amdgpu_gfx_scratch_get(struct amdgpu_device *adev, uint32_t *reg)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	int i;
 
 	i = ffs(adev->gfx.scratch.free_mask);
@@ -131,6 +138,7 @@ int amdgpu_gfx_scratch_get(struct amdgpu_device *adev, uint32_t *reg)
  */
 void amdgpu_gfx_scratch_free(struct amdgpu_device *adev, uint32_t reg)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	adev->gfx.scratch.free_mask |= 1u << (reg - adev->gfx.scratch.reg_base);
 }
 
@@ -146,6 +154,7 @@ void amdgpu_gfx_scratch_free(struct amdgpu_device *adev, uint32_t reg)
  */
 void amdgpu_gfx_parse_disable_cu(unsigned *mask, unsigned max_se, unsigned max_sh)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	unsigned se, sh, cu;
 	const char *p;
 
@@ -180,6 +189,7 @@ void amdgpu_gfx_parse_disable_cu(unsigned *mask, unsigned max_se, unsigned max_s
 
 static bool amdgpu_gfx_is_multipipe_capable(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	if (amdgpu_compute_multipipe != -1) {
 		DRM_INFO("amdgpu: forcing compute pipe policy %d\n",
 			 amdgpu_compute_multipipe);
@@ -197,6 +207,7 @@ static bool amdgpu_gfx_is_multipipe_capable(struct amdgpu_device *adev)
 bool amdgpu_gfx_is_high_priority_compute_queue(struct amdgpu_device *adev,
 					       struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	/* Policy: use 1st queue as high priority compute queue if we
 	 * have more than one compute queue.
 	 */
@@ -209,6 +220,7 @@ bool amdgpu_gfx_is_high_priority_compute_queue(struct amdgpu_device *adev,
 
 void amdgpu_gfx_compute_queue_acquire(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	int i, queue, pipe;
 	bool multipipe_policy = amdgpu_gfx_is_multipipe_capable(adev);
 	int max_queues_per_mec = min(adev->gfx.mec.num_pipe_per_mec *
@@ -236,6 +248,7 @@ void amdgpu_gfx_compute_queue_acquire(struct amdgpu_device *adev)
 
 void amdgpu_gfx_graphics_queue_acquire(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	int i, queue, me;
 
 	for (i = 0; i < AMDGPU_MAX_GFX_QUEUES; ++i) {
@@ -259,6 +272,7 @@ void amdgpu_gfx_graphics_queue_acquire(struct amdgpu_device *adev)
 static int amdgpu_gfx_kiq_acquire(struct amdgpu_device *adev,
 				  struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	int queue_bit;
 	int mec, pipe, queue;
 
@@ -295,6 +309,7 @@ int amdgpu_gfx_kiq_init_ring(struct amdgpu_device *adev,
 			     struct amdgpu_ring *ring,
 			     struct amdgpu_irq_src *irq)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	struct amdgpu_kiq *kiq = &adev->gfx.kiq;
 	int r = 0;
 
@@ -322,11 +337,13 @@ int amdgpu_gfx_kiq_init_ring(struct amdgpu_device *adev,
 
 void amdgpu_gfx_kiq_free_ring(struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	amdgpu_ring_fini(ring);
 }
 
 void amdgpu_gfx_kiq_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	struct amdgpu_kiq *kiq = &adev->gfx.kiq;
 
 	amdgpu_bo_free_kernel(&kiq->eop_obj, &kiq->eop_gpu_addr, NULL);
@@ -335,6 +352,7 @@ void amdgpu_gfx_kiq_fini(struct amdgpu_device *adev)
 int amdgpu_gfx_kiq_init(struct amdgpu_device *adev,
 			unsigned hpd_size)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	int r;
 	u32 *hpd;
 	struct amdgpu_kiq *kiq = &adev->gfx.kiq;
@@ -362,6 +380,7 @@ int amdgpu_gfx_kiq_init(struct amdgpu_device *adev,
 int amdgpu_gfx_mqd_sw_init(struct amdgpu_device *adev,
 			   unsigned mqd_size)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	struct amdgpu_ring *ring = NULL;
 	int r, i;
 
@@ -432,6 +451,7 @@ int amdgpu_gfx_mqd_sw_init(struct amdgpu_device *adev,
 
 void amdgpu_gfx_mqd_sw_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	struct amdgpu_ring *ring = NULL;
 	int i;
 
@@ -462,6 +482,7 @@ void amdgpu_gfx_mqd_sw_fini(struct amdgpu_device *adev)
 
 int amdgpu_gfx_disable_kcq(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	struct amdgpu_kiq *kiq = &adev->gfx.kiq;
 	struct amdgpu_ring *kiq_ring = &kiq->ring;
 	int i, r;
@@ -488,6 +509,7 @@ int amdgpu_gfx_disable_kcq(struct amdgpu_device *adev)
 int amdgpu_queue_mask_bit_to_set_resource_bit(struct amdgpu_device *adev,
 					int queue_bit)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	int mec, pipe, queue;
 	int set_resource_bit = 0;
 
@@ -500,6 +522,7 @@ int amdgpu_queue_mask_bit_to_set_resource_bit(struct amdgpu_device *adev,
 
 int amdgpu_gfx_enable_kcq(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	struct amdgpu_kiq *kiq = &adev->gfx.kiq;
 	struct amdgpu_ring *kiq_ring = &adev->gfx.kiq.ring;
 	uint64_t queue_mask = 0;
@@ -560,6 +583,7 @@ int amdgpu_gfx_enable_kcq(struct amdgpu_device *adev)
 
 void amdgpu_gfx_off_ctrl(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	unsigned long delay = GFX_OFF_DELAY_ENABLE;
 
 	if (!(adev->pm.pp_feature & PP_GFXOFF_MASK))
@@ -610,6 +634,7 @@ unlock:
 
 int amdgpu_get_gfx_off_status(struct amdgpu_device *adev, uint32_t *value)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 
 	int r = 0;
 
@@ -624,6 +649,7 @@ int amdgpu_get_gfx_off_status(struct amdgpu_device *adev, uint32_t *value)
 
 int amdgpu_gfx_ras_late_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	int r;
 	struct ras_fs_if fs_info = {
 		.sysfs_name = "gfx_err_count",
@@ -670,6 +696,7 @@ free:
 
 void amdgpu_gfx_ras_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	if (amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__GFX) &&
 			adev->gfx.ras_if) {
 		struct ras_common_if *ras_if = adev->gfx.ras_if;
@@ -687,6 +714,7 @@ int amdgpu_gfx_process_ras_data_cb(struct amdgpu_device *adev,
 		void *err_data,
 		struct amdgpu_iv_entry *entry)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	/* TODO ue will trigger an interrupt.
 	 *
 	 * When “Full RAS” is enabled, the per-IP interrupt sources should
@@ -707,6 +735,7 @@ int amdgpu_gfx_cp_ecc_error_irq(struct amdgpu_device *adev,
 				  struct amdgpu_irq_src *source,
 				  struct amdgpu_iv_entry *entry)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	struct ras_common_if *ras_if = adev->gfx.ras_if;
 	struct ras_dispatch_if ih_data = {
 		.entry = entry,
@@ -724,6 +753,7 @@ int amdgpu_gfx_cp_ecc_error_irq(struct amdgpu_device *adev,
 
 uint32_t amdgpu_kiq_rreg(struct amdgpu_device *adev, uint32_t reg)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	signed long r, cnt = 0;
 	unsigned long flags;
 	uint32_t seq, reg_val_offs = 0, value = 0;
@@ -789,6 +819,7 @@ failed_kiq_read:
 
 void amdgpu_kiq_wreg(struct amdgpu_device *adev, uint32_t reg, uint32_t v)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	signed long r, cnt = 0;
 	unsigned long flags;
 	uint32_t seq;
@@ -844,6 +875,7 @@ failed_kiq_write:
 
 int amdgpu_gfx_get_num_kcq(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	if (amdgpu_num_kcq == -1) {
 		return 8;
 	} else if (amdgpu_num_kcq > 8 || amdgpu_num_kcq < 0) {
@@ -861,6 +893,7 @@ int amdgpu_gfx_get_num_kcq(struct amdgpu_device *adev)
 
 void amdgpu_gfx_state_change_set(struct amdgpu_device *adev, enum gfx_change_state state)
 {
+    pr_info("amdgpu_gfx: called %s\n", __func__);
 	mutex_lock(&adev->pm.mutex);
 	if (adev->powerplay.pp_funcs &&
 	    adev->powerplay.pp_funcs->gfx_state_change_set)

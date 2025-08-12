@@ -257,6 +257,7 @@ static const struct amdgpu_video_codecs cz_video_codecs_decode =
 static int vi_query_video_codecs(struct amdgpu_device *adev, bool encode,
 				 const struct amdgpu_video_codecs **codecs)
 {
+    pr_info("vi: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_TOPAZ:
 		if (encode)
@@ -297,6 +298,7 @@ static int vi_query_video_codecs(struct amdgpu_device *adev, bool encode,
  */
 static u32 vi_pcie_rreg(struct amdgpu_device *adev, u32 reg)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -310,6 +312,7 @@ static u32 vi_pcie_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void vi_pcie_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
@@ -322,6 +325,7 @@ static void vi_pcie_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 vi_smc_rreg(struct amdgpu_device *adev, u32 reg)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -334,6 +338,7 @@ static u32 vi_smc_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void vi_smc_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->smc_idx_lock, flags);
@@ -348,6 +353,7 @@ static void vi_smc_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 cz_smc_rreg(struct amdgpu_device *adev, u32 reg)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -360,6 +366,7 @@ static u32 cz_smc_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void cz_smc_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->smc_idx_lock, flags);
@@ -370,6 +377,7 @@ static void cz_smc_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 vi_uvd_ctx_rreg(struct amdgpu_device *adev, u32 reg)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -382,6 +390,7 @@ static u32 vi_uvd_ctx_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void vi_uvd_ctx_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->uvd_ctx_idx_lock, flags);
@@ -392,6 +401,7 @@ static void vi_uvd_ctx_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 vi_didt_rreg(struct amdgpu_device *adev, u32 reg)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -404,6 +414,7 @@ static u32 vi_didt_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void vi_didt_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->didt_idx_lock, flags);
@@ -414,6 +425,7 @@ static void vi_didt_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 vi_gc_cac_rreg(struct amdgpu_device *adev, u32 reg)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -426,6 +438,7 @@ static u32 vi_gc_cac_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void vi_gc_cac_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
+    pr_info("vi: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->gc_cac_idx_lock, flags);
@@ -484,6 +497,7 @@ static const u32 stoney_mgcg_cgcg_init[] =
 
 static void vi_init_golden_registers(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	/* Some of the registers might be dependent on GRBM_GFX_INDEX */
 	mutex_lock(&adev->grbm_idx_mutex);
 
@@ -539,6 +553,7 @@ static void vi_init_golden_registers(struct amdgpu_device *adev)
  */
 static u32 vi_get_xclk(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	u32 reference_clock = adev->clock.spll.reference_freq;
 	u32 tmp;
 
@@ -572,6 +587,7 @@ static u32 vi_get_xclk(struct amdgpu_device *adev)
 void vi_srbm_select(struct amdgpu_device *adev,
 		     u32 me, u32 pipe, u32 queue, u32 vmid)
 {
+    pr_info("vi: called %s\n", __func__);
 	u32 srbm_gfx_cntl = 0;
 	srbm_gfx_cntl = REG_SET_FIELD(srbm_gfx_cntl, SRBM_GFX_CNTL, PIPEID, pipe);
 	srbm_gfx_cntl = REG_SET_FIELD(srbm_gfx_cntl, SRBM_GFX_CNTL, MEID, me);
@@ -582,11 +598,13 @@ void vi_srbm_select(struct amdgpu_device *adev,
 
 static void vi_vga_set_state(struct amdgpu_device *adev, bool state)
 {
+    pr_info("vi: called %s\n", __func__);
 	/* todo */
 }
 
 static bool vi_read_disabled_bios(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	u32 bus_cntl;
 	u32 d1vga_control = 0;
 	u32 d2vga_control = 0;
@@ -633,6 +651,7 @@ static bool vi_read_disabled_bios(struct amdgpu_device *adev)
 static bool vi_read_bios_from_rom(struct amdgpu_device *adev,
 				  u8 *bios, u32 length_bytes)
 {
+    pr_info("vi: called %s\n", __func__);
 	u32 *dw_ptr;
 	unsigned long flags;
 	u32 i, length_dw;
@@ -744,6 +763,7 @@ static uint32_t vi_get_register_value(struct amdgpu_device *adev,
 				      bool indexed, u32 se_num,
 				      u32 sh_num, u32 reg_offset)
 {
+    pr_info("vi: called %s\n", __func__);
 	if (indexed) {
 		uint32_t val;
 		unsigned se_idx = (se_num == 0xffffffff) ? 0 : se_num;
@@ -839,6 +859,7 @@ static uint32_t vi_get_register_value(struct amdgpu_device *adev,
 static int vi_read_register(struct amdgpu_device *adev, u32 se_num,
 			    u32 sh_num, u32 reg_offset, u32 *value)
 {
+    pr_info("vi: called %s\n", __func__);
 	uint32_t i;
 
 	*value = 0;
@@ -866,6 +887,7 @@ static int vi_read_register(struct amdgpu_device *adev, u32 se_num,
  */
 static int vi_asic_pci_config_reset(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	u32 i;
 	int r = -EINVAL;
 
@@ -897,6 +919,7 @@ static int vi_asic_pci_config_reset(struct amdgpu_device *adev)
 
 static bool vi_asic_supports_baco(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_FIJI:
 	case CHIP_TONGA:
@@ -913,6 +936,7 @@ static bool vi_asic_supports_baco(struct amdgpu_device *adev)
 static enum amd_reset_method
 vi_asic_reset_method(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	bool baco_reset;
 
 	if (amdgpu_reset_method == AMD_RESET_METHOD_LEGACY ||
@@ -954,6 +978,7 @@ vi_asic_reset_method(struct amdgpu_device *adev)
  */
 static int vi_asic_reset(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	int r;
 
 	if (vi_asic_reset_method(adev) == AMD_RESET_METHOD_BACO) {
@@ -969,12 +994,14 @@ static int vi_asic_reset(struct amdgpu_device *adev)
 
 static u32 vi_get_config_memsize(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	return RREG32(mmCONFIG_MEMSIZE);
 }
 
 static int vi_set_uvd_clock(struct amdgpu_device *adev, u32 clock,
 			u32 cntl_reg, u32 status_reg)
 {
+    pr_info("vi: called %s\n", __func__);
 	int r, i;
 	struct atom_clock_dividers dividers;
 	uint32_t tmp;
@@ -1020,6 +1047,7 @@ static int vi_set_uvd_clock(struct amdgpu_device *adev, u32 clock,
 
 static int vi_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 {
+    pr_info("vi: called %s\n", __func__);
 	int r;
 
 	if (adev->flags & AMD_IS_APU) {
@@ -1045,6 +1073,7 @@ static int vi_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 
 static int vi_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk)
 {
+    pr_info("vi: called %s\n", __func__);
 	int r, i;
 	struct atom_clock_dividers dividers;
 	u32 tmp;
@@ -1099,6 +1128,7 @@ static int vi_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk)
 
 static void vi_pcie_gen3_enable(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	if (pci_is_root_bus(adev->pdev->bus))
 		return;
 
@@ -1117,6 +1147,7 @@ static void vi_pcie_gen3_enable(struct amdgpu_device *adev)
 
 static void vi_enable_aspm(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	u32 data, orig;
 
 	orig = data = RREG32_PCIE(ixPCIE_LC_CNTL);
@@ -1132,6 +1163,7 @@ static void vi_enable_aspm(struct amdgpu_device *adev)
 
 static void vi_program_aspm(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	u32 data, data1, orig;
 	bool bL1SS = false;
 	bool bClkReqSupport = true;
@@ -1292,6 +1324,7 @@ static void vi_program_aspm(struct amdgpu_device *adev)
 static void vi_enable_doorbell_aperture(struct amdgpu_device *adev,
 					bool enable)
 {
+    pr_info("vi: called %s\n", __func__);
 	u32 tmp;
 
 	/* not necessary on CZ */
@@ -1313,6 +1346,7 @@ static void vi_enable_doorbell_aperture(struct amdgpu_device *adev,
 
 static uint32_t vi_get_rev_id(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	if (adev->flags & AMD_IS_APU)
 		return (RREG32_SMC(ATI_REV_ID_FUSE_MACRO__ADDRESS) & ATI_REV_ID_FUSE_MACRO__MASK)
 			>> ATI_REV_ID_FUSE_MACRO__SHIFT;
@@ -1323,6 +1357,7 @@ static uint32_t vi_get_rev_id(struct amdgpu_device *adev)
 
 static void vi_flush_hdp(struct amdgpu_device *adev, struct amdgpu_ring *ring)
 {
+    pr_info("vi: called %s\n", __func__);
 	if (!ring || !ring->funcs->emit_wreg) {
 		WREG32(mmHDP_MEM_COHERENCY_FLUSH_CNTL, 1);
 		RREG32(mmHDP_MEM_COHERENCY_FLUSH_CNTL);
@@ -1334,6 +1369,7 @@ static void vi_flush_hdp(struct amdgpu_device *adev, struct amdgpu_ring *ring)
 static void vi_invalidate_hdp(struct amdgpu_device *adev,
 			      struct amdgpu_ring *ring)
 {
+    pr_info("vi: called %s\n", __func__);
 	if (!ring || !ring->funcs->emit_wreg) {
 		WREG32(mmHDP_DEBUG0, 1);
 		RREG32(mmHDP_DEBUG0);
@@ -1344,6 +1380,7 @@ static void vi_invalidate_hdp(struct amdgpu_device *adev,
 
 static bool vi_need_full_reset(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_CARRIZO:
 	case CHIP_STONEY:
@@ -1366,6 +1403,7 @@ static bool vi_need_full_reset(struct amdgpu_device *adev)
 static void vi_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 			      uint64_t *count1)
 {
+    pr_info("vi: called %s\n", __func__);
 	uint32_t perfctr = 0;
 	uint64_t cnt0_of, cnt1_of;
 	int tmp;
@@ -1411,6 +1449,7 @@ static void vi_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 
 static uint64_t vi_get_pcie_replay_count(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	uint64_t nak_r, nak_g;
 
 	/* Get the number of NAKs received and generated */
@@ -1423,6 +1462,7 @@ static uint64_t vi_get_pcie_replay_count(struct amdgpu_device *adev)
 
 static bool vi_need_reset_on_init(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	u32 clock_cntl, pc;
 
 	if (adev->flags & AMD_IS_APU)
@@ -1440,6 +1480,7 @@ static bool vi_need_reset_on_init(struct amdgpu_device *adev)
 
 static void vi_pre_asic_init(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 }
 
 static const struct amdgpu_asic_funcs vi_asic_funcs =
@@ -1471,6 +1512,7 @@ static const struct amdgpu_asic_funcs vi_asic_funcs =
 
 static int vi_common_early_init(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (adev->flags & AMD_IS_APU) {
@@ -1695,6 +1737,7 @@ static int vi_common_early_init(void *handle)
 
 static int vi_common_late_init(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1705,6 +1748,7 @@ static int vi_common_late_init(void *handle)
 
 static int vi_common_sw_init(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1715,11 +1759,13 @@ static int vi_common_sw_init(void *handle)
 
 static int vi_common_sw_fini(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	return 0;
 }
 
 static int vi_common_hw_init(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* move the golden regs per IP block */
@@ -1736,6 +1782,7 @@ static int vi_common_hw_init(void *handle)
 
 static int vi_common_hw_fini(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* enable the doorbell aperture */
@@ -1749,6 +1796,7 @@ static int vi_common_hw_fini(void *handle)
 
 static int vi_common_suspend(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return vi_common_hw_fini(adev);
@@ -1756,6 +1804,7 @@ static int vi_common_suspend(void *handle)
 
 static int vi_common_resume(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return vi_common_hw_init(adev);
@@ -1763,22 +1812,26 @@ static int vi_common_resume(void *handle)
 
 static bool vi_common_is_idle(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	return true;
 }
 
 static int vi_common_wait_for_idle(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	return 0;
 }
 
 static int vi_common_soft_reset(void *handle)
 {
+    pr_info("vi: called %s\n", __func__);
 	return 0;
 }
 
 static void vi_update_bif_medium_grain_light_sleep(struct amdgpu_device *adev,
 						   bool enable)
 {
+    pr_info("vi: called %s\n", __func__);
 	uint32_t temp, data;
 
 	temp = data = RREG32_PCIE(ixPCIE_CNTL2);
@@ -1799,6 +1852,7 @@ static void vi_update_bif_medium_grain_light_sleep(struct amdgpu_device *adev,
 static void vi_update_hdp_medium_grain_clock_gating(struct amdgpu_device *adev,
 						    bool enable)
 {
+    pr_info("vi: called %s\n", __func__);
 	uint32_t temp, data;
 
 	temp = data = RREG32(mmHDP_HOST_PATH_CNTL);
@@ -1815,6 +1869,7 @@ static void vi_update_hdp_medium_grain_clock_gating(struct amdgpu_device *adev,
 static void vi_update_hdp_light_sleep(struct amdgpu_device *adev,
 				      bool enable)
 {
+    pr_info("vi: called %s\n", __func__);
 	uint32_t temp, data;
 
 	temp = data = RREG32(mmHDP_MEM_POWER_LS);
@@ -1831,6 +1886,7 @@ static void vi_update_hdp_light_sleep(struct amdgpu_device *adev,
 static void vi_update_drm_light_sleep(struct amdgpu_device *adev,
 				      bool enable)
 {
+    pr_info("vi: called %s\n", __func__);
 	uint32_t temp, data;
 
 	temp = data = RREG32(0x157a);
@@ -1848,6 +1904,7 @@ static void vi_update_drm_light_sleep(struct amdgpu_device *adev,
 static void vi_update_rom_medium_grain_clock_gating(struct amdgpu_device *adev,
 						    bool enable)
 {
+    pr_info("vi: called %s\n", __func__);
 	uint32_t temp, data;
 
 	temp = data = RREG32_SMC(ixCGTT_ROM_CLK_CTRL0);
@@ -1866,6 +1923,7 @@ static void vi_update_rom_medium_grain_clock_gating(struct amdgpu_device *adev,
 static int vi_common_set_clockgating_state_by_smu(void *handle,
 					   enum amd_clockgating_state state)
 {
+    pr_info("vi: called %s\n", __func__);
 	uint32_t msg_id, pp_state = 0;
 	uint32_t pp_support_state = 0;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -1983,6 +2041,7 @@ static int vi_common_set_clockgating_state_by_smu(void *handle,
 static int vi_common_set_clockgating_state(void *handle,
 					   enum amd_clockgating_state state)
 {
+    pr_info("vi: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))
@@ -2026,11 +2085,13 @@ static int vi_common_set_clockgating_state(void *handle,
 static int vi_common_set_powergating_state(void *handle,
 					    enum amd_powergating_state state)
 {
+    pr_info("vi: called %s\n", __func__);
 	return 0;
 }
 
 static void vi_common_get_clockgating_state(void *handle, u32 *flags)
 {
+    pr_info("vi: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int data;
 
@@ -2087,11 +2148,13 @@ static const struct amdgpu_ip_block_version vi_common_ip_block =
 
 void vi_set_virt_ops(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	adev->virt.ops = &xgpu_vi_virt_ops;
 }
 
 int vi_set_ip_blocks(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_TOPAZ:
 		/* topaz has no DCE, UVD, VCE */
@@ -2217,6 +2280,7 @@ int vi_set_ip_blocks(struct amdgpu_device *adev)
 
 void legacy_doorbell_index_init(struct amdgpu_device *adev)
 {
+    pr_info("vi: called %s\n", __func__);
 	adev->doorbell_index.kiq = AMDGPU_DOORBELL_KIQ;
 	adev->doorbell_index.mec_ring0 = AMDGPU_DOORBELL_MEC_RING0;
 	adev->doorbell_index.mec_ring1 = AMDGPU_DOORBELL_MEC_RING1;

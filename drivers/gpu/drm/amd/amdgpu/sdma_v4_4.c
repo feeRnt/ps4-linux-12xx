@@ -37,6 +37,7 @@ static uint32_t sdma_v4_4_get_reg_offset(struct amdgpu_device *adev,
 					 uint32_t instance,
 					 uint32_t offset)
 {
+    pr_info("sdma_v4_4: called %s\n", __func__);
 	uint32_t sdma_base = adev->reg_offset[SDMA0_HWIP][0][0];
 
 	switch (instance) {
@@ -165,6 +166,7 @@ static void sdma_v4_4_get_ras_error_count(struct amdgpu_device *adev,
 					  uint32_t instance,
 					  uint32_t *sec_count)
 {
+    pr_info("sdma_v4_4: called %s\n", __func__);
 	uint32_t i;
 	uint32_t sec_cnt;
 
@@ -192,6 +194,7 @@ static int sdma_v4_4_query_ras_error_count(struct amdgpu_device *adev,
 					   uint32_t instance,
 					   void *ras_error_status)
 {
+    pr_info("sdma_v4_4: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 	uint32_t sec_count = 0;
 	uint32_t reg_value = 0;
@@ -231,6 +234,7 @@ static int sdma_v4_4_query_ras_error_count(struct amdgpu_device *adev,
 
 static void sdma_v4_4_reset_ras_error_count(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_4: called %s\n", __func__);
 	int i;
 	uint32_t reg_offset;
 

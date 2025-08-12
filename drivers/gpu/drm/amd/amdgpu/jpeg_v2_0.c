@@ -66,6 +66,7 @@ static int jpeg_v2_0_set_powergating_state(void *handle,
  */
 static int jpeg_v2_0_early_init(void *handle)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	adev->jpeg.num_jpeg_inst = 1;
@@ -85,6 +86,7 @@ static int jpeg_v2_0_early_init(void *handle)
  */
 static int jpeg_v2_0_sw_init(void *handle)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct amdgpu_ring *ring;
 	int r;
@@ -127,6 +129,7 @@ static int jpeg_v2_0_sw_init(void *handle)
  */
 static int jpeg_v2_0_sw_fini(void *handle)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -147,6 +150,7 @@ static int jpeg_v2_0_sw_fini(void *handle)
  */
 static int jpeg_v2_0_hw_init(void *handle)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct amdgpu_ring *ring = &adev->jpeg.inst->ring_dec;
 	int r;
@@ -170,6 +174,7 @@ static int jpeg_v2_0_hw_init(void *handle)
  */
 static int jpeg_v2_0_hw_fini(void *handle)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	cancel_delayed_work_sync(&adev->vcn.idle_work);
@@ -190,6 +195,7 @@ static int jpeg_v2_0_hw_fini(void *handle)
  */
 static int jpeg_v2_0_suspend(void *handle)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r;
 
@@ -211,6 +217,7 @@ static int jpeg_v2_0_suspend(void *handle)
  */
 static int jpeg_v2_0_resume(void *handle)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -225,6 +232,7 @@ static int jpeg_v2_0_resume(void *handle)
 
 static int jpeg_v2_0_disable_power_gating(struct amdgpu_device *adev)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	uint32_t data;
 	int r = 0;
 
@@ -251,6 +259,7 @@ static int jpeg_v2_0_disable_power_gating(struct amdgpu_device *adev)
 
 static int jpeg_v2_0_enable_power_gating(struct amdgpu_device *adev)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	if (adev->pg_flags & AMD_PG_SUPPORT_JPEG) {
 		uint32_t data;
 		int r = 0;
@@ -278,6 +287,7 @@ static int jpeg_v2_0_enable_power_gating(struct amdgpu_device *adev)
 
 static void jpeg_v2_0_disable_clock_gating(struct amdgpu_device *adev)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	uint32_t data;
 
 	data = RREG32_SOC15(JPEG, 0, mmJPEG_CGC_CTRL);
@@ -301,6 +311,7 @@ static void jpeg_v2_0_disable_clock_gating(struct amdgpu_device *adev)
 
 static void jpeg_v2_0_enable_clock_gating(struct amdgpu_device *adev)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	uint32_t data;
 
 	data = RREG32_SOC15(JPEG, 0, mmJPEG_CGC_CTRL);
@@ -331,6 +342,7 @@ static void jpeg_v2_0_enable_clock_gating(struct amdgpu_device *adev)
  */
 static int jpeg_v2_0_start(struct amdgpu_device *adev)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_ring *ring = &adev->jpeg.inst->ring_dec;
 	int r;
 
@@ -380,6 +392,7 @@ static int jpeg_v2_0_start(struct amdgpu_device *adev)
  */
 static int jpeg_v2_0_stop(struct amdgpu_device *adev)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	int r;
 
 	/* reset JMI */
@@ -410,6 +423,7 @@ static int jpeg_v2_0_stop(struct amdgpu_device *adev)
  */
 static uint64_t jpeg_v2_0_dec_ring_get_rptr(struct amdgpu_ring *ring)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	return RREG32_SOC15(JPEG, 0, mmUVD_JRBC_RB_RPTR);
@@ -424,6 +438,7 @@ static uint64_t jpeg_v2_0_dec_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t jpeg_v2_0_dec_ring_get_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring->use_doorbell)
@@ -441,6 +456,7 @@ static uint64_t jpeg_v2_0_dec_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static void jpeg_v2_0_dec_ring_set_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring->use_doorbell) {
@@ -460,6 +476,7 @@ static void jpeg_v2_0_dec_ring_set_wptr(struct amdgpu_ring *ring)
  */
 void jpeg_v2_0_dec_ring_insert_start(struct amdgpu_ring *ring)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, PACKETJ(mmUVD_JRBC_EXTERNAL_REG_INTERNAL_OFFSET,
 		0, 0, PACKETJ_TYPE0));
 	amdgpu_ring_write(ring, 0x68e04);
@@ -478,6 +495,7 @@ void jpeg_v2_0_dec_ring_insert_start(struct amdgpu_ring *ring)
  */
 void jpeg_v2_0_dec_ring_insert_end(struct amdgpu_ring *ring)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, PACKETJ(mmUVD_JRBC_EXTERNAL_REG_INTERNAL_OFFSET,
 		0, 0, PACKETJ_TYPE0));
 	amdgpu_ring_write(ring, 0x68e04);
@@ -500,6 +518,7 @@ void jpeg_v2_0_dec_ring_insert_end(struct amdgpu_ring *ring)
 void jpeg_v2_0_dec_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				unsigned flags)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	WARN_ON(flags & AMDGPU_FENCE_FLAG_64BIT);
 
 	amdgpu_ring_write(ring, PACKETJ(mmUVD_JPEG_GPCOM_DATA0_INTERNAL_OFFSET,
@@ -553,6 +572,7 @@ void jpeg_v2_0_dec_ring_emit_ib(struct amdgpu_ring *ring,
 				struct amdgpu_ib *ib,
 				uint32_t flags)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
 
 	amdgpu_ring_write(ring, PACKETJ(mmUVD_LMI_JRBC_IB_VMID_INTERNAL_OFFSET,
@@ -602,6 +622,7 @@ void jpeg_v2_0_dec_ring_emit_ib(struct amdgpu_ring *ring,
 void jpeg_v2_0_dec_ring_emit_reg_wait(struct amdgpu_ring *ring, uint32_t reg,
 				uint32_t val, uint32_t mask)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	uint32_t reg_offset = (reg << 2);
 
 	amdgpu_ring_write(ring, PACKETJ(mmUVD_JRBC_RB_COND_RD_TIMER_INTERNAL_OFFSET,
@@ -629,6 +650,7 @@ void jpeg_v2_0_dec_ring_emit_reg_wait(struct amdgpu_ring *ring, uint32_t reg,
 void jpeg_v2_0_dec_ring_emit_vm_flush(struct amdgpu_ring *ring,
 				unsigned vmid, uint64_t pd_addr)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &ring->adev->vmhub[ring->funcs->vmhub];
 	uint32_t data0, data1, mask;
 
@@ -643,6 +665,7 @@ void jpeg_v2_0_dec_ring_emit_vm_flush(struct amdgpu_ring *ring,
 
 void jpeg_v2_0_dec_ring_emit_wreg(struct amdgpu_ring *ring, uint32_t reg, uint32_t val)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	uint32_t reg_offset = (reg << 2);
 
 	amdgpu_ring_write(ring,	PACKETJ(mmUVD_JRBC_EXTERNAL_REG_INTERNAL_OFFSET,
@@ -661,6 +684,7 @@ void jpeg_v2_0_dec_ring_emit_wreg(struct amdgpu_ring *ring, uint32_t reg, uint32
 
 void jpeg_v2_0_dec_ring_nop(struct amdgpu_ring *ring, uint32_t count)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	int i;
 
 	WARN_ON(ring->wptr % 2 || count % 2);
@@ -673,6 +697,7 @@ void jpeg_v2_0_dec_ring_nop(struct amdgpu_ring *ring, uint32_t count)
 
 static bool jpeg_v2_0_is_idle(void *handle)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return ((RREG32_SOC15(JPEG, 0, mmUVD_JRBC_STATUS) &
@@ -682,6 +707,7 @@ static bool jpeg_v2_0_is_idle(void *handle)
 
 static int jpeg_v2_0_wait_for_idle(void *handle)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int ret;
 
@@ -694,6 +720,7 @@ static int jpeg_v2_0_wait_for_idle(void *handle)
 static int jpeg_v2_0_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	bool enable = (state == AMD_CG_STATE_GATE);
 
@@ -711,6 +738,7 @@ static int jpeg_v2_0_set_clockgating_state(void *handle,
 static int jpeg_v2_0_set_powergating_state(void *handle,
 					enum amd_powergating_state state)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int ret;
 
@@ -733,6 +761,7 @@ static int jpeg_v2_0_set_interrupt_state(struct amdgpu_device *adev,
 					unsigned type,
 					enum amdgpu_interrupt_state state)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	return 0;
 }
 
@@ -740,6 +769,7 @@ static int jpeg_v2_0_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	DRM_DEBUG("IH: JPEG TRAP\n");
 
 	switch (entry->src_id) {
@@ -807,6 +837,7 @@ static const struct amdgpu_ring_funcs jpeg_v2_0_dec_ring_vm_funcs = {
 
 static void jpeg_v2_0_set_dec_ring_funcs(struct amdgpu_device *adev)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	adev->jpeg.inst->ring_dec.funcs = &jpeg_v2_0_dec_ring_vm_funcs;
 	DRM_INFO("JPEG decode is enabled in VM mode\n");
 }
@@ -818,6 +849,7 @@ static const struct amdgpu_irq_src_funcs jpeg_v2_0_irq_funcs = {
 
 static void jpeg_v2_0_set_irq_funcs(struct amdgpu_device *adev)
 {
+    pr_info("jpeg_v2_0: called %s\n", __func__);
 	adev->jpeg.inst->irq.num_types = 1;
 	adev->jpeg.inst->irq.funcs = &jpeg_v2_0_irq_funcs;
 }

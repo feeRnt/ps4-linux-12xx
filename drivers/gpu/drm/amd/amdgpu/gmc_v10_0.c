@@ -60,6 +60,7 @@ static int gmc_v10_0_ecc_interrupt_state(struct amdgpu_device *adev,
 					 unsigned type,
 					 enum amdgpu_interrupt_state state)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	return 0;
 }
 
@@ -68,6 +69,7 @@ gmc_v10_0_vm_fault_interrupt_state(struct amdgpu_device *adev,
 				   struct amdgpu_irq_src *src, unsigned type,
 				   enum amdgpu_interrupt_state state)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	switch (state) {
 	case AMDGPU_IRQ_STATE_DISABLE:
 		/* MM HUB */
@@ -92,6 +94,7 @@ static int gmc_v10_0_process_interrupt(struct amdgpu_device *adev,
 				       struct amdgpu_irq_src *source,
 				       struct amdgpu_iv_entry *entry)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	bool retry_fault = !!(entry->src_data[1] & 0x80);
 	bool write_fault = !!(entry->src_data[1] & 0x20);
 	struct amdgpu_vmhub *hub = &adev->vmhub[entry->vmid_src];
@@ -176,6 +179,7 @@ static const struct amdgpu_irq_src_funcs gmc_v10_0_ecc_funcs = {
 
 static void gmc_v10_0_set_irq_funcs(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	adev->gmc.vm_fault.num_types = 1;
 	adev->gmc.vm_fault.funcs = &gmc_v10_0_irq_funcs;
 
@@ -195,6 +199,7 @@ static void gmc_v10_0_set_irq_funcs(struct amdgpu_device *adev)
 static bool gmc_v10_0_use_invalidate_semaphore(struct amdgpu_device *adev,
 				       uint32_t vmhub)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	return ((vmhub == AMDGPU_MMHUB_0 ||
 		 vmhub == AMDGPU_MMHUB_1) &&
 		(!amdgpu_sriov_vf(adev)));
@@ -204,6 +209,7 @@ static bool gmc_v10_0_get_atc_vmid_pasid_mapping_info(
 					struct amdgpu_device *adev,
 					uint8_t vmid, uint16_t *p_pasid)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	uint32_t value;
 
 	value = RREG32(SOC15_REG_OFFSET(ATHUB, 0, mmATC_VMID0_PASID_MAPPING)
@@ -223,6 +229,7 @@ static bool gmc_v10_0_get_atc_vmid_pasid_mapping_info(
 static void gmc_v10_0_flush_vm_hub(struct amdgpu_device *adev, uint32_t vmid,
 				   unsigned int vmhub, uint32_t flush_type)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	bool use_semaphore = gmc_v10_0_use_invalidate_semaphore(adev, vmhub);
 	struct amdgpu_vmhub *hub = &adev->vmhub[vmhub];
 	u32 inv_req = hub->vmhub_funcs->get_invalidate_req(vmid, flush_type);
@@ -314,6 +321,7 @@ static void gmc_v10_0_flush_vm_hub(struct amdgpu_device *adev, uint32_t vmid,
 static void gmc_v10_0_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 					uint32_t vmhub, uint32_t flush_type)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	struct amdgpu_ring *ring = adev->mman.buffer_funcs_ring;
 	struct dma_fence *fence;
 	struct amdgpu_job *job;
@@ -409,6 +417,7 @@ static int gmc_v10_0_flush_gpu_tlb_pasid(struct amdgpu_device *adev,
 					uint16_t pasid, uint32_t flush_type,
 					bool all_hub)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	int vmid, i;
 	signed long r;
 	uint32_t seq;
@@ -464,6 +473,7 @@ static int gmc_v10_0_flush_gpu_tlb_pasid(struct amdgpu_device *adev,
 static uint64_t gmc_v10_0_emit_flush_gpu_tlb(struct amdgpu_ring *ring,
 					     unsigned vmid, uint64_t pd_addr)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	bool use_semaphore = gmc_v10_0_use_invalidate_semaphore(ring->adev, ring->funcs->vmhub);
 	struct amdgpu_vmhub *hub = &ring->adev->vmhub[ring->funcs->vmhub];
 	uint32_t req = hub->vmhub_funcs->get_invalidate_req(vmid, 0);
@@ -512,6 +522,7 @@ static uint64_t gmc_v10_0_emit_flush_gpu_tlb(struct amdgpu_ring *ring,
 static void gmc_v10_0_emit_pasid_mapping(struct amdgpu_ring *ring, unsigned vmid,
 					 unsigned pasid)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t reg;
 
@@ -558,6 +569,7 @@ static void gmc_v10_0_emit_pasid_mapping(struct amdgpu_ring *ring, unsigned vmid
 
 static uint64_t gmc_v10_0_map_mtype(struct amdgpu_device *adev, uint32_t flags)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	switch (flags) {
 	case AMDGPU_VM_MTYPE_DEFAULT:
 		return AMDGPU_PTE_MTYPE_NV10(MTYPE_NC);
@@ -577,6 +589,7 @@ static uint64_t gmc_v10_0_map_mtype(struct amdgpu_device *adev, uint32_t flags)
 static void gmc_v10_0_get_vm_pde(struct amdgpu_device *adev, int level,
 				 uint64_t *addr, uint64_t *flags)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	if (!(*flags & AMDGPU_PDE_PTE) && !(*flags & AMDGPU_PTE_SYSTEM))
 		*addr = amdgpu_gmc_vram_mc2pa(adev, *addr);
 	BUG_ON(*addr & 0xFFFF00000000003FULL);
@@ -601,6 +614,7 @@ static void gmc_v10_0_get_vm_pte(struct amdgpu_device *adev,
 				 struct amdgpu_bo_va_mapping *mapping,
 				 uint64_t *flags)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	*flags &= ~AMDGPU_PTE_EXECUTABLE;
 	*flags |= mapping->flags & AMDGPU_PTE_EXECUTABLE;
 
@@ -618,6 +632,7 @@ static void gmc_v10_0_get_vm_pte(struct amdgpu_device *adev,
 
 static unsigned gmc_v10_0_get_vbios_fb_size(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	u32 d1vga_control = RREG32_SOC15(DCE, 0, mmD1VGA_CONTROL);
 	unsigned size;
 
@@ -651,12 +666,14 @@ static const struct amdgpu_gmc_funcs gmc_v10_0_gmc_funcs = {
 
 static void gmc_v10_0_set_gmc_funcs(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	if (adev->gmc.gmc_funcs == NULL)
 		adev->gmc.gmc_funcs = &gmc_v10_0_gmc_funcs;
 }
 
 static void gmc_v10_0_set_umc_funcs(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_SIENNA_CICHLID:
 		adev->umc.max_ras_err_cnt_per_query = UMC_V8_7_TOTAL_CHANNEL_NUM;
@@ -674,6 +691,7 @@ static void gmc_v10_0_set_umc_funcs(struct amdgpu_device *adev)
 
 static void gmc_v10_0_set_mmhub_funcs(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_VANGOGH:
 	case CHIP_YELLOW_CARP:
@@ -687,6 +705,7 @@ static void gmc_v10_0_set_mmhub_funcs(struct amdgpu_device *adev)
 
 static void gmc_v10_0_set_gfxhub_funcs(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_SIENNA_CICHLID:
 	case CHIP_NAVY_FLOUNDER:
@@ -705,6 +724,7 @@ static void gmc_v10_0_set_gfxhub_funcs(struct amdgpu_device *adev)
 
 static int gmc_v10_0_early_init(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	gmc_v10_0_set_mmhub_funcs(adev);
@@ -725,6 +745,7 @@ static int gmc_v10_0_early_init(void *handle)
 
 static int gmc_v10_0_late_init(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r;
 
@@ -742,6 +763,7 @@ static int gmc_v10_0_late_init(void *handle)
 static void gmc_v10_0_vram_gtt_location(struct amdgpu_device *adev,
 					struct amdgpu_gmc *mc)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	u64 base = 0;
 
 	base = adev->gfxhub.funcs->get_fb_location(adev);
@@ -772,6 +794,7 @@ static void gmc_v10_0_vram_gtt_location(struct amdgpu_device *adev,
  */
 static int gmc_v10_0_mc_init(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	int r;
 
 	/* size in MB on si */
@@ -826,6 +849,7 @@ static int gmc_v10_0_mc_init(struct amdgpu_device *adev)
 
 static int gmc_v10_0_gart_init(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	int r;
 
 	if (adev->gart.bo) {
@@ -847,6 +871,7 @@ static int gmc_v10_0_gart_init(struct amdgpu_device *adev)
 
 static int gmc_v10_0_sw_init(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	int r, vram_width = 0, vram_type = 0, vram_vendor = 0;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -972,11 +997,13 @@ static int gmc_v10_0_sw_init(void *handle)
  */
 static void gmc_v10_0_gart_fini(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	amdgpu_gart_table_vram_free(adev);
 }
 
 static int gmc_v10_0_sw_fini(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	amdgpu_vm_manager_fini(adev);
@@ -989,6 +1016,7 @@ static int gmc_v10_0_sw_fini(void *handle)
 
 static void gmc_v10_0_init_golden_registers(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_NAVI10:
 	case CHIP_NAVI14:
@@ -1013,6 +1041,7 @@ static void gmc_v10_0_init_golden_registers(struct amdgpu_device *adev)
  */
 static int gmc_v10_0_gart_enable(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	int r;
 	bool value;
 
@@ -1057,6 +1086,7 @@ static int gmc_v10_0_gart_enable(struct amdgpu_device *adev)
 
 static int gmc_v10_0_hw_init(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1089,6 +1119,7 @@ static int gmc_v10_0_hw_init(void *handle)
  */
 static void gmc_v10_0_gart_disable(struct amdgpu_device *adev)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	adev->gfxhub.funcs->gart_disable(adev);
 	adev->mmhub.funcs->gart_disable(adev);
 	amdgpu_gart_table_vram_unpin(adev);
@@ -1096,6 +1127,7 @@ static void gmc_v10_0_gart_disable(struct amdgpu_device *adev)
 
 static int gmc_v10_0_hw_fini(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	gmc_v10_0_gart_disable(adev);
@@ -1114,6 +1146,7 @@ static int gmc_v10_0_hw_fini(void *handle)
 
 static int gmc_v10_0_suspend(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	gmc_v10_0_hw_fini(adev);
@@ -1123,6 +1156,7 @@ static int gmc_v10_0_suspend(void *handle)
 
 static int gmc_v10_0_resume(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1137,24 +1171,28 @@ static int gmc_v10_0_resume(void *handle)
 
 static bool gmc_v10_0_is_idle(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	/* MC is always ready in GMC v10.*/
 	return true;
 }
 
 static int gmc_v10_0_wait_for_idle(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	/* There is no need to wait for MC idle in GMC v10.*/
 	return 0;
 }
 
 static int gmc_v10_0_soft_reset(void *handle)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	return 0;
 }
 
 static int gmc_v10_0_set_clockgating_state(void *handle,
 					   enum amd_clockgating_state state)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1171,6 +1209,7 @@ static int gmc_v10_0_set_clockgating_state(void *handle,
 
 static void gmc_v10_0_get_clockgating_state(void *handle, u32 *flags)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	adev->mmhub.funcs->get_clockgating(adev, flags);
@@ -1185,6 +1224,7 @@ static void gmc_v10_0_get_clockgating_state(void *handle, u32 *flags)
 static int gmc_v10_0_set_powergating_state(void *handle,
 					   enum amd_powergating_state state)
 {
+    pr_info("gmc_v10_0: called %s\n", __func__);
 	return 0;
 }
 

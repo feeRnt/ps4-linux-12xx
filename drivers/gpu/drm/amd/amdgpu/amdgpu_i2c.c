@@ -39,6 +39,7 @@
 /* bit banging i2c */
 static int amdgpu_i2c_pre_xfer(struct i2c_adapter *i2c_adap)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	struct amdgpu_i2c_chan *i2c = i2c_get_adapdata(i2c_adap);
 	struct amdgpu_device *adev = drm_to_adev(i2c->dev);
 	struct amdgpu_i2c_bus_rec *rec = &i2c->rec;
@@ -81,6 +82,7 @@ static int amdgpu_i2c_pre_xfer(struct i2c_adapter *i2c_adap)
 
 static void amdgpu_i2c_post_xfer(struct i2c_adapter *i2c_adap)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	struct amdgpu_i2c_chan *i2c = i2c_get_adapdata(i2c_adap);
 	struct amdgpu_device *adev = drm_to_adev(i2c->dev);
 	struct amdgpu_i2c_bus_rec *rec = &i2c->rec;
@@ -100,6 +102,7 @@ static void amdgpu_i2c_post_xfer(struct i2c_adapter *i2c_adap)
 
 static int amdgpu_i2c_get_clock(void *i2c_priv)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	struct amdgpu_i2c_chan *i2c = i2c_priv;
 	struct amdgpu_device *adev = drm_to_adev(i2c->dev);
 	struct amdgpu_i2c_bus_rec *rec = &i2c->rec;
@@ -115,6 +118,7 @@ static int amdgpu_i2c_get_clock(void *i2c_priv)
 
 static int amdgpu_i2c_get_data(void *i2c_priv)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	struct amdgpu_i2c_chan *i2c = i2c_priv;
 	struct amdgpu_device *adev = drm_to_adev(i2c->dev);
 	struct amdgpu_i2c_bus_rec *rec = &i2c->rec;
@@ -129,6 +133,7 @@ static int amdgpu_i2c_get_data(void *i2c_priv)
 
 static void amdgpu_i2c_set_clock(void *i2c_priv, int clock)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	struct amdgpu_i2c_chan *i2c = i2c_priv;
 	struct amdgpu_device *adev = drm_to_adev(i2c->dev);
 	struct amdgpu_i2c_bus_rec *rec = &i2c->rec;
@@ -142,6 +147,7 @@ static void amdgpu_i2c_set_clock(void *i2c_priv, int clock)
 
 static void amdgpu_i2c_set_data(void *i2c_priv, int data)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	struct amdgpu_i2c_chan *i2c = i2c_priv;
 	struct amdgpu_device *adev = drm_to_adev(i2c->dev);
 	struct amdgpu_i2c_bus_rec *rec = &i2c->rec;
@@ -162,6 +168,7 @@ struct amdgpu_i2c_chan *amdgpu_i2c_create(struct drm_device *dev,
 					  const struct amdgpu_i2c_bus_rec *rec,
 					  const char *name)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	struct amdgpu_i2c_chan *i2c;
 	int ret;
 
@@ -219,6 +226,7 @@ out_free:
 
 void amdgpu_i2c_destroy(struct amdgpu_i2c_chan *i2c)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	if (!i2c)
 		return;
 	WARN_ON(i2c->has_aux);
@@ -229,6 +237,7 @@ void amdgpu_i2c_destroy(struct amdgpu_i2c_chan *i2c)
 /* Add the default buses */
 void amdgpu_i2c_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	if (amdgpu_hw_i2c)
 		DRM_INFO("hw_i2c forced on, you may experience display detection problems!\n");
 
@@ -238,6 +247,7 @@ void amdgpu_i2c_init(struct amdgpu_device *adev)
 /* remove all the buses */
 void amdgpu_i2c_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < AMDGPU_MAX_I2C_BUS; i++) {
@@ -253,6 +263,7 @@ void amdgpu_i2c_add(struct amdgpu_device *adev,
 		    const struct amdgpu_i2c_bus_rec *rec,
 		    const char *name)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	struct drm_device *dev = adev_to_drm(adev);
 	int i;
 
@@ -269,6 +280,7 @@ struct amdgpu_i2c_chan *
 amdgpu_i2c_lookup(struct amdgpu_device *adev,
 		  const struct amdgpu_i2c_bus_rec *i2c_bus)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < AMDGPU_MAX_I2C_BUS; i++) {
@@ -285,6 +297,7 @@ static void amdgpu_i2c_get_byte(struct amdgpu_i2c_chan *i2c_bus,
 				 u8 addr,
 				 u8 *val)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	u8 out_buf[2];
 	u8 in_buf[2];
 	struct i2c_msg msgs[] = {
@@ -319,6 +332,7 @@ static void amdgpu_i2c_put_byte(struct amdgpu_i2c_chan *i2c_bus,
 				 u8 addr,
 				 u8 val)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	uint8_t out_buf[2];
 	struct i2c_msg msg = {
 		.addr = slave_addr,
@@ -339,6 +353,7 @@ static void amdgpu_i2c_put_byte(struct amdgpu_i2c_chan *i2c_bus,
 void
 amdgpu_i2c_router_select_ddc_port(const struct amdgpu_connector *amdgpu_connector)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	u8 val = 0;
 
 	if (!amdgpu_connector->router.ddc_valid)
@@ -368,6 +383,7 @@ amdgpu_i2c_router_select_ddc_port(const struct amdgpu_connector *amdgpu_connecto
 void
 amdgpu_i2c_router_select_cd_port(const struct amdgpu_connector *amdgpu_connector)
 {
+    pr_info("amdgpu_i2c: called %s\n", __func__);
 	u8 val;
 
 	if (!amdgpu_connector->router.cd_valid)

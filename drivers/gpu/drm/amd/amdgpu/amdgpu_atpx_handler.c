@@ -74,23 +74,28 @@ struct atpx_mux {
 } __packed;
 
 bool amdgpu_has_atpx(void) {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	return amdgpu_atpx_priv.atpx_detected;
 }
 
 bool amdgpu_has_atpx_dgpu_power_cntl(void) {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	return amdgpu_atpx_priv.atpx.functions.power_cntl;
 }
 
 bool amdgpu_is_atpx_hybrid(void) {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	return amdgpu_atpx_priv.atpx.is_hybrid;
 }
 
 bool amdgpu_atpx_dgpu_req_power_for_displays(void) {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	return amdgpu_atpx_priv.atpx.dgpu_req_power_for_displays;
 }
 
 #if defined(CONFIG_ACPI)
 void *amdgpu_atpx_get_dhandle(void) {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	return amdgpu_atpx_priv.dhandle;
 }
 #endif
@@ -108,6 +113,7 @@ void *amdgpu_atpx_get_dhandle(void) {
 static union acpi_object *amdgpu_atpx_call(acpi_handle handle, int function,
 					   struct acpi_buffer *params)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	acpi_status status;
 	union acpi_object atpx_arg_elements[2];
 	struct acpi_object_list atpx_arg;
@@ -154,6 +160,7 @@ static union acpi_object *amdgpu_atpx_call(acpi_handle handle, int function,
  */
 static void amdgpu_atpx_parse_functions(struct amdgpu_atpx_functions *f, u32 mask)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	f->px_params = mask & ATPX_GET_PX_PARAMETERS_SUPPORTED;
 	f->power_cntl = mask & ATPX_POWER_CONTROL_SUPPORTED;
 	f->disp_mux_cntl = mask & ATPX_DISPLAY_MUX_CONTROL_SUPPORTED;
@@ -174,6 +181,7 @@ static void amdgpu_atpx_parse_functions(struct amdgpu_atpx_functions *f, u32 mas
  */
 static int amdgpu_atpx_validate(struct amdgpu_atpx *atpx)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	u32 valid_bits = 0;
 
 	if (atpx->functions.px_params) {
@@ -255,6 +263,7 @@ static int amdgpu_atpx_validate(struct amdgpu_atpx *atpx)
  */
 static int amdgpu_atpx_verify_interface(struct amdgpu_atpx *atpx)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	union acpi_object *info;
 	struct atpx_verify_interface output;
 	size_t size;
@@ -299,6 +308,7 @@ out:
  */
 static int amdgpu_atpx_set_discrete_state(struct amdgpu_atpx *atpx, u8 state)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	struct acpi_buffer params;
 	union acpi_object *info;
 	struct atpx_power_control input;
@@ -335,6 +345,7 @@ static int amdgpu_atpx_set_discrete_state(struct amdgpu_atpx *atpx, u8 state)
  */
 static int amdgpu_atpx_switch_disp_mux(struct amdgpu_atpx *atpx, u16 mux_id)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	struct acpi_buffer params;
 	union acpi_object *info;
 	struct atpx_mux input;
@@ -367,6 +378,7 @@ static int amdgpu_atpx_switch_disp_mux(struct amdgpu_atpx *atpx, u16 mux_id)
  */
 static int amdgpu_atpx_switch_i2c_mux(struct amdgpu_atpx *atpx, u16 mux_id)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	struct acpi_buffer params;
 	union acpi_object *info;
 	struct atpx_mux input;
@@ -399,6 +411,7 @@ static int amdgpu_atpx_switch_i2c_mux(struct amdgpu_atpx *atpx, u16 mux_id)
  */
 static int amdgpu_atpx_switch_start(struct amdgpu_atpx *atpx, u16 mux_id)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	struct acpi_buffer params;
 	union acpi_object *info;
 	struct atpx_mux input;
@@ -431,6 +444,7 @@ static int amdgpu_atpx_switch_start(struct amdgpu_atpx *atpx, u16 mux_id)
  */
 static int amdgpu_atpx_switch_end(struct amdgpu_atpx *atpx, u16 mux_id)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	struct acpi_buffer params;
 	union acpi_object *info;
 	struct atpx_mux input;
@@ -461,6 +475,7 @@ static int amdgpu_atpx_switch_end(struct amdgpu_atpx *atpx, u16 mux_id)
  */
 static int amdgpu_atpx_switchto(enum vga_switcheroo_client_id id)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	u16 gpu_id;
 
 	if (id == VGA_SWITCHEROO_IGD)
@@ -489,6 +504,7 @@ static int amdgpu_atpx_switchto(enum vga_switcheroo_client_id id)
 static int amdgpu_atpx_power_state(enum vga_switcheroo_client_id id,
 				   enum vga_switcheroo_state state)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	/* on w500 ACPI can't change intel gpu state */
 	if (id == VGA_SWITCHEROO_IGD)
 		return 0;
@@ -507,6 +523,7 @@ static int amdgpu_atpx_power_state(enum vga_switcheroo_client_id id,
  */
 static bool amdgpu_atpx_pci_probe_handle(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	acpi_handle dhandle, atpx_handle;
 	acpi_status status;
 
@@ -532,6 +549,7 @@ static bool amdgpu_atpx_pci_probe_handle(struct pci_dev *pdev)
  */
 static int amdgpu_atpx_init(void)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	int r;
 
 	/* set up the ATPX handle */
@@ -557,6 +575,7 @@ static int amdgpu_atpx_init(void)
  */
 static enum vga_switcheroo_client_id amdgpu_atpx_get_client_id(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	if (amdgpu_atpx_priv.dhandle == ACPI_HANDLE(&pdev->dev))
 		return VGA_SWITCHEROO_IGD;
 	else
@@ -582,6 +601,7 @@ static const struct amdgpu_px_quirk amdgpu_px_quirk_list[] = {
 
 static void amdgpu_atpx_get_quirks(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	const struct amdgpu_px_quirk *p = amdgpu_px_quirk_list;
 
 	/* Apply PX quirks */
@@ -605,6 +625,7 @@ static void amdgpu_atpx_get_quirks(struct pci_dev *pdev)
  */
 static bool amdgpu_atpx_detect(void)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	char acpi_method_name[255] = { 0 };
 	struct acpi_buffer buffer = {sizeof(acpi_method_name), acpi_method_name};
 	struct pci_dev *pdev = NULL;
@@ -652,6 +673,7 @@ static bool amdgpu_atpx_detect(void)
  */
 void amdgpu_register_atpx_handler(void)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	bool r;
 	enum vga_switcheroo_handler_flags_t handler_flags = 0;
 
@@ -670,5 +692,6 @@ void amdgpu_register_atpx_handler(void)
  */
 void amdgpu_unregister_atpx_handler(void)
 {
+    pr_info("amdgpu_atpx_handler: called %s\n", __func__);
 	vga_switcheroo_unregister_handler();
 }

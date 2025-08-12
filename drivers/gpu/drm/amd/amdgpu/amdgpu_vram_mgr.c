@@ -39,12 +39,14 @@ struct amdgpu_vram_reservation {
 static inline struct amdgpu_vram_mgr *
 to_vram_mgr(struct ttm_resource_manager *man)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	return container_of(man, struct amdgpu_vram_mgr, manager);
 }
 
 static inline struct amdgpu_device *
 to_amdgpu_device(struct amdgpu_vram_mgr *mgr)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	return container_of(mgr, struct amdgpu_device, mman.vram_mgr);
 }
 
@@ -59,6 +61,7 @@ to_amdgpu_device(struct amdgpu_vram_mgr *mgr)
 static ssize_t amdgpu_mem_info_vram_total_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 
@@ -76,6 +79,7 @@ static ssize_t amdgpu_mem_info_vram_total_show(struct device *dev,
 static ssize_t amdgpu_mem_info_vis_vram_total_show(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 
@@ -94,6 +98,7 @@ static ssize_t amdgpu_mem_info_vram_used_show(struct device *dev,
 					      struct device_attribute *attr,
 					      char *buf)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	struct ttm_resource_manager *man;
@@ -114,6 +119,7 @@ static ssize_t amdgpu_mem_info_vis_vram_used_show(struct device *dev,
 						  struct device_attribute *attr,
 						  char *buf)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	struct ttm_resource_manager *man;
@@ -134,6 +140,7 @@ static ssize_t amdgpu_mem_info_vram_vendor(struct device *dev,
 					   struct device_attribute *attr,
 					   char *buf)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 
@@ -198,6 +205,7 @@ const struct attribute_group amdgpu_vram_mgr_attr_group = {
 static u64 amdgpu_vram_mgr_vis_size(struct amdgpu_device *adev,
 				    struct drm_mm_node *node)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	uint64_t start = node->start << PAGE_SHIFT;
 	uint64_t end = (node->size + node->start) << PAGE_SHIFT;
 
@@ -218,6 +226,7 @@ static u64 amdgpu_vram_mgr_vis_size(struct amdgpu_device *adev,
  */
 u64 amdgpu_vram_mgr_bo_visible_size(struct amdgpu_bo *bo)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	struct ttm_resource *res = bo->tbo.resource;
 	unsigned pages = res->num_pages;
@@ -240,6 +249,7 @@ u64 amdgpu_vram_mgr_bo_visible_size(struct amdgpu_bo *bo)
 /* Commit the reservation of VRAM pages */
 static void amdgpu_vram_mgr_do_reserve(struct ttm_resource_manager *man)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct amdgpu_vram_mgr *mgr = to_vram_mgr(man);
 	struct amdgpu_device *adev = to_amdgpu_device(mgr);
 	struct drm_mm *mm = &mgr->mm;
@@ -272,6 +282,7 @@ static void amdgpu_vram_mgr_do_reserve(struct ttm_resource_manager *man)
 int amdgpu_vram_mgr_reserve_range(struct ttm_resource_manager *man,
 				  uint64_t start, uint64_t size)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct amdgpu_vram_mgr *mgr = to_vram_mgr(man);
 	struct amdgpu_vram_reservation *rsv;
 
@@ -305,6 +316,7 @@ int amdgpu_vram_mgr_reserve_range(struct ttm_resource_manager *man,
 int amdgpu_vram_mgr_query_page_status(struct ttm_resource_manager *man,
 				      uint64_t start)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct amdgpu_vram_mgr *mgr = to_vram_mgr(man);
 	struct amdgpu_vram_reservation *rsv;
 	int ret;
@@ -345,6 +357,7 @@ out:
 static void amdgpu_vram_mgr_virt_start(struct ttm_resource *mem,
 				       struct drm_mm_node *node)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	unsigned long start;
 
 	start = node->start + node->size;
@@ -370,6 +383,7 @@ static int amdgpu_vram_mgr_new(struct ttm_resource_manager *man,
 			       const struct ttm_place *place,
 			       struct ttm_resource **res)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	unsigned long lpfn, num_nodes, pages_per_node, pages_left, pages;
 	struct amdgpu_vram_mgr *mgr = to_vram_mgr(man);
 	struct amdgpu_device *adev = to_amdgpu_device(mgr);
@@ -494,6 +508,7 @@ error_sub:
 static void amdgpu_vram_mgr_del(struct ttm_resource_manager *man,
 				struct ttm_resource *res)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct ttm_range_mgr_node *node = to_ttm_range_mgr_node(res);
 	struct amdgpu_vram_mgr *mgr = to_vram_mgr(man);
 	struct amdgpu_device *adev = to_amdgpu_device(mgr);
@@ -538,6 +553,7 @@ int amdgpu_vram_mgr_alloc_sgt(struct amdgpu_device *adev,
 			      enum dma_data_direction dir,
 			      struct sg_table **sgt)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct amdgpu_res_cursor cursor;
 	struct scatterlist *sg;
 	int num_entries = 0;
@@ -618,6 +634,7 @@ void amdgpu_vram_mgr_free_sgt(struct device *dev,
 			      enum dma_data_direction dir,
 			      struct sg_table *sgt)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct scatterlist *sg;
 	int i;
 
@@ -638,6 +655,7 @@ void amdgpu_vram_mgr_free_sgt(struct device *dev,
  */
 uint64_t amdgpu_vram_mgr_usage(struct ttm_resource_manager *man)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct amdgpu_vram_mgr *mgr = to_vram_mgr(man);
 
 	return atomic64_read(&mgr->usage);
@@ -652,6 +670,7 @@ uint64_t amdgpu_vram_mgr_usage(struct ttm_resource_manager *man)
  */
 uint64_t amdgpu_vram_mgr_vis_usage(struct ttm_resource_manager *man)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct amdgpu_vram_mgr *mgr = to_vram_mgr(man);
 
 	return atomic64_read(&mgr->vis_usage);
@@ -668,6 +687,7 @@ uint64_t amdgpu_vram_mgr_vis_usage(struct ttm_resource_manager *man)
 static void amdgpu_vram_mgr_debug(struct ttm_resource_manager *man,
 				  struct drm_printer *printer)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct amdgpu_vram_mgr *mgr = to_vram_mgr(man);
 
 	spin_lock(&mgr->lock);
@@ -694,6 +714,7 @@ static const struct ttm_resource_manager_func amdgpu_vram_mgr_func = {
  */
 int amdgpu_vram_mgr_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct amdgpu_vram_mgr *mgr = &adev->mman.vram_mgr;
 	struct ttm_resource_manager *man = &mgr->manager;
 
@@ -721,6 +742,7 @@ int amdgpu_vram_mgr_init(struct amdgpu_device *adev)
  */
 void amdgpu_vram_mgr_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_vram_mgr: called %s\n", __func__);
 	struct amdgpu_vram_mgr *mgr = &adev->mman.vram_mgr;
 	struct ttm_resource_manager *man = &mgr->manager;
 	int ret;

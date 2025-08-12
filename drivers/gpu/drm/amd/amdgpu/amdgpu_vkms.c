@@ -41,6 +41,7 @@ static const u32 amdgpu_vkms_formats[] = {
 
 static enum hrtimer_restart amdgpu_vkms_vblank_simulate(struct hrtimer *timer)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct amdgpu_vkms_output *output = container_of(timer,
 							 struct amdgpu_vkms_output,
 							 vblank_hrtimer);
@@ -61,6 +62,7 @@ static enum hrtimer_restart amdgpu_vkms_vblank_simulate(struct hrtimer *timer)
 
 static int amdgpu_vkms_enable_vblank(struct drm_crtc *crtc)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = drm_crtc_index(crtc);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
@@ -78,6 +80,7 @@ static int amdgpu_vkms_enable_vblank(struct drm_crtc *crtc)
 
 static void amdgpu_vkms_disable_vblank(struct drm_crtc *crtc)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct amdgpu_vkms_output *out = drm_crtc_to_amdgpu_vkms_output(crtc);
 
 	hrtimer_cancel(&out->vblank_hrtimer);
@@ -88,6 +91,7 @@ static bool amdgpu_vkms_get_vblank_timestamp(struct drm_crtc *crtc,
 					     ktime_t *vblank_time,
 					     bool in_vblank_irq)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = crtc->index;
 	struct amdgpu_vkms_output *output = drm_crtc_to_amdgpu_vkms_output(crtc);
@@ -130,18 +134,21 @@ static const struct drm_crtc_funcs amdgpu_vkms_crtc_funcs = {
 static void amdgpu_vkms_crtc_atomic_enable(struct drm_crtc *crtc,
 					   struct drm_atomic_state *state)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	drm_crtc_vblank_on(crtc);
 }
 
 static void amdgpu_vkms_crtc_atomic_disable(struct drm_crtc *crtc,
 					    struct drm_atomic_state *state)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	drm_crtc_vblank_off(crtc);
 }
 
 static void amdgpu_vkms_crtc_atomic_flush(struct drm_crtc *crtc,
 					  struct drm_atomic_state *state)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	if (crtc->state->event) {
 		spin_lock(&crtc->dev->event_lock);
 
@@ -165,6 +172,7 @@ static const struct drm_crtc_helper_funcs amdgpu_vkms_crtc_helper_funcs = {
 static int amdgpu_vkms_crtc_init(struct drm_device *dev, struct drm_crtc *crtc,
 			  struct drm_plane *primary, struct drm_plane *cursor)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	int ret;
 
 	ret = drm_crtc_init_with_planes(dev, crtc, primary, cursor,
@@ -189,6 +197,7 @@ static const struct drm_connector_funcs amdgpu_vkms_connector_funcs = {
 
 static int amdgpu_vkms_conn_get_modes(struct drm_connector *connector)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *mode = NULL;
 	unsigned i;
@@ -246,12 +255,14 @@ static const struct drm_plane_funcs amdgpu_vkms_plane_funcs = {
 static void amdgpu_vkms_plane_atomic_update(struct drm_plane *plane,
 					    struct drm_atomic_state *old_state)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	return;
 }
 
 static int amdgpu_vkms_plane_atomic_check(struct drm_plane *plane,
 					  struct drm_atomic_state *state)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct drm_plane_state *new_plane_state = drm_atomic_get_new_plane_state(state,
 										 plane);
 	struct drm_crtc_state *crtc_state;
@@ -282,6 +293,7 @@ static int amdgpu_vkms_plane_atomic_check(struct drm_plane *plane,
 static int amdgpu_vkms_prepare_fb(struct drm_plane *plane,
 				  struct drm_plane_state *new_state)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct amdgpu_framebuffer *afb;
 	struct drm_gem_object *obj;
 	struct amdgpu_device *adev;
@@ -345,6 +357,7 @@ static int amdgpu_vkms_prepare_fb(struct drm_plane *plane,
 static void amdgpu_vkms_cleanup_fb(struct drm_plane *plane,
 				   struct drm_plane_state *old_state)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct amdgpu_bo *rbo;
 	int r;
 
@@ -374,6 +387,7 @@ static struct drm_plane *amdgpu_vkms_plane_init(struct drm_device *dev,
 						enum drm_plane_type type,
 						int index)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct drm_plane *plane;
 	int ret;
 
@@ -399,6 +413,7 @@ static struct drm_plane *amdgpu_vkms_plane_init(struct drm_device *dev,
 int amdgpu_vkms_output_init(struct drm_device *dev,
 			    struct amdgpu_vkms_output *output, int index)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct drm_connector *connector = &output->connector;
 	struct drm_encoder *encoder = &output->encoder;
 	struct drm_crtc *crtc = &output->crtc;
@@ -462,6 +477,7 @@ const struct drm_mode_config_funcs amdgpu_vkms_mode_funcs = {
 
 static int amdgpu_vkms_sw_init(void *handle)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	int r, i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -500,6 +516,7 @@ static int amdgpu_vkms_sw_init(void *handle)
 
 static int amdgpu_vkms_sw_fini(void *handle)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int i = 0;
 
@@ -518,6 +535,7 @@ static int amdgpu_vkms_sw_fini(void *handle)
 
 static int amdgpu_vkms_hw_init(void *handle)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	switch (adev->asic_type) {
@@ -565,11 +583,13 @@ static int amdgpu_vkms_hw_init(void *handle)
 
 static int amdgpu_vkms_hw_fini(void *handle)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	return 0;
 }
 
 static int amdgpu_vkms_suspend(void *handle)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r;
 
@@ -581,6 +601,7 @@ static int amdgpu_vkms_suspend(void *handle)
 
 static int amdgpu_vkms_resume(void *handle)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r;
 
@@ -592,28 +613,33 @@ static int amdgpu_vkms_resume(void *handle)
 
 static bool amdgpu_vkms_is_idle(void *handle)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	return true;
 }
 
 static int amdgpu_vkms_wait_for_idle(void *handle)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	return 0;
 }
 
 static int amdgpu_vkms_soft_reset(void *handle)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	return 0;
 }
 
 static int amdgpu_vkms_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	return 0;
 }
 
 static int amdgpu_vkms_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
+    pr_info("amdgpu_vkms: called %s\n", __func__);
 	return 0;
 }
 

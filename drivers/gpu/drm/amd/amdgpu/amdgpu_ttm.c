@@ -71,6 +71,7 @@ static int amdgpu_ttm_init_on_chip(struct amdgpu_device *adev,
 				    unsigned int type,
 				    uint64_t size_in_page)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	return ttm_range_man_init(&adev->mman.bdev, type,
 				  false, size_in_page);
 }
@@ -86,6 +87,7 @@ static int amdgpu_ttm_init_on_chip(struct amdgpu_device *adev,
 static void amdgpu_evict_flags(struct ttm_buffer_object *bo,
 				struct ttm_placement *placement)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->bdev);
 	struct amdgpu_bo *abo;
 	static const struct ttm_place placements = {
@@ -191,6 +193,7 @@ static int amdgpu_ttm_map_buffer(struct ttm_buffer_object *bo,
 				 struct amdgpu_ring *ring, bool tmz,
 				 uint64_t *addr)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct amdgpu_job *job;
 	unsigned num_dw, num_bytes;
@@ -302,6 +305,7 @@ int amdgpu_ttm_copy_mem_to_mem(struct amdgpu_device *adev,
 			       struct dma_resv *resv,
 			       struct dma_fence **f)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	const uint32_t GTT_MAX_BYTES = (AMDGPU_GTT_MAX_TRANSFER_SIZE *
 					AMDGPU_GPU_PAGE_SIZE);
 
@@ -376,6 +380,7 @@ static int amdgpu_move_blit(struct ttm_buffer_object *bo,
 			    struct ttm_resource *new_mem,
 			    struct ttm_resource *old_mem)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->bdev);
 	struct amdgpu_bo *abo = ttm_to_amdgpu_bo(bo);
 	struct amdgpu_copy_mem src, dst;
@@ -434,6 +439,7 @@ error:
 static bool amdgpu_mem_visible(struct amdgpu_device *adev,
 			       struct ttm_resource *mem)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	uint64_t mem_size = (u64)mem->num_pages << PAGE_SHIFT;
 	struct amdgpu_res_cursor cursor;
 
@@ -462,6 +468,7 @@ static int amdgpu_bo_move(struct ttm_buffer_object *bo, bool evict,
 			  struct ttm_resource *new_mem,
 			  struct ttm_place *hop)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev;
 	struct amdgpu_bo *abo;
 	struct ttm_resource *old_mem = bo->resource;
@@ -569,6 +576,7 @@ out:
 static int amdgpu_ttm_io_mem_reserve(struct ttm_device *bdev,
 				     struct ttm_resource *mem)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	size_t bus_size = (size_t)mem->num_pages << PAGE_SHIFT;
 
@@ -602,6 +610,7 @@ static int amdgpu_ttm_io_mem_reserve(struct ttm_device *bdev,
 static unsigned long amdgpu_ttm_io_mem_pfn(struct ttm_buffer_object *bo,
 					   unsigned long page_offset)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->bdev);
 	struct amdgpu_res_cursor cursor;
 
@@ -621,6 +630,7 @@ static unsigned long amdgpu_ttm_io_mem_pfn(struct ttm_buffer_object *bo,
 
 uint64_t amdgpu_ttm_domain_start(struct amdgpu_device *adev, uint32_t type)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	switch (type) {
 	case TTM_PL_TT:
 		return adev->gmc.gart_start;
@@ -657,6 +667,7 @@ struct amdgpu_ttm_tt {
  */
 int amdgpu_ttm_tt_get_user_pages(struct amdgpu_bo *bo, struct page **pages)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct ttm_tt *ttm = bo->tbo.ttm;
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	unsigned long start = gtt->userptr;
@@ -709,6 +720,7 @@ out_unlock:
  */
 bool amdgpu_ttm_tt_get_user_pages_done(struct ttm_tt *ttm)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	bool r = false;
 
@@ -743,6 +755,7 @@ bool amdgpu_ttm_tt_get_user_pages_done(struct ttm_tt *ttm)
  */
 void amdgpu_ttm_tt_set_user_pages(struct ttm_tt *ttm, struct page **pages)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	unsigned long i;
 
 	for (i = 0; i < ttm->num_pages; ++i)
@@ -757,6 +770,7 @@ void amdgpu_ttm_tt_set_user_pages(struct ttm_tt *ttm, struct page **pages)
 static int amdgpu_ttm_tt_pin_userptr(struct ttm_device *bdev,
 				     struct ttm_tt *ttm)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	int write = !(gtt->userflags & AMDGPU_GEM_USERPTR_READONLY);
@@ -794,6 +808,7 @@ release_sg:
 static void amdgpu_ttm_tt_unpin_userptr(struct ttm_device *bdev,
 					struct ttm_tt *ttm)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	int write = !(gtt->userflags & AMDGPU_GEM_USERPTR_READONLY);
@@ -827,6 +842,7 @@ static int amdgpu_ttm_gart_bind(struct amdgpu_device *adev,
 				struct ttm_buffer_object *tbo,
 				uint64_t flags)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_bo *abo = ttm_to_amdgpu_bo(tbo);
 	struct ttm_tt *ttm = tbo->ttm;
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
@@ -877,6 +893,7 @@ static int amdgpu_ttm_backend_bind(struct ttm_device *bdev,
 				   struct ttm_tt *ttm,
 				   struct ttm_resource *bo_mem)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void*)ttm;
 	uint64_t flags;
@@ -952,6 +969,7 @@ static int amdgpu_ttm_backend_bind(struct ttm_device *bdev,
  */
 int amdgpu_ttm_alloc_gart(struct ttm_buffer_object *bo)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->bdev);
 	struct ttm_operation_ctx ctx = { false, false };
 	struct amdgpu_ttm_tt *gtt = (void *)bo->ttm;
@@ -1010,6 +1028,7 @@ int amdgpu_ttm_alloc_gart(struct ttm_buffer_object *bo)
  */
 int amdgpu_ttm_recover_gart(struct ttm_buffer_object *tbo)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(tbo->bdev);
 	uint64_t flags;
 	int r;
@@ -1032,6 +1051,7 @@ int amdgpu_ttm_recover_gart(struct ttm_buffer_object *tbo)
 static void amdgpu_ttm_backend_unbind(struct ttm_device *bdev,
 				      struct ttm_tt *ttm)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	int r;
@@ -1064,6 +1084,7 @@ static void amdgpu_ttm_backend_unbind(struct ttm_device *bdev,
 static void amdgpu_ttm_backend_destroy(struct ttm_device *bdev,
 				       struct ttm_tt *ttm)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 
 	amdgpu_ttm_backend_unbind(bdev, ttm);
@@ -1086,6 +1107,7 @@ static void amdgpu_ttm_backend_destroy(struct ttm_device *bdev,
 static struct ttm_tt *amdgpu_ttm_tt_create(struct ttm_buffer_object *bo,
 					   uint32_t page_flags)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_bo *abo = ttm_to_amdgpu_bo(bo);
 	struct amdgpu_ttm_tt *gtt;
 	enum ttm_caching caching;
@@ -1119,6 +1141,7 @@ static int amdgpu_ttm_tt_populate(struct ttm_device *bdev,
 				  struct ttm_tt *ttm,
 				  struct ttm_operation_ctx *ctx)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bdev);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 
@@ -1145,6 +1168,7 @@ static int amdgpu_ttm_tt_populate(struct ttm_device *bdev,
 static void amdgpu_ttm_tt_unpopulate(struct ttm_device *bdev,
 				     struct ttm_tt *ttm)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	struct amdgpu_device *adev;
 
@@ -1176,6 +1200,7 @@ static void amdgpu_ttm_tt_unpopulate(struct ttm_device *bdev,
 int amdgpu_ttm_tt_set_userptr(struct ttm_buffer_object *bo,
 			      uint64_t addr, uint32_t flags)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_ttm_tt *gtt;
 
 	if (!bo->ttm) {
@@ -1205,6 +1230,7 @@ int amdgpu_ttm_tt_set_userptr(struct ttm_buffer_object *bo,
  */
 struct mm_struct *amdgpu_ttm_tt_get_usermm(struct ttm_tt *ttm)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 
 	if (gtt == NULL)
@@ -1224,6 +1250,7 @@ struct mm_struct *amdgpu_ttm_tt_get_usermm(struct ttm_tt *ttm)
 bool amdgpu_ttm_tt_affect_userptr(struct ttm_tt *ttm, unsigned long start,
 				  unsigned long end)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 	unsigned long size;
 
@@ -1245,6 +1272,7 @@ bool amdgpu_ttm_tt_affect_userptr(struct ttm_tt *ttm, unsigned long start,
  */
 bool amdgpu_ttm_tt_is_userptr(struct ttm_tt *ttm)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 
 	if (gtt == NULL || !gtt->userptr)
@@ -1258,6 +1286,7 @@ bool amdgpu_ttm_tt_is_userptr(struct ttm_tt *ttm)
  */
 bool amdgpu_ttm_tt_is_readonly(struct ttm_tt *ttm)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_ttm_tt *gtt = (void *)ttm;
 
 	if (gtt == NULL)
@@ -1276,6 +1305,7 @@ bool amdgpu_ttm_tt_is_readonly(struct ttm_tt *ttm)
  */
 uint64_t amdgpu_ttm_tt_pde_flags(struct ttm_tt *ttm, struct ttm_resource *mem)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	uint64_t flags = 0;
 
 	if (mem && mem->mem_type != TTM_PL_SYSTEM)
@@ -1308,6 +1338,7 @@ uint64_t amdgpu_ttm_tt_pde_flags(struct ttm_tt *ttm, struct ttm_resource *mem)
 uint64_t amdgpu_ttm_tt_pte_flags(struct amdgpu_device *adev, struct ttm_tt *ttm,
 				 struct ttm_resource *mem)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	uint64_t flags = amdgpu_ttm_tt_pde_flags(ttm, mem);
 
 	flags |= adev->gart.gart_pte_flags;
@@ -1331,6 +1362,7 @@ uint64_t amdgpu_ttm_tt_pte_flags(struct amdgpu_device *adev, struct ttm_tt *ttm,
 static bool amdgpu_ttm_bo_eviction_valuable(struct ttm_buffer_object *bo,
 					    const struct ttm_place *place)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	unsigned long num_pages = bo->resource->num_pages;
 	struct amdgpu_res_cursor cursor;
 	struct dma_resv_list *flist;
@@ -1399,6 +1431,7 @@ static bool amdgpu_ttm_bo_eviction_valuable(struct ttm_buffer_object *bo,
 static void amdgpu_ttm_vram_mm_access(struct amdgpu_device *adev, loff_t pos,
 				      void *buf, size_t size, bool write)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	while (size) {
 		uint64_t aligned_pos = ALIGN_DOWN(pos, 4);
 		uint64_t bytes = 4 - (pos & 0x3);
@@ -1447,6 +1480,7 @@ static int amdgpu_ttm_access_memory(struct ttm_buffer_object *bo,
 				    unsigned long offset, void *buf, int len,
 				    int write)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_bo *abo = ttm_to_amdgpu_bo(bo);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(abo->tbo.bdev);
 	struct amdgpu_res_cursor cursor;
@@ -1480,6 +1514,7 @@ static int amdgpu_ttm_access_memory(struct ttm_buffer_object *bo,
 static void
 amdgpu_bo_delete_mem_notify(struct ttm_buffer_object *bo)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	amdgpu_bo_move_notify(bo, false, NULL);
 }
 
@@ -1511,6 +1546,7 @@ static struct ttm_device_funcs amdgpu_bo_driver = {
  */
 static void amdgpu_ttm_fw_reserve_vram_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	amdgpu_bo_free_kernel(&adev->mman.fw_vram_usage_reserved_bo,
 		NULL, &adev->mman.fw_vram_usage_va);
 }
@@ -1524,6 +1560,7 @@ static void amdgpu_ttm_fw_reserve_vram_fini(struct amdgpu_device *adev)
  */
 static int amdgpu_ttm_fw_reserve_vram_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	uint64_t vram_size = adev->gmc.visible_vram_size;
 
 	adev->mman.fw_vram_usage_va = NULL;
@@ -1554,6 +1591,7 @@ static int amdgpu_ttm_fw_reserve_vram_init(struct amdgpu_device *adev)
  */
 static int amdgpu_ttm_training_reserve_vram_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct psp_memory_training_context *ctx = &adev->psp.mem_train_ctx;
 
 	ctx->init = PSP_MEM_TRAIN_NOT_SUPPORT;
@@ -1565,6 +1603,7 @@ static int amdgpu_ttm_training_reserve_vram_fini(struct amdgpu_device *adev)
 
 static void amdgpu_ttm_training_data_block_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct psp_memory_training_context *ctx = &adev->psp.mem_train_ctx;
 
 	memset(ctx, 0, sizeof(*ctx));
@@ -1588,6 +1627,7 @@ static void amdgpu_ttm_training_data_block_init(struct amdgpu_device *adev)
  */
 static int amdgpu_ttm_reserve_tmr(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	int ret;
 	struct psp_memory_training_context *ctx = &adev->psp.mem_train_ctx;
 	bool mem_train_support = false;
@@ -1654,6 +1694,7 @@ static int amdgpu_ttm_reserve_tmr(struct amdgpu_device *adev)
  */
 int amdgpu_ttm_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	uint64_t gtt_size;
 	int r;
 	u64 vis_vram_limit;
@@ -1803,6 +1844,7 @@ int amdgpu_ttm_init(struct amdgpu_device *adev)
  */
 void amdgpu_ttm_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	if (!adev->mman.initialized)
 		return;
 
@@ -1839,6 +1881,7 @@ void amdgpu_ttm_fini(struct amdgpu_device *adev)
  */
 void amdgpu_ttm_set_buffer_funcs_status(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct ttm_resource_manager *man = ttm_manager_type(&adev->mman.bdev, TTM_PL_VRAM);
 	uint64_t size;
 	int r;
@@ -1882,6 +1925,7 @@ int amdgpu_copy_buffer(struct amdgpu_ring *ring, uint64_t src_offset,
 		       struct dma_fence **fence, bool direct_submit,
 		       bool vm_needs_flush, bool tmz)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	enum amdgpu_ib_pool_type pool = direct_submit ? AMDGPU_IB_POOL_DIRECT :
 		AMDGPU_IB_POOL_DELAYED;
 	struct amdgpu_device *adev = ring->adev;
@@ -1954,6 +1998,7 @@ int amdgpu_fill_buffer(struct amdgpu_bo *bo,
 		       struct dma_resv *resv,
 		       struct dma_fence **fence)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	uint32_t max_bytes = adev->mman.buffer_funcs->fill_max_bytes;
 	struct amdgpu_ring *ring = adev->mman.buffer_funcs_ring;
@@ -2040,6 +2085,7 @@ error_free:
 
 static int amdgpu_mm_vram_table_show(struct seq_file *m, void *unused)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	struct ttm_resource_manager *man = ttm_manager_type(&adev->mman.bdev,
 							    TTM_PL_VRAM);
@@ -2051,6 +2097,7 @@ static int amdgpu_mm_vram_table_show(struct seq_file *m, void *unused)
 
 static int amdgpu_ttm_page_pool_show(struct seq_file *m, void *unused)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 
 	return ttm_pool_debugfs(&adev->mman.bdev.pool, m);
@@ -2058,6 +2105,7 @@ static int amdgpu_ttm_page_pool_show(struct seq_file *m, void *unused)
 
 static int amdgpu_mm_tt_table_show(struct seq_file *m, void *unused)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	struct ttm_resource_manager *man = ttm_manager_type(&adev->mman.bdev,
 							    TTM_PL_TT);
@@ -2069,6 +2117,7 @@ static int amdgpu_mm_tt_table_show(struct seq_file *m, void *unused)
 
 static int amdgpu_mm_gds_table_show(struct seq_file *m, void *unused)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	struct ttm_resource_manager *man = ttm_manager_type(&adev->mman.bdev,
 							    AMDGPU_PL_GDS);
@@ -2080,6 +2129,7 @@ static int amdgpu_mm_gds_table_show(struct seq_file *m, void *unused)
 
 static int amdgpu_mm_gws_table_show(struct seq_file *m, void *unused)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	struct ttm_resource_manager *man = ttm_manager_type(&adev->mman.bdev,
 							    AMDGPU_PL_GWS);
@@ -2091,6 +2141,7 @@ static int amdgpu_mm_gws_table_show(struct seq_file *m, void *unused)
 
 static int amdgpu_mm_oa_table_show(struct seq_file *m, void *unused)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	struct ttm_resource_manager *man = ttm_manager_type(&adev->mman.bdev,
 							    AMDGPU_PL_OA);
@@ -2115,6 +2166,7 @@ DEFINE_SHOW_ATTRIBUTE(amdgpu_ttm_page_pool);
 static ssize_t amdgpu_ttm_vram_read(struct file *f, char __user *buf,
 				    size_t size, loff_t *pos)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 
@@ -2150,6 +2202,7 @@ static ssize_t amdgpu_ttm_vram_read(struct file *f, char __user *buf,
 static ssize_t amdgpu_ttm_vram_write(struct file *f, const char __user *buf,
 				    size_t size, loff_t *pos)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -2198,6 +2251,7 @@ static const struct file_operations amdgpu_ttm_vram_fops = {
 static ssize_t amdgpu_iomem_read(struct file *f, char __user *buf,
 				 size_t size, loff_t *pos)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	struct iommu_domain *dom;
 	ssize_t result = 0;
@@ -2254,6 +2308,7 @@ static ssize_t amdgpu_iomem_read(struct file *f, char __user *buf,
 static ssize_t amdgpu_iomem_write(struct file *f, const char __user *buf,
 				 size_t size, loff_t *pos)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	struct iommu_domain *dom;
 	ssize_t result = 0;
@@ -2306,6 +2361,7 @@ static const struct file_operations amdgpu_ttm_iomem_fops = {
 
 void amdgpu_ttm_debugfs_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ttm: called %s\n", __func__);
 #if defined(CONFIG_DEBUG_FS)
 	struct drm_minor *minor = adev_to_drm(adev)->primary;
 	struct dentry *root = minor->debugfs_root;

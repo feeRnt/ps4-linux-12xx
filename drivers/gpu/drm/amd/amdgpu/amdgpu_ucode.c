@@ -30,6 +30,7 @@
 
 static void amdgpu_ucode_print_common_hdr(const struct common_firmware_header *hdr)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	DRM_DEBUG("size_bytes: %u\n", le32_to_cpu(hdr->size_bytes));
 	DRM_DEBUG("header_size_bytes: %u\n", le32_to_cpu(hdr->header_size_bytes));
 	DRM_DEBUG("header_version_major: %u\n", le16_to_cpu(hdr->header_version_major));
@@ -45,6 +46,7 @@ static void amdgpu_ucode_print_common_hdr(const struct common_firmware_header *h
 
 void amdgpu_ucode_print_mc_hdr(const struct common_firmware_header *hdr)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	uint16_t version_major = le16_to_cpu(hdr->header_version_major);
 	uint16_t version_minor = le16_to_cpu(hdr->header_version_minor);
 
@@ -66,6 +68,7 @@ void amdgpu_ucode_print_mc_hdr(const struct common_firmware_header *hdr)
 
 void amdgpu_ucode_print_smc_hdr(const struct common_firmware_header *hdr)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	uint16_t version_major = le16_to_cpu(hdr->header_version_major);
 	uint16_t version_minor = le16_to_cpu(hdr->header_version_minor);
 	const struct smc_firmware_header_v1_0 *v1_0_hdr;
@@ -101,6 +104,7 @@ void amdgpu_ucode_print_smc_hdr(const struct common_firmware_header *hdr)
 
 void amdgpu_ucode_print_gfx_hdr(const struct common_firmware_header *hdr)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	uint16_t version_major = le16_to_cpu(hdr->header_version_major);
 	uint16_t version_minor = le16_to_cpu(hdr->header_version_minor);
 
@@ -122,6 +126,7 @@ void amdgpu_ucode_print_gfx_hdr(const struct common_firmware_header *hdr)
 
 void amdgpu_ucode_print_rlc_hdr(const struct common_firmware_header *hdr)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	uint16_t version_major = le16_to_cpu(hdr->header_version_major);
 	uint16_t version_minor = le16_to_cpu(hdr->header_version_minor);
 
@@ -217,6 +222,7 @@ void amdgpu_ucode_print_rlc_hdr(const struct common_firmware_header *hdr)
 
 void amdgpu_ucode_print_sdma_hdr(const struct common_firmware_header *hdr)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	uint16_t version_major = le16_to_cpu(hdr->header_version_major);
 	uint16_t version_minor = le16_to_cpu(hdr->header_version_minor);
 
@@ -246,6 +252,7 @@ void amdgpu_ucode_print_sdma_hdr(const struct common_firmware_header *hdr)
 
 void amdgpu_ucode_print_psp_hdr(const struct common_firmware_header *hdr)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	uint16_t version_major = le16_to_cpu(hdr->header_version_major);
 	uint16_t version_minor = le16_to_cpu(hdr->header_version_minor);
 
@@ -320,6 +327,7 @@ void amdgpu_ucode_print_psp_hdr(const struct common_firmware_header *hdr)
 
 void amdgpu_ucode_print_gpu_info_hdr(const struct common_firmware_header *hdr)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	uint16_t version_major = le16_to_cpu(hdr->header_version_major);
 	uint16_t version_minor = le16_to_cpu(hdr->header_version_minor);
 
@@ -341,6 +349,7 @@ void amdgpu_ucode_print_gpu_info_hdr(const struct common_firmware_header *hdr)
 
 int amdgpu_ucode_validate(const struct firmware *fw)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	const struct common_firmware_header *hdr =
 		(const struct common_firmware_header *)fw->data;
 
@@ -353,6 +362,7 @@ int amdgpu_ucode_validate(const struct firmware *fw)
 bool amdgpu_ucode_hdr_version(union amdgpu_firmware_header *hdr,
 				uint16_t hdr_major, uint16_t hdr_minor)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	if ((hdr->common.header_version_major == hdr_major) &&
 		(hdr->common.header_version_minor == hdr_minor))
 		return false;
@@ -362,6 +372,7 @@ bool amdgpu_ucode_hdr_version(union amdgpu_firmware_header *hdr,
 enum amdgpu_firmware_load_type
 amdgpu_ucode_get_load_type(struct amdgpu_device *adev, int load_type)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	switch (adev->asic_type) {
 #ifdef CONFIG_DRM_AMDGPU_SI
 	case CHIP_TAHITI:
@@ -426,6 +437,7 @@ amdgpu_ucode_get_load_type(struct amdgpu_device *adev, int load_type)
 
 const char *amdgpu_ucode_name(enum AMDGPU_UCODE_ID ucode_id)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	switch (ucode_id) {
 	case AMDGPU_UCODE_ID_SDMA0:
 		return "SDMA0";
@@ -557,11 +569,13 @@ static const struct attribute_group fw_attr_group = {
 
 int amdgpu_ucode_sysfs_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	return sysfs_create_group(&adev->dev->kobj, &fw_attr_group);
 }
 
 void amdgpu_ucode_sysfs_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	sysfs_remove_group(&adev->dev->kobj, &fw_attr_group);
 }
 
@@ -569,6 +583,7 @@ static int amdgpu_ucode_init_single_fw(struct amdgpu_device *adev,
 				       struct amdgpu_firmware_info *ucode,
 				       uint64_t mc_addr, void *kptr)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	const struct common_firmware_header *header = NULL;
 	const struct gfx_firmware_header_v1_0 *cp_hdr = NULL;
 	const struct dmcu_firmware_header_v1_0 *dmcu_hdr = NULL;
@@ -684,6 +699,7 @@ static int amdgpu_ucode_init_single_fw(struct amdgpu_device *adev,
 static int amdgpu_ucode_patch_jt(struct amdgpu_firmware_info *ucode,
 				uint64_t mc_addr, void *kptr)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	const struct gfx_firmware_header_v1_0 *header = NULL;
 	const struct common_firmware_header *comm_hdr = NULL;
 	uint8_t *src_addr = NULL;
@@ -707,6 +723,7 @@ static int amdgpu_ucode_patch_jt(struct amdgpu_firmware_info *ucode,
 
 int amdgpu_ucode_create_bo(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	if (adev->firmware.load_type != AMDGPU_FW_LOAD_DIRECT) {
 		amdgpu_bo_create_kernel(adev, adev->firmware.fw_size, PAGE_SIZE,
 			amdgpu_sriov_vf(adev) ? AMDGPU_GEM_DOMAIN_VRAM : AMDGPU_GEM_DOMAIN_GTT,
@@ -725,6 +742,7 @@ int amdgpu_ucode_create_bo(struct amdgpu_device *adev)
 
 void amdgpu_ucode_free_bo(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	if (adev->firmware.load_type != AMDGPU_FW_LOAD_DIRECT)
 		amdgpu_bo_free_kernel(&adev->firmware.fw_buf,
 		&adev->firmware.fw_buf_mc,
@@ -733,6 +751,7 @@ void amdgpu_ucode_free_bo(struct amdgpu_device *adev)
 
 int amdgpu_ucode_init_bo(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_ucode: called %s\n", __func__);
 	uint64_t fw_offset = 0;
 	int i;
 	struct amdgpu_firmware_info *ucode = NULL;

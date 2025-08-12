@@ -41,12 +41,14 @@ enum hqd_dequeue_request_type {
 
 static inline struct amdgpu_device *get_amdgpu_device(struct kgd_dev *kgd)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	return (struct amdgpu_device *)kgd;
 }
 
 static void lock_srbm(struct kgd_dev *kgd, uint32_t mec, uint32_t pipe,
 			uint32_t queue, uint32_t vmid)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	uint32_t value = PIPEID(pipe) | MEID(mec) | VMID(vmid) | QUEUEID(queue);
 
@@ -56,6 +58,7 @@ static void lock_srbm(struct kgd_dev *kgd, uint32_t mec, uint32_t pipe,
 
 static void unlock_srbm(struct kgd_dev *kgd)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 
 	WREG32(mmSRBM_GFX_CNTL, 0);
@@ -65,6 +68,7 @@ static void unlock_srbm(struct kgd_dev *kgd)
 static void acquire_queue(struct kgd_dev *kgd, uint32_t pipe_id,
 				uint32_t queue_id)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 
 	uint32_t mec = (pipe_id / adev->gfx.mec.num_pipe_per_mec) + 1;
@@ -75,6 +79,7 @@ static void acquire_queue(struct kgd_dev *kgd, uint32_t pipe_id,
 
 static void release_queue(struct kgd_dev *kgd)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	unlock_srbm(kgd);
 }
 
@@ -84,6 +89,7 @@ static void kgd_program_sh_mem_settings(struct kgd_dev *kgd, uint32_t vmid,
 					uint32_t sh_mem_ape1_limit,
 					uint32_t sh_mem_bases)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 
 	lock_srbm(kgd, 0, 0, 0, vmid);
@@ -99,6 +105,7 @@ static void kgd_program_sh_mem_settings(struct kgd_dev *kgd, uint32_t vmid,
 static int kgd_set_pasid_vmid_mapping(struct kgd_dev *kgd, u32 pasid,
 					unsigned int vmid)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 
 	/*
@@ -125,6 +132,7 @@ static int kgd_set_pasid_vmid_mapping(struct kgd_dev *kgd, u32 pasid,
 
 static int kgd_init_interrupts(struct kgd_dev *kgd, uint32_t pipe_id)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	uint32_t mec;
 	uint32_t pipe;
@@ -144,6 +152,7 @@ static int kgd_init_interrupts(struct kgd_dev *kgd, uint32_t pipe_id)
 
 static inline uint32_t get_sdma_rlc_reg_offset(struct vi_sdma_mqd *m)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	uint32_t retval;
 
 	retval = m->sdma_engine_id * SDMA1_REGISTER_OFFSET +
@@ -157,11 +166,13 @@ static inline uint32_t get_sdma_rlc_reg_offset(struct vi_sdma_mqd *m)
 
 static inline struct vi_mqd *get_mqd(void *mqd)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	return (struct vi_mqd *)mqd;
 }
 
 static inline struct vi_sdma_mqd *get_sdma_mqd(void *mqd)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	return (struct vi_sdma_mqd *)mqd;
 }
 
@@ -170,6 +181,7 @@ static int kgd_hqd_load(struct kgd_dev *kgd, void *mqd, uint32_t pipe_id,
 			uint32_t wptr_shift, uint32_t wptr_mask,
 			struct mm_struct *mm)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct vi_mqd *m;
 	uint32_t *mqd_hqd;
@@ -244,6 +256,7 @@ static int kgd_hqd_dump(struct kgd_dev *kgd,
 			uint32_t pipe_id, uint32_t queue_id,
 			uint32_t (**dump)[2], uint32_t *n_regs)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	uint32_t i = 0, reg;
 #define HQD_N_REGS (54+4)
@@ -279,6 +292,7 @@ static int kgd_hqd_dump(struct kgd_dev *kgd,
 static int kgd_hqd_sdma_load(struct kgd_dev *kgd, void *mqd,
 			     uint32_t __user *wptr, struct mm_struct *mm)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct vi_sdma_mqd *m;
 	unsigned long end_jiffies;
@@ -335,6 +349,7 @@ static int kgd_hqd_sdma_dump(struct kgd_dev *kgd,
 			     uint32_t engine_id, uint32_t queue_id,
 			     uint32_t (**dump)[2], uint32_t *n_regs)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	uint32_t sdma_offset = engine_id * SDMA1_REGISTER_OFFSET +
 		queue_id * KFD_VI_SDMA_QUEUE_OFFSET;
@@ -370,6 +385,7 @@ static int kgd_hqd_sdma_dump(struct kgd_dev *kgd,
 static bool kgd_hqd_is_occupied(struct kgd_dev *kgd, uint64_t queue_address,
 				uint32_t pipe_id, uint32_t queue_id)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	uint32_t act;
 	bool retval = false;
@@ -391,6 +407,7 @@ static bool kgd_hqd_is_occupied(struct kgd_dev *kgd, uint64_t queue_address,
 
 static bool kgd_hqd_sdma_is_occupied(struct kgd_dev *kgd, void *mqd)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct vi_sdma_mqd *m;
 	uint32_t sdma_rlc_reg_offset;
@@ -412,6 +429,7 @@ static int kgd_hqd_destroy(struct kgd_dev *kgd, void *mqd,
 				unsigned int utimeout, uint32_t pipe_id,
 				uint32_t queue_id)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	uint32_t temp;
 	enum hqd_dequeue_request_type type;
@@ -515,6 +533,7 @@ loop:
 static int kgd_hqd_sdma_destroy(struct kgd_dev *kgd, void *mqd,
 				unsigned int utimeout)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct vi_sdma_mqd *m;
 	uint32_t sdma_rlc_reg_offset;
@@ -552,6 +571,7 @@ static int kgd_hqd_sdma_destroy(struct kgd_dev *kgd, void *mqd,
 static bool get_atc_vmid_pasid_mapping_info(struct kgd_dev *kgd,
 					uint8_t vmid, uint16_t *p_pasid)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	uint32_t value;
 	struct amdgpu_device *adev = (struct amdgpu_device *) kgd;
 
@@ -563,6 +583,7 @@ static bool get_atc_vmid_pasid_mapping_info(struct kgd_dev *kgd,
 
 static int kgd_address_watch_disable(struct kgd_dev *kgd)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	return 0;
 }
 
@@ -572,6 +593,7 @@ static int kgd_address_watch_execute(struct kgd_dev *kgd,
 					uint32_t addr_hi,
 					uint32_t addr_lo)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	return 0;
 }
 
@@ -579,6 +601,7 @@ static int kgd_wave_control_execute(struct kgd_dev *kgd,
 					uint32_t gfx_index_val,
 					uint32_t sq_cmd)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	uint32_t data = 0;
 
@@ -604,12 +627,14 @@ static uint32_t kgd_address_watch_get_offset(struct kgd_dev *kgd,
 					unsigned int watch_point_id,
 					unsigned int reg_offset)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	return 0;
 }
 
 static void set_scratch_backing_va(struct kgd_dev *kgd,
 					uint64_t va, uint32_t vmid)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *) kgd;
 
 	lock_srbm(kgd, 0, 0, 0, vmid);
@@ -620,6 +645,7 @@ static void set_scratch_backing_va(struct kgd_dev *kgd,
 static void set_vm_context_page_table_base(struct kgd_dev *kgd, uint32_t vmid,
 		uint64_t page_table_base)
 {
+    pr_info("amdgpu_amdkfd_gfx_v8: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 
 	if (!amdgpu_amdkfd_is_kfd_vmid(adev, vmid)) {

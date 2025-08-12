@@ -142,6 +142,7 @@ const char *amdgpu_asic_name[] = {
 static ssize_t amdgpu_device_get_pcie_replay_count(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	uint64_t cnt = amdgpu_asic_get_pcie_replay_count(adev);
@@ -167,6 +168,7 @@ static void amdgpu_device_get_pcie_info(struct amdgpu_device *adev);
 static ssize_t amdgpu_device_get_product_name(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 
@@ -189,6 +191,7 @@ static DEVICE_ATTR(product_name, S_IRUGO,
 static ssize_t amdgpu_device_get_product_number(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 
@@ -211,6 +214,7 @@ static DEVICE_ATTR(product_number, S_IRUGO,
 static ssize_t amdgpu_device_get_serial_number(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 
@@ -230,6 +234,7 @@ static DEVICE_ATTR(serial_number, S_IRUGO,
  */
 bool amdgpu_device_supports_px(struct drm_device *dev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
 	if ((adev->flags & AMD_IS_PX) && !amdgpu_is_atpx_hybrid())
@@ -247,6 +252,7 @@ bool amdgpu_device_supports_px(struct drm_device *dev)
  */
 bool amdgpu_device_supports_boco(struct drm_device *dev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
 	if (adev->has_pr3 ||
@@ -265,6 +271,7 @@ bool amdgpu_device_supports_boco(struct drm_device *dev)
  */
 bool amdgpu_device_supports_baco(struct drm_device *dev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
 	return amdgpu_asic_supports_baco(adev);
@@ -281,6 +288,7 @@ bool amdgpu_device_supports_baco(struct drm_device *dev)
  */
 bool amdgpu_device_supports_smart_shift(struct drm_device *dev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	return (amdgpu_device_supports_boco(dev) &&
 		amdgpu_acpi_is_power_shift_control_supported());
 }
@@ -301,6 +309,7 @@ bool amdgpu_device_supports_smart_shift(struct drm_device *dev)
 void amdgpu_device_mm_access(struct amdgpu_device *adev, loff_t pos,
 			     void *buf, size_t size, bool write)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	unsigned long flags;
 	uint32_t hi = ~0, tmp = 0;
 	uint32_t *data = buf;
@@ -345,6 +354,7 @@ void amdgpu_device_mm_access(struct amdgpu_device *adev, loff_t pos,
 size_t amdgpu_device_aper_access(struct amdgpu_device *adev, loff_t pos,
 				 void *buf, size_t size, bool write)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 #ifdef CONFIG_64BIT
 	void __iomem *addr;
 	size_t count = 0;
@@ -388,6 +398,7 @@ size_t amdgpu_device_aper_access(struct amdgpu_device *adev, loff_t pos,
 void amdgpu_device_vram_access(struct amdgpu_device *adev, loff_t pos,
 			       void *buf, size_t size, bool write)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	size_t count;
 
 	/* try to using vram apreature to access vram first */
@@ -408,6 +419,7 @@ void amdgpu_device_vram_access(struct amdgpu_device *adev, loff_t pos,
 /* Check if hw access should be skipped because of hotplug or device error */
 bool amdgpu_device_skip_hw_access(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (adev->no_hw_access)
 		return true;
 
@@ -445,6 +457,7 @@ bool amdgpu_device_skip_hw_access(struct amdgpu_device *adev)
 uint32_t amdgpu_device_rreg(struct amdgpu_device *adev,
 			    uint32_t reg, uint32_t acc_flags)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	uint32_t ret;
 
 	if (amdgpu_device_skip_hw_access(adev))
@@ -484,6 +497,7 @@ uint32_t amdgpu_device_rreg(struct amdgpu_device *adev,
  */
 uint8_t amdgpu_mm_rreg8(struct amdgpu_device *adev, uint32_t offset)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_device_skip_hw_access(adev))
 		return 0;
 
@@ -509,6 +523,7 @@ uint8_t amdgpu_mm_rreg8(struct amdgpu_device *adev, uint32_t offset)
  */
 void amdgpu_mm_wreg8(struct amdgpu_device *adev, uint32_t offset, uint8_t value)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_device_skip_hw_access(adev))
 		return;
 
@@ -532,6 +547,7 @@ void amdgpu_device_wreg(struct amdgpu_device *adev,
 			uint32_t reg, uint32_t v,
 			uint32_t acc_flags)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_device_skip_hw_access(adev))
 		return;
 
@@ -559,6 +575,7 @@ void amdgpu_device_wreg(struct amdgpu_device *adev,
 void amdgpu_mm_wreg_mmio_rlc(struct amdgpu_device *adev,
 			     uint32_t reg, uint32_t v)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_device_skip_hw_access(adev))
 		return;
 
@@ -583,6 +600,7 @@ void amdgpu_mm_wreg_mmio_rlc(struct amdgpu_device *adev,
  */
 u32 amdgpu_mm_rdoorbell(struct amdgpu_device *adev, u32 index)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_device_skip_hw_access(adev))
 		return 0;
 
@@ -606,6 +624,7 @@ u32 amdgpu_mm_rdoorbell(struct amdgpu_device *adev, u32 index)
  */
 void amdgpu_mm_wdoorbell(struct amdgpu_device *adev, u32 index, u32 v)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_device_skip_hw_access(adev))
 		return;
 
@@ -627,6 +646,7 @@ void amdgpu_mm_wdoorbell(struct amdgpu_device *adev, u32 index, u32 v)
  */
 u64 amdgpu_mm_rdoorbell64(struct amdgpu_device *adev, u32 index)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_device_skip_hw_access(adev))
 		return 0;
 
@@ -650,6 +670,7 @@ u64 amdgpu_mm_rdoorbell64(struct amdgpu_device *adev, u32 index)
  */
 void amdgpu_mm_wdoorbell64(struct amdgpu_device *adev, u32 index, u64 v)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_device_skip_hw_access(adev))
 		return;
 
@@ -674,6 +695,7 @@ u32 amdgpu_device_indirect_rreg(struct amdgpu_device *adev,
 				u32 pcie_index, u32 pcie_data,
 				u32 reg_addr)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 	void __iomem *pcie_index_offset;
@@ -705,6 +727,7 @@ u64 amdgpu_device_indirect_rreg64(struct amdgpu_device *adev,
 				  u32 pcie_index, u32 pcie_data,
 				  u32 reg_addr)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	unsigned long flags;
 	u64 r;
 	void __iomem *pcie_index_offset;
@@ -741,6 +764,7 @@ void amdgpu_device_indirect_wreg(struct amdgpu_device *adev,
 				 u32 pcie_index, u32 pcie_data,
 				 u32 reg_addr, u32 reg_data)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	unsigned long flags;
 	void __iomem *pcie_index_offset;
 	void __iomem *pcie_data_offset;
@@ -770,6 +794,7 @@ void amdgpu_device_indirect_wreg64(struct amdgpu_device *adev,
 				   u32 pcie_index, u32 pcie_data,
 				   u32 reg_addr, u64 reg_data)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	unsigned long flags;
 	void __iomem *pcie_index_offset;
 	void __iomem *pcie_data_offset;
@@ -803,6 +828,7 @@ void amdgpu_device_indirect_wreg64(struct amdgpu_device *adev,
  */
 static uint32_t amdgpu_invalid_rreg(struct amdgpu_device *adev, uint32_t reg)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	DRM_ERROR("Invalid callback to read register 0x%04X\n", reg);
 	BUG();
 	return 0;
@@ -820,6 +846,7 @@ static uint32_t amdgpu_invalid_rreg(struct amdgpu_device *adev, uint32_t reg)
  */
 static void amdgpu_invalid_wreg(struct amdgpu_device *adev, uint32_t reg, uint32_t v)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	DRM_ERROR("Invalid callback to write register 0x%04X with 0x%08X\n",
 		  reg, v);
 	BUG();
@@ -837,6 +864,7 @@ static void amdgpu_invalid_wreg(struct amdgpu_device *adev, uint32_t reg, uint32
  */
 static uint64_t amdgpu_invalid_rreg64(struct amdgpu_device *adev, uint32_t reg)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	DRM_ERROR("Invalid callback to read 64 bit register 0x%04X\n", reg);
 	BUG();
 	return 0;
@@ -854,6 +882,7 @@ static uint64_t amdgpu_invalid_rreg64(struct amdgpu_device *adev, uint32_t reg)
  */
 static void amdgpu_invalid_wreg64(struct amdgpu_device *adev, uint32_t reg, uint64_t v)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	DRM_ERROR("Invalid callback to write 64 bit register 0x%04X with 0x%08llX\n",
 		  reg, v);
 	BUG();
@@ -873,6 +902,7 @@ static void amdgpu_invalid_wreg64(struct amdgpu_device *adev, uint32_t reg, uint
 static uint32_t amdgpu_block_invalid_rreg(struct amdgpu_device *adev,
 					  uint32_t block, uint32_t reg)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	DRM_ERROR("Invalid callback to read register 0x%04X in block 0x%04X\n",
 		  reg, block);
 	BUG();
@@ -894,6 +924,7 @@ static void amdgpu_block_invalid_wreg(struct amdgpu_device *adev,
 				      uint32_t block,
 				      uint32_t reg, uint32_t v)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	DRM_ERROR("Invalid block callback to write register 0x%04X in block 0x%04X with 0x%08X\n",
 		  reg, block, v);
 	BUG();
@@ -908,6 +939,7 @@ static void amdgpu_block_invalid_wreg(struct amdgpu_device *adev,
  */
 static int amdgpu_device_asic_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	amdgpu_asic_pre_asic_init(adev);
 
 	return amdgpu_atom_asic_init(adev->mode_info.atom_context);
@@ -923,6 +955,7 @@ static int amdgpu_device_asic_init(struct amdgpu_device *adev)
  */
 static int amdgpu_device_vram_scratch_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	return amdgpu_bo_create_kernel(adev, AMDGPU_GPU_PAGE_SIZE,
 				       PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM,
 				       &adev->vram_scratch.robj,
@@ -939,6 +972,7 @@ static int amdgpu_device_vram_scratch_init(struct amdgpu_device *adev)
  */
 static void amdgpu_device_vram_scratch_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	amdgpu_bo_free_kernel(&adev->vram_scratch.robj, NULL, NULL);
 }
 
@@ -956,6 +990,7 @@ void amdgpu_device_program_register_sequence(struct amdgpu_device *adev,
 					     const u32 *registers,
 					     const u32 array_size)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	u32 tmp, reg, and_mask, or_mask;
 	int i;
 
@@ -991,6 +1026,7 @@ void amdgpu_device_program_register_sequence(struct amdgpu_device *adev,
  */
 void amdgpu_device_pci_config_reset(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	pci_write_config_dword(adev->pdev, 0x7c, AMDGPU_ASIC_RESET_DATA);
 }
 
@@ -1003,6 +1039,7 @@ void amdgpu_device_pci_config_reset(struct amdgpu_device *adev)
  */
 int amdgpu_device_pci_reset(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	return pci_reset_function(adev->pdev);
 }
 
@@ -1019,6 +1056,7 @@ int amdgpu_device_pci_reset(struct amdgpu_device *adev)
  */
 static int amdgpu_device_doorbell_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 
 	/* No doorbell on SI hardware generation */
 	if (adev->asic_type < CHIP_BONAIRE) {
@@ -1070,6 +1108,7 @@ static int amdgpu_device_doorbell_init(struct amdgpu_device *adev)
  */
 static void amdgpu_device_doorbell_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	iounmap(adev->doorbell.ptr);
 	adev->doorbell.ptr = NULL;
 }
@@ -1092,6 +1131,7 @@ static void amdgpu_device_doorbell_fini(struct amdgpu_device *adev)
  */
 static void amdgpu_device_wb_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (adev->wb.wb_obj) {
 		amdgpu_bo_free_kernel(&adev->wb.wb_obj,
 				      &adev->wb.gpu_addr,
@@ -1111,6 +1151,7 @@ static void amdgpu_device_wb_fini(struct amdgpu_device *adev)
  */
 static int amdgpu_device_wb_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int r;
 
 	if (adev->wb.wb_obj == NULL) {
@@ -1145,6 +1186,7 @@ static int amdgpu_device_wb_init(struct amdgpu_device *adev)
  */
 int amdgpu_device_wb_get(struct amdgpu_device *adev, u32 *wb)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	unsigned long offset = find_first_zero_bit(adev->wb.used, adev->wb.num_wb);
 
 	if (offset < adev->wb.num_wb) {
@@ -1166,6 +1208,7 @@ int amdgpu_device_wb_get(struct amdgpu_device *adev, u32 *wb)
  */
 void amdgpu_device_wb_free(struct amdgpu_device *adev, u32 wb)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	wb >>= 3;
 	if (wb < adev->wb.num_wb)
 		__clear_bit(wb, adev->wb.used);
@@ -1182,6 +1225,7 @@ void amdgpu_device_wb_free(struct amdgpu_device *adev, u32 wb)
  */
 int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int rbar_size = pci_rebar_bytes_to_size(adev->gmc.real_vram_size);
 	struct pci_bus *root;
 	struct resource *res;
@@ -1263,6 +1307,7 @@ int amdgpu_device_resize_fb_bar(struct amdgpu_device *adev)
  */
 bool amdgpu_device_need_post(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	uint32_t reg;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1323,6 +1368,7 @@ bool amdgpu_device_need_post(struct amdgpu_device *adev)
 static unsigned int amdgpu_device_vga_set_decode(struct pci_dev *pdev,
 		bool state)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(pci_get_drvdata(pdev));
 	amdgpu_asic_set_vga_state(adev, state);
 	if (state)
@@ -1344,6 +1390,7 @@ static unsigned int amdgpu_device_vga_set_decode(struct pci_dev *pdev,
  */
 static void amdgpu_device_check_block_size(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	/* defines number of bits in page table versus page directory,
 	 * a page is 4KB so we have 12 bits offset, minimum 9 bits in the
 	 * page table and the remaining bits are in the page directory */
@@ -1367,6 +1414,7 @@ static void amdgpu_device_check_block_size(struct amdgpu_device *adev)
  */
 static void amdgpu_device_check_vm_size(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	/* no need to check the default value */
 	if (amdgpu_vm_size == -1)
 		return;
@@ -1380,6 +1428,7 @@ static void amdgpu_device_check_vm_size(struct amdgpu_device *adev)
 
 static void amdgpu_device_check_smu_prv_buffer_size(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct sysinfo si;
 	bool is_os_64 = (sizeof(void *) == 8);
 	uint64_t total_memory;
@@ -1420,6 +1469,7 @@ def_value:
 
 static int amdgpu_device_init_apu_flags(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (!(adev->flags & AMD_IS_APU) ||
 	    adev->asic_type < CHIP_RAVEN)
 		return 0;
@@ -1464,6 +1514,7 @@ static int amdgpu_device_init_apu_flags(struct amdgpu_device *adev)
  */
 static int amdgpu_device_check_arguments(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_sched_jobs < 4) {
 		dev_warn(adev->dev, "sched jobs (%d) must be at least 4\n",
 			 amdgpu_sched_jobs);
@@ -1532,6 +1583,7 @@ static int amdgpu_device_check_arguments(struct amdgpu_device *adev)
 static void amdgpu_switcheroo_set_state(struct pci_dev *pdev,
 					enum vga_switcheroo_state state)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *dev = pci_get_drvdata(pdev);
 	int r;
 
@@ -1574,6 +1626,7 @@ static void amdgpu_switcheroo_set_state(struct pci_dev *pdev,
  */
 static bool amdgpu_switcheroo_can_switch(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *dev = pci_get_drvdata(pdev);
 
 	/*
@@ -1605,6 +1658,7 @@ int amdgpu_device_ip_set_clockgating_state(void *dev,
 					   enum amd_ip_block_type block_type,
 					   enum amd_clockgating_state state)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev = dev;
 	int i, r = 0;
 
@@ -1639,6 +1693,7 @@ int amdgpu_device_ip_set_powergating_state(void *dev,
 					   enum amd_ip_block_type block_type,
 					   enum amd_powergating_state state)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev = dev;
 	int i, r = 0;
 
@@ -1672,6 +1727,7 @@ int amdgpu_device_ip_set_powergating_state(void *dev,
 void amdgpu_device_ip_get_clockgating_state(struct amdgpu_device *adev,
 					    u32 *flags)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -1694,6 +1750,7 @@ void amdgpu_device_ip_get_clockgating_state(struct amdgpu_device *adev,
 int amdgpu_device_ip_wait_for_idle(struct amdgpu_device *adev,
 				   enum amd_ip_block_type block_type)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -1722,6 +1779,7 @@ int amdgpu_device_ip_wait_for_idle(struct amdgpu_device *adev,
 bool amdgpu_device_ip_is_idle(struct amdgpu_device *adev,
 			      enum amd_ip_block_type block_type)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -1747,6 +1805,7 @@ struct amdgpu_ip_block *
 amdgpu_device_ip_get_ip_block(struct amdgpu_device *adev,
 			      enum amd_ip_block_type type)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->num_ip_blocks; i++)
@@ -1771,6 +1830,7 @@ int amdgpu_device_ip_block_version_cmp(struct amdgpu_device *adev,
 				       enum amd_ip_block_type type,
 				       u32 major, u32 minor)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_ip_block *ip_block = amdgpu_device_ip_get_ip_block(adev, type);
 
 	if (ip_block && ((ip_block->version->major > major) ||
@@ -1793,6 +1853,7 @@ int amdgpu_device_ip_block_version_cmp(struct amdgpu_device *adev,
 int amdgpu_device_ip_block_add(struct amdgpu_device *adev,
 			       const struct amdgpu_ip_block_version *ip_block_version)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (!ip_block_version)
 		return -EINVAL;
 
@@ -1831,6 +1892,7 @@ int amdgpu_device_ip_block_add(struct amdgpu_device *adev,
  */
 static void amdgpu_device_enable_virtual_display(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	adev->enable_virtual_display = false;
 
 	if (amdgpu_virtual_display) {
@@ -1885,6 +1947,7 @@ static void amdgpu_device_enable_virtual_display(struct amdgpu_device *adev)
  */
 static int amdgpu_device_parse_gpu_info_fw(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	const char *chip_name;
 	char fw_name[40];
 	int err;
@@ -2073,6 +2136,7 @@ out:
  */
 static int amdgpu_device_ip_early_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	amdgpu_device_enable_virtual_display(adev);
@@ -2235,6 +2299,7 @@ static int amdgpu_device_ip_early_init(struct amdgpu_device *adev)
 
 static int amdgpu_device_ip_hw_init_phase1(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -2260,6 +2325,7 @@ static int amdgpu_device_ip_hw_init_phase1(struct amdgpu_device *adev)
 
 static int amdgpu_device_ip_hw_init_phase2(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -2281,6 +2347,7 @@ static int amdgpu_device_ip_hw_init_phase2(struct amdgpu_device *adev)
 
 static int amdgpu_device_fw_loading(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int r = 0;
 	int i;
 	uint32_t smu_version;
@@ -2337,6 +2404,7 @@ static int amdgpu_device_fw_loading(struct amdgpu_device *adev)
  */
 static int amdgpu_device_ip_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	r = amdgpu_ras_init(adev);
@@ -2462,6 +2530,7 @@ init_failed:
  */
 static void amdgpu_device_fill_reset_magic(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	memcpy(adev->reset_magic, adev->gart.ptr, AMDGPU_RESET_MAGIC_NUM);
 }
 
@@ -2477,6 +2546,7 @@ static void amdgpu_device_fill_reset_magic(struct amdgpu_device *adev)
  */
 static bool amdgpu_device_check_vram_lost(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (memcmp(adev->gart.ptr, adev->reset_magic,
 			AMDGPU_RESET_MAGIC_NUM))
 		return true;
@@ -2513,6 +2583,7 @@ static bool amdgpu_device_check_vram_lost(struct amdgpu_device *adev)
 int amdgpu_device_set_cg_state(struct amdgpu_device *adev,
 			       enum amd_clockgating_state state)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, j, r;
 
 	if (amdgpu_emu_mode == 1)
@@ -2549,6 +2620,7 @@ int amdgpu_device_set_cg_state(struct amdgpu_device *adev,
 int amdgpu_device_set_pg_state(struct amdgpu_device *adev,
 			       enum amd_powergating_state state)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, j, r;
 
 	if (amdgpu_emu_mode == 1)
@@ -2583,6 +2655,7 @@ int amdgpu_device_set_pg_state(struct amdgpu_device *adev,
 
 static int amdgpu_device_enable_mgpu_fan_boost(void)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_gpu_instance *gpu_ins;
 	struct amdgpu_device *adev;
 	int i, ret = 0;
@@ -2630,6 +2703,7 @@ out:
  */
 static int amdgpu_device_ip_late_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_gpu_instance *gpu_instance;
 	int i = 0, r;
 
@@ -2703,6 +2777,7 @@ static int amdgpu_device_ip_late_init(struct amdgpu_device *adev)
 
 static int amdgpu_device_ip_fini_early(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -2772,6 +2847,7 @@ static int amdgpu_device_ip_fini_early(struct amdgpu_device *adev)
  */
 static int amdgpu_device_ip_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	if (amdgpu_sriov_vf(adev) && adev->virt.ras_init_done)
@@ -2826,6 +2902,7 @@ static int amdgpu_device_ip_fini(struct amdgpu_device *adev)
  */
 static void amdgpu_device_delayed_init_work_handler(struct work_struct *work)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev =
 		container_of(work, struct amdgpu_device, delayed_init_work.work);
 	int r;
@@ -2837,6 +2914,7 @@ static void amdgpu_device_delayed_init_work_handler(struct work_struct *work)
 
 static void amdgpu_device_delay_enable_gfx_off(struct work_struct *work)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev =
 		container_of(work, struct amdgpu_device, gfx.gfx_off_delay_work.work);
 
@@ -2860,6 +2938,7 @@ static void amdgpu_device_delay_enable_gfx_off(struct work_struct *work)
  */
 static int amdgpu_device_ip_suspend_phase1(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	amdgpu_device_set_pg_state(adev, AMD_PG_STATE_UNGATE);
@@ -2901,6 +2980,7 @@ static int amdgpu_device_ip_suspend_phase1(struct amdgpu_device *adev)
  */
 static int amdgpu_device_ip_suspend_phase2(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	if (adev->in_s0ix)
@@ -2976,6 +3056,7 @@ static int amdgpu_device_ip_suspend_phase2(struct amdgpu_device *adev)
  */
 int amdgpu_device_ip_suspend(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int r;
 
 	if (amdgpu_sriov_vf(adev)) {
@@ -2996,6 +3077,7 @@ int amdgpu_device_ip_suspend(struct amdgpu_device *adev)
 
 static int amdgpu_device_ip_reinit_early_sriov(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	static enum amd_ip_block_type ip_order[] = {
@@ -3031,6 +3113,7 @@ static int amdgpu_device_ip_reinit_early_sriov(struct amdgpu_device *adev)
 
 static int amdgpu_device_ip_reinit_late_sriov(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	static enum amd_ip_block_type ip_order[] = {
@@ -3084,6 +3167,7 @@ static int amdgpu_device_ip_reinit_late_sriov(struct amdgpu_device *adev)
  */
 static int amdgpu_device_ip_resume_phase1(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -3121,6 +3205,7 @@ static int amdgpu_device_ip_resume_phase1(struct amdgpu_device *adev)
  */
 static int amdgpu_device_ip_resume_phase2(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -3157,6 +3242,7 @@ static int amdgpu_device_ip_resume_phase2(struct amdgpu_device *adev)
  */
 static int amdgpu_device_ip_resume(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_amdkfd_resume_iommu(adev);
@@ -3185,6 +3271,7 @@ static int amdgpu_device_ip_resume(struct amdgpu_device *adev)
  */
 static void amdgpu_device_detect_sriov_bios(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_sriov_vf(adev)) {
 		if (adev->is_atom_fw) {
 			if (amdgpu_atomfirmware_gpu_virtualization_supported(adev))
@@ -3209,6 +3296,7 @@ static void amdgpu_device_detect_sriov_bios(struct amdgpu_device *adev)
  */
 bool amdgpu_device_asic_has_dc_support(enum amd_asic_type asic_type)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	switch (asic_type) {
 #if defined(CONFIG_DRM_AMD_DC)
 #if defined(CONFIG_DRM_AMD_DC_SI)
@@ -3273,6 +3361,7 @@ bool amdgpu_device_asic_has_dc_support(enum amd_asic_type asic_type)
  */
 bool amdgpu_device_has_dc_support(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (amdgpu_sriov_vf(adev) || 
 	    adev->enable_virtual_display ||
 	    (adev->harvest_ip_mask & AMD_HARVEST_IP_DMU_MASK))
@@ -3283,6 +3372,7 @@ bool amdgpu_device_has_dc_support(struct amdgpu_device *adev)
 
 static void amdgpu_device_xgmi_reset_func(struct work_struct *__work)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev =
 		container_of(__work, struct amdgpu_device, xgmi_reset_work);
 	struct amdgpu_hive_info *hive = amdgpu_get_xgmi_hive(adev);
@@ -3329,6 +3419,7 @@ fail:
 
 static int amdgpu_device_get_job_timeout_settings(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	char *input = amdgpu_lockup_timeout;
 	char *timeout_setting = NULL;
 	int index = 0;
@@ -3417,6 +3508,7 @@ static const struct attribute *amdgpu_dev_attributes[] = {
 int amdgpu_device_init(struct amdgpu_device *adev,
 		       uint32_t flags)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *ddev = adev_to_drm(adev);
 	struct pci_dev *pdev = adev->pdev;
 	int r, i;
@@ -3812,6 +3904,7 @@ failed:
 
 static void amdgpu_device_unmap_mmio(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	/* Clear all CPU mappings pointing to this device */
 	unmap_mapping_range(adev->ddev.anon_inode->i_mapping, 0, 0, 1);
 
@@ -3841,6 +3934,7 @@ static void amdgpu_device_unmap_mmio(struct amdgpu_device *adev)
  */
 void amdgpu_device_fini_hw(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	dev_info(adev->dev, "amdgpu: finishing device.\n");
 	flush_delayed_work(&adev->delayed_init_work);
 	if (adev->mman.initialized) {
@@ -3886,6 +3980,7 @@ void amdgpu_device_fini_hw(struct amdgpu_device *adev)
 
 void amdgpu_device_fini_sw(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	amdgpu_fence_driver_sw_fini(adev);
 	amdgpu_device_ip_fini(adev);
 	release_firmware(adev->firmware.gpu_info_fw);
@@ -3935,6 +4030,7 @@ void amdgpu_device_fini_sw(struct amdgpu_device *adev)
  */
 int amdgpu_device_suspend(struct drm_device *dev, bool fbcon)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
 	if (dev->switch_power_state == DRM_SWITCH_POWER_OFF)
@@ -3986,6 +4082,7 @@ int amdgpu_device_suspend(struct drm_device *dev, bool fbcon)
  */
 int amdgpu_device_resume(struct drm_device *dev, bool fbcon)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	int r = 0;
 
@@ -4071,6 +4168,7 @@ int amdgpu_device_resume(struct drm_device *dev, bool fbcon)
  */
 static bool amdgpu_device_ip_check_soft_reset(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i;
 	bool asic_hang = false;
 
@@ -4107,6 +4205,7 @@ static bool amdgpu_device_ip_check_soft_reset(struct amdgpu_device *adev)
  */
 static int amdgpu_device_ip_pre_soft_reset(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r = 0;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -4134,6 +4233,7 @@ static int amdgpu_device_ip_pre_soft_reset(struct amdgpu_device *adev)
  */
 static bool amdgpu_device_ip_need_full_reset(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i;
 
 	if (amdgpu_asic_need_full_reset(adev))
@@ -4169,6 +4269,7 @@ static bool amdgpu_device_ip_need_full_reset(struct amdgpu_device *adev)
  */
 static int amdgpu_device_ip_soft_reset(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r = 0;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -4198,6 +4299,7 @@ static int amdgpu_device_ip_soft_reset(struct amdgpu_device *adev)
  */
 static int amdgpu_device_ip_post_soft_reset(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r = 0;
 
 	for (i = 0; i < adev->num_ip_blocks; i++) {
@@ -4227,6 +4329,7 @@ static int amdgpu_device_ip_post_soft_reset(struct amdgpu_device *adev)
  */
 static int amdgpu_device_recover_vram(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct dma_fence *fence = NULL, *next = NULL;
 	struct amdgpu_bo *shadow;
 	struct amdgpu_bo_vm *vmbo;
@@ -4294,6 +4397,7 @@ static int amdgpu_device_recover_vram(struct amdgpu_device *adev)
 static int amdgpu_device_reset_sriov(struct amdgpu_device *adev,
 				     bool from_hypervisor)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int r;
 
 	if (from_hypervisor)
@@ -4346,6 +4450,7 @@ error:
  */
 bool amdgpu_device_has_job_running(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i;
 	struct drm_sched_job *job;
 
@@ -4375,6 +4480,7 @@ bool amdgpu_device_has_job_running(struct amdgpu_device *adev)
  */
 bool amdgpu_device_should_recover_gpu(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (!amdgpu_device_ip_check_soft_reset(adev)) {
 		dev_info(adev->dev, "Timeout, but no hardware hang detected.\n");
 		return false;
@@ -4427,6 +4533,7 @@ disabled:
 
 int amdgpu_device_mode1_reset(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
         u32 i;
         int ret = 0;
 
@@ -4468,6 +4575,7 @@ int amdgpu_device_mode1_reset(struct amdgpu_device *adev)
 int amdgpu_device_pre_asic_reset(struct amdgpu_device *adev,
 				 struct amdgpu_reset_context *reset_context)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, j, r = 0;
 	struct amdgpu_job *job = NULL;
 	bool need_full_reset =
@@ -4544,6 +4652,7 @@ int amdgpu_device_pre_asic_reset(struct amdgpu_device *adev,
 int amdgpu_do_asic_reset(struct list_head *device_list_handle,
 			 struct amdgpu_reset_context *reset_context)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *tmp_adev = NULL;
 	bool need_full_reset, skip_hw_reset, vram_lost = false;
 	int r = 0;
@@ -4715,6 +4824,7 @@ end:
 static bool amdgpu_device_lock_adev(struct amdgpu_device *adev,
 				struct amdgpu_hive_info *hive)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	if (atomic_cmpxchg(&adev->in_gpu_reset, 0, 1) != 0)
 		return false;
 
@@ -4741,6 +4851,7 @@ static bool amdgpu_device_lock_adev(struct amdgpu_device *adev,
 
 static void amdgpu_device_unlock_adev(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	amdgpu_vf_error_trans_all(adev);
 	adev->mp1_state = PP_MP1_STATE_NONE;
 	atomic_set(&adev->in_gpu_reset, 0);
@@ -4755,6 +4866,7 @@ static void amdgpu_device_unlock_adev(struct amdgpu_device *adev)
  */
 static int amdgpu_device_lock_hive_adev(struct amdgpu_device *adev, struct amdgpu_hive_info *hive)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *tmp_adev = NULL;
 
 	if (adev->gmc.xgmi.num_physical_nodes > 1) {
@@ -4789,6 +4901,7 @@ roll_back:
 
 static void amdgpu_device_resume_display_audio(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct pci_dev *p = NULL;
 
 	p = pci_get_domain_bus_and_slot(pci_domain_nr(adev->pdev->bus),
@@ -4801,6 +4914,7 @@ static void amdgpu_device_resume_display_audio(struct amdgpu_device *adev)
 
 static int amdgpu_device_suspend_display_audio(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	enum amd_reset_method reset_method;
 	struct pci_dev *p = NULL;
 	u64 expires;
@@ -4849,6 +4963,7 @@ static void amdgpu_device_recheck_guilty_jobs(
 	struct amdgpu_device *adev, struct list_head *device_list_handle,
 	struct amdgpu_reset_context *reset_context)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i, r = 0;
 
 	for (i = 0; i < AMDGPU_MAX_RINGS; ++i) {
@@ -4927,6 +5042,7 @@ retry:
 int amdgpu_device_gpu_recover(struct amdgpu_device *adev,
 			      struct amdgpu_job *job)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct list_head device_list, *device_list_handle =  NULL;
 	bool job_signaled = false;
 	struct amdgpu_hive_info *hive = NULL;
@@ -5193,6 +5309,7 @@ skip_recovery:
  */
 static void amdgpu_device_get_pcie_info(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct pci_dev *pdev;
 	enum pci_bus_speed speed_cap, platform_speed_cap;
 	enum pcie_link_width platform_link_width;
@@ -5332,6 +5449,7 @@ static void amdgpu_device_get_pcie_info(struct amdgpu_device *adev)
 
 int amdgpu_device_baco_enter(struct drm_device *dev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
 
@@ -5347,6 +5465,7 @@ int amdgpu_device_baco_enter(struct drm_device *dev)
 
 int amdgpu_device_baco_exit(struct drm_device *dev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
 	int ret = 0;
@@ -5371,6 +5490,7 @@ int amdgpu_device_baco_exit(struct drm_device *dev)
 
 static void amdgpu_cancel_all_tdr(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < AMDGPU_MAX_RINGS; ++i) {
@@ -5394,6 +5514,7 @@ static void amdgpu_cancel_all_tdr(struct amdgpu_device *adev)
  */
 pci_ers_result_t amdgpu_pci_error_detected(struct pci_dev *pdev, pci_channel_state_t state)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *dev = pci_get_drvdata(pdev);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	int i;
@@ -5450,6 +5571,7 @@ pci_ers_result_t amdgpu_pci_error_detected(struct pci_dev *pdev, pci_channel_sta
  */
 pci_ers_result_t amdgpu_pci_mmio_enabled(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 
 	DRM_INFO("PCI error: mmio enabled callback!!\n");
 
@@ -5473,6 +5595,7 @@ pci_ers_result_t amdgpu_pci_mmio_enabled(struct pci_dev *pdev)
  */
 pci_ers_result_t amdgpu_pci_slot_reset(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *dev = pci_get_drvdata(pdev);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	int r, i;
@@ -5542,6 +5665,7 @@ out:
  */
 void amdgpu_pci_resume(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *dev = pci_get_drvdata(pdev);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	int i;
@@ -5569,6 +5693,7 @@ void amdgpu_pci_resume(struct pci_dev *pdev)
 
 bool amdgpu_device_cache_pci_state(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *dev = pci_get_drvdata(pdev);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	int r;
@@ -5593,6 +5718,7 @@ bool amdgpu_device_cache_pci_state(struct pci_dev *pdev)
 
 bool amdgpu_device_load_pci_state(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 	struct drm_device *dev = pci_get_drvdata(pdev);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	int r;
@@ -5615,6 +5741,7 @@ bool amdgpu_device_load_pci_state(struct pci_dev *pdev)
 void amdgpu_device_flush_hdp(struct amdgpu_device *adev,
 		struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 #ifdef CONFIG_X86_64
 	if (adev->flags & AMD_IS_APU)
 		return;
@@ -5631,6 +5758,7 @@ void amdgpu_device_flush_hdp(struct amdgpu_device *adev,
 void amdgpu_device_invalidate_hdp(struct amdgpu_device *adev,
 		struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_device: called %s\n", __func__);
 #ifdef CONFIG_X86_64
 	if (adev->flags & AMD_IS_APU)
 		return;

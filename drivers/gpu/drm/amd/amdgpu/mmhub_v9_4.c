@@ -38,6 +38,7 @@
 
 static u64 mmhub_v9_4_get_fb_location(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	/* The base should be same b/t 2 mmhubs on Acrturus. Read one here. */
 	u64 base = RREG32_SOC15(MMHUB, 0, mmVMSHAREDVC0_MC_VM_FB_LOCATION_BASE);
 	u64 top = RREG32_SOC15(MMHUB, 0, mmVMSHAREDVC0_MC_VM_FB_LOCATION_TOP);
@@ -57,6 +58,7 @@ static u64 mmhub_v9_4_get_fb_location(struct amdgpu_device *adev)
 static void mmhub_v9_4_setup_hubid_vm_pt_regs(struct amdgpu_device *adev, int hubid,
 				uint32_t vmid, uint64_t value)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 
 	WREG32_SOC15_OFFSET(MMHUB, 0,
@@ -74,6 +76,7 @@ static void mmhub_v9_4_setup_hubid_vm_pt_regs(struct amdgpu_device *adev, int hu
 static void mmhub_v9_4_init_gart_aperture_regs(struct amdgpu_device *adev,
 					       int hubid)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	uint64_t pt_base = amdgpu_gmc_pd_addr(adev->gart.bo);
 
 	mmhub_v9_4_setup_hubid_vm_pt_regs(adev, hubid, 0, pt_base);
@@ -100,6 +103,7 @@ static void mmhub_v9_4_init_gart_aperture_regs(struct amdgpu_device *adev,
 static void mmhub_v9_4_setup_vm_pt_regs(struct amdgpu_device *adev, uint32_t vmid,
 				uint64_t page_table_base)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < MMHUB_NUM_INSTANCES; i++)
@@ -110,6 +114,7 @@ static void mmhub_v9_4_setup_vm_pt_regs(struct amdgpu_device *adev, uint32_t vmi
 static void mmhub_v9_4_init_system_aperture_regs(struct amdgpu_device *adev,
 					         int hubid)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	uint64_t value;
 	uint32_t tmp;
 
@@ -174,6 +179,7 @@ static void mmhub_v9_4_init_system_aperture_regs(struct amdgpu_device *adev,
 
 static void mmhub_v9_4_init_tlb_regs(struct amdgpu_device *adev, int hubid)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* Setup TLB control */
@@ -200,6 +206,7 @@ static void mmhub_v9_4_init_tlb_regs(struct amdgpu_device *adev, int hubid)
 
 static void mmhub_v9_4_init_cache_regs(struct amdgpu_device *adev, int hubid)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* Setup L2 cache */
@@ -255,6 +262,7 @@ static void mmhub_v9_4_init_cache_regs(struct amdgpu_device *adev, int hubid)
 static void mmhub_v9_4_enable_system_domain(struct amdgpu_device *adev,
 					    int hubid)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	uint32_t tmp;
 
 	tmp = RREG32_SOC15_OFFSET(MMHUB, 0, mmVML2VC0_VM_CONTEXT0_CNTL,
@@ -270,6 +278,7 @@ static void mmhub_v9_4_enable_system_domain(struct amdgpu_device *adev,
 static void mmhub_v9_4_disable_identity_aperture(struct amdgpu_device *adev,
 						 int hubid)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	WREG32_SOC15_OFFSET(MMHUB, 0,
 		    mmVML2PF0_VM_L2_CONTEXT1_IDENTITY_APERTURE_LOW_ADDR_LO32,
 		    hubid * MMHUB_INSTANCE_REGISTER_OFFSET, 0XFFFFFFFF);
@@ -294,6 +303,7 @@ static void mmhub_v9_4_disable_identity_aperture(struct amdgpu_device *adev,
 
 static void mmhub_v9_4_setup_vmid_config(struct amdgpu_device *adev, int hubid)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 	uint32_t tmp;
 	int i;
@@ -355,6 +365,7 @@ static void mmhub_v9_4_setup_vmid_config(struct amdgpu_device *adev, int hubid)
 static void mmhub_v9_4_program_invalidation(struct amdgpu_device *adev,
 					    int hubid)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 	unsigned i;
 
@@ -374,6 +385,7 @@ static void mmhub_v9_4_program_invalidation(struct amdgpu_device *adev,
 
 static int mmhub_v9_4_gart_enable(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < MMHUB_NUM_INSTANCES; i++) {
@@ -396,6 +408,7 @@ static int mmhub_v9_4_gart_enable(struct amdgpu_device *adev)
 
 static void mmhub_v9_4_gart_disable(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 	u32 tmp;
 	u32 i, j;
@@ -441,6 +454,7 @@ static void mmhub_v9_4_gart_disable(struct amdgpu_device *adev)
  */
 static void mmhub_v9_4_set_fault_enable_default(struct amdgpu_device *adev, bool value)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	u32 tmp;
 	int i;
 
@@ -499,6 +513,7 @@ static void mmhub_v9_4_set_fault_enable_default(struct amdgpu_device *adev, bool
 
 static void mmhub_v9_4_init(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	struct amdgpu_vmhub *hub[MMHUB_NUM_INSTANCES] =
 		{&adev->vmhub[AMDGPU_MMHUB_0], &adev->vmhub[AMDGPU_MMHUB_1]};
 	int i;
@@ -551,6 +566,7 @@ static void mmhub_v9_4_init(struct amdgpu_device *adev)
 static void mmhub_v9_4_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 							bool enable)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	uint32_t def, data, def1, data1;
 	int i, j;
 	int dist = mmDAGB1_CNTL_MISC2 - mmDAGB0_CNTL_MISC2;
@@ -608,6 +624,7 @@ static void mmhub_v9_4_update_medium_grain_clock_gating(struct amdgpu_device *ad
 static void mmhub_v9_4_update_medium_grain_light_sleep(struct amdgpu_device *adev,
 						       bool enable)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	uint32_t def, data;
 	int i;
 
@@ -630,6 +647,7 @@ static void mmhub_v9_4_update_medium_grain_light_sleep(struct amdgpu_device *ade
 static int mmhub_v9_4_set_clockgating(struct amdgpu_device *adev,
 			       enum amd_clockgating_state state)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	if (amdgpu_sriov_vf(adev))
 		return 0;
 
@@ -649,6 +667,7 @@ static int mmhub_v9_4_set_clockgating(struct amdgpu_device *adev,
 
 static void mmhub_v9_4_get_clockgating(struct amdgpu_device *adev, u32 *flags)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	int data, data1;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1556,6 +1575,7 @@ static int mmhub_v9_4_get_ras_error_count(struct amdgpu_device *adev,
 					  uint32_t *sec_count,
 					  uint32_t *ded_count)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	uint32_t i;
 	uint32_t sec_cnt, ded_cnt;
 
@@ -1590,6 +1610,7 @@ static int mmhub_v9_4_get_ras_error_count(struct amdgpu_device *adev,
 static void mmhub_v9_4_query_ras_error_count(struct amdgpu_device *adev,
 					   void *ras_error_status)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 	uint32_t sec_count = 0, ded_count = 0;
 	uint32_t i;
@@ -1612,6 +1633,7 @@ static void mmhub_v9_4_query_ras_error_count(struct amdgpu_device *adev,
 
 static void mmhub_v9_4_reset_ras_error_count(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	uint32_t i;
 
 	/* read back edc counter registers to reset the counters to 0 */
@@ -1634,6 +1656,7 @@ static const struct soc15_reg_entry mmhub_v9_4_err_status_regs[] = {
 
 static void mmhub_v9_4_query_ras_error_status(struct amdgpu_device *adev)
 {
+    pr_info("mmhub_v9_4: called %s\n", __func__);
 	int i;
 	uint32_t reg_value;
 

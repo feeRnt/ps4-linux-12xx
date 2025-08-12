@@ -107,6 +107,7 @@ static union acpi_object *amdgpu_atif_call(struct amdgpu_atif *atif,
 					   int function,
 					   struct acpi_buffer *params)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	acpi_status status;
 	union acpi_object atif_arg_elements[2];
 	struct acpi_object_list atif_arg;
@@ -154,6 +155,7 @@ static union acpi_object *amdgpu_atif_call(struct amdgpu_atif *atif,
  */
 static void amdgpu_atif_parse_notification(struct amdgpu_atif_notifications *n, u32 mask)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	n->thermal_state = mask & ATIF_THERMAL_STATE_CHANGE_REQUEST_SUPPORTED;
 	n->forced_power_state = mask & ATIF_FORCED_POWER_STATE_CHANGE_REQUEST_SUPPORTED;
 	n->system_power_state = mask & ATIF_SYSTEM_POWER_SOURCE_CHANGE_REQUEST_SUPPORTED;
@@ -174,6 +176,7 @@ static void amdgpu_atif_parse_notification(struct amdgpu_atif_notifications *n, 
  */
 static void amdgpu_atif_parse_functions(struct amdgpu_atif_functions *f, u32 mask)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	f->system_params = mask & ATIF_GET_SYSTEM_PARAMETERS_SUPPORTED;
 	f->sbios_requests = mask & ATIF_GET_SYSTEM_BIOS_REQUESTS_SUPPORTED;
 	f->temperature_change = mask & ATIF_TEMPERATURE_CHANGE_NOTIFICATION_SUPPORTED;
@@ -195,6 +198,7 @@ static void amdgpu_atif_parse_functions(struct amdgpu_atif_functions *f, u32 mas
  */
 static int amdgpu_atif_verify_interface(struct amdgpu_atif *atif)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	union acpi_object *info;
 	struct atif_verify_interface output;
 	size_t size;
@@ -240,6 +244,7 @@ out:
  */
 static int amdgpu_atif_get_notification_params(struct amdgpu_atif *atif)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	union acpi_object *info;
 	struct amdgpu_atif_notification_cfg *n = &atif->notification_cfg;
 	struct atif_system_params params;
@@ -308,6 +313,7 @@ out:
  */
 static int amdgpu_atif_query_backlight_caps(struct amdgpu_atif *atif)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	union acpi_object *info;
 	struct atif_qbtc_output characteristics;
 	struct atif_qbtc_arguments arguments;
@@ -363,6 +369,7 @@ out:
 static int amdgpu_atif_get_sbios_requests(struct amdgpu_atif *atif,
 					  struct atif_sbios_requests *req)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	union acpi_object *info;
 	size_t size;
 	int count = 0;
@@ -405,6 +412,7 @@ out:
 static int amdgpu_atif_handler(struct amdgpu_device *adev,
 			       struct acpi_bus_event *event)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	struct amdgpu_atif *atif = &amdgpu_acpi_priv.atif;
 	int count;
 
@@ -486,6 +494,7 @@ static union acpi_object *amdgpu_atcs_call(struct amdgpu_atcs *atcs,
 					   int function,
 					   struct acpi_buffer *params)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	acpi_status status;
 	union acpi_object atcs_arg_elements[2];
 	struct acpi_object_list atcs_arg;
@@ -532,6 +541,7 @@ static union acpi_object *amdgpu_atcs_call(struct amdgpu_atcs *atcs,
  */
 static void amdgpu_atcs_parse_functions(struct amdgpu_atcs_functions *f, u32 mask)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	f->get_ext_state = mask & ATCS_GET_EXTERNAL_STATE_SUPPORTED;
 	f->pcie_perf_req = mask & ATCS_PCIE_PERFORMANCE_REQUEST_SUPPORTED;
 	f->pcie_dev_rdy = mask & ATCS_PCIE_DEVICE_READY_NOTIFICATION_SUPPORTED;
@@ -551,6 +561,7 @@ static void amdgpu_atcs_parse_functions(struct amdgpu_atcs_functions *f, u32 mas
  */
 static int amdgpu_atcs_verify_interface(struct amdgpu_atcs *atcs)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	union acpi_object *info;
 	struct atcs_verify_interface output;
 	size_t size;
@@ -593,6 +604,7 @@ out:
  */
 bool amdgpu_acpi_is_pcie_performance_request_supported(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	struct amdgpu_atcs *atcs = &amdgpu_acpi_priv.atcs;
 
 	if (atcs->functions.pcie_perf_req && atcs->functions.pcie_dev_rdy)
@@ -610,6 +622,7 @@ bool amdgpu_acpi_is_pcie_performance_request_supported(struct amdgpu_device *ade
  */
 bool amdgpu_acpi_is_power_shift_control_supported(void)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	return amdgpu_acpi_priv.atcs.functions.power_shift_control;
 }
 
@@ -624,6 +637,7 @@ bool amdgpu_acpi_is_power_shift_control_supported(void)
  */
 int amdgpu_acpi_pcie_notify_device_ready(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	union acpi_object *info;
 	struct amdgpu_atcs *atcs = &amdgpu_acpi_priv.atcs;
 
@@ -653,6 +667,7 @@ int amdgpu_acpi_pcie_notify_device_ready(struct amdgpu_device *adev)
 int amdgpu_acpi_pcie_performance_request(struct amdgpu_device *adev,
 					 u8 perf_req, bool advertise)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	union acpi_object *info;
 	struct amdgpu_atcs *atcs = &amdgpu_acpi_priv.atcs;
 	struct atcs_pref_req_input atcs_input;
@@ -729,6 +744,7 @@ int amdgpu_acpi_pcie_performance_request(struct amdgpu_device *adev,
 int amdgpu_acpi_power_shift_control(struct amdgpu_device *adev,
 				    u8 dev_state, bool drv_state)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	union acpi_object *info;
 	struct amdgpu_atcs *atcs = &amdgpu_acpi_priv.atcs;
 	struct atcs_pwr_shift_input atcs_input;
@@ -766,6 +782,7 @@ int amdgpu_acpi_power_shift_control(struct amdgpu_device *adev,
  */
 int amdgpu_acpi_smart_shift_update(struct drm_device *dev, enum amdgpu_ss ss_state)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	int r;
 
@@ -819,6 +836,7 @@ static int amdgpu_acpi_event(struct notifier_block *nb,
 			     unsigned long val,
 			     void *data)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	struct amdgpu_device *adev = container_of(nb, struct amdgpu_device, acpi_nb);
 	struct acpi_bus_event *entry = (struct acpi_bus_event *)data;
 
@@ -847,6 +865,7 @@ static int amdgpu_acpi_event(struct notifier_block *nb,
  */
 int amdgpu_acpi_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	struct amdgpu_atif *atif = &amdgpu_acpi_priv.atif;
 
 #if defined(CONFIG_BACKLIGHT_CLASS_DEVICE) || defined(CONFIG_BACKLIGHT_CLASS_DEVICE_MODULE)
@@ -885,6 +904,7 @@ int amdgpu_acpi_init(struct amdgpu_device *adev)
 
 void amdgpu_acpi_get_backlight_caps(struct amdgpu_dm_backlight_caps *caps)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	struct amdgpu_atif *atif = &amdgpu_acpi_priv.atif;
 
 	caps->caps_valid = atif->backlight_caps.caps_valid;
@@ -901,6 +921,7 @@ void amdgpu_acpi_get_backlight_caps(struct amdgpu_dm_backlight_caps *caps)
  */
 void amdgpu_acpi_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	unregister_acpi_notifier(&adev->acpi_nb);
 }
 
@@ -914,6 +935,7 @@ void amdgpu_acpi_fini(struct amdgpu_device *adev)
  */
 static bool amdgpu_atif_pci_probe_handle(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	char acpi_method_name[255] = { 0 };
 	struct acpi_buffer buffer = {sizeof(acpi_method_name), acpi_method_name};
 	acpi_handle dhandle, atif_handle;
@@ -949,6 +971,7 @@ static bool amdgpu_atif_pci_probe_handle(struct pci_dev *pdev)
  */
 static bool amdgpu_atcs_pci_probe_handle(struct pci_dev *pdev)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	char acpi_method_name[255] = { 0 };
 	struct acpi_buffer buffer = { sizeof(acpi_method_name), acpi_method_name };
 	acpi_handle dhandle, atcs_handle;
@@ -982,6 +1005,7 @@ static bool amdgpu_atcs_pci_probe_handle(struct pci_dev *pdev)
  */
 void amdgpu_acpi_detect(void)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 	struct amdgpu_atif *atif = &amdgpu_acpi_priv.atif;
 	struct amdgpu_atcs *atcs = &amdgpu_acpi_priv.atcs;
 	struct pci_dev *pdev = NULL;
@@ -1040,6 +1064,7 @@ void amdgpu_acpi_detect(void)
  */
 bool amdgpu_acpi_is_s0ix_active(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_acpi: called %s\n", __func__);
 #if IS_ENABLED(CONFIG_AMD_PMC) && IS_ENABLED(CONFIG_SUSPEND)
 	if (acpi_gbl_FADT.flags & ACPI_FADT_LOW_POWER_S0) {
 		if (adev->flags & AMD_IS_APU)

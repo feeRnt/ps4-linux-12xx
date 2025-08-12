@@ -95,6 +95,7 @@ enum {
 
 static int acp_sw_init(void *handle)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	adev->acp.parent = adev->dev;
@@ -109,6 +110,7 @@ static int acp_sw_init(void *handle)
 
 static int acp_sw_fini(void *handle)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (adev->acp.cgs_device)
@@ -124,6 +126,7 @@ struct acp_pm_domain {
 
 static int acp_poweroff(struct generic_pm_domain *genpd)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	struct acp_pm_domain *apd;
 	struct amdgpu_device *adev;
 
@@ -143,6 +146,7 @@ static int acp_poweroff(struct generic_pm_domain *genpd)
 
 static int acp_poweron(struct generic_pm_domain *genpd)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	struct acp_pm_domain *apd;
 	struct amdgpu_device *adev;
 
@@ -162,6 +166,7 @@ static int acp_poweron(struct generic_pm_domain *genpd)
 
 static int acp_genpd_add_device(struct device *dev, void *data)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	struct generic_pm_domain *gpd = data;
 	int ret;
 
@@ -174,6 +179,7 @@ static int acp_genpd_add_device(struct device *dev, void *data)
 
 static int acp_genpd_remove_device(struct device *dev, void *data)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	int ret;
 
 	ret = pm_genpd_remove_device(dev);
@@ -192,6 +198,7 @@ static int acp_genpd_remove_device(struct device *dev, void *data)
  */
 static int acp_hw_init(void *handle)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	int r;
 	uint64_t acp_base;
 	u32 val = 0;
@@ -415,6 +422,7 @@ failure:
  */
 static int acp_hw_fini(void *handle)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	u32 val = 0;
 	u32 count = 0;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -474,6 +482,7 @@ static int acp_hw_fini(void *handle)
 
 static int acp_suspend(void *handle)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* power up on suspend */
@@ -484,6 +493,7 @@ static int acp_suspend(void *handle)
 
 static int acp_resume(void *handle)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* power down again on resume */
@@ -494,33 +504,39 @@ static int acp_resume(void *handle)
 
 static int acp_early_init(void *handle)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	return 0;
 }
 
 static bool acp_is_idle(void *handle)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	return true;
 }
 
 static int acp_wait_for_idle(void *handle)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	return 0;
 }
 
 static int acp_soft_reset(void *handle)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	return 0;
 }
 
 static int acp_set_clockgating_state(void *handle,
 				     enum amd_clockgating_state state)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	return 0;
 }
 
 static int acp_set_powergating_state(void *handle,
 				     enum amd_powergating_state state)
 {
+    pr_info("amdgpu_acp: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	bool enable = (state == AMD_PG_STATE_GATE);
 

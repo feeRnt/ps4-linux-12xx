@@ -42,6 +42,7 @@ static int amdgpu_cs_user_fence_chunk(struct amdgpu_cs_parser *p,
 				      struct drm_amdgpu_cs_chunk_fence *data,
 				      uint32_t *offset)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct drm_gem_object *gobj;
 	struct amdgpu_bo *bo;
 	unsigned long size;
@@ -82,6 +83,7 @@ error_unref:
 static int amdgpu_cs_bo_handles_chunk(struct amdgpu_cs_parser *p,
 				      struct drm_amdgpu_bo_list_in *data)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	int r;
 	struct drm_amdgpu_bo_list_entry *info = NULL;
 
@@ -105,6 +107,7 @@ error_free:
 
 static int amdgpu_cs_parser_init(struct amdgpu_cs_parser *p, union drm_amdgpu_cs *cs)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_fpriv *fpriv = p->filp->driver_priv;
 	struct amdgpu_vm *vm = &fpriv->vm;
 	uint64_t *chunk_array_user;
@@ -262,6 +265,7 @@ free_chunk:
 /* Convert microseconds to bytes. */
 static u64 us_to_bytes(struct amdgpu_device *adev, s64 us)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	if (us <= 0 || !adev->mm_stats.log2_max_MBps)
 		return 0;
 
@@ -273,6 +277,7 @@ static u64 us_to_bytes(struct amdgpu_device *adev, s64 us)
 
 static s64 bytes_to_us(struct amdgpu_device *adev, u64 bytes)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	if (!adev->mm_stats.log2_max_MBps)
 		return 0;
 
@@ -296,6 +301,7 @@ static void amdgpu_cs_get_threshold_for_moves(struct amdgpu_device *adev,
 					      u64 *max_bytes,
 					      u64 *max_vis_bytes)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	s64 time_us, increment_us;
 	u64 free_vram, total_vram, used_vram;
 	struct ttm_resource_manager *vram_man = ttm_manager_type(&adev->mman.bdev, TTM_PL_VRAM);
@@ -390,6 +396,7 @@ static void amdgpu_cs_get_threshold_for_moves(struct amdgpu_device *adev,
 void amdgpu_cs_report_moved_bytes(struct amdgpu_device *adev, u64 num_bytes,
 				  u64 num_vis_bytes)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	spin_lock(&adev->mm_stats.lock);
 	adev->mm_stats.accum_us -= bytes_to_us(adev, num_bytes);
 	adev->mm_stats.accum_us_vis -= bytes_to_us(adev, num_vis_bytes);
@@ -398,6 +405,7 @@ void amdgpu_cs_report_moved_bytes(struct amdgpu_device *adev, u64 num_bytes,
 
 static int amdgpu_cs_bo_validate(void *param, struct amdgpu_bo *bo)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	struct amdgpu_cs_parser *p = param;
 	struct ttm_operation_ctx ctx = {
@@ -454,6 +462,7 @@ retry:
 static int amdgpu_cs_list_validate(struct amdgpu_cs_parser *p,
 			    struct list_head *validated)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct ttm_operation_ctx ctx = { true, false };
 	struct amdgpu_bo_list_entry *lobj;
 	int r;
@@ -491,6 +500,7 @@ static int amdgpu_cs_list_validate(struct amdgpu_cs_parser *p,
 static int amdgpu_cs_parser_bos(struct amdgpu_cs_parser *p,
 				union drm_amdgpu_cs *cs)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_fpriv *fpriv = p->filp->driver_priv;
 	struct amdgpu_vm *vm = &fpriv->vm;
 	struct amdgpu_bo_list_entry *e;
@@ -647,6 +657,7 @@ out:
 
 static int amdgpu_cs_sync_rings(struct amdgpu_cs_parser *p)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_fpriv *fpriv = p->filp->driver_priv;
 	struct amdgpu_bo_list_entry *e;
 	int r;
@@ -678,6 +689,7 @@ static int amdgpu_cs_sync_rings(struct amdgpu_cs_parser *p)
 static void amdgpu_cs_parser_fini(struct amdgpu_cs_parser *parser, int error,
 				  bool backoff)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	unsigned i;
 
 	if (error && backoff) {
@@ -721,6 +733,7 @@ static void amdgpu_cs_parser_fini(struct amdgpu_cs_parser *parser, int error,
 
 static int amdgpu_cs_vm_handling(struct amdgpu_cs_parser *p)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_ring *ring = to_amdgpu_ring(p->entity->rq->sched);
 	struct amdgpu_fpriv *fpriv = p->filp->driver_priv;
 	struct amdgpu_device *adev = p->adev;
@@ -871,6 +884,7 @@ static int amdgpu_cs_vm_handling(struct amdgpu_cs_parser *p)
 static int amdgpu_cs_ib_fill(struct amdgpu_device *adev,
 			     struct amdgpu_cs_parser *parser)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_fpriv *fpriv = parser->filp->driver_priv;
 	struct amdgpu_vm *vm = &fpriv->vm;
 	int r, ce_preempt = 0, de_preempt = 0;
@@ -951,6 +965,7 @@ static int amdgpu_cs_ib_fill(struct amdgpu_device *adev,
 static int amdgpu_cs_process_fence_dep(struct amdgpu_cs_parser *p,
 				       struct amdgpu_cs_chunk *chunk)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_fpriv *fpriv = p->filp->driver_priv;
 	unsigned num_deps;
 	int i, r;
@@ -1006,6 +1021,7 @@ static int amdgpu_syncobj_lookup_and_add_to_sync(struct amdgpu_cs_parser *p,
 						 uint32_t handle, u64 point,
 						 u64 flags)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct dma_fence *fence;
 	int r;
 
@@ -1025,6 +1041,7 @@ static int amdgpu_syncobj_lookup_and_add_to_sync(struct amdgpu_cs_parser *p,
 static int amdgpu_cs_process_syncobj_in_dep(struct amdgpu_cs_parser *p,
 					    struct amdgpu_cs_chunk *chunk)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct drm_amdgpu_cs_chunk_sem *deps;
 	unsigned num_deps;
 	int i, r;
@@ -1046,6 +1063,7 @@ static int amdgpu_cs_process_syncobj_in_dep(struct amdgpu_cs_parser *p,
 static int amdgpu_cs_process_syncobj_timeline_in_dep(struct amdgpu_cs_parser *p,
 						     struct amdgpu_cs_chunk *chunk)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct drm_amdgpu_cs_chunk_syncobj *syncobj_deps;
 	unsigned num_deps;
 	int i, r;
@@ -1068,6 +1086,7 @@ static int amdgpu_cs_process_syncobj_timeline_in_dep(struct amdgpu_cs_parser *p,
 static int amdgpu_cs_process_syncobj_out_dep(struct amdgpu_cs_parser *p,
 					     struct amdgpu_cs_chunk *chunk)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct drm_amdgpu_cs_chunk_sem *deps;
 	unsigned num_deps;
 	int i;
@@ -1104,6 +1123,7 @@ static int amdgpu_cs_process_syncobj_out_dep(struct amdgpu_cs_parser *p,
 static int amdgpu_cs_process_syncobj_timeline_out_dep(struct amdgpu_cs_parser *p,
 						      struct amdgpu_cs_chunk *chunk)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct drm_amdgpu_cs_chunk_syncobj *syncobj_deps;
 	unsigned num_deps;
 	int i;
@@ -1148,6 +1168,7 @@ static int amdgpu_cs_process_syncobj_timeline_out_dep(struct amdgpu_cs_parser *p
 static int amdgpu_cs_dependencies(struct amdgpu_device *adev,
 				  struct amdgpu_cs_parser *p)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	int i, r;
 
 	for (i = 0; i < p->nchunks; ++i) {
@@ -1190,6 +1211,7 @@ static int amdgpu_cs_dependencies(struct amdgpu_device *adev,
 
 static void amdgpu_cs_post_dependencies(struct amdgpu_cs_parser *p)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < p->num_post_deps; ++i) {
@@ -1208,6 +1230,7 @@ static void amdgpu_cs_post_dependencies(struct amdgpu_cs_parser *p)
 static int amdgpu_cs_submit(struct amdgpu_cs_parser *p,
 			    union drm_amdgpu_cs *cs)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_fpriv *fpriv = p->filp->driver_priv;
 	struct drm_sched_entity *entity = p->entity;
 	struct amdgpu_bo_list_entry *e;
@@ -1301,6 +1324,7 @@ error_unlock:
 
 static void trace_amdgpu_cs_ibs(struct amdgpu_cs_parser *parser)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	int i;
 
 	if (!trace_amdgpu_cs_enabled())
@@ -1312,6 +1336,7 @@ static void trace_amdgpu_cs_ibs(struct amdgpu_cs_parser *parser)
 
 int amdgpu_cs_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	union drm_amdgpu_cs *cs = data;
 	struct amdgpu_cs_parser parser = {};
@@ -1381,6 +1406,7 @@ out:
 int amdgpu_cs_wait_ioctl(struct drm_device *dev, void *data,
 			 struct drm_file *filp)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	union drm_amdgpu_wait_cs *wait = data;
 	unsigned long timeout = amdgpu_gem_timeout(wait->in.timeout);
 	struct drm_sched_entity *entity;
@@ -1431,6 +1457,7 @@ static struct dma_fence *amdgpu_cs_get_fence(struct amdgpu_device *adev,
 					     struct drm_file *filp,
 					     struct drm_amdgpu_fence *user)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct drm_sched_entity *entity;
 	struct amdgpu_ctx *ctx;
 	struct dma_fence *fence;
@@ -1456,6 +1483,7 @@ static struct dma_fence *amdgpu_cs_get_fence(struct amdgpu_device *adev,
 int amdgpu_cs_fence_to_handle_ioctl(struct drm_device *dev, void *data,
 				    struct drm_file *filp)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	union drm_amdgpu_fence_to_handle *info = data;
 	struct dma_fence *fence;
@@ -1525,6 +1553,7 @@ static int amdgpu_cs_wait_all_fences(struct amdgpu_device *adev,
 				     union drm_amdgpu_wait_fences *wait,
 				     struct drm_amdgpu_fence *fences)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	uint32_t fence_count = wait->in.fence_count;
 	unsigned int i;
 	long r = 1;
@@ -1570,6 +1599,7 @@ static int amdgpu_cs_wait_any_fence(struct amdgpu_device *adev,
 				    union drm_amdgpu_wait_fences *wait,
 				    struct drm_amdgpu_fence *fences)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	unsigned long timeout = amdgpu_gem_timeout(wait->in.timeout_ns);
 	uint32_t fence_count = wait->in.fence_count;
 	uint32_t first = ~0;
@@ -1632,6 +1662,7 @@ err_free_fence_array:
 int amdgpu_cs_wait_fences_ioctl(struct drm_device *dev, void *data,
 				struct drm_file *filp)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	union drm_amdgpu_wait_fences *wait = data;
 	uint32_t fence_count = wait->in.fence_count;
@@ -1679,6 +1710,7 @@ int amdgpu_cs_find_mapping(struct amdgpu_cs_parser *parser,
 			   uint64_t addr, struct amdgpu_bo **bo,
 			   struct amdgpu_bo_va_mapping **map)
 {
+    pr_info("amdgpu_cs: called %s\n", __func__);
 	struct amdgpu_fpriv *fpriv = parser->filp->driver_priv;
 	struct ttm_operation_ctx ctx = { false, false };
 	struct amdgpu_vm *vm = &fpriv->vm;

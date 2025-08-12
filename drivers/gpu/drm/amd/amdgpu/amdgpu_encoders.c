@@ -40,6 +40,7 @@ ps4_bridge_register(struct drm_connector *connector,
 static void amdgpu_maybe_add_bridge(struct drm_connector *connector,
 				    struct drm_encoder *encoder)
 {
+    pr_info("amdgpu_encoders: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
@@ -52,6 +53,7 @@ static void amdgpu_maybe_add_bridge(struct drm_connector *connector,
 void
 amdgpu_link_encoder_connector(struct drm_device *dev)
 {
+    pr_info("amdgpu_encoders: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct drm_connector *connector;
 	struct drm_connector_list_iter iter;
@@ -82,6 +84,7 @@ amdgpu_link_encoder_connector(struct drm_device *dev)
 
 void amdgpu_encoder_set_active_device(struct drm_encoder *encoder)
 {
+    pr_info("amdgpu_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct drm_connector *connector;
@@ -103,6 +106,7 @@ void amdgpu_encoder_set_active_device(struct drm_encoder *encoder)
 struct drm_connector *
 amdgpu_get_connector_for_encoder(struct drm_encoder *encoder)
 {
+    pr_info("amdgpu_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct drm_connector *connector, *found = NULL;
@@ -124,6 +128,7 @@ amdgpu_get_connector_for_encoder(struct drm_encoder *encoder)
 struct drm_connector *
 amdgpu_get_connector_for_encoder_init(struct drm_encoder *encoder)
 {
+    pr_info("amdgpu_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct drm_connector *connector, *found = NULL;
@@ -144,6 +149,7 @@ amdgpu_get_connector_for_encoder_init(struct drm_encoder *encoder)
 
 struct drm_encoder *amdgpu_get_external_encoder(struct drm_encoder *encoder)
 {
+    pr_info("amdgpu_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct drm_encoder *other_encoder;
@@ -165,6 +171,7 @@ struct drm_encoder *amdgpu_get_external_encoder(struct drm_encoder *encoder)
 
 u16 amdgpu_encoder_get_dp_bridge_encoder_id(struct drm_encoder *encoder)
 {
+    pr_info("amdgpu_encoders: called %s\n", __func__);
 	struct drm_encoder *other_encoder = amdgpu_get_external_encoder(encoder);
 
 	if (other_encoder) {
@@ -184,6 +191,7 @@ u16 amdgpu_encoder_get_dp_bridge_encoder_id(struct drm_encoder *encoder)
 void amdgpu_panel_mode_fixup(struct drm_encoder *encoder,
 			     struct drm_display_mode *adjusted_mode)
 {
+    pr_info("amdgpu_encoders: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct drm_display_mode *native_mode = &amdgpu_encoder->native_mode;
 	unsigned hblank = native_mode->htotal - native_mode->hdisplay;
@@ -225,6 +233,7 @@ void amdgpu_panel_mode_fixup(struct drm_encoder *encoder,
 bool amdgpu_dig_monitor_is_duallink(struct drm_encoder *encoder,
 				    u32 pixel_clock)
 {
+    pr_info("amdgpu_encoders: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct amdgpu_connector *amdgpu_connector;
 	struct amdgpu_connector_atom_dig *dig_connector;

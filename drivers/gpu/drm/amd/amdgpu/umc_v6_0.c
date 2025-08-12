@@ -25,6 +25,7 @@
 
 static void umc_v6_0_init_registers(struct amdgpu_device *adev)
 {
+    pr_info("umc_v6_0: called %s\n", __func__);
 	unsigned i,j;
 
 	for (i = 0; i < 4; i++)

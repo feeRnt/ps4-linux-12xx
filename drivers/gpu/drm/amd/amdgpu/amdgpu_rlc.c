@@ -36,6 +36,7 @@
  */
 void amdgpu_gfx_rlc_enter_safe_mode(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_rlc: called %s\n", __func__);
 	if (adev->gfx.rlc.in_safe_mode)
 		return;
 
@@ -60,6 +61,7 @@ void amdgpu_gfx_rlc_enter_safe_mode(struct amdgpu_device *adev)
  */
 void amdgpu_gfx_rlc_exit_safe_mode(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_rlc: called %s\n", __func__);
 	if (!(adev->gfx.rlc.in_safe_mode))
 		return;
 
@@ -86,6 +88,7 @@ void amdgpu_gfx_rlc_exit_safe_mode(struct amdgpu_device *adev)
  */
 int amdgpu_gfx_rlc_init_sr(struct amdgpu_device *adev, u32 dws)
 {
+    pr_info("amdgpu_rlc: called %s\n", __func__);
 	const u32 *src_ptr;
 	volatile u32 *dst_ptr;
 	u32 i;
@@ -124,6 +127,7 @@ int amdgpu_gfx_rlc_init_sr(struct amdgpu_device *adev, u32 dws)
  */
 int amdgpu_gfx_rlc_init_csb(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_rlc: called %s\n", __func__);
 	u32 dws;
 	int r;
 
@@ -153,6 +157,7 @@ int amdgpu_gfx_rlc_init_csb(struct amdgpu_device *adev)
  */
 int amdgpu_gfx_rlc_init_cpt(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_rlc: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_bo_create_reserved(adev, adev->gfx.rlc.cp_table_size,
@@ -183,6 +188,7 @@ int amdgpu_gfx_rlc_init_cpt(struct amdgpu_device *adev)
  */
 void amdgpu_gfx_rlc_setup_cp_table(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_rlc: called %s\n", __func__);
 	const __le32 *fw_data;
 	volatile u32 *dst_ptr;
 	int me, i, max_me;
@@ -255,6 +261,7 @@ void amdgpu_gfx_rlc_setup_cp_table(struct amdgpu_device *adev)
  */
 void amdgpu_gfx_rlc_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_rlc: called %s\n", __func__);
 	/* save restore block */
 	if (adev->gfx.rlc.save_restore_obj) {
 		amdgpu_bo_free_kernel(&adev->gfx.rlc.save_restore_obj,

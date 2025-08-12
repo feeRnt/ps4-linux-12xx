@@ -93,6 +93,7 @@ static const struct soc15_reg_entry gfx_v9_4_edc_counter_regs[] = {
 static void gfx_v9_4_select_se_sh(struct amdgpu_device *adev, u32 se_num,
 				  u32 sh_num, u32 instance)
 {
+    pr_info("gfx_v9_4: called %s\n", __func__);
 	u32 data;
 
 	if (instance == 0xffffffff)
@@ -689,6 +690,7 @@ static const char * const atc_l2_cache_4k_mems[] = {
 static int gfx_v9_4_query_utc_edc_status(struct amdgpu_device *adev,
 					 struct ras_err_data *err_data)
 {
+    pr_info("gfx_v9_4: called %s\n", __func__);
 	uint32_t i, data;
 	uint32_t sec_count, ded_count;
 
@@ -830,6 +832,7 @@ static int gfx_v9_4_ras_error_count(struct amdgpu_device *adev,
 				    uint32_t value, uint32_t *sec_count,
 				    uint32_t *ded_count)
 {
+    pr_info("gfx_v9_4: called %s\n", __func__);
 	uint32_t i;
 	uint32_t sec_cnt, ded_cnt;
 
@@ -866,6 +869,7 @@ static int gfx_v9_4_ras_error_count(struct amdgpu_device *adev,
 static int gfx_v9_4_query_ras_error_count(struct amdgpu_device *adev,
 					  void *ras_error_status)
 {
+    pr_info("gfx_v9_4: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 	uint32_t sec_count = 0, ded_count = 0;
 	uint32_t i, j, k;
@@ -908,6 +912,7 @@ static int gfx_v9_4_query_ras_error_count(struct amdgpu_device *adev,
 
 static void gfx_v9_4_reset_ras_error_count(struct amdgpu_device *adev)
 {
+    pr_info("gfx_v9_4: called %s\n", __func__);
 	int i, j, k;
 
 	if (!amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__GFX))
@@ -974,6 +979,7 @@ static void gfx_v9_4_reset_ras_error_count(struct amdgpu_device *adev)
 static int gfx_v9_4_ras_error_inject(struct amdgpu_device *adev,
 				     void *inject_if)
 {
+    pr_info("gfx_v9_4: called %s\n", __func__);
 	struct ras_inject_if *info = (struct ras_inject_if *)inject_if;
 	int ret;
 	struct ta_ras_trigger_error_input block_info = { 0 };
@@ -999,6 +1005,7 @@ static const struct soc15_reg_entry gfx_v9_4_ea_err_status_regs =
 
 static void gfx_v9_4_query_ras_error_status(struct amdgpu_device *adev)
 {
+    pr_info("gfx_v9_4: called %s\n", __func__);
 	uint32_t i, j;
 	uint32_t reg_value;
 

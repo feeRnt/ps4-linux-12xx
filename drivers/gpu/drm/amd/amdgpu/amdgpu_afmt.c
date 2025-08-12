@@ -50,6 +50,7 @@ static const struct amdgpu_afmt_acr amdgpu_afmt_predefined_acr[] = {
  */
 static void amdgpu_afmt_calc_cts(uint32_t clock, int *CTS, int *N, int freq)
 {
+    pr_info("amdgpu_afmt: called %s\n", __func__);
 	int n, cts;
 	unsigned long div, mul;
 
@@ -87,6 +88,7 @@ static void amdgpu_afmt_calc_cts(uint32_t clock, int *CTS, int *N, int freq)
 
 struct amdgpu_afmt_acr amdgpu_afmt_acr(uint32_t clock)
 {
+    pr_info("amdgpu_afmt: called %s\n", __func__);
 	struct amdgpu_afmt_acr res;
 	u8 i;
 

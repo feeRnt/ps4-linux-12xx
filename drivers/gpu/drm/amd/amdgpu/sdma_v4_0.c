@@ -394,6 +394,7 @@ static const struct soc15_ras_field_entry sdma_v4_0_ras_fields[] = {
 static u32 sdma_v4_0_get_reg_offset(struct amdgpu_device *adev,
 		u32 instance, u32 offset)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	switch (instance) {
 	case 0:
 		return (adev->reg_offset[SDMA0_HWIP][0][0] + offset);
@@ -419,6 +420,7 @@ static u32 sdma_v4_0_get_reg_offset(struct amdgpu_device *adev,
 
 static unsigned sdma_v4_0_seq_to_irq_id(int seq_num)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	switch (seq_num) {
 	case 0:
 		return SOC15_IH_CLIENTID_SDMA0;
@@ -444,6 +446,7 @@ static unsigned sdma_v4_0_seq_to_irq_id(int seq_num)
 
 static int sdma_v4_0_irq_id_to_seq(unsigned client_id)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	switch (client_id) {
 	case SOC15_IH_CLIENTID_SDMA0:
 		return 0;
@@ -469,6 +472,7 @@ static int sdma_v4_0_irq_id_to_seq(unsigned client_id)
 
 static void sdma_v4_0_init_golden_registers(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_VEGA10:
 		soc15_program_register_sequence(adev,
@@ -532,6 +536,7 @@ static void sdma_v4_0_init_golden_registers(struct amdgpu_device *adev)
 
 static void sdma_v4_0_setup_ulv(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	int i;
 
 	/*
@@ -562,6 +567,7 @@ static void sdma_v4_0_setup_ulv(struct amdgpu_device *adev)
 
 static int sdma_v4_0_init_inst_ctx(struct amdgpu_sdma_instance *sdma_inst)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	int err = 0;
 	const struct sdma_firmware_header_v1_0 *hdr;
 
@@ -581,6 +587,7 @@ static int sdma_v4_0_init_inst_ctx(struct amdgpu_sdma_instance *sdma_inst)
 
 static void sdma_v4_0_destroy_inst_ctx(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->sdma.num_instances; i++) {
@@ -612,6 +619,7 @@ static void sdma_v4_0_destroy_inst_ctx(struct amdgpu_device *adev)
 // vega10 real chip need to use PSP to load firmware
 static int sdma_v4_0_init_microcode(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	const char *chip_name;
 	char fw_name[30];
 	int err = 0, i;
@@ -717,6 +725,7 @@ out:
  */
 static uint64_t sdma_v4_0_ring_get_rptr(struct amdgpu_ring *ring)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	u64 *rptr;
 
 	/* XXX check if swapping is necessary on BE */
@@ -735,6 +744,7 @@ static uint64_t sdma_v4_0_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t sdma_v4_0_ring_get_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	u64 wptr;
 
@@ -762,6 +772,7 @@ static uint64_t sdma_v4_0_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static void sdma_v4_0_ring_set_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	DRM_DEBUG("Setting write pointer\n");
@@ -804,6 +815,7 @@ static void sdma_v4_0_ring_set_wptr(struct amdgpu_ring *ring)
  */
 static uint64_t sdma_v4_0_page_ring_get_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	u64 wptr;
 
@@ -828,6 +840,7 @@ static uint64_t sdma_v4_0_page_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static void sdma_v4_0_page_ring_set_wptr(struct amdgpu_ring *ring)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring->use_doorbell) {
@@ -848,6 +861,7 @@ static void sdma_v4_0_page_ring_set_wptr(struct amdgpu_ring *ring)
 
 static void sdma_v4_0_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_sdma_instance *sdma = amdgpu_sdma_get_instance_from_ring(ring);
 	int i;
 
@@ -874,6 +888,7 @@ static void sdma_v4_0_ring_emit_ib(struct amdgpu_ring *ring,
 				   struct amdgpu_ib *ib,
 				   uint32_t flags)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
 
 	/* IB packet must end on a 8 DW boundary */
@@ -896,6 +911,7 @@ static void sdma_v4_0_wait_reg_mem(struct amdgpu_ring *ring,
 				   uint32_t ref, uint32_t mask,
 				   uint32_t inv)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, SDMA_PKT_HEADER_OP(SDMA_OP_POLL_REGMEM) |
 			  SDMA_PKT_POLL_REGMEM_HEADER_HDP_FLUSH(hdp) |
 			  SDMA_PKT_POLL_REGMEM_HEADER_MEM_POLL(mem_space) |
@@ -924,6 +940,7 @@ static void sdma_v4_0_wait_reg_mem(struct amdgpu_ring *ring,
  */
 static void sdma_v4_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	u32 ref_and_mask = 0;
 	const struct nbio_hdp_flush_reg *nbio_hf_reg = adev->nbio.hdp_flush_reg;
@@ -951,6 +968,7 @@ static void sdma_v4_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
 static void sdma_v4_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				      unsigned flags)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	bool write64bit = flags & AMDGPU_FENCE_FLAG_64BIT;
 	/* write the fence */
 	amdgpu_ring_write(ring, SDMA_PKT_HEADER_OP(SDMA_OP_FENCE));
@@ -986,6 +1004,7 @@ static void sdma_v4_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 se
  */
 static void sdma_v4_0_gfx_stop(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_ring *sdma[AMDGPU_MAX_SDMA_INSTANCES];
 	u32 rb_cntl, ib_cntl;
 	int i, unset = 0;
@@ -1016,6 +1035,7 @@ static void sdma_v4_0_gfx_stop(struct amdgpu_device *adev)
  */
 static void sdma_v4_0_rlc_stop(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	/* XXX todo */
 }
 
@@ -1028,6 +1048,7 @@ static void sdma_v4_0_rlc_stop(struct amdgpu_device *adev)
  */
 static void sdma_v4_0_page_stop(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_ring *sdma[AMDGPU_MAX_SDMA_INSTANCES];
 	u32 rb_cntl, ib_cntl;
 	int i;
@@ -1063,6 +1084,7 @@ static void sdma_v4_0_page_stop(struct amdgpu_device *adev)
  */
 static void sdma_v4_0_ctx_switch_enable(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	u32 f32_cntl, phase_quantum = 0;
 	int i;
 
@@ -1125,6 +1147,7 @@ static void sdma_v4_0_ctx_switch_enable(struct amdgpu_device *adev, bool enable)
  */
 static void sdma_v4_0_enable(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	u32 f32_cntl;
 	int i;
 
@@ -1147,6 +1170,7 @@ static void sdma_v4_0_enable(struct amdgpu_device *adev, bool enable)
  */
 static uint32_t sdma_v4_0_rb_cntl(struct amdgpu_ring *ring, uint32_t rb_cntl)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	/* Set ring buffer size in dwords */
 	uint32_t rb_bufsz = order_base_2(ring->ring_size / 4);
 
@@ -1170,6 +1194,7 @@ static uint32_t sdma_v4_0_rb_cntl(struct amdgpu_ring *ring, uint32_t rb_cntl)
  */
 static void sdma_v4_0_gfx_resume(struct amdgpu_device *adev, unsigned int i)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_ring *ring = &adev->sdma.instance[i].ring;
 	u32 rb_cntl, ib_cntl, wptr_poll_cntl;
 	u32 wb_offset;
@@ -1260,6 +1285,7 @@ static void sdma_v4_0_gfx_resume(struct amdgpu_device *adev, unsigned int i)
  */
 static void sdma_v4_0_page_resume(struct amdgpu_device *adev, unsigned int i)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_ring *ring = &adev->sdma.instance[i].page;
 	u32 rb_cntl, ib_cntl, wptr_poll_cntl;
 	u32 wb_offset;
@@ -1343,6 +1369,7 @@ static void sdma_v4_0_page_resume(struct amdgpu_device *adev, unsigned int i)
 static void
 sdma_v4_1_update_power_gating(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	uint32_t def, data;
 
 	if (enable && (adev->pg_flags & AMD_PG_SUPPORT_SDMA)) {
@@ -1363,6 +1390,7 @@ sdma_v4_1_update_power_gating(struct amdgpu_device *adev, bool enable)
 
 static void sdma_v4_1_init_power_gating(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	uint32_t def, data;
 
 	/* Enable HW based PG. */
@@ -1390,6 +1418,7 @@ static void sdma_v4_1_init_power_gating(struct amdgpu_device *adev)
 
 static void sdma_v4_0_init_pg(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	if (!(adev->pg_flags & AMD_PG_SUPPORT_SDMA))
 		return;
 
@@ -1414,6 +1443,7 @@ static void sdma_v4_0_init_pg(struct amdgpu_device *adev)
  */
 static int sdma_v4_0_rlc_resume(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	sdma_v4_0_init_pg(adev);
 
 	return 0;
@@ -1429,6 +1459,7 @@ static int sdma_v4_0_rlc_resume(struct amdgpu_device *adev)
  */
 static int sdma_v4_0_load_microcode(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	const struct sdma_firmware_header_v1_0 *hdr;
 	const __le32 *fw_data;
 	u32 fw_size;
@@ -1472,6 +1503,7 @@ static int sdma_v4_0_load_microcode(struct amdgpu_device *adev)
  */
 static int sdma_v4_0_start(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	int i, r = 0;
 
@@ -1559,6 +1591,7 @@ static int sdma_v4_0_start(struct amdgpu_device *adev)
  */
 static int sdma_v4_0_ring_test_ring(struct amdgpu_ring *ring)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned i;
 	unsigned index;
@@ -1612,6 +1645,7 @@ error_free_wb:
  */
 static int sdma_v4_0_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct amdgpu_ib ib;
 	struct dma_fence *f = NULL;
@@ -1684,6 +1718,7 @@ static void sdma_v4_0_vm_copy_pte(struct amdgpu_ib *ib,
 				  uint64_t pe, uint64_t src,
 				  unsigned count)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	unsigned bytes = count * 8;
 
 	ib->ptr[ib->length_dw++] = SDMA_PKT_HEADER_OP(SDMA_OP_COPY) |
@@ -1712,6 +1747,7 @@ static void sdma_v4_0_vm_write_pte(struct amdgpu_ib *ib, uint64_t pe,
 				   uint64_t value, unsigned count,
 				   uint32_t incr)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	unsigned ndw = count * 2;
 
 	ib->ptr[ib->length_dw++] = SDMA_PKT_HEADER_OP(SDMA_OP_WRITE) |
@@ -1743,6 +1779,7 @@ static void sdma_v4_0_vm_set_pte_pde(struct amdgpu_ib *ib,
 				     uint64_t addr, unsigned count,
 				     uint32_t incr, uint64_t flags)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	/* for physically contiguous pages (vram) */
 	ib->ptr[ib->length_dw++] = SDMA_PKT_HEADER_OP(SDMA_OP_PTEPDE);
 	ib->ptr[ib->length_dw++] = lower_32_bits(pe); /* dst addr */
@@ -1764,6 +1801,7 @@ static void sdma_v4_0_vm_set_pte_pde(struct amdgpu_ib *ib,
  */
 static void sdma_v4_0_ring_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_sdma_instance *sdma = amdgpu_sdma_get_instance_from_ring(ring);
 	u32 pad_count;
 	int i;
@@ -1789,6 +1827,7 @@ static void sdma_v4_0_ring_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib
  */
 static void sdma_v4_0_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	uint32_t seq = ring->fence_drv.sync_seq;
 	uint64_t addr = ring->fence_drv.gpu_addr;
 
@@ -1813,12 +1852,14 @@ static void sdma_v4_0_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
 static void sdma_v4_0_ring_emit_vm_flush(struct amdgpu_ring *ring,
 					 unsigned vmid, uint64_t pd_addr)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	amdgpu_gmc_emit_flush_gpu_tlb(ring, vmid, pd_addr);
 }
 
 static void sdma_v4_0_ring_emit_wreg(struct amdgpu_ring *ring,
 				     uint32_t reg, uint32_t val)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, SDMA_PKT_HEADER_OP(SDMA_OP_SRBM_WRITE) |
 			  SDMA_PKT_SRBM_WRITE_HEADER_BYTE_EN(0xf));
 	amdgpu_ring_write(ring, reg);
@@ -1828,11 +1869,13 @@ static void sdma_v4_0_ring_emit_wreg(struct amdgpu_ring *ring,
 static void sdma_v4_0_ring_emit_reg_wait(struct amdgpu_ring *ring, uint32_t reg,
 					 uint32_t val, uint32_t mask)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	sdma_v4_0_wait_reg_mem(ring, 0, 0, reg, 0, val, mask, 10);
 }
 
 static bool sdma_v4_0_fw_support_paging_queue(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	uint fw_version = adev->sdma.instance[0].fw_version;
 
 	switch (adev->asic_type) {
@@ -1850,6 +1893,7 @@ static bool sdma_v4_0_fw_support_paging_queue(struct amdgpu_device *adev)
 
 static int sdma_v4_0_early_init(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r;
 
@@ -1889,6 +1933,7 @@ static int sdma_v4_0_process_ras_data_cb(struct amdgpu_device *adev,
 
 static int sdma_v4_0_late_init(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct ras_ih_if ih_info = {
 		.cb = sdma_v4_0_process_ras_data_cb,
@@ -1910,6 +1955,7 @@ static int sdma_v4_0_late_init(void *handle)
 
 static int sdma_v4_0_sw_init(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	int r, i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -2003,6 +2049,7 @@ static int sdma_v4_0_sw_init(void *handle)
 
 static int sdma_v4_0_sw_fini(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int i;
 
@@ -2022,6 +2069,7 @@ static int sdma_v4_0_sw_fini(void *handle)
 
 static int sdma_v4_0_hw_init(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -2038,6 +2086,7 @@ static int sdma_v4_0_hw_init(void *handle)
 
 static int sdma_v4_0_hw_fini(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int i;
 
@@ -2060,6 +2109,7 @@ static int sdma_v4_0_hw_fini(void *handle)
 
 static int sdma_v4_0_suspend(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return sdma_v4_0_hw_fini(adev);
@@ -2067,6 +2117,7 @@ static int sdma_v4_0_suspend(void *handle)
 
 static int sdma_v4_0_resume(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return sdma_v4_0_hw_init(adev);
@@ -2074,6 +2125,7 @@ static int sdma_v4_0_resume(void *handle)
 
 static bool sdma_v4_0_is_idle(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 i;
 
@@ -2089,6 +2141,7 @@ static bool sdma_v4_0_is_idle(void *handle)
 
 static int sdma_v4_0_wait_for_idle(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	unsigned i, j;
 	u32 sdma[AMDGPU_MAX_SDMA_INSTANCES];
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -2108,6 +2161,7 @@ static int sdma_v4_0_wait_for_idle(void *handle)
 
 static int sdma_v4_0_soft_reset(void *handle)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	/* todo */
 
 	return 0;
@@ -2118,6 +2172,7 @@ static int sdma_v4_0_set_trap_irq_state(struct amdgpu_device *adev,
 					unsigned type,
 					enum amdgpu_interrupt_state state)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	u32 sdma_cntl;
 
 	sdma_cntl = RREG32_SDMA(type, mmSDMA0_CNTL);
@@ -2132,6 +2187,7 @@ static int sdma_v4_0_process_trap_irq(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	uint32_t instance;
 
 	DRM_DEBUG("IH: SDMA trap\n");
@@ -2159,6 +2215,7 @@ static int sdma_v4_0_process_ras_data_cb(struct amdgpu_device *adev,
 		void *err_data,
 		struct amdgpu_iv_entry *entry)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	int instance;
 
 	/* When “Full RAS” is enabled, the per-IP interrupt sources should
@@ -2182,6 +2239,7 @@ static int sdma_v4_0_process_illegal_inst_irq(struct amdgpu_device *adev,
 					      struct amdgpu_irq_src *source,
 					      struct amdgpu_iv_entry *entry)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	int instance;
 
 	DRM_ERROR("Illegal instruction in SDMA command stream\n");
@@ -2203,6 +2261,7 @@ static int sdma_v4_0_set_ecc_irq_state(struct amdgpu_device *adev,
 					unsigned type,
 					enum amdgpu_interrupt_state state)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	u32 sdma_edc_config;
 
 	sdma_edc_config = RREG32_SDMA(type, mmSDMA0_EDC_CONFIG);
@@ -2216,6 +2275,7 @@ static int sdma_v4_0_set_ecc_irq_state(struct amdgpu_device *adev,
 static int sdma_v4_0_print_iv_entry(struct amdgpu_device *adev,
 					      struct amdgpu_iv_entry *entry)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	int instance;
 	struct amdgpu_task_info task_info;
 	u64 addr;
@@ -2245,6 +2305,7 @@ static int sdma_v4_0_process_vm_hole_irq(struct amdgpu_device *adev,
 					      struct amdgpu_irq_src *source,
 					      struct amdgpu_iv_entry *entry)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	dev_dbg_ratelimited(adev->dev, "MC or SEM address in VM hole\n");
 	sdma_v4_0_print_iv_entry(adev, entry);
 	return 0;
@@ -2254,6 +2315,7 @@ static int sdma_v4_0_process_doorbell_invalid_irq(struct amdgpu_device *adev,
 					      struct amdgpu_irq_src *source,
 					      struct amdgpu_iv_entry *entry)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	dev_dbg_ratelimited(adev->dev, "SDMA received a doorbell from BIF with byte_enable !=0xff\n");
 	sdma_v4_0_print_iv_entry(adev, entry);
 	return 0;
@@ -2263,6 +2325,7 @@ static int sdma_v4_0_process_pool_timeout_irq(struct amdgpu_device *adev,
 					      struct amdgpu_irq_src *source,
 					      struct amdgpu_iv_entry *entry)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	dev_dbg_ratelimited(adev->dev,
 		"Polling register/memory timeout executing POLL_REG/MEM with finite timer\n");
 	sdma_v4_0_print_iv_entry(adev, entry);
@@ -2273,6 +2336,7 @@ static int sdma_v4_0_process_srbm_write_irq(struct amdgpu_device *adev,
 					      struct amdgpu_irq_src *source,
 					      struct amdgpu_iv_entry *entry)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	dev_dbg_ratelimited(adev->dev,
 		"SDMA gets an Register Write SRBM_WRITE command in non-privilege command buffer\n");
 	sdma_v4_0_print_iv_entry(adev, entry);
@@ -2283,6 +2347,7 @@ static void sdma_v4_0_update_medium_grain_clock_gating(
 		struct amdgpu_device *adev,
 		bool enable)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	uint32_t data, def;
 	int i;
 
@@ -2322,6 +2387,7 @@ static void sdma_v4_0_update_medium_grain_light_sleep(
 		struct amdgpu_device *adev,
 		bool enable)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	uint32_t data, def;
 	int i;
 
@@ -2347,6 +2413,7 @@ static void sdma_v4_0_update_medium_grain_light_sleep(
 static int sdma_v4_0_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))
@@ -2362,6 +2429,7 @@ static int sdma_v4_0_set_clockgating_state(void *handle,
 static int sdma_v4_0_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	switch (adev->asic_type) {
@@ -2379,6 +2447,7 @@ static int sdma_v4_0_set_powergating_state(void *handle,
 
 static void sdma_v4_0_get_clockgating_state(void *handle, u32 *flags)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int data;
 
@@ -2548,6 +2617,7 @@ static const struct amdgpu_ring_funcs sdma_v4_0_page_ring_funcs_2nd_mmhub = {
 
 static void sdma_v4_0_set_ring_funcs(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->sdma.num_instances; i++) {
@@ -2602,6 +2672,7 @@ static const struct amdgpu_irq_src_funcs sdma_v4_0_srbm_write_irq_funcs = {
 
 static void sdma_v4_0_set_irq_funcs(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	adev->sdma.trap_irq.num_types = adev->sdma.num_instances;
 	adev->sdma.ecc_irq.num_types = adev->sdma.num_instances;
 	/*For Arcturus and Aldebaran, add another 4 irq handler*/
@@ -2644,6 +2715,7 @@ static void sdma_v4_0_emit_copy_buffer(struct amdgpu_ib *ib,
 				       uint32_t byte_count,
 				       bool tmz)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	ib->ptr[ib->length_dw++] = SDMA_PKT_HEADER_OP(SDMA_OP_COPY) |
 		SDMA_PKT_HEADER_SUB_OP(SDMA_SUBOP_COPY_LINEAR) |
 		SDMA_PKT_COPY_LINEAR_HEADER_TMZ(tmz ? 1 : 0);
@@ -2670,6 +2742,7 @@ static void sdma_v4_0_emit_fill_buffer(struct amdgpu_ib *ib,
 				       uint64_t dst_offset,
 				       uint32_t byte_count)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	ib->ptr[ib->length_dw++] = SDMA_PKT_HEADER_OP(SDMA_OP_CONST_FILL);
 	ib->ptr[ib->length_dw++] = lower_32_bits(dst_offset);
 	ib->ptr[ib->length_dw++] = upper_32_bits(dst_offset);
@@ -2689,6 +2762,7 @@ static const struct amdgpu_buffer_funcs sdma_v4_0_buffer_funcs = {
 
 static void sdma_v4_0_set_buffer_funcs(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	adev->mman.buffer_funcs = &sdma_v4_0_buffer_funcs;
 	if (adev->sdma.has_page_queue)
 		adev->mman.buffer_funcs_ring = &adev->sdma.instance[0].page;
@@ -2706,6 +2780,7 @@ static const struct amdgpu_vm_pte_funcs sdma_v4_0_vm_pte_funcs = {
 
 static void sdma_v4_0_set_vm_pte_funcs(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct drm_gpu_scheduler *sched;
 	unsigned i;
 
@@ -2724,6 +2799,7 @@ static void sdma_v4_0_get_ras_error_count(uint32_t value,
 					uint32_t instance,
 					uint32_t *sec_count)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	uint32_t i;
 	uint32_t sec_cnt;
 
@@ -2747,6 +2823,7 @@ static void sdma_v4_0_get_ras_error_count(uint32_t value,
 static int sdma_v4_0_query_ras_error_count(struct amdgpu_device *adev,
 			uint32_t instance, void *ras_error_status)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 	uint32_t sec_count = 0;
 	uint32_t reg_value = 0;
@@ -2768,6 +2845,7 @@ static int sdma_v4_0_query_ras_error_count(struct amdgpu_device *adev,
 
 static void sdma_v4_0_reset_ras_error_count(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	int i;
 
 	/* read back edc counter registers to clear the counters */
@@ -2786,6 +2864,7 @@ static const struct amdgpu_sdma_ras_funcs sdma_v4_0_ras_funcs = {
 
 static void sdma_v4_0_set_ras_funcs(struct amdgpu_device *adev)
 {
+    pr_info("sdma_v4_0: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_VEGA20:
 	case CHIP_ARCTURUS:

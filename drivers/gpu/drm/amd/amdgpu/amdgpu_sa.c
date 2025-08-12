@@ -51,6 +51,7 @@ int amdgpu_sa_bo_manager_init(struct amdgpu_device *adev,
 			      struct amdgpu_sa_manager *sa_manager,
 			      unsigned size, u32 align, u32 domain)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	int i, r;
 
 	init_waitqueue_head(&sa_manager->wq);
@@ -77,6 +78,7 @@ int amdgpu_sa_bo_manager_init(struct amdgpu_device *adev,
 void amdgpu_sa_bo_manager_fini(struct amdgpu_device *adev,
 			       struct amdgpu_sa_manager *sa_manager)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	struct amdgpu_sa_bo *sa_bo, *tmp;
 
 	if (sa_manager->bo == NULL) {
@@ -101,6 +103,7 @@ void amdgpu_sa_bo_manager_fini(struct amdgpu_device *adev,
 
 static void amdgpu_sa_bo_remove_locked(struct amdgpu_sa_bo *sa_bo)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	struct amdgpu_sa_manager *sa_manager = sa_bo->manager;
 	if (sa_manager->hole == &sa_bo->olist) {
 		sa_manager->hole = sa_bo->olist.prev;
@@ -113,6 +116,7 @@ static void amdgpu_sa_bo_remove_locked(struct amdgpu_sa_bo *sa_bo)
 
 static void amdgpu_sa_bo_try_free(struct amdgpu_sa_manager *sa_manager)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	struct amdgpu_sa_bo *sa_bo, *tmp;
 
 	if (sa_manager->hole->next == &sa_manager->olist)
@@ -130,6 +134,7 @@ static void amdgpu_sa_bo_try_free(struct amdgpu_sa_manager *sa_manager)
 
 static inline unsigned amdgpu_sa_bo_hole_soffset(struct amdgpu_sa_manager *sa_manager)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	struct list_head *hole = sa_manager->hole;
 
 	if (hole != &sa_manager->olist) {
@@ -140,6 +145,7 @@ static inline unsigned amdgpu_sa_bo_hole_soffset(struct amdgpu_sa_manager *sa_ma
 
 static inline unsigned amdgpu_sa_bo_hole_eoffset(struct amdgpu_sa_manager *sa_manager)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	struct list_head *hole = sa_manager->hole;
 
 	if (hole->next != &sa_manager->olist) {
@@ -152,6 +158,7 @@ static bool amdgpu_sa_bo_try_alloc(struct amdgpu_sa_manager *sa_manager,
 				   struct amdgpu_sa_bo *sa_bo,
 				   unsigned size, unsigned align)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	unsigned soffset, eoffset, wasted;
 
 	soffset = amdgpu_sa_bo_hole_soffset(sa_manager);
@@ -185,6 +192,7 @@ static bool amdgpu_sa_bo_try_alloc(struct amdgpu_sa_manager *sa_manager,
 static bool amdgpu_sa_event(struct amdgpu_sa_manager *sa_manager,
 			    unsigned size, unsigned align)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	unsigned soffset, eoffset, wasted;
 	int i;
 
@@ -207,6 +215,7 @@ static bool amdgpu_sa_bo_next_hole(struct amdgpu_sa_manager *sa_manager,
 				   struct dma_fence **fences,
 				   unsigned *tries)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	struct amdgpu_sa_bo *best_bo = NULL;
 	unsigned i, soffset, best, tmp;
 
@@ -276,6 +285,7 @@ int amdgpu_sa_bo_new(struct amdgpu_sa_manager *sa_manager,
 		     struct amdgpu_sa_bo **sa_bo,
 		     unsigned size, unsigned align)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	struct dma_fence *fences[AMDGPU_SA_NUM_FENCE_LISTS];
 	unsigned tries[AMDGPU_SA_NUM_FENCE_LISTS];
 	unsigned count;
@@ -346,6 +356,7 @@ int amdgpu_sa_bo_new(struct amdgpu_sa_manager *sa_manager,
 void amdgpu_sa_bo_free(struct amdgpu_device *adev, struct amdgpu_sa_bo **sa_bo,
 		       struct dma_fence *fence)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	struct amdgpu_sa_manager *sa_manager;
 
 	if (sa_bo == NULL || *sa_bo == NULL) {
@@ -373,6 +384,7 @@ void amdgpu_sa_bo_free(struct amdgpu_device *adev, struct amdgpu_sa_bo **sa_bo,
 void amdgpu_sa_bo_dump_debug_info(struct amdgpu_sa_manager *sa_manager,
 				  struct seq_file *m)
 {
+    pr_info("amdgpu_sa: called %s\n", __func__);
 	struct amdgpu_sa_bo *i;
 
 	spin_lock(&sa_manager->wq.lock);

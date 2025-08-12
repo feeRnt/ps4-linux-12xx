@@ -36,6 +36,7 @@
 
 long amdgpu_kms_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
+    pr_info("amdgpu_ioc32: called %s\n", __func__);
 	unsigned int nr = DRM_IOCTL_NR(cmd);
 	int ret;
 

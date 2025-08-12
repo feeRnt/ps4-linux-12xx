@@ -27,16 +27,19 @@
 
 static u32 smuio_v11_0_6_get_rom_index_offset(struct amdgpu_device *adev)
 {
+    pr_info("smuio_v11_0_6: called %s\n", __func__);
 	return SOC15_REG_OFFSET(SMUIO, 0, mmROM_INDEX);
 }
 
 static u32 smuio_v11_0_6_get_rom_data_offset(struct amdgpu_device *adev)
 {
+    pr_info("smuio_v11_0_6: called %s\n", __func__);
 	return SOC15_REG_OFFSET(SMUIO, 0, mmROM_DATA);
 }
 
 static void smuio_v11_0_6_update_rom_clock_gating(struct amdgpu_device *adev, bool enable)
 {
+    pr_info("smuio_v11_0_6: called %s\n", __func__);
 	u32 def, data;
 
 	/* enable/disable ROM CG is not supported on APU */
@@ -58,6 +61,7 @@ static void smuio_v11_0_6_update_rom_clock_gating(struct amdgpu_device *adev, bo
 
 static void smuio_v11_0_6_get_clock_gating_state(struct amdgpu_device *adev, u32 *flags)
 {
+    pr_info("smuio_v11_0_6: called %s\n", __func__);
 	u32 data;
 
 	/* CGTT_ROM_CLK_CTRL0 is not available for APU */

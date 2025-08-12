@@ -45,6 +45,7 @@ union firmware_info {
  */
 uint32_t amdgpu_atomfirmware_query_firmware_capability(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index;
 	u16 data_offset, size;
@@ -77,6 +78,7 @@ uint32_t amdgpu_atomfirmware_query_firmware_capability(struct amdgpu_device *ade
  */
 bool amdgpu_atomfirmware_gpu_virtualization_supported(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	u32 fw_cap;
 
 	fw_cap = adev->mode_info.firmware_flags;
@@ -86,6 +88,7 @@ bool amdgpu_atomfirmware_gpu_virtualization_supported(struct amdgpu_device *adev
 
 void amdgpu_atomfirmware_scratch_regs_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	int index = get_index_into_master_table(atom_master_list_of_data_tables_v2_1,
 						firmwareinfo);
 	uint16_t data_offset;
@@ -103,6 +106,7 @@ void amdgpu_atomfirmware_scratch_regs_init(struct amdgpu_device *adev)
 
 int amdgpu_atomfirmware_allocate_fb_scratch(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	struct atom_context *ctx = adev->mode_info.atom_context;
 	int index = get_index_into_master_table(atom_master_list_of_data_tables_v2_1,
 						vram_usagebyfirmware);
@@ -173,6 +177,7 @@ union vram_module {
 static int convert_atom_mem_type_to_vram_type(struct amdgpu_device *adev,
 					      int atom_mem_type)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	int vram_type;
 
 	if (adev->flags & AMD_IS_APU) {
@@ -224,6 +229,7 @@ amdgpu_atomfirmware_get_vram_info(struct amdgpu_device *adev,
 				  int *vram_width, int *vram_type,
 				  int *vram_vendor)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index, i = 0;
 	u16 data_offset, size;
@@ -391,6 +397,7 @@ amdgpu_atomfirmware_get_vram_info(struct amdgpu_device *adev,
  */
 bool amdgpu_atomfirmware_mem_ecc_supported(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index;
 	u16 data_offset, size;
@@ -445,6 +452,7 @@ bool amdgpu_atomfirmware_mem_ecc_supported(struct amdgpu_device *adev)
  */
 bool amdgpu_atomfirmware_sram_ecc_supported(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	u32 fw_cap;
 
 	fw_cap = adev->mode_info.firmware_flags;
@@ -461,6 +469,7 @@ bool amdgpu_atomfirmware_sram_ecc_supported(struct amdgpu_device *adev)
  */
 bool amdgpu_atomfirmware_dynamic_boot_config_supported(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	u32 fw_cap;
 
 	fw_cap = adev->mode_info.firmware_flags;
@@ -481,6 +490,7 @@ bool amdgpu_atomfirmware_dynamic_boot_config_supported(struct amdgpu_device *ade
 bool amdgpu_atomfirmware_ras_rom_addr(struct amdgpu_device *adev,
 				      u8 *i2c_address)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index;
 	u16 data_offset, size;
@@ -530,6 +540,7 @@ union smu_info {
 
 int amdgpu_atomfirmware_get_clock_info(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	struct amdgpu_pll *spll = &adev->clock.spll;
 	struct amdgpu_pll *mpll = &adev->clock.mpll;
@@ -627,6 +638,7 @@ union gfx_info {
 
 int amdgpu_atomfirmware_get_gfx_info(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index;
 	uint8_t frev, crev;
@@ -690,6 +702,7 @@ int amdgpu_atomfirmware_get_gfx_info(struct amdgpu_device *adev)
  */
 bool amdgpu_atomfirmware_mem_training_supported(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	u32 fw_cap;
 
 	fw_cap = adev->mode_info.firmware_flags;
@@ -699,6 +712,7 @@ bool amdgpu_atomfirmware_mem_training_supported(struct amdgpu_device *adev)
 
 int amdgpu_atomfirmware_get_fw_reserved_fb_size(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atomfirmware: called %s\n", __func__);
 	struct atom_context *ctx = adev->mode_info.atom_context;
 	union firmware_info *firmware_info;
 	int index;

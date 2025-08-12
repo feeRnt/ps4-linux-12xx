@@ -34,6 +34,7 @@ static void
 athub_v2_0_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 					    bool enable)
 {
+    pr_info("athub_v2_0: called %s\n", __func__);
 	uint32_t def, data;
 
 	if (!(adev->cg_flags & AMD_CG_SUPPORT_MC_MGCG))
@@ -54,6 +55,7 @@ static void
 athub_v2_0_update_medium_grain_light_sleep(struct amdgpu_device *adev,
 					   bool enable)
 {
+    pr_info("athub_v2_0: called %s\n", __func__);
 	uint32_t def, data;
 
 	if (!((adev->cg_flags & AMD_CG_SUPPORT_MC_LS) &&
@@ -74,6 +76,7 @@ athub_v2_0_update_medium_grain_light_sleep(struct amdgpu_device *adev,
 int athub_v2_0_set_clockgating(struct amdgpu_device *adev,
 			       enum amd_clockgating_state state)
 {
+    pr_info("athub_v2_0: called %s\n", __func__);
 	if (amdgpu_sriov_vf(adev))
 		return 0;
 
@@ -95,6 +98,7 @@ int athub_v2_0_set_clockgating(struct amdgpu_device *adev,
 
 void athub_v2_0_get_clockgating(struct amdgpu_device *adev, u32 *flags)
 {
+    pr_info("athub_v2_0: called %s\n", __func__);
 	int data;
 
 	/* AMD_CG_SUPPORT_ATHUB_MGCG */

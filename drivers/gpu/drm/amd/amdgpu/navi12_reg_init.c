@@ -28,6 +28,7 @@
 
 int navi12_reg_base_init(struct amdgpu_device *adev)
 {
+    pr_info("navi12_reg_init: called %s\n", __func__);
 	/* HW has more IP blocks,  only initialized the blocks needed by driver */
 	uint32_t i;
 	for (i = 0 ; i < MAX_INSTANCE ; ++i) {

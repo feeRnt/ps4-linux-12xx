@@ -50,6 +50,7 @@ static struct kmem_cache *amdgpu_sync_slab;
  */
 void amdgpu_sync_create(struct amdgpu_sync *sync)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	hash_init(sync->fences);
 	sync->last_vm_update = NULL;
 }
@@ -65,6 +66,7 @@ void amdgpu_sync_create(struct amdgpu_sync *sync)
 static bool amdgpu_sync_same_dev(struct amdgpu_device *adev,
 				 struct dma_fence *f)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	struct drm_sched_fence *s_fence = to_drm_sched_fence(f);
 
 	if (s_fence) {
@@ -86,6 +88,7 @@ static bool amdgpu_sync_same_dev(struct amdgpu_device *adev,
  */
 static void *amdgpu_sync_get_owner(struct dma_fence *f)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	struct drm_sched_fence *s_fence;
 	struct amdgpu_amdkfd_fence *kfd_fence;
 
@@ -114,6 +117,7 @@ static void *amdgpu_sync_get_owner(struct dma_fence *f)
 static void amdgpu_sync_keep_later(struct dma_fence **keep,
 				   struct dma_fence *fence)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	if (*keep && dma_fence_is_later(*keep, fence))
 		return;
 
@@ -132,6 +136,7 @@ static void amdgpu_sync_keep_later(struct dma_fence **keep,
  */
 static bool amdgpu_sync_add_later(struct amdgpu_sync *sync, struct dma_fence *f)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	struct amdgpu_sync_entry *e;
 
 	hash_for_each_possible(sync->fences, e, node, f->context) {
@@ -154,6 +159,7 @@ static bool amdgpu_sync_add_later(struct amdgpu_sync *sync, struct dma_fence *f)
  */
 int amdgpu_sync_fence(struct amdgpu_sync *sync, struct dma_fence *f)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	struct amdgpu_sync_entry *e;
 
 	if (!f)
@@ -181,6 +187,7 @@ int amdgpu_sync_fence(struct amdgpu_sync *sync, struct dma_fence *f)
  */
 int amdgpu_sync_vm_fence(struct amdgpu_sync *sync, struct dma_fence *fence)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	if (!fence)
 		return 0;
 
@@ -193,6 +200,7 @@ static bool amdgpu_sync_test_fence(struct amdgpu_device *adev,
 				   enum amdgpu_sync_mode mode,
 				   void *owner, struct dma_fence *f)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	void *fence_owner = amdgpu_sync_get_owner(f);
 
 	/* Always sync to moves, no matter what */
@@ -252,6 +260,7 @@ int amdgpu_sync_resv(struct amdgpu_device *adev, struct amdgpu_sync *sync,
 		     struct dma_resv *resv, enum amdgpu_sync_mode mode,
 		     void *owner)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	struct dma_resv_list *flist;
 	struct dma_fence *f;
 	unsigned i;
@@ -304,6 +313,7 @@ int amdgpu_sync_resv(struct amdgpu_device *adev, struct amdgpu_sync *sync,
 struct dma_fence *amdgpu_sync_peek_fence(struct amdgpu_sync *sync,
 					 struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	struct amdgpu_sync_entry *e;
 	struct hlist_node *tmp;
 	int i;
@@ -345,6 +355,7 @@ struct dma_fence *amdgpu_sync_peek_fence(struct amdgpu_sync *sync,
  */
 struct dma_fence *amdgpu_sync_get_fence(struct amdgpu_sync *sync)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	struct amdgpu_sync_entry *e;
 	struct hlist_node *tmp;
 	struct dma_fence *f;
@@ -375,6 +386,7 @@ struct dma_fence *amdgpu_sync_get_fence(struct amdgpu_sync *sync)
  */
 int amdgpu_sync_clone(struct amdgpu_sync *source, struct amdgpu_sync *clone)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	struct amdgpu_sync_entry *e;
 	struct hlist_node *tmp;
 	struct dma_fence *f;
@@ -401,6 +413,7 @@ int amdgpu_sync_clone(struct amdgpu_sync *source, struct amdgpu_sync *clone)
 
 int amdgpu_sync_wait(struct amdgpu_sync *sync, bool intr)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	struct amdgpu_sync_entry *e;
 	struct hlist_node *tmp;
 	int i, r;
@@ -427,6 +440,7 @@ int amdgpu_sync_wait(struct amdgpu_sync *sync, bool intr)
  */
 void amdgpu_sync_free(struct amdgpu_sync *sync)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	struct amdgpu_sync_entry *e;
 	struct hlist_node *tmp;
 	unsigned i;
@@ -447,6 +461,7 @@ void amdgpu_sync_free(struct amdgpu_sync *sync)
  */
 int amdgpu_sync_init(void)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	amdgpu_sync_slab = kmem_cache_create(
 		"amdgpu_sync", sizeof(struct amdgpu_sync_entry), 0,
 		SLAB_HWCACHE_ALIGN, NULL);
@@ -463,5 +478,6 @@ int amdgpu_sync_init(void)
  */
 void amdgpu_sync_fini(void)
 {
+    pr_info("amdgpu_sync: called %s\n", __func__);
 	kmem_cache_destroy(amdgpu_sync_slab);
 }

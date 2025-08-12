@@ -60,6 +60,7 @@ static struct kmem_cache *amdgpu_fence_slab;
 
 int amdgpu_fence_slab_init(void)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	amdgpu_fence_slab = kmem_cache_create(
 		"amdgpu_fence", sizeof(struct amdgpu_fence), 0,
 		SLAB_HWCACHE_ALIGN, NULL);
@@ -70,6 +71,7 @@ int amdgpu_fence_slab_init(void)
 
 void amdgpu_fence_slab_fini(void)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	rcu_barrier();
 	kmem_cache_destroy(amdgpu_fence_slab);
 }
@@ -79,6 +81,7 @@ void amdgpu_fence_slab_fini(void)
 static const struct dma_fence_ops amdgpu_fence_ops;
 static inline struct amdgpu_fence *to_amdgpu_fence(struct dma_fence *f)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_fence *__f = container_of(f, struct amdgpu_fence, base);
 
 	if (__f->base.ops == &amdgpu_fence_ops)
@@ -97,6 +100,7 @@ static inline struct amdgpu_fence *to_amdgpu_fence(struct dma_fence *f)
  */
 static void amdgpu_fence_write(struct amdgpu_ring *ring, u32 seq)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_fence_driver *drv = &ring->fence_drv;
 
 	if (drv->cpu_addr)
@@ -113,6 +117,7 @@ static void amdgpu_fence_write(struct amdgpu_ring *ring, u32 seq)
  */
 static u32 amdgpu_fence_read(struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_fence_driver *drv = &ring->fence_drv;
 	u32 seq = 0;
 
@@ -138,6 +143,7 @@ static u32 amdgpu_fence_read(struct amdgpu_ring *ring)
 int amdgpu_fence_emit(struct amdgpu_ring *ring, struct dma_fence **f, struct amdgpu_job *job,
 		      unsigned flags)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct dma_fence *fence;
 	struct amdgpu_fence *am_fence;
@@ -216,6 +222,7 @@ int amdgpu_fence_emit(struct amdgpu_ring *ring, struct dma_fence **f, struct amd
 int amdgpu_fence_emit_polling(struct amdgpu_ring *ring, uint32_t *s,
 			      uint32_t timeout)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	uint32_t seq;
 	signed long r;
 
@@ -246,6 +253,7 @@ int amdgpu_fence_emit_polling(struct amdgpu_ring *ring, uint32_t *s,
  */
 static void amdgpu_fence_schedule_fallback(struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	mod_timer(&ring->fence_drv.fallback_timer,
 		  jiffies + AMDGPU_FENCE_JIFFIES_TIMEOUT);
 }
@@ -263,6 +271,7 @@ static void amdgpu_fence_schedule_fallback(struct amdgpu_ring *ring)
  */
 bool amdgpu_fence_process(struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_fence_driver *drv = &ring->fence_drv;
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t seq, last_seq;
@@ -321,6 +330,7 @@ bool amdgpu_fence_process(struct amdgpu_ring *ring)
  */
 static void amdgpu_fence_fallback(struct timer_list *t)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_ring *ring = from_timer(ring, t,
 					      fence_drv.fallback_timer);
 
@@ -338,6 +348,7 @@ static void amdgpu_fence_fallback(struct timer_list *t)
  */
 int amdgpu_fence_wait_empty(struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	uint64_t seq = READ_ONCE(ring->fence_drv.sync_seq);
 	struct dma_fence *fence, **ptr;
 	int r;
@@ -373,6 +384,7 @@ signed long amdgpu_fence_wait_polling(struct amdgpu_ring *ring,
 				      uint32_t wait_seq,
 				      signed long timeout)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	uint32_t seq;
 
 	do {
@@ -394,6 +406,7 @@ signed long amdgpu_fence_wait_polling(struct amdgpu_ring *ring,
  */
 unsigned amdgpu_fence_count_emitted(struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	uint64_t emitted;
 
 	/* We are not protected by ring lock when reading the last sequence
@@ -423,6 +436,7 @@ int amdgpu_fence_driver_start_ring(struct amdgpu_ring *ring,
 				   struct amdgpu_irq_src *irq_src,
 				   unsigned irq_type)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint64_t index;
 
@@ -461,6 +475,7 @@ int amdgpu_fence_driver_init_ring(struct amdgpu_ring *ring,
 				  unsigned num_hw_submission,
 				  atomic_t *sched_score)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	long timeout;
 	int r;
@@ -531,6 +546,7 @@ int amdgpu_fence_driver_init_ring(struct amdgpu_ring *ring,
  */
 int amdgpu_fence_driver_sw_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	return 0;
 }
 
@@ -544,6 +560,7 @@ int amdgpu_fence_driver_sw_init(struct amdgpu_device *adev)
  */
 void amdgpu_fence_driver_hw_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	int i, r;
 
 	for (i = 0; i < AMDGPU_MAX_RINGS; i++) {
@@ -571,6 +588,7 @@ void amdgpu_fence_driver_hw_fini(struct amdgpu_device *adev)
 
 void amdgpu_fence_driver_sw_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	unsigned int i, j;
 
 	for (i = 0; i < AMDGPU_MAX_RINGS; i++) {
@@ -604,6 +622,7 @@ void amdgpu_fence_driver_sw_fini(struct amdgpu_device *adev)
  */
 void amdgpu_fence_driver_hw_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < AMDGPU_MAX_RINGS; i++) {
@@ -626,6 +645,7 @@ void amdgpu_fence_driver_hw_init(struct amdgpu_device *adev)
  */
 void amdgpu_fence_driver_force_completion(struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	amdgpu_fence_write(ring, ring->fence_drv.sync_seq);
 	amdgpu_fence_process(ring);
 }
@@ -636,11 +656,13 @@ void amdgpu_fence_driver_force_completion(struct amdgpu_ring *ring)
 
 static const char *amdgpu_fence_get_driver_name(struct dma_fence *fence)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	return "amdgpu";
 }
 
 static const char *amdgpu_fence_get_timeline_name(struct dma_fence *f)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 
 	if (test_bit(AMDGPU_FENCE_FLAG_EMBED_IN_JOB_BIT, &f->flags)) {
@@ -663,6 +685,7 @@ static const char *amdgpu_fence_get_timeline_name(struct dma_fence *f)
  */
 static bool amdgpu_fence_enable_signaling(struct dma_fence *f)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 
 	if (test_bit(AMDGPU_FENCE_FLAG_EMBED_IN_JOB_BIT, &f->flags)) {
@@ -690,6 +713,7 @@ static bool amdgpu_fence_enable_signaling(struct dma_fence *f)
  */
 static void amdgpu_fence_free(struct rcu_head *rcu)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct dma_fence *f = container_of(rcu, struct dma_fence, rcu);
 
 	if (test_bit(AMDGPU_FENCE_FLAG_EMBED_IN_JOB_BIT, &f->flags)) {
@@ -717,6 +741,7 @@ static void amdgpu_fence_free(struct rcu_head *rcu)
  */
 static void amdgpu_fence_release(struct dma_fence *f)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	call_rcu(&f->rcu, amdgpu_fence_free);
 }
 
@@ -734,6 +759,7 @@ static const struct dma_fence_ops amdgpu_fence_ops = {
 #if defined(CONFIG_DEBUG_FS)
 static int amdgpu_debugfs_fence_info_show(struct seq_file *m, void *unused)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	int i;
 
@@ -781,6 +807,7 @@ static int amdgpu_debugfs_fence_info_show(struct seq_file *m, void *unused)
  */
 static int gpu_recover_get(void *data, u64 *val)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)data;
 	struct drm_device *dev = adev_to_drm(adev);
 	int r;
@@ -807,6 +834,7 @@ DEFINE_DEBUGFS_ATTRIBUTE(amdgpu_debugfs_gpu_recover_fops, gpu_recover_get, NULL,
 
 void amdgpu_debugfs_fence_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_fence: called %s\n", __func__);
 #if defined(CONFIG_DEBUG_FS)
 	struct drm_minor *minor = adev_to_drm(adev)->primary;
 	struct dentry *root = minor->debugfs_root;

@@ -31,6 +31,7 @@
 static void hdp_v5_0_flush_hdp(struct amdgpu_device *adev,
 				struct amdgpu_ring *ring)
 {
+    pr_info("hdp_v5_0: called %s\n", __func__);
 	if (!ring || !ring->funcs->emit_wreg)
 		WREG32_NO_KIQ((adev->rmmio_remap.reg_offset + KFD_MMIO_REMAP_HDP_MEM_FLUSH_CNTL) >> 2, 0);
 	else
@@ -40,6 +41,7 @@ static void hdp_v5_0_flush_hdp(struct amdgpu_device *adev,
 static void hdp_v5_0_invalidate_hdp(struct amdgpu_device *adev,
 				    struct amdgpu_ring *ring)
 {
+    pr_info("hdp_v5_0: called %s\n", __func__);
 	if (!ring || !ring->funcs->emit_wreg) {
 		WREG32_SOC15_NO_KIQ(HDP, 0, mmHDP_READ_CACHE_INVALIDATE, 1);
 	} else {
@@ -51,6 +53,7 @@ static void hdp_v5_0_invalidate_hdp(struct amdgpu_device *adev,
 static void hdp_v5_0_update_mem_power_gating(struct amdgpu_device *adev,
 					  bool enable)
 {
+    pr_info("hdp_v5_0: called %s\n", __func__);
 	uint32_t hdp_clk_cntl, hdp_clk_cntl1;
 	uint32_t hdp_mem_pwr_cntl;
 
@@ -145,6 +148,7 @@ static void hdp_v5_0_update_mem_power_gating(struct amdgpu_device *adev,
 static void hdp_v5_0_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 						      bool enable)
 {
+    pr_info("hdp_v5_0: called %s\n", __func__);
 	uint32_t hdp_clk_cntl;
 
 	if (!(adev->cg_flags & AMD_CG_SUPPORT_HDP_MGCG))
@@ -176,6 +180,7 @@ static void hdp_v5_0_update_medium_grain_clock_gating(struct amdgpu_device *adev
 static void hdp_v5_0_update_clock_gating(struct amdgpu_device *adev,
 					      bool enable)
 {
+    pr_info("hdp_v5_0: called %s\n", __func__);
 	hdp_v5_0_update_mem_power_gating(adev, enable);
 	hdp_v5_0_update_medium_grain_clock_gating(adev, enable);
 }
@@ -183,6 +188,7 @@ static void hdp_v5_0_update_clock_gating(struct amdgpu_device *adev,
 static void hdp_v5_0_get_clockgating_state(struct amdgpu_device *adev,
 					    u32 *flags)
 {
+    pr_info("hdp_v5_0: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* AMD_CG_SUPPORT_HDP_MGCG */
@@ -207,6 +213,7 @@ static void hdp_v5_0_get_clockgating_state(struct amdgpu_device *adev,
 
 static void hdp_v5_0_init_registers(struct amdgpu_device *adev)
 {
+    pr_info("hdp_v5_0: called %s\n", __func__);
 	u32 tmp;
 
 	tmp = RREG32_SOC15(HDP, 0, mmHDP_MISC_CNTL);

@@ -39,6 +39,7 @@ static int amdgpu_atombios_i2c_process_i2c_ch(struct amdgpu_i2c_chan *chan,
 				       u8 slave_addr, u8 flags,
 				       u8 *buf, u8 num)
 {
+    pr_info("atombios_i2c: called %s\n", __func__);
 	struct drm_device *dev = chan->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	PROCESS_I2C_CHANNEL_TRANSACTION_PS_ALLOCATION args;
@@ -107,6 +108,7 @@ done:
 int amdgpu_atombios_i2c_xfer(struct i2c_adapter *i2c_adap,
 		      struct i2c_msg *msgs, int num)
 {
+    pr_info("atombios_i2c: called %s\n", __func__);
 	struct amdgpu_i2c_chan *i2c = i2c_get_adapdata(i2c_adap);
 	struct i2c_msg *p;
 	int i, remaining, current_count, buffer_offset, max_bytes, ret;
@@ -156,11 +158,13 @@ int amdgpu_atombios_i2c_xfer(struct i2c_adapter *i2c_adap,
 
 u32 amdgpu_atombios_i2c_func(struct i2c_adapter *adap)
 {
+    pr_info("atombios_i2c: called %s\n", __func__);
 	return I2C_FUNC_I2C | I2C_FUNC_SMBUS_EMUL;
 }
 
 void amdgpu_atombios_i2c_channel_trans(struct amdgpu_device *adev, u8 slave_addr, u8 line_number, u8 offset, u8 data)
 {
+    pr_info("atombios_i2c: called %s\n", __func__);
 	PROCESS_I2C_CHANNEL_TRANSACTION_PS_ALLOCATION args;
 	int index = GetIndexIntoMasterTable(COMMAND, ProcessI2cChannelTransaction);
 

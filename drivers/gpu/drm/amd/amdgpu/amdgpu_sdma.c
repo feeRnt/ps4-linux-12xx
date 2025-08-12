@@ -35,6 +35,7 @@
 
 struct amdgpu_sdma_instance *amdgpu_sdma_get_instance_from_ring(struct amdgpu_ring *ring)
 {
+    pr_info("amdgpu_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	int i;
 
@@ -48,6 +49,7 @@ struct amdgpu_sdma_instance *amdgpu_sdma_get_instance_from_ring(struct amdgpu_ri
 
 int amdgpu_sdma_get_index_from_ring(struct amdgpu_ring *ring, uint32_t *index)
 {
+    pr_info("amdgpu_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	int i;
 
@@ -65,6 +67,7 @@ int amdgpu_sdma_get_index_from_ring(struct amdgpu_ring *ring, uint32_t *index)
 uint64_t amdgpu_sdma_get_csa_mc_addr(struct amdgpu_ring *ring,
 				     unsigned vmid)
 {
+    pr_info("amdgpu_sdma: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint64_t csa_mc_addr;
 	uint32_t index = 0;
@@ -89,6 +92,7 @@ uint64_t amdgpu_sdma_get_csa_mc_addr(struct amdgpu_ring *ring,
 int amdgpu_sdma_ras_late_init(struct amdgpu_device *adev,
 			      void *ras_ih_info)
 {
+    pr_info("amdgpu_sdma: called %s\n", __func__);
 	int r, i;
 	struct ras_ih_if *ih_info = (struct ras_ih_if *)ras_ih_info;
 	struct ras_fs_if fs_info = {
@@ -137,6 +141,7 @@ free:
 
 void amdgpu_sdma_ras_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_sdma: called %s\n", __func__);
 	if (amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__SDMA) &&
 			adev->sdma.ras_if) {
 		struct ras_common_if *ras_if = adev->sdma.ras_if;
@@ -158,6 +163,7 @@ int amdgpu_sdma_process_ras_data_cb(struct amdgpu_device *adev,
 		void *err_data,
 		struct amdgpu_iv_entry *entry)
 {
+    pr_info("amdgpu_sdma: called %s\n", __func__);
 	kgd2kfd_set_sram_ecc_flag(adev->kfd.dev);
 	amdgpu_ras_reset_gpu(adev);
 
@@ -168,6 +174,7 @@ int amdgpu_sdma_process_ecc_irq(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
+    pr_info("amdgpu_sdma: called %s\n", __func__);
 	struct ras_common_if *ras_if = adev->sdma.ras_if;
 	struct ras_dispatch_if ih_data = {
 		.entry = entry,

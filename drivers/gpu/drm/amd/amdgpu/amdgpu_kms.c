@@ -45,6 +45,7 @@
 
 void amdgpu_unregister_gpu_instance(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct amdgpu_gpu_instance *gpu_instance;
 	int i;
 
@@ -77,6 +78,7 @@ void amdgpu_unregister_gpu_instance(struct amdgpu_device *adev)
  */
 void amdgpu_driver_unload_kms(struct drm_device *dev)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
 	if (adev == NULL)
@@ -101,6 +103,7 @@ void amdgpu_driver_unload_kms(struct drm_device *dev)
 
 void amdgpu_register_gpu_instance(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct amdgpu_gpu_instance *gpu_instance;
 
 	mutex_lock(&mgpu_info.mutex);
@@ -126,6 +129,7 @@ void amdgpu_register_gpu_instance(struct amdgpu_device *adev)
 
 static void amdgpu_get_audio_func(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct pci_dev *p = NULL;
 
 	p = pci_get_domain_bus_and_slot(pci_domain_nr(adev->pdev->bus),
@@ -151,6 +155,7 @@ static void amdgpu_get_audio_func(struct amdgpu_device *adev)
  */
 int amdgpu_driver_load_kms(struct amdgpu_device *adev, unsigned long flags)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct drm_device *dev;
 	struct pci_dev *parent;
 	int r, acpi_status;
@@ -284,6 +289,7 @@ static int amdgpu_firmware_info(struct drm_amdgpu_info_firmware *fw_info,
 				struct drm_amdgpu_query_fw *query_fw,
 				struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	switch (query_fw->fw_type) {
 	case AMDGPU_INFO_FW_VCE:
 		fw_info->ver = adev->vce.fw_version;
@@ -409,6 +415,7 @@ static int amdgpu_hw_ip_info(struct amdgpu_device *adev,
 			     struct drm_amdgpu_info *info,
 			     struct drm_amdgpu_info_hw_ip *result)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	uint32_t ib_start_alignment = 0;
 	uint32_t ib_size_alignment = 0;
 	enum amd_ip_block_type type;
@@ -556,6 +563,7 @@ static int amdgpu_hw_ip_info(struct amdgpu_device *adev,
  */
 int amdgpu_info_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct drm_amdgpu_info *info = data;
 	struct amdgpu_mode_info *minfo = &adev->mode_info;
@@ -1139,6 +1147,7 @@ int amdgpu_info_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
  */
 void amdgpu_driver_lastclose_kms(struct drm_device *dev)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	drm_fb_helper_lastclose(dev);
 	vga_switcheroo_process_delayed_switch();
 }
@@ -1154,6 +1163,7 @@ void amdgpu_driver_lastclose_kms(struct drm_device *dev)
  */
 int amdgpu_driver_open_kms(struct drm_device *dev, struct drm_file *file_priv)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_fpriv *fpriv;
 	int r, pasid;
@@ -1246,6 +1256,7 @@ pm_put:
 void amdgpu_driver_postclose_kms(struct drm_device *dev,
 				 struct drm_file *file_priv)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_fpriv *fpriv = file_priv->driver_priv;
 	struct amdgpu_bo_list *list;
@@ -1299,6 +1310,7 @@ void amdgpu_driver_postclose_kms(struct drm_device *dev,
 
 void amdgpu_driver_release_kms(struct drm_device *dev)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
 	amdgpu_device_fini_sw(adev);
@@ -1318,6 +1330,7 @@ void amdgpu_driver_release_kms(struct drm_device *dev)
  */
 u32 amdgpu_get_vblank_counter_kms(struct drm_crtc *crtc)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = crtc->index;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -1386,6 +1399,7 @@ u32 amdgpu_get_vblank_counter_kms(struct drm_crtc *crtc)
  */
 int amdgpu_enable_vblank_kms(struct drm_crtc *crtc)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = crtc->index;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -1403,6 +1417,7 @@ int amdgpu_enable_vblank_kms(struct drm_crtc *crtc)
  */
 void amdgpu_disable_vblank_kms(struct drm_crtc *crtc)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = crtc->index;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -1418,6 +1433,7 @@ void amdgpu_disable_vblank_kms(struct drm_crtc *crtc)
 
 static int amdgpu_debugfs_firmware_info_show(struct seq_file *m, void *unused)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	struct drm_amdgpu_info_firmware fw_info;
 	struct drm_amdgpu_query_fw query_fw;
@@ -1624,6 +1640,7 @@ DEFINE_SHOW_ATTRIBUTE(amdgpu_debugfs_firmware_info);
 
 void amdgpu_debugfs_firmware_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_kms: called %s\n", __func__);
 #if defined(CONFIG_DEBUG_FS)
 	struct drm_minor *minor = adev_to_drm(adev)->primary;
 	struct dentry *root = minor->debugfs_root;

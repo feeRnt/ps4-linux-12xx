@@ -43,6 +43,7 @@
 
 int gfxhub_v1_1_get_xgmi_info(struct amdgpu_device *adev)
 {
+    pr_info("gfxhub_v1_1: called %s\n", __func__);
 	u32 max_num_physical_nodes;
 	u32 max_physical_node_id;
 	u32 xgmi_lfb_cntl;

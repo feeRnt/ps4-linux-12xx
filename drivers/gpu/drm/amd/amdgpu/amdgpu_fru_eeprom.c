@@ -34,6 +34,7 @@
 
 static bool is_fru_eeprom_supported(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_fru_eeprom: called %s\n", __func__);
 	/* Only server cards have the FRU EEPROM
 	 * TODO: See if we can figure this out dynamically instead of
 	 * having to parse VBIOS versions.
@@ -64,6 +65,7 @@ static bool is_fru_eeprom_supported(struct amdgpu_device *adev)
 static int amdgpu_fru_read_eeprom(struct amdgpu_device *adev, uint32_t addrptr,
 				  unsigned char *buff)
 {
+    pr_info("amdgpu_fru_eeprom: called %s\n", __func__);
 	int ret, size;
 
 	ret = amdgpu_eeprom_read(&adev->pm.smu_i2c, addrptr, buff, 1);
@@ -88,6 +90,7 @@ static int amdgpu_fru_read_eeprom(struct amdgpu_device *adev, uint32_t addrptr,
 
 int amdgpu_fru_get_product_info(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_fru_eeprom: called %s\n", __func__);
 	unsigned char buff[34];
 	u32 addrptr;
 	int size, len;

@@ -40,11 +40,13 @@ static void amdgpu_atombios_lookup_i2c_gpio_quirks(struct amdgpu_device *adev,
 					  ATOM_GPIO_I2C_ASSIGMENT *gpio,
 					  u8 index)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 
 }
 
 static struct amdgpu_i2c_bus_rec amdgpu_atombios_get_bus_rec_for_i2c_gpio(ATOM_GPIO_I2C_ASSIGMENT *gpio)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_i2c_bus_rec i2c;
 
 	memset(&i2c, 0, sizeof(struct amdgpu_i2c_bus_rec));
@@ -89,6 +91,7 @@ static struct amdgpu_i2c_bus_rec amdgpu_atombios_get_bus_rec_for_i2c_gpio(ATOM_G
 struct amdgpu_i2c_bus_rec amdgpu_atombios_lookup_i2c_gpio(struct amdgpu_device *adev,
 							  uint8_t id)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct atom_context *ctx = adev->mode_info.atom_context;
 	ATOM_GPIO_I2C_ASSIGMENT *gpio;
 	struct amdgpu_i2c_bus_rec i2c;
@@ -125,6 +128,7 @@ struct amdgpu_i2c_bus_rec amdgpu_atombios_lookup_i2c_gpio(struct amdgpu_device *
 
 void amdgpu_atombios_i2c_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct atom_context *ctx = adev->mode_info.atom_context;
 	ATOM_GPIO_I2C_ASSIGMENT *gpio;
 	struct amdgpu_i2c_bus_rec i2c;
@@ -160,6 +164,7 @@ struct amdgpu_gpio_rec
 amdgpu_atombios_lookup_gpio(struct amdgpu_device *adev,
 			    u8 id)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct atom_context *ctx = adev->mode_info.atom_context;
 	struct amdgpu_gpio_rec gpio;
 	int index = GetIndexIntoMasterTable(DATA, GPIO_Pin_LUT);
@@ -199,6 +204,7 @@ static struct amdgpu_hpd
 amdgpu_atombios_get_hpd_info_from_gpio(struct amdgpu_device *adev,
 				       struct amdgpu_gpio_rec *gpio)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_hpd hpd;
 	u32 reg;
 
@@ -263,6 +269,7 @@ static const int object_connector_convert[] = {
 
 bool amdgpu_atombios_has_dce_engine_info(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	struct atom_context *ctx = mode_info->atom_context;
 	int index = GetIndexIntoMasterTable(DATA, Object_Header);
@@ -290,6 +297,7 @@ bool amdgpu_atombios_has_dce_engine_info(struct amdgpu_device *adev)
 
 bool amdgpu_atombios_get_connector_info_from_object_table(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	struct atom_context *ctx = mode_info->atom_context;
 	int index = GetIndexIntoMasterTable(DATA, Object_Header);
@@ -557,6 +565,7 @@ union firmware_info {
 
 int amdgpu_atombios_get_clock_info(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index = GetIndexIntoMasterTable(DATA, FirmwareInfo);
 	uint8_t frev, crev;
@@ -711,6 +720,7 @@ union gfx_info {
 
 int amdgpu_atombios_get_gfx_info(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index = GetIndexIntoMasterTable(DATA, GFX_Info);
 	uint8_t frev, crev;
@@ -750,6 +760,7 @@ union igp_info {
  */
 int amdgpu_atombios_get_vram_width(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index = GetIndexIntoMasterTable(DATA, IntegratedSystemInfo);
 	u16 data_offset, size;
@@ -777,6 +788,7 @@ static void amdgpu_atombios_get_igp_ss_overrides(struct amdgpu_device *adev,
 						 struct amdgpu_atom_ss *ss,
 						 int id)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index = GetIndexIntoMasterTable(DATA, IntegratedSystemInfo);
 	u16 data_offset, size;
@@ -881,6 +893,7 @@ bool amdgpu_atombios_get_asic_ss_info(struct amdgpu_device *adev,
 				      struct amdgpu_atom_ss *ss,
 				      int id, u32 clock)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index = GetIndexIntoMasterTable(DATA, ASIC_InternalSS_Info);
 	uint16_t data_offset, size;
@@ -999,6 +1012,7 @@ int amdgpu_atombios_get_clock_dividers(struct amdgpu_device *adev,
 				       bool strobe_mode,
 				       struct atom_clock_dividers *dividers)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	union get_clock_dividers args;
 	int index = GetIndexIntoMasterTable(COMMAND, ComputeMemoryEnginePLL);
 	u8 frev, crev;
@@ -1088,6 +1102,7 @@ int amdgpu_atombios_get_memory_pll_dividers(struct amdgpu_device *adev,
 					    bool strobe_mode,
 					    struct atom_mpll_param *mpll_param)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	COMPUTE_MEMORY_CLOCK_PARAM_PARAMETERS_V2_1 args;
 	int index = GetIndexIntoMasterTable(COMMAND, ComputeMemoryClockParam);
 	u8 frev, crev;
@@ -1137,6 +1152,7 @@ int amdgpu_atombios_get_memory_pll_dividers(struct amdgpu_device *adev,
 void amdgpu_atombios_set_engine_dram_timings(struct amdgpu_device *adev,
 					     u32 eng_clock, u32 mem_clock)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	SET_ENGINE_CLOCK_PS_ALLOCATION args;
 	int index = GetIndexIntoMasterTable(COMMAND, DynamicMemorySettings);
 	u32 tmp;
@@ -1156,6 +1172,7 @@ void amdgpu_atombios_set_engine_dram_timings(struct amdgpu_device *adev,
 void amdgpu_atombios_get_default_voltages(struct amdgpu_device *adev,
 					  u16 *vddc, u16 *vddci, u16 *mvdd)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
 	int index = GetIndexIntoMasterTable(DATA, FirmwareInfo);
 	u8 frev, crev;
@@ -1189,6 +1206,7 @@ union set_voltage {
 int amdgpu_atombios_get_max_vddc(struct amdgpu_device *adev, u8 voltage_type,
 			     u16 voltage_id, u16 *voltage)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	union set_voltage args;
 	int index = GetIndexIntoMasterTable(COMMAND, SetVoltage);
 	u8 frev, crev;
@@ -1229,6 +1247,7 @@ int amdgpu_atombios_get_leakage_vddc_based_on_leakage_idx(struct amdgpu_device *
 						      u16 *voltage,
 						      u16 leakage_idx)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	return amdgpu_atombios_get_max_vddc(adev, VOLTAGE_TYPE_VDDC, leakage_idx, voltage);
 }
 
@@ -1248,6 +1267,7 @@ union voltage_object {
 static ATOM_VOLTAGE_OBJECT_V3 *amdgpu_atombios_lookup_voltage_object_v3(ATOM_VOLTAGE_OBJECT_INFO_V3_1 *v3,
 									u8 voltage_type, u8 voltage_mode)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	u32 size = le16_to_cpu(v3->sHeader.usStructureSize);
 	u32 offset = offsetof(ATOM_VOLTAGE_OBJECT_INFO_V3_1, asVoltageObj[0]);
 	u8 *start = (u8 *)v3;
@@ -1266,6 +1286,7 @@ int amdgpu_atombios_get_svi2_info(struct amdgpu_device *adev,
 			      u8 voltage_type,
 			      u8 *svd_gpio_id, u8 *svc_gpio_id)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	int index = GetIndexIntoMasterTable(DATA, VoltageObjectInfo);
 	u8 frev, crev;
 	u16 data_offset, size;
@@ -1310,6 +1331,7 @@ bool
 amdgpu_atombios_is_voltage_gpio(struct amdgpu_device *adev,
 				u8 voltage_type, u8 voltage_mode)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	int index = GetIndexIntoMasterTable(DATA, VoltageObjectInfo);
 	u8 frev, crev;
 	u16 data_offset, size;
@@ -1346,6 +1368,7 @@ int amdgpu_atombios_get_voltage_table(struct amdgpu_device *adev,
 				      u8 voltage_type, u8 voltage_mode,
 				      struct atom_voltage_table *voltage_table)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	int index = GetIndexIntoMasterTable(DATA, VoltageObjectInfo);
 	u8 frev, crev;
 	u16 data_offset, size;
@@ -1417,6 +1440,7 @@ int amdgpu_atombios_init_mc_reg_table(struct amdgpu_device *adev,
 				      u8 module_index,
 				      struct atom_mc_reg_table *reg_table)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	int index = GetIndexIntoMasterTable(DATA, VRAM_Info);
 	u8 frev, crev, num_entries, t_mem_id, num_ranges = 0;
 	u32 i = 0, j;
@@ -1506,6 +1530,7 @@ int amdgpu_atombios_init_mc_reg_table(struct amdgpu_device *adev,
 
 bool amdgpu_atombios_has_gpu_virtualization_table(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	int index = GetIndexIntoMasterTable(DATA, GPUVirtualizationInfo);
 	u8 frev, crev;
 	u16 data_offset, size;
@@ -1519,6 +1544,7 @@ bool amdgpu_atombios_has_gpu_virtualization_table(struct amdgpu_device *adev)
 
 void amdgpu_atombios_scratch_regs_lock(struct amdgpu_device *adev, bool lock)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	uint32_t bios_6_scratch;
 
 	bios_6_scratch = RREG32(adev->bios_scratch_reg_offset + 6);
@@ -1536,6 +1562,7 @@ void amdgpu_atombios_scratch_regs_lock(struct amdgpu_device *adev, bool lock)
 
 static void amdgpu_atombios_scratch_regs_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	uint32_t bios_2_scratch, bios_6_scratch;
 
 	adev->bios_scratch_reg_offset = mmBIOS_SCRATCH_0;
@@ -1559,6 +1586,7 @@ static void amdgpu_atombios_scratch_regs_init(struct amdgpu_device *adev)
 void amdgpu_atombios_scratch_regs_engine_hung(struct amdgpu_device *adev,
 					      bool hung)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	u32 tmp = RREG32(adev->bios_scratch_reg_offset + 3);
 
 	if (hung)
@@ -1571,6 +1599,7 @@ void amdgpu_atombios_scratch_regs_engine_hung(struct amdgpu_device *adev,
 
 bool amdgpu_atombios_scratch_need_asic_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	u32 tmp = RREG32(adev->bios_scratch_reg_offset + 7);
 
 	if (tmp & ATOM_S7_ASIC_INIT_COMPLETE_MASK)
@@ -1590,6 +1619,7 @@ bool amdgpu_atombios_scratch_need_asic_init(struct amdgpu_device *adev)
  */
 void amdgpu_atombios_copy_swap(u8 *dst, u8 *src, u8 num_bytes, bool to_le)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 #ifdef __BIG_ENDIAN
 	u32 src_tmp[5], dst_tmp[5];
 	int i;
@@ -1613,6 +1643,7 @@ void amdgpu_atombios_copy_swap(u8 *dst, u8 *src, u8 num_bytes, bool to_le)
 
 static int amdgpu_atombios_allocate_fb_scratch(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct atom_context *ctx = adev->mode_info.atom_context;
 	int index = GetIndexIntoMasterTable(DATA, VRAM_UsageByFirmware);
 	uint16_t data_offset;
@@ -1675,6 +1706,7 @@ static int amdgpu_atombios_allocate_fb_scratch(struct amdgpu_device *adev)
  */
 static uint32_t cail_pll_read(struct card_info *info, uint32_t reg)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	return 0;
 }
 
@@ -1689,6 +1721,7 @@ static uint32_t cail_pll_read(struct card_info *info, uint32_t reg)
  */
 static void cail_pll_write(struct card_info *info, uint32_t reg, uint32_t val)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 
 }
 
@@ -1703,6 +1736,7 @@ static void cail_pll_write(struct card_info *info, uint32_t reg, uint32_t val)
  */
 static uint32_t cail_mc_read(struct card_info *info, uint32_t reg)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	return 0;
 }
 
@@ -1717,6 +1751,7 @@ static uint32_t cail_mc_read(struct card_info *info, uint32_t reg)
  */
 static void cail_mc_write(struct card_info *info, uint32_t reg, uint32_t val)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 
 }
 
@@ -1731,6 +1766,7 @@ static void cail_mc_write(struct card_info *info, uint32_t reg, uint32_t val)
  */
 static void cail_reg_write(struct card_info *info, uint32_t reg, uint32_t val)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(info->dev);
 
 	WREG32(reg, val);
@@ -1747,6 +1783,7 @@ static void cail_reg_write(struct card_info *info, uint32_t reg, uint32_t val)
  */
 static uint32_t cail_reg_read(struct card_info *info, uint32_t reg)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(info->dev);
 	uint32_t r;
 
@@ -1758,6 +1795,7 @@ static ssize_t amdgpu_atombios_get_vbios_version(struct device *dev,
 						 struct device_attribute *attr,
 						 char *buf)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	struct atom_context *ctx = adev->mode_info.atom_context;
@@ -1788,6 +1826,7 @@ const struct attribute_group amdgpu_vbios_version_attr_group = {
  */
 void amdgpu_atombios_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	if (adev->mode_info.atom_context) {
 		kfree(adev->mode_info.atom_context->scratch);
 		kfree(adev->mode_info.atom_context->iio);
@@ -1810,6 +1849,7 @@ void amdgpu_atombios_fini(struct amdgpu_device *adev)
  */
 int amdgpu_atombios_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	struct card_info *atom_card_info =
 	    kzalloc(sizeof(struct card_info), GFP_KERNEL);
 
@@ -1853,6 +1893,7 @@ int amdgpu_atombios_get_data_table(struct amdgpu_device *adev,
 				   uint8_t *crev,
 				   uint8_t **addr)
 {
+    pr_info("amdgpu_atombios: called %s\n", __func__);
 	uint16_t data_start;
 
 	if (!amdgpu_atom_parse_data_header(adev->mode_info.atom_context, table,

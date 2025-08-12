@@ -90,6 +90,7 @@
 static int __amdgpu_eeprom_xfer(struct i2c_adapter *i2c_adap, u32 eeprom_addr,
 				u8 *eeprom_buf, u16 buf_size, bool read)
 {
+    pr_info("amdgpu_eeprom: called %s\n", __func__);
 	u8 eeprom_offset_buf[EEPROM_OFFSET_SIZE];
 	struct i2c_msg msgs[] = {
 		{
@@ -179,6 +180,7 @@ static int __amdgpu_eeprom_xfer(struct i2c_adapter *i2c_adap, u32 eeprom_addr,
 static int amdgpu_eeprom_xfer(struct i2c_adapter *i2c_adap, u32 eeprom_addr,
 			      u8 *eeprom_buf, u16 buf_size, bool read)
 {
+    pr_info("amdgpu_eeprom: called %s\n", __func__);
 	const struct i2c_adapter_quirks *quirks = i2c_adap->quirks;
 	u16 limit;
 
@@ -226,6 +228,7 @@ int amdgpu_eeprom_read(struct i2c_adapter *i2c_adap,
 		       u32 eeprom_addr, u8 *eeprom_buf,
 		       u16 bytes)
 {
+    pr_info("amdgpu_eeprom: called %s\n", __func__);
 	return amdgpu_eeprom_xfer(i2c_adap, eeprom_addr, eeprom_buf, bytes,
 				  true);
 }
@@ -234,6 +237,7 @@ int amdgpu_eeprom_write(struct i2c_adapter *i2c_adap,
 			u32 eeprom_addr, u8 *eeprom_buf,
 			u16 bytes)
 {
+    pr_info("amdgpu_eeprom: called %s\n", __func__);
 	return amdgpu_eeprom_xfer(i2c_adap, eeprom_addr, eeprom_buf, bytes,
 				  false);
 }

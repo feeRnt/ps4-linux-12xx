@@ -48,6 +48,7 @@
  */
 static bool check_atom_bios(uint8_t *bios, size_t size)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	uint16_t tmp, bios_header_start;
 
 	if (!bios || size < 0x49) {
@@ -89,6 +90,7 @@ static bool check_atom_bios(uint8_t *bios, size_t size)
  */
 static bool igp_read_bios_from_vram(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	uint8_t __iomem *bios;
 	resource_size_t vram_base;
 	resource_size_t size = 256 * 1024; /* ??? */
@@ -127,6 +129,7 @@ static bool igp_read_bios_from_vram(struct amdgpu_device *adev)
 
 bool amdgpu_read_bios(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	uint8_t __iomem *bios;
 	size_t size;
 
@@ -156,6 +159,7 @@ bool amdgpu_read_bios(struct amdgpu_device *adev)
 
 static bool amdgpu_read_bios_from_rom(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	u8 header[AMD_VBIOS_SIGNATURE_END+1] = {0};
 	int len;
 
@@ -196,6 +200,7 @@ static bool amdgpu_read_bios_from_rom(struct amdgpu_device *adev)
 
 static bool amdgpu_read_platform_bios(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	phys_addr_t rom = adev->pdev->rom;
 	size_t romlen = adev->pdev->romlen;
 	void __iomem *bios;
@@ -248,6 +253,7 @@ free_bios:
 static int amdgpu_atrm_call(acpi_handle atrm_handle, uint8_t *bios,
 			    int offset, int len)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	acpi_status status;
 	union acpi_object atrm_arg_elements[2], *obj;
 	struct acpi_object_list atrm_arg;
@@ -277,6 +283,7 @@ static int amdgpu_atrm_call(acpi_handle atrm_handle, uint8_t *bios,
 
 static bool amdgpu_atrm_get_bios(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	int ret;
 	int size = 256 * 1024;
 	int i;
@@ -343,12 +350,14 @@ static bool amdgpu_atrm_get_bios(struct amdgpu_device *adev)
 #else
 static inline bool amdgpu_atrm_get_bios(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	return false;
 }
 #endif
 
 static bool amdgpu_read_disabled_bios(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	if (adev->flags & AMD_IS_APU)
 		return igp_read_bios_from_vram(adev);
 	else
@@ -359,6 +368,7 @@ static bool amdgpu_read_disabled_bios(struct amdgpu_device *adev)
 #ifdef CONFIG_ACPI
 static bool amdgpu_acpi_vfct_bios(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	struct acpi_table_header *hdr;
 	acpi_size tbl_size;
 	UEFI_ACPI_VFCT *vfct;
@@ -416,12 +426,14 @@ static bool amdgpu_acpi_vfct_bios(struct amdgpu_device *adev)
 #else
 static inline bool amdgpu_acpi_vfct_bios(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	return false;
 }
 #endif
 
 bool amdgpu_get_bios(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_bios: called %s\n", __func__);
 	if (amdgpu_atrm_get_bios(adev)) {
 		dev_info(adev->dev, "Fetched VBIOS from ATRM\n");
 		goto success;

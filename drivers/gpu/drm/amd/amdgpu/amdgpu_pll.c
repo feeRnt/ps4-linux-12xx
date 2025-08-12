@@ -44,6 +44,7 @@
 static void amdgpu_pll_reduce_ratio(unsigned *nom, unsigned *den,
 				    unsigned nom_min, unsigned den_min)
 {
+    pr_info("amdgpu_pll: called %s\n", __func__);
 	unsigned tmp;
 
 	/* reduce the numbers to a simpler ratio */
@@ -85,6 +86,7 @@ static void amdgpu_pll_get_fb_ref_div(struct amdgpu_device *adev, unsigned int n
 				      unsigned int fb_div_max, unsigned int ref_div_max,
 				      unsigned int *fb_div, unsigned int *ref_div)
 {
+    pr_info("amdgpu_pll: called %s\n", __func__);
 
 	/* limit reference * post divider to a maximum */
 	if (adev->family == AMDGPU_FAMILY_SI)
@@ -126,6 +128,7 @@ void amdgpu_pll_compute(struct amdgpu_device *adev,
 			u32 *ref_div_p,
 			u32 *post_div_p)
 {
+    pr_info("amdgpu_pll: called %s\n", __func__);
 	unsigned target_clock = pll->flags & AMDGPU_PLL_USE_FRAC_FB_DIV ?
 		freq : freq / 10;
 
@@ -266,6 +269,7 @@ void amdgpu_pll_compute(struct amdgpu_device *adev,
  */
 u32 amdgpu_pll_get_use_mask(struct drm_crtc *crtc)
 {
+    pr_info("amdgpu_pll: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_crtc *test_crtc;
 	struct amdgpu_crtc *test_amdgpu_crtc;
@@ -293,6 +297,7 @@ u32 amdgpu_pll_get_use_mask(struct drm_crtc *crtc)
  */
 int amdgpu_pll_get_shared_dp_ppll(struct drm_crtc *crtc)
 {
+    pr_info("amdgpu_pll: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_crtc *test_crtc;
 	struct amdgpu_crtc *test_amdgpu_crtc;
@@ -321,6 +326,7 @@ int amdgpu_pll_get_shared_dp_ppll(struct drm_crtc *crtc)
  */
 int amdgpu_pll_get_shared_nondp_ppll(struct drm_crtc *crtc)
 {
+    pr_info("amdgpu_pll: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct drm_device *dev = crtc->dev;
 	struct drm_crtc *test_crtc;

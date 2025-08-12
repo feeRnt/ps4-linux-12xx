@@ -54,6 +54,7 @@
 
 static void amdgpu_bo_destroy(struct ttm_buffer_object *tbo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_bo *bo = ttm_to_amdgpu_bo(tbo);
 
 	amdgpu_bo_kunmap(bo);
@@ -67,6 +68,7 @@ static void amdgpu_bo_destroy(struct ttm_buffer_object *tbo)
 
 static void amdgpu_bo_user_destroy(struct ttm_buffer_object *tbo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_bo *bo = ttm_to_amdgpu_bo(tbo);
 	struct amdgpu_bo_user *ubo;
 
@@ -77,6 +79,7 @@ static void amdgpu_bo_user_destroy(struct ttm_buffer_object *tbo)
 
 static void amdgpu_bo_vm_destroy(struct ttm_buffer_object *tbo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(tbo->bdev);
 	struct amdgpu_bo *bo = ttm_to_amdgpu_bo(tbo);
 	struct amdgpu_bo_vm *vmbo;
@@ -104,6 +107,7 @@ static void amdgpu_bo_vm_destroy(struct ttm_buffer_object *tbo)
  */
 bool amdgpu_bo_is_amdgpu_bo(struct ttm_buffer_object *bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	if (bo->destroy == &amdgpu_bo_destroy ||
 	    bo->destroy == &amdgpu_bo_user_destroy ||
 	    bo->destroy == &amdgpu_bo_vm_destroy)
@@ -122,6 +126,7 @@ bool amdgpu_bo_is_amdgpu_bo(struct ttm_buffer_object *bo)
  */
 void amdgpu_bo_placement_from_domain(struct amdgpu_bo *abo, u32 domain)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(abo->tbo.bdev);
 	struct ttm_placement *placement = &abo->placement;
 	struct ttm_place *places = abo->placements;
@@ -229,6 +234,7 @@ int amdgpu_bo_create_reserved(struct amdgpu_device *adev,
 			      u32 domain, struct amdgpu_bo **bo_ptr,
 			      u64 *gpu_addr, void **cpu_addr)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_bo_param bp;
 	bool free = false;
 	int r;
@@ -325,6 +331,7 @@ int amdgpu_bo_create_kernel(struct amdgpu_device *adev,
 			    u32 domain, struct amdgpu_bo **bo_ptr,
 			    u64 *gpu_addr, void **cpu_addr)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_bo_create_reserved(adev, size, align, domain, bo_ptr,
@@ -358,6 +365,7 @@ int amdgpu_bo_create_kernel_at(struct amdgpu_device *adev,
 			       uint64_t offset, uint64_t size, uint32_t domain,
 			       struct amdgpu_bo **bo_ptr, void **cpu_addr)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct ttm_operation_ctx ctx = { false, false };
 	unsigned int i;
 	int r;
@@ -418,6 +426,7 @@ error:
 void amdgpu_bo_free_kernel(struct amdgpu_bo **bo, u64 *gpu_addr,
 			   void **cpu_addr)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	if (*bo == NULL)
 		return;
 
@@ -441,6 +450,7 @@ void amdgpu_bo_free_kernel(struct amdgpu_bo **bo, u64 *gpu_addr,
 static bool amdgpu_bo_validate_size(struct amdgpu_device *adev,
 					  unsigned long size, u32 domain)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct ttm_resource_manager *man = NULL;
 
 	/*
@@ -477,6 +487,7 @@ fail:
 
 bool amdgpu_bo_support_uswc(u64 bo_flags)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 
 #ifdef CONFIG_X86_32
 	/* XXX: Write-combined CPU mappings of GTT seem broken on 32-bit
@@ -524,6 +535,7 @@ int amdgpu_bo_create(struct amdgpu_device *adev,
 			       struct amdgpu_bo_param *bp,
 			       struct amdgpu_bo **bo_ptr)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct ttm_operation_ctx ctx = {
 		.interruptible = (bp->type != ttm_bo_type_kernel),
 		.no_wait_gpu = bp->no_wait_gpu,
@@ -648,6 +660,7 @@ int amdgpu_bo_create_user(struct amdgpu_device *adev,
 			  struct amdgpu_bo_param *bp,
 			  struct amdgpu_bo_user **ubo_ptr)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_bo *bo_ptr;
 	int r;
 
@@ -677,6 +690,7 @@ int amdgpu_bo_create_vm(struct amdgpu_device *adev,
 			struct amdgpu_bo_param *bp,
 			struct amdgpu_bo_vm **vmbo_ptr)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_bo *bo_ptr;
 	int r;
 
@@ -708,6 +722,7 @@ int amdgpu_bo_create_vm(struct amdgpu_device *adev,
  */
 int amdgpu_bo_validate(struct amdgpu_bo *bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct ttm_operation_ctx ctx = { false, false };
 	uint32_t domain;
 	int r;
@@ -737,6 +752,7 @@ retry:
  */
 void amdgpu_bo_add_to_shadow_list(struct amdgpu_bo_vm *vmbo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(vmbo->bo.tbo.bdev);
 
 	mutex_lock(&adev->shadow_list_lock);
@@ -760,6 +776,7 @@ void amdgpu_bo_add_to_shadow_list(struct amdgpu_bo_vm *vmbo)
 int amdgpu_bo_restore_shadow(struct amdgpu_bo *shadow, struct dma_fence **fence)
 
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(shadow->tbo.bdev);
 	struct amdgpu_ring *ring = adev->mman.buffer_funcs_ring;
 	uint64_t shadow_addr, parent_addr;
@@ -785,6 +802,7 @@ int amdgpu_bo_restore_shadow(struct amdgpu_bo *shadow, struct dma_fence **fence)
  */
 int amdgpu_bo_kmap(struct amdgpu_bo *bo, void **ptr)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	void *kptr;
 	long r;
 
@@ -824,6 +842,7 @@ int amdgpu_bo_kmap(struct amdgpu_bo *bo, void **ptr)
  */
 void *amdgpu_bo_kptr(struct amdgpu_bo *bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	bool is_iomem;
 
 	return ttm_kmap_obj_virtual(&bo->kmap, &is_iomem);
@@ -837,6 +856,7 @@ void *amdgpu_bo_kptr(struct amdgpu_bo *bo)
  */
 void amdgpu_bo_kunmap(struct amdgpu_bo *bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	if (bo->kmap.bo)
 		ttm_bo_kunmap(&bo->kmap);
 }
@@ -852,6 +872,7 @@ void amdgpu_bo_kunmap(struct amdgpu_bo *bo)
  */
 struct amdgpu_bo *amdgpu_bo_ref(struct amdgpu_bo *bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	if (bo == NULL)
 		return NULL;
 
@@ -867,6 +888,7 @@ struct amdgpu_bo *amdgpu_bo_ref(struct amdgpu_bo *bo)
  */
 void amdgpu_bo_unref(struct amdgpu_bo **bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct ttm_buffer_object *tbo;
 
 	if ((*bo) == NULL)
@@ -902,6 +924,7 @@ void amdgpu_bo_unref(struct amdgpu_bo **bo)
 int amdgpu_bo_pin_restricted(struct amdgpu_bo *bo, u32 domain,
 			     u64 min_offset, u64 max_offset)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	struct ttm_operation_ctx ctx = { false, false };
 	int r, i;
@@ -1004,6 +1027,7 @@ error:
  */
 int amdgpu_bo_pin(struct amdgpu_bo *bo, u32 domain)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	bo->flags |= AMDGPU_GEM_CREATE_VRAM_CONTIGUOUS;
 	return amdgpu_bo_pin_restricted(bo, domain, 0, 0);
 }
@@ -1020,6 +1044,7 @@ int amdgpu_bo_pin(struct amdgpu_bo *bo, u32 domain)
  */
 void amdgpu_bo_unpin(struct amdgpu_bo *bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 
 	ttm_bo_unpin(&bo->tbo);
@@ -1050,6 +1075,7 @@ void amdgpu_bo_unpin(struct amdgpu_bo *bo)
  */
 int amdgpu_bo_evict_vram(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct ttm_resource_manager *man;
 
 	if (adev->in_s3 && (adev->flags & AMD_IS_APU)) {
@@ -1086,6 +1112,7 @@ static const char *amdgpu_vram_names[] = {
  */
 int amdgpu_bo_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	/* On A+A platform, VRAM can be mapped as WB */
 	if (!adev->gmc.xgmi.connected_to_cpu) {
 		/* reserve PAT memory space to WC for VRAM */
@@ -1113,6 +1140,7 @@ int amdgpu_bo_init(struct amdgpu_device *adev)
  */
 void amdgpu_bo_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	amdgpu_ttm_fini(adev);
 }
 
@@ -1129,6 +1157,7 @@ void amdgpu_bo_fini(struct amdgpu_device *adev)
  */
 int amdgpu_bo_set_tiling_flags(struct amdgpu_bo *bo, u64 tiling_flags)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	struct amdgpu_bo_user *ubo;
 
@@ -1152,6 +1181,7 @@ int amdgpu_bo_set_tiling_flags(struct amdgpu_bo *bo, u64 tiling_flags)
  */
 void amdgpu_bo_get_tiling_flags(struct amdgpu_bo *bo, u64 *tiling_flags)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_bo_user *ubo;
 
 	BUG_ON(bo->tbo.type == ttm_bo_type_kernel);
@@ -1178,6 +1208,7 @@ void amdgpu_bo_get_tiling_flags(struct amdgpu_bo *bo, u64 *tiling_flags)
 int amdgpu_bo_set_metadata (struct amdgpu_bo *bo, void *metadata,
 			    uint32_t metadata_size, uint64_t flags)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_bo_user *ubo;
 	void *buffer;
 
@@ -1226,6 +1257,7 @@ int amdgpu_bo_get_metadata(struct amdgpu_bo *bo, void *buffer,
 			   size_t buffer_size, uint32_t *metadata_size,
 			   uint64_t *flags)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_bo_user *ubo;
 
 	if (!buffer && !metadata_size)
@@ -1264,6 +1296,7 @@ void amdgpu_bo_move_notify(struct ttm_buffer_object *bo,
 			   bool evict,
 			   struct ttm_resource *new_mem)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->bdev);
 	struct amdgpu_bo *abo;
 	struct ttm_resource *old_mem = bo->resource;
@@ -1295,6 +1328,7 @@ void amdgpu_bo_move_notify(struct ttm_buffer_object *bo,
 void amdgpu_bo_get_memory(struct amdgpu_bo *bo, uint64_t *vram_mem,
 				uint64_t *gtt_mem, uint64_t *cpu_mem)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	unsigned int domain;
 
 	domain = amdgpu_mem_type_to_domain(bo->tbo.resource->mem_type);
@@ -1321,6 +1355,7 @@ void amdgpu_bo_get_memory(struct amdgpu_bo *bo, uint64_t *vram_mem,
  */
 void amdgpu_bo_release_notify(struct ttm_buffer_object *bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct dma_fence *fence = NULL;
 	struct amdgpu_bo *abo;
 	int r;
@@ -1367,6 +1402,7 @@ void amdgpu_bo_release_notify(struct ttm_buffer_object *bo)
  */
 vm_fault_t amdgpu_bo_fault_reserve_notify(struct ttm_buffer_object *bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->bdev);
 	struct ttm_operation_ctx ctx = { false, false };
 	struct amdgpu_bo *abo = ttm_to_amdgpu_bo(bo);
@@ -1423,6 +1459,7 @@ vm_fault_t amdgpu_bo_fault_reserve_notify(struct ttm_buffer_object *bo)
 void amdgpu_bo_fence(struct amdgpu_bo *bo, struct dma_fence *fence,
 		     bool shared)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct dma_resv *resv = bo->tbo.base.resv;
 
 	if (shared)
@@ -1449,6 +1486,7 @@ int amdgpu_bo_sync_wait_resv(struct amdgpu_device *adev, struct dma_resv *resv,
 			     enum amdgpu_sync_mode sync_mode, void *owner,
 			     bool intr)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_sync sync;
 	int r;
 
@@ -1471,6 +1509,7 @@ int amdgpu_bo_sync_wait_resv(struct amdgpu_device *adev, struct dma_resv *resv,
  */
 int amdgpu_bo_sync_wait(struct amdgpu_bo *bo, void *owner, bool intr)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 
 	return amdgpu_bo_sync_wait_resv(adev, bo->tbo.base.resv,
@@ -1489,6 +1528,7 @@ int amdgpu_bo_sync_wait(struct amdgpu_bo *bo, void *owner, bool intr)
  */
 u64 amdgpu_bo_gpu_offset(struct amdgpu_bo *bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	WARN_ON_ONCE(bo->tbo.resource->mem_type == TTM_PL_SYSTEM);
 	WARN_ON_ONCE(!dma_resv_is_locked(bo->tbo.base.resv) &&
 		     !bo->tbo.pin_count && bo->tbo.type != ttm_bo_type_kernel);
@@ -1508,6 +1548,7 @@ u64 amdgpu_bo_gpu_offset(struct amdgpu_bo *bo)
  */
 u64 amdgpu_bo_gpu_offset_no_check(struct amdgpu_bo *bo)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	uint64_t offset;
 
@@ -1528,6 +1569,7 @@ u64 amdgpu_bo_gpu_offset_no_check(struct amdgpu_bo *bo)
 uint32_t amdgpu_bo_get_preferred_domain(struct amdgpu_device *adev,
 					    uint32_t domain)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	if (domain == (AMDGPU_GEM_DOMAIN_VRAM | AMDGPU_GEM_DOMAIN_GTT)) {
 		domain = AMDGPU_GEM_DOMAIN_VRAM;
 		if (adev->gmc.real_vram_size <= AMDGPU_SG_THRESHOLD)
@@ -1558,6 +1600,7 @@ uint32_t amdgpu_bo_get_preferred_domain(struct amdgpu_device *adev,
  */
 u64 amdgpu_bo_print_info(int id, struct amdgpu_bo *bo, struct seq_file *m)
 {
+    pr_info("amdgpu_object: called %s\n", __func__);
 	struct dma_buf_attachment *attachment;
 	struct dma_buf *dma_buf;
 	unsigned int domain;

@@ -53,6 +53,7 @@
 static int amdgpu_dma_buf_attach(struct dma_buf *dmabuf,
 				 struct dma_buf_attachment *attach)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct drm_gem_object *obj = dmabuf->priv;
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
@@ -86,6 +87,7 @@ out:
 static void amdgpu_dma_buf_detach(struct dma_buf *dmabuf,
 				  struct dma_buf_attachment *attach)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct drm_gem_object *obj = dmabuf->priv;
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
@@ -103,6 +105,7 @@ static void amdgpu_dma_buf_detach(struct dma_buf *dmabuf,
  */
 static int amdgpu_dma_buf_pin(struct dma_buf_attachment *attach)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct drm_gem_object *obj = attach->dmabuf->priv;
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
 	int r;
@@ -131,6 +134,7 @@ static int amdgpu_dma_buf_pin(struct dma_buf_attachment *attach)
  */
 static void amdgpu_dma_buf_unpin(struct dma_buf_attachment *attach)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct drm_gem_object *obj = attach->dmabuf->priv;
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
 
@@ -153,6 +157,7 @@ static void amdgpu_dma_buf_unpin(struct dma_buf_attachment *attach)
 static struct sg_table *amdgpu_dma_buf_map(struct dma_buf_attachment *attach,
 					   enum dma_data_direction dir)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct dma_buf *dma_buf = attach->dmabuf;
 	struct drm_gem_object *obj = dma_buf->priv;
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
@@ -225,6 +230,7 @@ static void amdgpu_dma_buf_unmap(struct dma_buf_attachment *attach,
 				 struct sg_table *sgt,
 				 enum dma_data_direction dir)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	if (sgt->sgl->page_link) {
 		dma_unmap_sgtable(attach->dev, sgt, dir, 0);
 		sg_free_table(sgt);
@@ -249,6 +255,7 @@ static void amdgpu_dma_buf_unmap(struct dma_buf_attachment *attach,
 static int amdgpu_dma_buf_begin_cpu_access(struct dma_buf *dma_buf,
 					   enum dma_data_direction direction)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(dma_buf->priv);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	struct ttm_operation_ctx ctx = { true, false };
@@ -302,6 +309,7 @@ const struct dma_buf_ops amdgpu_dmabuf_ops = {
 struct dma_buf *amdgpu_gem_prime_export(struct drm_gem_object *gobj,
 					int flags)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(gobj);
 	struct dma_buf *buf;
 
@@ -331,6 +339,7 @@ struct dma_buf *amdgpu_gem_prime_export(struct drm_gem_object *gobj,
 static struct drm_gem_object *
 amdgpu_dma_buf_create_obj(struct drm_device *dev, struct dma_buf *dma_buf)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct dma_resv *resv = dma_buf->resv;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct drm_gem_object *gobj;
@@ -375,6 +384,7 @@ error:
 static void
 amdgpu_dma_buf_move_notify(struct dma_buf_attachment *attach)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct drm_gem_object *obj = attach->importer_priv;
 	struct ww_acquire_ctx *ticket = dma_resv_locking_ctx(obj->resv);
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
@@ -445,6 +455,7 @@ static const struct dma_buf_attach_ops amdgpu_dma_buf_attach_ops = {
 struct drm_gem_object *amdgpu_gem_prime_import(struct drm_device *dev,
 					       struct dma_buf *dma_buf)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct dma_buf_attachment *attach;
 	struct drm_gem_object *obj;
 
@@ -488,6 +499,7 @@ struct drm_gem_object *amdgpu_gem_prime_import(struct drm_device *dev,
 bool amdgpu_dmabuf_is_xgmi_accessible(struct amdgpu_device *adev,
 				      struct amdgpu_bo *bo)
 {
+    pr_info("amdgpu_dma_buf: called %s\n", __func__);
 	struct drm_gem_object *obj = &bo->tbo.base;
 	struct drm_gem_object *gobj;
 

@@ -65,6 +65,7 @@ static int psp_load_smu_fw(struct psp_context *psp);
  */
 static void psp_check_pmfw_centralized_cstate_management(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 
 	psp->pmfw_centralized_cstate_management = false;
@@ -82,6 +83,7 @@ static void psp_check_pmfw_centralized_cstate_management(struct psp_context *psp
 
 static int psp_early_init(void *handle)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct psp_context *psp = &adev->psp;
 
@@ -140,6 +142,7 @@ static int psp_early_init(void *handle)
 
 static void psp_memory_training_fini(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct psp_memory_training_context *ctx = &psp->mem_train_ctx;
 
 	ctx->init = PSP_MEM_TRAIN_NOT_SUPPORT;
@@ -149,6 +152,7 @@ static void psp_memory_training_fini(struct psp_context *psp)
 
 static int psp_memory_training_init(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_memory_training_context *ctx = &psp->mem_train_ctx;
 
@@ -190,6 +194,7 @@ static bool psp_get_runtime_db_entry(struct amdgpu_device *adev,
 				     enum psp_runtime_entry_type entry_type,
 				     void *db_entry)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	uint64_t db_header_pos, db_dir_pos;
 	struct psp_runtime_data_header db_header = {0};
 	struct psp_runtime_data_directory db_dir = {0};
@@ -246,6 +251,7 @@ static bool psp_get_runtime_db_entry(struct amdgpu_device *adev,
 
 static int psp_sw_init(void *handle)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct psp_context *psp = &adev->psp;
 	int ret;
@@ -319,6 +325,7 @@ static int psp_sw_init(void *handle)
 
 static int psp_sw_fini(void *handle)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct psp_context *psp = &adev->psp;
 	struct psp_gfx_cmd_resp *cmd = psp->cmd;
@@ -350,6 +357,7 @@ static int psp_sw_fini(void *handle)
 int psp_wait_for(struct psp_context *psp, uint32_t reg_index,
 		 uint32_t reg_val, uint32_t mask, bool check_changed)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	uint32_t val;
 	int i;
 	struct amdgpu_device *adev = psp->adev;
@@ -374,6 +382,7 @@ int psp_wait_for(struct psp_context *psp, uint32_t reg_index,
 
 static const char *psp_gfx_cmd_name(enum psp_gfx_cmd_id cmd_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	switch (cmd_id) {
 	case GFX_CMD_ID_LOAD_TA:
 		return "LOAD_TA";
@@ -415,6 +424,7 @@ psp_cmd_submit_buf(struct psp_context *psp,
 		   struct amdgpu_firmware_info *ucode,
 		   struct psp_gfx_cmd_resp *cmd, uint64_t fence_mc_addr)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	int index, idx;
 	int timeout = 20000;
@@ -492,6 +502,7 @@ exit:
 
 static struct psp_gfx_cmd_resp *acquire_psp_cmd_buf(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct psp_gfx_cmd_resp *cmd = psp->cmd;
 
 	mutex_lock(&psp->mutex);
@@ -503,6 +514,7 @@ static struct psp_gfx_cmd_resp *acquire_psp_cmd_buf(struct psp_context *psp)
 
 void release_psp_cmd_buf(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	mutex_unlock(&psp->mutex);
 }
 
@@ -510,6 +522,7 @@ static void psp_prep_tmr_cmd_buf(struct psp_context *psp,
 				 struct psp_gfx_cmd_resp *cmd,
 				 uint64_t tmr_mc, struct amdgpu_bo *tmr_bo)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	uint32_t size = amdgpu_bo_size(tmr_bo);
 	uint64_t tmr_pa = amdgpu_gmc_vram_pa(adev, tmr_bo);
@@ -529,6 +542,7 @@ static void psp_prep_tmr_cmd_buf(struct psp_context *psp,
 static void psp_prep_load_toc_cmd_buf(struct psp_gfx_cmd_resp *cmd,
 				      uint64_t pri_buf_mc, uint32_t size)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	cmd->cmd_id = GFX_CMD_ID_LOAD_TOC;
 	cmd->cmd.cmd_load_toc.toc_phy_addr_lo = lower_32_bits(pri_buf_mc);
 	cmd->cmd.cmd_load_toc.toc_phy_addr_hi = upper_32_bits(pri_buf_mc);
@@ -539,6 +553,7 @@ static void psp_prep_load_toc_cmd_buf(struct psp_gfx_cmd_resp *cmd,
 static int psp_load_toc(struct psp_context *psp,
 			uint32_t *tmr_size)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
 
@@ -560,6 +575,7 @@ static int psp_load_toc(struct psp_context *psp,
 /* Set up Trusted Memory Region */
 static int psp_tmr_init(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	int tmr_size;
 	void *tmr_buf;
@@ -597,6 +613,7 @@ static int psp_tmr_init(struct psp_context *psp)
 
 static bool psp_skip_tmr(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	switch (psp->adev->asic_type) {
 	case CHIP_NAVI12:
 	case CHIP_SIENNA_CICHLID:
@@ -609,6 +626,7 @@ static bool psp_skip_tmr(struct psp_context *psp)
 
 static int psp_tmr_load(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -635,6 +653,7 @@ static int psp_tmr_load(struct psp_context *psp)
 static void psp_prep_tmr_unload_cmd_buf(struct psp_context *psp,
 				        struct psp_gfx_cmd_resp *cmd)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	if (amdgpu_sriov_vf(psp->adev))
 		cmd->cmd_id = GFX_CMD_ID_DESTROY_VMR;
 	else
@@ -643,6 +662,7 @@ static void psp_prep_tmr_unload_cmd_buf(struct psp_context *psp,
 
 static int psp_tmr_unload(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
 
@@ -659,6 +679,7 @@ static int psp_tmr_unload(struct psp_context *psp)
 
 static int psp_tmr_terminate(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	void *tmr_buf;
 	void **pptr;
@@ -677,6 +698,7 @@ static int psp_tmr_terminate(struct psp_context *psp)
 int psp_get_fw_attestation_records_addr(struct psp_context *psp,
 					uint64_t *output_ptr)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -705,6 +727,7 @@ int psp_get_fw_attestation_records_addr(struct psp_context *psp,
 
 static int psp_boot_config_get(struct amdgpu_device *adev, uint32_t *boot_cfg)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct psp_context *psp = &adev->psp;
 	struct psp_gfx_cmd_resp *cmd;
 	int ret;
@@ -730,6 +753,7 @@ static int psp_boot_config_get(struct amdgpu_device *adev, uint32_t *boot_cfg)
 
 static int psp_boot_config_set(struct amdgpu_device *adev, uint32_t boot_cfg)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_context *psp = &adev->psp;
 	struct psp_gfx_cmd_resp *cmd;
@@ -753,6 +777,7 @@ static int psp_boot_config_set(struct amdgpu_device *adev, uint32_t boot_cfg)
 
 static int psp_rl_load(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_context *psp = &adev->psp;
 	struct psp_gfx_cmd_resp *cmd;
@@ -781,6 +806,7 @@ static int psp_rl_load(struct amdgpu_device *adev)
 static void psp_prep_asd_load_cmd_buf(struct psp_gfx_cmd_resp *cmd,
 				uint64_t asd_mc, uint32_t size)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	cmd->cmd_id = GFX_CMD_ID_LOAD_ASD;
 	cmd->cmd.cmd_load_ta.app_phy_addr_lo = lower_32_bits(asd_mc);
 	cmd->cmd.cmd_load_ta.app_phy_addr_hi = upper_32_bits(asd_mc);
@@ -793,6 +819,7 @@ static void psp_prep_asd_load_cmd_buf(struct psp_gfx_cmd_resp *cmd,
 
 static int psp_asd_load(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -825,12 +852,14 @@ static int psp_asd_load(struct psp_context *psp)
 static void psp_prep_ta_unload_cmd_buf(struct psp_gfx_cmd_resp *cmd,
 				       uint32_t session_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	cmd->cmd_id = GFX_CMD_ID_UNLOAD_TA;
 	cmd->cmd.cmd_unload_ta.session_id = session_id;
 }
 
 static int psp_asd_unload(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -857,6 +886,7 @@ static int psp_asd_unload(struct psp_context *psp)
 static void psp_prep_reg_prog_cmd_buf(struct psp_gfx_cmd_resp *cmd,
 		uint32_t id, uint32_t value)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	cmd->cmd_id = GFX_CMD_ID_PROG_REG;
 	cmd->cmd.cmd_setup_reg_prog.reg_value = value;
 	cmd->cmd.cmd_setup_reg_prog.reg_id = id;
@@ -865,6 +895,7 @@ static void psp_prep_reg_prog_cmd_buf(struct psp_gfx_cmd_resp *cmd,
 int psp_reg_program(struct psp_context *psp, enum psp_reg_prog_id reg,
 		uint32_t value)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct psp_gfx_cmd_resp *cmd;
 	int ret = 0;
 
@@ -889,6 +920,7 @@ static void psp_prep_ta_load_cmd_buf(struct psp_gfx_cmd_resp *cmd,
 				     uint64_t ta_shared_mc,
 				     uint32_t ta_shared_size)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	cmd->cmd_id				= GFX_CMD_ID_LOAD_TA;
 	cmd->cmd.cmd_load_ta.app_phy_addr_lo 	= lower_32_bits(ta_bin_mc);
 	cmd->cmd.cmd_load_ta.app_phy_addr_hi	= upper_32_bits(ta_bin_mc);
@@ -903,6 +935,7 @@ static int psp_ta_init_shared_buf(struct psp_context *psp,
 				  struct ta_mem_context *mem_ctx,
 				  uint32_t shared_mem_size)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	/*
@@ -920,12 +953,14 @@ static int psp_ta_init_shared_buf(struct psp_context *psp,
 
 static void psp_ta_free_shared_buf(struct ta_mem_context *mem_ctx)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	amdgpu_bo_free_kernel(&mem_ctx->shared_bo, &mem_ctx->shared_mc_addr,
 			      &mem_ctx->shared_buf);
 }
 
 static int psp_xgmi_init_shared_buf(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return psp_ta_init_shared_buf(psp, &psp->xgmi_context.context.mem_context,
 				      PSP_XGMI_SHARED_MEM_SIZE);
 }
@@ -934,6 +969,7 @@ static void psp_prep_ta_invoke_cmd_buf(struct psp_gfx_cmd_resp *cmd,
 				       uint32_t ta_cmd_id,
 				       uint32_t session_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	cmd->cmd_id				= GFX_CMD_ID_INVOKE_CMD;
 	cmd->cmd.cmd_invoke_cmd.session_id	= session_id;
 	cmd->cmd.cmd_invoke_cmd.ta_cmd_id	= ta_cmd_id;
@@ -943,6 +979,7 @@ static int psp_ta_invoke(struct psp_context *psp,
 		  uint32_t ta_cmd_id,
 		  uint32_t session_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
 
@@ -958,6 +995,7 @@ static int psp_ta_invoke(struct psp_context *psp,
 
 static int psp_xgmi_load(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -990,6 +1028,7 @@ static int psp_xgmi_load(struct psp_context *psp)
 
 static int psp_xgmi_unload(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 	struct amdgpu_device *adev = psp->adev;
@@ -1017,11 +1056,13 @@ static int psp_xgmi_unload(struct psp_context *psp)
 
 int psp_xgmi_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return psp_ta_invoke(psp, ta_cmd_id, psp->xgmi_context.context.session_id);
 }
 
 int psp_xgmi_terminate(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	if (!psp->xgmi_context.context.initialized)
@@ -1041,6 +1082,7 @@ int psp_xgmi_terminate(struct psp_context *psp)
 
 int psp_xgmi_initialize(struct psp_context *psp, bool set_extended_data, bool load_ta)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct ta_xgmi_shared_memory *xgmi_cmd;
 	int ret;
 
@@ -1077,6 +1119,7 @@ invoke:
 
 int psp_xgmi_get_hive_id(struct psp_context *psp, uint64_t *hive_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct ta_xgmi_shared_memory *xgmi_cmd;
 	int ret;
 
@@ -1097,6 +1140,7 @@ int psp_xgmi_get_hive_id(struct psp_context *psp, uint64_t *hive_id)
 
 int psp_xgmi_get_node_id(struct psp_context *psp, uint64_t *node_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct ta_xgmi_shared_memory *xgmi_cmd;
 	int ret;
 
@@ -1117,6 +1161,7 @@ int psp_xgmi_get_node_id(struct psp_context *psp, uint64_t *node_id)
 
 static bool psp_xgmi_peer_link_info_supported(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return psp->adev->asic_type == CHIP_ALDEBARAN &&
 				psp->xgmi.feature_version >= 0x2000000b;
 }
@@ -1131,6 +1176,7 @@ static bool psp_xgmi_peer_link_info_supported(struct psp_context *psp)
 static void psp_xgmi_reflect_topology_info(struct psp_context *psp,
 					struct psp_xgmi_node_info node_info)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *mirror_adev;
 	struct amdgpu_hive_info *hive;
 	uint64_t src_node_id = psp->adev->gmc.xgmi.node_id;
@@ -1172,6 +1218,7 @@ int psp_xgmi_get_topology_info(struct psp_context *psp,
 			       struct psp_xgmi_topology_info *topology,
 			       bool get_extended_data)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct ta_xgmi_shared_memory *xgmi_cmd;
 	struct ta_xgmi_cmd_get_topology_info_input *topology_info_input;
 	struct ta_xgmi_cmd_get_topology_info_output *topology_info_output;
@@ -1254,6 +1301,7 @@ int psp_xgmi_set_topology_info(struct psp_context *psp,
 			       int number_devices,
 			       struct psp_xgmi_topology_info *topology)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct ta_xgmi_shared_memory *xgmi_cmd;
 	struct ta_xgmi_cmd_get_topology_info_input *topology_info_input;
 	int i;
@@ -1282,12 +1330,14 @@ int psp_xgmi_set_topology_info(struct psp_context *psp,
 // ras begin
 static int psp_ras_init_shared_buf(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return psp_ta_init_shared_buf(psp, &psp->ras_context.context.mem_context,
 				      PSP_RAS_SHARED_MEM_SIZE);
 }
 
 static int psp_ras_load(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 	struct ta_ras_shared_memory *ras_cmd;
@@ -1337,6 +1387,7 @@ static int psp_ras_load(struct psp_context *psp)
 
 static int psp_ras_unload(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -1360,6 +1411,7 @@ static int psp_ras_unload(struct psp_context *psp)
 
 int psp_ras_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct ta_ras_shared_memory *ras_cmd;
 	int ret;
 
@@ -1399,6 +1451,7 @@ int psp_ras_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 static int psp_ras_status_to_errno(struct amdgpu_device *adev,
 					 enum ta_ras_status ras_status)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret = -EINVAL;
 
 	switch (ras_status) {
@@ -1424,6 +1477,7 @@ static int psp_ras_status_to_errno(struct amdgpu_device *adev,
 int psp_ras_enable_features(struct psp_context *psp,
 		union ta_ras_cmd_input *info, bool enable)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct ta_ras_shared_memory *ras_cmd;
 	int ret;
 
@@ -1449,6 +1503,7 @@ int psp_ras_enable_features(struct psp_context *psp,
 
 static int psp_ras_terminate(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	/*
@@ -1474,6 +1529,7 @@ static int psp_ras_terminate(struct psp_context *psp)
 
 static int psp_ras_initialize(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	uint32_t boot_cfg = 0xFF;
 	struct amdgpu_device *adev = psp->adev;
@@ -1547,6 +1603,7 @@ static int psp_ras_initialize(struct psp_context *psp)
 int psp_ras_trigger_error(struct psp_context *psp,
 			  struct ta_ras_trigger_error_input *info)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct ta_ras_shared_memory *ras_cmd;
 	int ret;
 
@@ -1575,12 +1632,14 @@ int psp_ras_trigger_error(struct psp_context *psp,
 // HDCP start
 static int psp_hdcp_init_shared_buf(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return psp_ta_init_shared_buf(psp, &psp->hdcp_context.context.mem_context,
 				      PSP_HDCP_SHARED_MEM_SIZE);
 }
 
 static int psp_hdcp_load(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -1615,6 +1674,7 @@ static int psp_hdcp_load(struct psp_context *psp)
 }
 static int psp_hdcp_initialize(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	/*
@@ -1644,6 +1704,7 @@ static int psp_hdcp_initialize(struct psp_context *psp)
 
 static int psp_hdcp_unload(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -1666,6 +1727,7 @@ static int psp_hdcp_unload(struct psp_context *psp)
 
 int psp_hdcp_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	/*
 	 * TODO: bypass the loading in sriov for now
 	 */
@@ -1677,6 +1739,7 @@ int psp_hdcp_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 
 static int psp_hdcp_terminate(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	/*
@@ -1709,12 +1772,14 @@ out:
 // DTM start
 static int psp_dtm_init_shared_buf(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return psp_ta_init_shared_buf(psp, &psp->dtm_context.context.mem_context,
 				      PSP_DTM_SHARED_MEM_SIZE);
 }
 
 static int psp_dtm_load(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -1749,6 +1814,7 @@ static int psp_dtm_load(struct psp_context *psp)
 
 static int psp_dtm_initialize(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	/*
@@ -1778,6 +1844,7 @@ static int psp_dtm_initialize(struct psp_context *psp)
 
 static int psp_dtm_unload(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -1800,6 +1867,7 @@ static int psp_dtm_unload(struct psp_context *psp)
 
 int psp_dtm_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	/*
 	 * TODO: bypass the loading in sriov for now
 	 */
@@ -1811,6 +1879,7 @@ int psp_dtm_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 
 static int psp_dtm_terminate(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	/*
@@ -1843,12 +1912,14 @@ out:
 // RAP start
 static int psp_rap_init_shared_buf(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return psp_ta_init_shared_buf(psp, &psp->rap_context.context.mem_context,
 				      PSP_RAP_SHARED_MEM_SIZE);
 }
 
 static int psp_rap_load(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd;
 
@@ -1877,6 +1948,7 @@ static int psp_rap_load(struct psp_context *psp)
 
 static int psp_rap_unload(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
 
@@ -1891,6 +1963,7 @@ static int psp_rap_unload(struct psp_context *psp)
 
 static int psp_rap_initialize(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	enum ta_rap_status status = TA_RAP_STATUS__SUCCESS;
 
@@ -1935,6 +2008,7 @@ static int psp_rap_initialize(struct psp_context *psp)
 
 static int psp_rap_terminate(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	if (!psp->rap_context.context.initialized)
@@ -1952,6 +2026,7 @@ static int psp_rap_terminate(struct psp_context *psp)
 
 int psp_rap_invoke(struct psp_context *psp, uint32_t ta_cmd_id, enum ta_rap_status *status)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct ta_rap_shared_memory *rap_cmd;
 	int ret = 0;
 
@@ -1988,6 +2063,7 @@ out_unlock:
 /* securedisplay start */
 static int psp_securedisplay_init_shared_buf(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return psp_ta_init_shared_buf(
 		psp, &psp->securedisplay_context.context.mem_context,
 		PSP_SECUREDISPLAY_SHARED_MEM_SIZE);
@@ -1995,6 +2071,7 @@ static int psp_securedisplay_init_shared_buf(struct psp_context *psp)
 
 static int psp_securedisplay_load(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
 
@@ -2022,6 +2099,7 @@ static int psp_securedisplay_load(struct psp_context *psp)
 
 static int psp_securedisplay_unload(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
 
@@ -2036,6 +2114,7 @@ static int psp_securedisplay_unload(struct psp_context *psp)
 
 static int psp_securedisplay_initialize(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct securedisplay_cmd *securedisplay_cmd;
 
@@ -2087,6 +2166,7 @@ static int psp_securedisplay_initialize(struct psp_context *psp)
 
 static int psp_securedisplay_terminate(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	/*
@@ -2112,6 +2192,7 @@ static int psp_securedisplay_terminate(struct psp_context *psp)
 
 int psp_securedisplay_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	if (!psp->securedisplay_context.context.initialized)
@@ -2133,6 +2214,7 @@ int psp_securedisplay_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 
 static int psp_hw_start(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	int ret;
 
@@ -2236,6 +2318,7 @@ static int psp_hw_start(struct psp_context *psp)
 static int psp_get_fw_type(struct amdgpu_firmware_info *ucode,
 			   enum psp_gfx_fw_type *type)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	switch (ucode->ucode_id) {
 	case AMDGPU_UCODE_ID_SDMA0:
 		*type = GFX_FW_TYPE_SDMA0;
@@ -2350,6 +2433,7 @@ static int psp_get_fw_type(struct amdgpu_firmware_info *ucode,
 static void psp_print_fw_hdr(struct psp_context *psp,
 			     struct amdgpu_firmware_info *ucode)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	struct common_firmware_header *hdr;
 
@@ -2398,6 +2482,7 @@ static void psp_print_fw_hdr(struct psp_context *psp,
 static int psp_prep_load_ip_fw_cmd_buf(struct amdgpu_firmware_info *ucode,
 				       struct psp_gfx_cmd_resp *cmd)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	uint64_t fw_mem_mc_addr = ucode->mc_addr;
 
@@ -2416,6 +2501,7 @@ static int psp_prep_load_ip_fw_cmd_buf(struct amdgpu_firmware_info *ucode,
 static int psp_execute_non_psp_fw_load(struct psp_context *psp,
 			          struct amdgpu_firmware_info *ucode)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret = 0;
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
 
@@ -2432,6 +2518,7 @@ static int psp_execute_non_psp_fw_load(struct psp_context *psp,
 
 static int psp_load_smu_fw(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct amdgpu_device *adev = psp->adev;
 	struct amdgpu_firmware_info *ucode =
@@ -2462,6 +2549,7 @@ static int psp_load_smu_fw(struct psp_context *psp)
 static bool fw_load_skip_check(struct psp_context *psp,
 			       struct amdgpu_firmware_info *ucode)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	if (!ucode->fw)
 		return true;
 
@@ -2500,6 +2588,7 @@ static bool fw_load_skip_check(struct psp_context *psp,
 int psp_load_fw_list(struct psp_context *psp,
 		     struct amdgpu_firmware_info **ucode_list, int ucode_count)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret = 0, i;
 	struct amdgpu_firmware_info *ucode;
 
@@ -2515,6 +2604,7 @@ int psp_load_fw_list(struct psp_context *psp,
 
 static int psp_load_non_psp_fw(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int i, ret;
 	struct amdgpu_firmware_info *ucode;
 	struct amdgpu_device *adev = psp->adev;
@@ -2572,6 +2662,7 @@ static int psp_load_non_psp_fw(struct psp_context *psp)
 
 static int psp_load_fw(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_context *psp = &adev->psp;
 
@@ -2681,6 +2772,7 @@ failed:
 
 static int psp_hw_init(void *handle)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -2710,6 +2802,7 @@ failed:
 
 static int psp_hw_fini(void *handle)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct psp_context *psp = &adev->psp;
 
@@ -2738,6 +2831,7 @@ static int psp_hw_fini(void *handle)
 
 static int psp_suspend(void *handle)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct psp_context *psp = &adev->psp;
@@ -2802,6 +2896,7 @@ static int psp_suspend(void *handle)
 
 static int psp_resume(void *handle)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct psp_context *psp = &adev->psp;
@@ -2881,6 +2976,7 @@ failed:
 
 int psp_gpu_reset(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 
 	if (adev->firmware.load_type != AMDGPU_FW_LOAD_PSP)
@@ -2895,6 +2991,7 @@ int psp_gpu_reset(struct amdgpu_device *adev)
 
 int psp_rlc_autoload_start(struct psp_context *psp)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret;
 	struct psp_gfx_cmd_resp *cmd = acquire_psp_cmd_buf(psp);
 
@@ -2911,6 +3008,7 @@ int psp_rlc_autoload_start(struct psp_context *psp)
 int psp_update_vcn_sram(struct amdgpu_device *adev, int inst_idx,
 			uint64_t cmd_gpu_addr, int cmd_size)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_firmware_info ucode = {0};
 
 	ucode.ucode_id = inst_idx ? AMDGPU_UCODE_ID_VCN1_RAM :
@@ -2926,6 +3024,7 @@ int psp_ring_cmd_submit(struct psp_context *psp,
 			uint64_t fence_mc_addr,
 			int index)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	unsigned int psp_write_ptr_reg = 0;
 	struct psp_gfx_rb_frame *write_frame;
 	struct psp_ring *ring = &psp->km_ring;
@@ -2974,6 +3073,7 @@ int psp_ring_cmd_submit(struct psp_context *psp,
 int psp_init_asd_microcode(struct psp_context *psp,
 			   const char *chip_name)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	char fw_name[PSP_FW_NAME_LEN];
 	const struct psp_firmware_header_v1_0 *asd_hdr;
@@ -3010,6 +3110,7 @@ out:
 int psp_init_toc_microcode(struct psp_context *psp,
 			   const char *chip_name)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	char fw_name[PSP_FW_NAME_LEN];
 	const struct psp_firmware_header_v1_0 *toc_hdr;
@@ -3047,6 +3148,7 @@ static int parse_sos_bin_descriptor(struct psp_context *psp,
 				   const struct psp_fw_bin_desc *desc,
 				   const struct psp_firmware_header_v2_0 *sos_hdr)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	uint8_t *ucode_start_addr  = NULL;
 
 	if (!psp || !desc || !sos_hdr)
@@ -3121,6 +3223,7 @@ static int parse_sos_bin_descriptor(struct psp_context *psp,
 
 static int psp_init_sos_base_fw(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	const struct psp_firmware_header_v1_0 *sos_hdr;
 	const struct psp_firmware_header_v1_3 *sos_hdr_v1_3;
 	uint8_t *ucode_array_start_addr;
@@ -3168,6 +3271,7 @@ static int psp_init_sos_base_fw(struct amdgpu_device *adev)
 int psp_init_sos_microcode(struct psp_context *psp,
 			   const char *chip_name)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	char fw_name[PSP_FW_NAME_LEN];
 	const struct psp_firmware_header_v1_0 *sos_hdr;
@@ -3273,6 +3377,7 @@ static int parse_ta_bin_descriptor(struct psp_context *psp,
 				   const struct psp_fw_bin_desc *desc,
 				   const struct ta_firmware_header_v2_0 *ta_hdr)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	uint8_t *ucode_start_addr  = NULL;
 
 	if (!psp || !desc || !ta_hdr)
@@ -3330,6 +3435,7 @@ static int parse_ta_bin_descriptor(struct psp_context *psp,
 int psp_init_ta_microcode(struct psp_context *psp,
 			  const char *chip_name)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	char fw_name[PSP_FW_NAME_LEN];
 	const struct ta_firmware_header_v2_0 *ta_hdr;
@@ -3383,12 +3489,14 @@ out:
 static int psp_set_clockgating_state(void *handle,
 				     enum amd_clockgating_state state)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return 0;
 }
 
 static int psp_set_powergating_state(void *handle,
 				     enum amd_powergating_state state)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return 0;
 }
 
@@ -3396,6 +3504,7 @@ static ssize_t psp_usbc_pd_fw_sysfs_read(struct device *dev,
 					 struct device_attribute *attr,
 					 char *buf)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	uint32_t fw_ver;
@@ -3423,6 +3532,7 @@ static ssize_t psp_usbc_pd_fw_sysfs_write(struct device *dev,
 						       const char *buf,
 						       size_t count)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	int ret, idx;
@@ -3476,6 +3586,7 @@ fail:
 
 void psp_copy_fw(struct psp_context *psp, uint8_t *start_addr, uint32_t bin_size)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int idx;
 
 	if (!drm_dev_enter(&psp->adev->ddev, &idx))
@@ -3493,6 +3604,7 @@ static DEVICE_ATTR(usbc_pd_fw, S_IRUGO | S_IWUSR,
 
 int is_psp_fw_valid(struct psp_bin_desc bin)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	return bin.size_bytes;
 }
 
@@ -3516,6 +3628,7 @@ const struct amd_ip_funcs psp_ip_funcs = {
 
 static int psp_sysfs_init(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	int ret = device_create_file(adev->dev, &dev_attr_usbc_pd_fw);
 
 	if (ret)
@@ -3526,6 +3639,7 @@ static int psp_sysfs_init(struct amdgpu_device *adev)
 
 static void psp_sysfs_fini(struct amdgpu_device *adev)
 {
+    pr_info("amdgpu_psp: called %s\n", __func__);
 	device_remove_file(adev->dev, &dev_attr_usbc_pd_fw);
 }
 
