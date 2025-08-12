@@ -102,6 +102,7 @@ static LIST_HEAD(bridge_list);
  */
 void drm_bridge_add(struct drm_bridge *bridge)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	mutex_init(&bridge->hpd_mutex);
 
 	mutex_lock(&bridge_lock);
@@ -117,6 +118,7 @@ EXPORT_SYMBOL(drm_bridge_add);
  */
 void drm_bridge_remove(struct drm_bridge *bridge)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	mutex_lock(&bridge_lock);
 	list_del_init(&bridge->list);
 	mutex_unlock(&bridge_lock);
@@ -128,6 +130,7 @@ EXPORT_SYMBOL(drm_bridge_remove);
 static struct drm_private_state *
 drm_bridge_atomic_duplicate_priv_state(struct drm_private_obj *obj)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_bridge *bridge = drm_priv_to_bridge(obj);
 	struct drm_bridge_state *state;
 
@@ -139,6 +142,7 @@ static void
 drm_bridge_atomic_destroy_priv_state(struct drm_private_obj *obj,
 				     struct drm_private_state *s)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_bridge_state *state = drm_priv_to_bridge_state(s);
 	struct drm_bridge *bridge = drm_priv_to_bridge(obj);
 
@@ -177,6 +181,7 @@ int drm_bridge_attach(struct drm_encoder *encoder, struct drm_bridge *bridge,
 		      struct drm_bridge *previous,
 		      enum drm_bridge_attach_flags flags)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	int ret;
 
 	if (!encoder || !bridge)
@@ -241,6 +246,7 @@ EXPORT_SYMBOL(drm_bridge_attach);
 
 void drm_bridge_detach(struct drm_bridge *bridge)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	if (WARN_ON(!bridge))
 		return;
 
@@ -365,6 +371,7 @@ bool drm_bridge_chain_mode_fixup(struct drm_bridge *bridge,
 				 const struct drm_display_mode *mode,
 				 struct drm_display_mode *adjusted_mode)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	if (!bridge)
@@ -404,6 +411,7 @@ drm_bridge_chain_mode_valid(struct drm_bridge *bridge,
 			    const struct drm_display_info *info,
 			    const struct drm_display_mode *mode)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	if (!bridge)
@@ -437,6 +445,7 @@ EXPORT_SYMBOL(drm_bridge_chain_mode_valid);
  */
 void drm_bridge_chain_disable(struct drm_bridge *bridge)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	struct drm_bridge *iter;
 
@@ -467,6 +476,7 @@ EXPORT_SYMBOL(drm_bridge_chain_disable);
  */
 void drm_bridge_chain_post_disable(struct drm_bridge *bridge)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	if (!bridge)
@@ -496,6 +506,7 @@ void drm_bridge_chain_mode_set(struct drm_bridge *bridge,
 			       const struct drm_display_mode *mode,
 			       const struct drm_display_mode *adjusted_mode)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	if (!bridge)
@@ -522,6 +533,7 @@ EXPORT_SYMBOL(drm_bridge_chain_mode_set);
  */
 void drm_bridge_chain_pre_enable(struct drm_bridge *bridge)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	struct drm_bridge *iter;
 
@@ -551,6 +563,7 @@ EXPORT_SYMBOL(drm_bridge_chain_pre_enable);
  */
 void drm_bridge_chain_enable(struct drm_bridge *bridge)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	if (!bridge)
@@ -579,6 +592,7 @@ EXPORT_SYMBOL(drm_bridge_chain_enable);
 void drm_atomic_bridge_chain_disable(struct drm_bridge *bridge,
 				     struct drm_atomic_state *old_state)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	struct drm_bridge *iter;
 
@@ -623,6 +637,7 @@ EXPORT_SYMBOL(drm_atomic_bridge_chain_disable);
 void drm_atomic_bridge_chain_post_disable(struct drm_bridge *bridge,
 					  struct drm_atomic_state *old_state)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	if (!bridge)
@@ -664,6 +679,7 @@ EXPORT_SYMBOL(drm_atomic_bridge_chain_post_disable);
 void drm_atomic_bridge_chain_pre_enable(struct drm_bridge *bridge,
 					struct drm_atomic_state *old_state)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	struct drm_bridge *iter;
 
@@ -707,6 +723,7 @@ EXPORT_SYMBOL(drm_atomic_bridge_chain_pre_enable);
 void drm_atomic_bridge_chain_enable(struct drm_bridge *bridge,
 				    struct drm_atomic_state *old_state)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	if (!bridge)
@@ -735,6 +752,7 @@ static int drm_atomic_bridge_check(struct drm_bridge *bridge,
 				   struct drm_crtc_state *crtc_state,
 				   struct drm_connector_state *conn_state)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	if (bridge->funcs->atomic_check) {
 		struct drm_bridge_state *bridge_state;
 		int ret;
@@ -763,6 +781,7 @@ static int select_bus_fmt_recursive(struct drm_bridge *first_bridge,
 				    struct drm_connector_state *conn_state,
 				    u32 out_bus_fmt)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_bridge_state *cur_state;
 	unsigned int num_in_bus_fmts, i;
 	struct drm_bridge *prev_bridge;
@@ -882,6 +901,7 @@ drm_atomic_bridge_chain_select_bus_fmts(struct drm_bridge *bridge,
 					struct drm_crtc_state *crtc_state,
 					struct drm_connector_state *conn_state)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_connector *conn = conn_state->connector;
 	struct drm_encoder *encoder = bridge->encoder;
 	struct drm_bridge_state *last_bridge_state;
@@ -944,6 +964,7 @@ drm_atomic_bridge_propagate_bus_flags(struct drm_bridge *bridge,
 				      struct drm_connector *conn,
 				      struct drm_atomic_state *state)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_bridge_state *bridge_state, *next_bridge_state;
 	struct drm_bridge *next_bridge;
 	u32 output_flags = 0;
@@ -1009,6 +1030,7 @@ int drm_atomic_bridge_chain_check(struct drm_bridge *bridge,
 				  struct drm_crtc_state *crtc_state,
 				  struct drm_connector_state *conn_state)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_connector *conn = conn_state->connector;
 	struct drm_encoder *encoder;
 	struct drm_bridge *iter;
@@ -1063,6 +1085,7 @@ EXPORT_SYMBOL(drm_atomic_bridge_chain_check);
  */
 enum drm_connector_status drm_bridge_detect(struct drm_bridge *bridge)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	if (!(bridge->ops & DRM_BRIDGE_OP_DETECT))
 		return connector_status_unknown;
 
@@ -1087,6 +1110,7 @@ EXPORT_SYMBOL_GPL(drm_bridge_detect);
 int drm_bridge_get_modes(struct drm_bridge *bridge,
 			 struct drm_connector *connector)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	if (!(bridge->ops & DRM_BRIDGE_OP_MODES))
 		return 0;
 
@@ -1109,6 +1133,7 @@ EXPORT_SYMBOL_GPL(drm_bridge_get_modes);
 struct edid *drm_bridge_get_edid(struct drm_bridge *bridge,
 				 struct drm_connector *connector)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	if (!(bridge->ops & DRM_BRIDGE_OP_EDID))
 		return NULL;
 
@@ -1139,6 +1164,7 @@ void drm_bridge_hpd_enable(struct drm_bridge *bridge,
 				      enum drm_connector_status status),
 			   void *data)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	if (!(bridge->ops & DRM_BRIDGE_OP_HPD))
 		return;
 
@@ -1172,6 +1198,7 @@ EXPORT_SYMBOL_GPL(drm_bridge_hpd_enable);
  */
 void drm_bridge_hpd_disable(struct drm_bridge *bridge)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	if (!(bridge->ops & DRM_BRIDGE_OP_HPD))
 		return;
 
@@ -1199,6 +1226,7 @@ EXPORT_SYMBOL_GPL(drm_bridge_hpd_disable);
 void drm_bridge_hpd_notify(struct drm_bridge *bridge,
 			   enum drm_connector_status status)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	mutex_lock(&bridge->hpd_mutex);
 	if (bridge->hpd_cb)
 		bridge->hpd_cb(bridge->hpd_data, status);
@@ -1218,6 +1246,7 @@ EXPORT_SYMBOL_GPL(drm_bridge_hpd_notify);
  */
 struct drm_bridge *of_drm_find_bridge(struct device_node *np)
 {
+    pr_info("drm_bridge: called %s\n", __func__);
 	struct drm_bridge *bridge;
 
 	mutex_lock(&bridge_lock);

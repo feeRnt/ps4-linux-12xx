@@ -143,6 +143,7 @@
  */
 int drm_gem_plane_helper_prepare_fb(struct drm_plane *plane, struct drm_plane_state *state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	struct drm_gem_object *obj;
 	struct dma_fence *fence;
 
@@ -174,6 +175,7 @@ EXPORT_SYMBOL_GPL(drm_gem_plane_helper_prepare_fb);
 int drm_gem_simple_display_pipe_prepare_fb(struct drm_simple_display_pipe *pipe,
 					   struct drm_plane_state *plane_state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	return drm_gem_plane_helper_prepare_fb(&pipe->plane, plane_state);
 }
 EXPORT_SYMBOL(drm_gem_simple_display_pipe_prepare_fb);
@@ -199,6 +201,7 @@ void
 __drm_gem_duplicate_shadow_plane_state(struct drm_plane *plane,
 				       struct drm_shadow_plane_state *new_shadow_plane_state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	__drm_atomic_helper_plane_duplicate_state(plane, &new_shadow_plane_state->base);
 }
 EXPORT_SYMBOL(__drm_gem_duplicate_shadow_plane_state);
@@ -223,6 +226,7 @@ EXPORT_SYMBOL(__drm_gem_duplicate_shadow_plane_state);
 struct drm_plane_state *
 drm_gem_duplicate_shadow_plane_state(struct drm_plane *plane)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	struct drm_plane_state *plane_state = plane->state;
 	struct drm_shadow_plane_state *new_shadow_plane_state;
 
@@ -247,6 +251,7 @@ EXPORT_SYMBOL(drm_gem_duplicate_shadow_plane_state);
  */
 void __drm_gem_destroy_shadow_plane_state(struct drm_shadow_plane_state *shadow_plane_state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	__drm_atomic_helper_plane_destroy_state(&shadow_plane_state->base);
 }
 EXPORT_SYMBOL(__drm_gem_destroy_shadow_plane_state);
@@ -263,6 +268,7 @@ EXPORT_SYMBOL(__drm_gem_destroy_shadow_plane_state);
 void drm_gem_destroy_shadow_plane_state(struct drm_plane *plane,
 					struct drm_plane_state *plane_state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	struct drm_shadow_plane_state *shadow_plane_state =
 		to_drm_shadow_plane_state(plane_state);
 
@@ -282,6 +288,7 @@ EXPORT_SYMBOL(drm_gem_destroy_shadow_plane_state);
 void __drm_gem_reset_shadow_plane(struct drm_plane *plane,
 				  struct drm_shadow_plane_state *shadow_plane_state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	__drm_atomic_helper_plane_reset(plane, &shadow_plane_state->base);
 }
 EXPORT_SYMBOL(__drm_gem_reset_shadow_plane);
@@ -297,6 +304,7 @@ EXPORT_SYMBOL(__drm_gem_reset_shadow_plane);
  */
 void drm_gem_reset_shadow_plane(struct drm_plane *plane)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	struct drm_shadow_plane_state *shadow_plane_state;
 
 	if (plane->state) {
@@ -328,6 +336,7 @@ EXPORT_SYMBOL(drm_gem_reset_shadow_plane);
  */
 int drm_gem_prepare_shadow_fb(struct drm_plane *plane, struct drm_plane_state *plane_state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	struct drm_shadow_plane_state *shadow_plane_state = to_drm_shadow_plane_state(plane_state);
 	struct drm_framebuffer *fb = plane_state->fb;
 	int ret;
@@ -355,6 +364,7 @@ EXPORT_SYMBOL(drm_gem_prepare_shadow_fb);
  */
 void drm_gem_cleanup_shadow_fb(struct drm_plane *plane, struct drm_plane_state *plane_state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	struct drm_shadow_plane_state *shadow_plane_state = to_drm_shadow_plane_state(plane_state);
 	struct drm_framebuffer *fb = plane_state->fb;
 
@@ -383,6 +393,7 @@ EXPORT_SYMBOL(drm_gem_cleanup_shadow_fb);
 int drm_gem_simple_kms_prepare_shadow_fb(struct drm_simple_display_pipe *pipe,
 					 struct drm_plane_state *plane_state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	return drm_gem_prepare_shadow_fb(&pipe->plane, plane_state);
 }
 EXPORT_SYMBOL(drm_gem_simple_kms_prepare_shadow_fb);
@@ -400,6 +411,7 @@ EXPORT_SYMBOL(drm_gem_simple_kms_prepare_shadow_fb);
 void drm_gem_simple_kms_cleanup_shadow_fb(struct drm_simple_display_pipe *pipe,
 					  struct drm_plane_state *plane_state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	drm_gem_cleanup_shadow_fb(&pipe->plane, plane_state);
 }
 EXPORT_SYMBOL(drm_gem_simple_kms_cleanup_shadow_fb);
@@ -413,6 +425,7 @@ EXPORT_SYMBOL(drm_gem_simple_kms_cleanup_shadow_fb);
  */
 void drm_gem_simple_kms_reset_shadow_plane(struct drm_simple_display_pipe *pipe)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	drm_gem_reset_shadow_plane(&pipe->plane);
 }
 EXPORT_SYMBOL(drm_gem_simple_kms_reset_shadow_plane);
@@ -432,6 +445,7 @@ EXPORT_SYMBOL(drm_gem_simple_kms_reset_shadow_plane);
 struct drm_plane_state *
 drm_gem_simple_kms_duplicate_shadow_plane_state(struct drm_simple_display_pipe *pipe)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	return drm_gem_duplicate_shadow_plane_state(&pipe->plane);
 }
 EXPORT_SYMBOL(drm_gem_simple_kms_duplicate_shadow_plane_state);
@@ -448,6 +462,7 @@ EXPORT_SYMBOL(drm_gem_simple_kms_duplicate_shadow_plane_state);
 void drm_gem_simple_kms_destroy_shadow_plane_state(struct drm_simple_display_pipe *pipe,
 						   struct drm_plane_state *plane_state)
 {
+    pr_info("drm_gem_atomic_helper: called %s\n", __func__);
 	drm_gem_destroy_shadow_plane_state(&pipe->plane, plane_state);
 }
 EXPORT_SYMBOL(drm_gem_simple_kms_destroy_shadow_plane_state);

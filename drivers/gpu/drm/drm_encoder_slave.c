@@ -54,6 +54,7 @@ int drm_i2c_encoder_init(struct drm_device *dev,
 			 struct i2c_adapter *adap,
 			 const struct i2c_board_info *info)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	struct module *module = NULL;
 	struct i2c_client *client;
 	struct drm_i2c_encoder_driver *encoder_drv;
@@ -104,6 +105,7 @@ EXPORT_SYMBOL(drm_i2c_encoder_init);
  */
 void drm_i2c_encoder_destroy(struct drm_encoder *drm_encoder)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	struct drm_encoder_slave *encoder = to_encoder_slave(drm_encoder);
 	struct i2c_client *client = drm_i2c_encoder_get_client(drm_encoder);
 	struct module *module = client->dev.driver->owner;
@@ -122,11 +124,13 @@ EXPORT_SYMBOL(drm_i2c_encoder_destroy);
 static inline const struct drm_encoder_slave_funcs *
 get_slave_funcs(struct drm_encoder *enc)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	return to_encoder_slave(enc)->slave_funcs;
 }
 
 void drm_i2c_encoder_dpms(struct drm_encoder *encoder, int mode)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	get_slave_funcs(encoder)->dpms(encoder, mode);
 }
 EXPORT_SYMBOL(drm_i2c_encoder_dpms);
@@ -135,6 +139,7 @@ bool drm_i2c_encoder_mode_fixup(struct drm_encoder *encoder,
 		const struct drm_display_mode *mode,
 		struct drm_display_mode *adjusted_mode)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	if (!get_slave_funcs(encoder)->mode_fixup)
 		return true;
 
@@ -144,12 +149,14 @@ EXPORT_SYMBOL(drm_i2c_encoder_mode_fixup);
 
 void drm_i2c_encoder_prepare(struct drm_encoder *encoder)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	drm_i2c_encoder_dpms(encoder, DRM_MODE_DPMS_OFF);
 }
 EXPORT_SYMBOL(drm_i2c_encoder_prepare);
 
 void drm_i2c_encoder_commit(struct drm_encoder *encoder)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	drm_i2c_encoder_dpms(encoder, DRM_MODE_DPMS_ON);
 }
 EXPORT_SYMBOL(drm_i2c_encoder_commit);
@@ -158,6 +165,7 @@ void drm_i2c_encoder_mode_set(struct drm_encoder *encoder,
 		struct drm_display_mode *mode,
 		struct drm_display_mode *adjusted_mode)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	get_slave_funcs(encoder)->mode_set(encoder, mode, adjusted_mode);
 }
 EXPORT_SYMBOL(drm_i2c_encoder_mode_set);
@@ -165,18 +173,21 @@ EXPORT_SYMBOL(drm_i2c_encoder_mode_set);
 enum drm_connector_status drm_i2c_encoder_detect(struct drm_encoder *encoder,
 	    struct drm_connector *connector)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	return get_slave_funcs(encoder)->detect(encoder, connector);
 }
 EXPORT_SYMBOL(drm_i2c_encoder_detect);
 
 void drm_i2c_encoder_save(struct drm_encoder *encoder)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	get_slave_funcs(encoder)->save(encoder);
 }
 EXPORT_SYMBOL(drm_i2c_encoder_save);
 
 void drm_i2c_encoder_restore(struct drm_encoder *encoder)
 {
+    pr_info("drm_encoder_slave: called %s\n", __func__);
 	get_slave_funcs(encoder)->restore(encoder);
 }
 EXPORT_SYMBOL(drm_i2c_encoder_restore);

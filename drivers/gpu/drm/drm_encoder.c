@@ -69,6 +69,7 @@ static const struct drm_prop_enum_list drm_encoder_enum_list[] = {
 
 int drm_encoder_register_all(struct drm_device *dev)
 {
+    pr_info("drm_encoder: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	int ret = 0;
 
@@ -84,6 +85,7 @@ int drm_encoder_register_all(struct drm_device *dev)
 
 void drm_encoder_unregister_all(struct drm_device *dev)
 {
+    pr_info("drm_encoder: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	drm_for_each_encoder(encoder, dev) {
@@ -98,6 +100,7 @@ static int __drm_encoder_init(struct drm_device *dev,
 			      const struct drm_encoder_funcs *funcs,
 			      int encoder_type, const char *name, va_list ap)
 {
+    pr_info("drm_encoder: called %s\n", __func__);
 	int ret;
 
 	/* encoder index is used with 32bit bitmasks */
@@ -160,6 +163,7 @@ int drm_encoder_init(struct drm_device *dev,
 		     const struct drm_encoder_funcs *funcs,
 		     int encoder_type, const char *name, ...)
 {
+    pr_info("drm_encoder: called %s\n", __func__);
 	va_list ap;
 	int ret;
 
@@ -181,6 +185,7 @@ EXPORT_SYMBOL(drm_encoder_init);
  */
 void drm_encoder_cleanup(struct drm_encoder *encoder)
 {
+    pr_info("drm_encoder: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct drm_bridge *bridge, *next;
 
@@ -204,6 +209,7 @@ EXPORT_SYMBOL(drm_encoder_cleanup);
 
 static void drmm_encoder_alloc_release(struct drm_device *dev, void *ptr)
 {
+    pr_info("drm_encoder: called %s\n", __func__);
 	struct drm_encoder *encoder = ptr;
 
 	if (WARN_ON(!encoder->dev))
@@ -216,6 +222,7 @@ void *__drmm_encoder_alloc(struct drm_device *dev, size_t size, size_t offset,
 			   const struct drm_encoder_funcs *funcs,
 			   int encoder_type, const char *name, ...)
 {
+    pr_info("drm_encoder: called %s\n", __func__);
 	void *container;
 	struct drm_encoder *encoder;
 	va_list ap;
@@ -246,6 +253,7 @@ EXPORT_SYMBOL(__drmm_encoder_alloc);
 
 static struct drm_crtc *drm_encoder_get_crtc(struct drm_encoder *encoder)
 {
+    pr_info("drm_encoder: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct drm_device *dev = encoder->dev;
 	bool uses_atomic = false;
@@ -278,6 +286,7 @@ static struct drm_crtc *drm_encoder_get_crtc(struct drm_encoder *encoder)
 int drm_mode_getencoder(struct drm_device *dev, void *data,
 			struct drm_file *file_priv)
 {
+    pr_info("drm_encoder: called %s\n", __func__);
 	struct drm_mode_get_encoder *enc_resp = data;
 	struct drm_encoder *encoder;
 	struct drm_crtc *crtc;

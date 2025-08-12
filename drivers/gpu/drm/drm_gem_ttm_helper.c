@@ -23,6 +23,7 @@
 void drm_gem_ttm_print_info(struct drm_printer *p, unsigned int indent,
 			    const struct drm_gem_object *gem)
 {
+    pr_info("drm_gem_ttm_helper: called %s\n", __func__);
 	static const char * const plname[] = {
 		[ TTM_PL_SYSTEM ] = "system",
 		[ TTM_PL_TT     ] = "tt",
@@ -63,6 +64,7 @@ EXPORT_SYMBOL(drm_gem_ttm_print_info);
 int drm_gem_ttm_vmap(struct drm_gem_object *gem,
 		     struct dma_buf_map *map)
 {
+    pr_info("drm_gem_ttm_helper: called %s\n", __func__);
 	struct ttm_buffer_object *bo = drm_gem_ttm_of_gem(gem);
 
 	return ttm_bo_vmap(bo, map);
@@ -80,6 +82,7 @@ EXPORT_SYMBOL(drm_gem_ttm_vmap);
 void drm_gem_ttm_vunmap(struct drm_gem_object *gem,
 			struct dma_buf_map *map)
 {
+    pr_info("drm_gem_ttm_helper: called %s\n", __func__);
 	struct ttm_buffer_object *bo = drm_gem_ttm_of_gem(gem);
 
 	ttm_bo_vunmap(bo, map);
@@ -97,6 +100,7 @@ EXPORT_SYMBOL(drm_gem_ttm_vunmap);
 int drm_gem_ttm_mmap(struct drm_gem_object *gem,
 		     struct vm_area_struct *vma)
 {
+    pr_info("drm_gem_ttm_helper: called %s\n", __func__);
 	struct ttm_buffer_object *bo = drm_gem_ttm_of_gem(gem);
 	int ret;
 
@@ -133,6 +137,7 @@ EXPORT_SYMBOL(drm_gem_ttm_mmap);
 int drm_gem_ttm_dumb_map_offset(struct drm_file *file, struct drm_device *dev,
 				uint32_t handle, uint64_t *offset)
 {
+    pr_info("drm_gem_ttm_helper: called %s\n", __func__);
 	struct drm_gem_object *gem;
 
 	gem = drm_gem_object_lookup(file, handle);

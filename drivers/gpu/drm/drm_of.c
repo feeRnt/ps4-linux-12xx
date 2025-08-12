@@ -20,6 +20,7 @@
 
 static void drm_release_of(struct device *dev, void *data)
 {
+    pr_info("drm_of: called %s\n", __func__);
 	of_node_put(data);
 }
 
@@ -34,6 +35,7 @@ static void drm_release_of(struct device *dev, void *data)
 uint32_t drm_of_crtc_port_mask(struct drm_device *dev,
 			    struct device_node *port)
 {
+    pr_info("drm_of: called %s\n", __func__);
 	unsigned int index = 0;
 	struct drm_crtc *tmp;
 
@@ -62,6 +64,7 @@ EXPORT_SYMBOL(drm_of_crtc_port_mask);
 uint32_t drm_of_find_possible_crtcs(struct drm_device *dev,
 				    struct device_node *port)
 {
+    pr_info("drm_of: called %s\n", __func__);
 	struct device_node *remote_port, *ep;
 	uint32_t possible_crtcs = 0;
 
@@ -93,6 +96,7 @@ void drm_of_component_match_add(struct device *master,
 				int (*compare)(struct device *, void *),
 				struct device_node *node)
 {
+    pr_info("drm_of: called %s\n", __func__);
 	of_node_get(node);
 	component_match_add_release(master, matchptr, drm_release_of,
 				    compare, node);
@@ -116,6 +120,7 @@ int drm_of_component_probe(struct device *dev,
 			   int (*compare_of)(struct device *, void *),
 			   const struct component_master_ops *m_ops)
 {
+    pr_info("drm_of: called %s\n", __func__);
 	struct device_node *ep, *port, *remote;
 	struct component_match *match = NULL;
 	int i;
@@ -197,6 +202,7 @@ int drm_of_encoder_active_endpoint(struct device_node *node,
 				   struct drm_encoder *encoder,
 				   struct of_endpoint *endpoint)
 {
+    pr_info("drm_of: called %s\n", __func__);
 	struct device_node *ep;
 	struct drm_crtc *crtc = encoder->crtc;
 	struct device_node *port;
@@ -238,6 +244,7 @@ int drm_of_find_panel_or_bridge(const struct device_node *np,
 				struct drm_panel **panel,
 				struct drm_bridge **bridge)
 {
+    pr_info("drm_of: called %s\n", __func__);
 	int ret = -EPROBE_DEFER;
 	struct device_node *remote;
 
@@ -291,6 +298,7 @@ enum drm_of_lvds_pixels {
 
 static int drm_of_lvds_get_port_pixels_type(struct device_node *port_node)
 {
+    pr_info("drm_of: called %s\n", __func__);
 	bool even_pixels =
 		of_property_read_bool(port_node, "dual-lvds-even-pixels");
 	bool odd_pixels =
@@ -303,6 +311,7 @@ static int drm_of_lvds_get_port_pixels_type(struct device_node *port_node)
 static int drm_of_lvds_get_remote_pixels_type(
 			const struct device_node *port_node)
 {
+    pr_info("drm_of: called %s\n", __func__);
 	struct device_node *endpoint = NULL;
 	int pixels_type = -EPIPE;
 
@@ -373,6 +382,7 @@ static int drm_of_lvds_get_remote_pixels_type(
 int drm_of_lvds_get_dual_link_pixel_order(const struct device_node *port1,
 					  const struct device_node *port2)
 {
+    pr_info("drm_of: called %s\n", __func__);
 	int remote_p1_pt, remote_p2_pt;
 
 	if (!port1 || !port2)

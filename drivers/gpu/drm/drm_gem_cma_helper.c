@@ -58,6 +58,7 @@ static const struct drm_gem_object_funcs drm_gem_cma_default_funcs = {
 static struct drm_gem_cma_object *
 __drm_gem_cma_create(struct drm_device *drm, size_t size, bool private)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj;
 	struct drm_gem_object *gem_obj;
 	int ret = 0;
@@ -113,6 +114,7 @@ error:
 struct drm_gem_cma_object *drm_gem_cma_create(struct drm_device *drm,
 					      size_t size)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj;
 	int ret;
 
@@ -167,6 +169,7 @@ drm_gem_cma_create_with_handle(struct drm_file *file_priv,
 			       struct drm_device *drm, size_t size,
 			       uint32_t *handle)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj;
 	struct drm_gem_object *gem_obj;
 	int ret;
@@ -202,6 +205,7 @@ drm_gem_cma_create_with_handle(struct drm_file *file_priv,
  */
 void drm_gem_cma_free_object(struct drm_gem_object *gem_obj)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj = to_drm_gem_cma_obj(gem_obj);
 	struct dma_buf_map map = DMA_BUF_MAP_INIT_VADDR(cma_obj->vaddr);
 
@@ -243,6 +247,7 @@ int drm_gem_cma_dumb_create_internal(struct drm_file *file_priv,
 				     struct drm_device *drm,
 				     struct drm_mode_create_dumb *args)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	unsigned int min_pitch = DIV_ROUND_UP(args->width * args->bpp, 8);
 	struct drm_gem_cma_object *cma_obj;
 
@@ -280,6 +285,7 @@ int drm_gem_cma_dumb_create(struct drm_file *file_priv,
 			    struct drm_device *drm,
 			    struct drm_mode_create_dumb *args)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj;
 
 	args->pitch = DIV_ROUND_UP(args->width * args->bpp, 8);
@@ -320,6 +326,7 @@ unsigned long drm_gem_cma_get_unmapped_area(struct file *filp,
 					    unsigned long pgoff,
 					    unsigned long flags)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj;
 	struct drm_gem_object *obj = NULL;
 	struct drm_file *priv = filp->private_data;
@@ -380,6 +387,7 @@ EXPORT_SYMBOL_GPL(drm_gem_cma_get_unmapped_area);
 void drm_gem_cma_print_info(struct drm_printer *p, unsigned int indent,
 			    const struct drm_gem_object *obj)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	const struct drm_gem_cma_object *cma_obj = to_drm_gem_cma_obj(obj);
 
 	drm_printf_indent(p, indent, "paddr=%pad\n", &cma_obj->paddr);
@@ -401,6 +409,7 @@ EXPORT_SYMBOL(drm_gem_cma_print_info);
  */
 struct sg_table *drm_gem_cma_get_sg_table(struct drm_gem_object *obj)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj = to_drm_gem_cma_obj(obj);
 	struct sg_table *sgt;
 	int ret;
@@ -444,6 +453,7 @@ drm_gem_cma_prime_import_sg_table(struct drm_device *dev,
 				  struct dma_buf_attachment *attach,
 				  struct sg_table *sgt)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj;
 
 	/* check if the entries in the sg_table are contiguous */
@@ -482,6 +492,7 @@ EXPORT_SYMBOL_GPL(drm_gem_cma_prime_import_sg_table);
  */
 int drm_gem_cma_vmap(struct drm_gem_object *obj, struct dma_buf_map *map)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj = to_drm_gem_cma_obj(obj);
 
 	dma_buf_map_set_vaddr(map, cma_obj->vaddr);
@@ -505,6 +516,7 @@ EXPORT_SYMBOL_GPL(drm_gem_cma_vmap);
  */
 int drm_gem_cma_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj;
 	int ret;
 
@@ -560,6 +572,7 @@ drm_gem_cma_prime_import_sg_table_vmap(struct drm_device *dev,
 				       struct dma_buf_attachment *attach,
 				       struct sg_table *sgt)
 {
+    pr_info("drm_gem_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *cma_obj;
 	struct drm_gem_object *obj;
 	struct dma_buf_map map;

@@ -50,6 +50,7 @@
 static void
 drm_clflush_page(struct page *page)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 	uint8_t *page_virtual;
 	unsigned int i;
 	const int size = boot_cpu_data.x86_clflush_size;
@@ -66,6 +67,7 @@ drm_clflush_page(struct page *page)
 static void drm_cache_flush_clflush(struct page *pages[],
 				    unsigned long num_pages)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 	unsigned long i;
 
 	mb(); /*Full memory barrier used before so that CLFLUSH is ordered*/
@@ -86,6 +88,7 @@ static void drm_cache_flush_clflush(struct page *pages[],
 void
 drm_clflush_pages(struct page *pages[], unsigned long num_pages)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 
 #if defined(CONFIG_X86)
 	if (static_cpu_has(X86_FEATURE_CLFLUSH)) {
@@ -128,6 +131,7 @@ EXPORT_SYMBOL(drm_clflush_pages);
 void
 drm_clflush_sg(struct sg_table *st)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 #if defined(CONFIG_X86)
 	if (static_cpu_has(X86_FEATURE_CLFLUSH)) {
 		struct sg_page_iter sg_iter;
@@ -160,6 +164,7 @@ EXPORT_SYMBOL(drm_clflush_sg);
 void
 drm_clflush_virt_range(void *addr, unsigned long length)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 #if defined(CONFIG_X86)
 	if (static_cpu_has(X86_FEATURE_CLFLUSH)) {
 		const int size = boot_cpu_data.x86_clflush_size;
@@ -185,6 +190,7 @@ EXPORT_SYMBOL(drm_clflush_virt_range);
 
 bool drm_need_swiotlb(int dma_bits)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 	struct resource *tmp;
 	resource_size_t max_iomem = 0;
 
@@ -218,6 +224,7 @@ static void memcpy_fallback(struct dma_buf_map *dst,
 			    const struct dma_buf_map *src,
 			    unsigned long len)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 	if (!dst->is_iomem && !src->is_iomem) {
 		memcpy(dst->vaddr, src->vaddr, len);
 	} else if (!src->is_iomem) {
@@ -254,6 +261,7 @@ static DEFINE_STATIC_KEY_FALSE(has_movntdqa);
 
 static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 	kernel_fpu_begin();
 
 	while (len >= 4) {
@@ -289,6 +297,7 @@ static void __memcpy_ntdqa(void *dst, const void *src, unsigned long len)
  */
 static void __drm_memcpy_from_wc(void *dst, const void *src, unsigned long len)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 	if (unlikely(((unsigned long)dst | (unsigned long)src | len) & 15))
 		memcpy(dst, src, len);
 	else if (likely(len))
@@ -309,6 +318,7 @@ void drm_memcpy_from_wc(struct dma_buf_map *dst,
 			const struct dma_buf_map *src,
 			unsigned long len)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 	if (WARN_ON(in_interrupt())) {
 		memcpy_fallback(dst, src, len);
 		return;
@@ -334,6 +344,7 @@ EXPORT_SYMBOL(drm_memcpy_from_wc);
  */
 void drm_memcpy_init_early(void)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 	/*
 	 * Some hypervisors (e.g. KVM) don't support VEX-prefix instructions
 	 * emulation. So don't enable movntdqa in hypervisor guest.
@@ -347,6 +358,7 @@ void drm_memcpy_from_wc(struct dma_buf_map *dst,
 			const struct dma_buf_map *src,
 			unsigned long len)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 	WARN_ON(in_interrupt());
 
 	memcpy_fallback(dst, src, len);
@@ -355,5 +367,6 @@ EXPORT_SYMBOL(drm_memcpy_from_wc);
 
 void drm_memcpy_init_early(void)
 {
+    pr_info("drm_cache: called %s\n", __func__);
 }
 #endif /* CONFIG_X86 */

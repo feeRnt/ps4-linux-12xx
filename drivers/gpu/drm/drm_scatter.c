@@ -45,6 +45,7 @@
 
 static void drm_sg_cleanup(struct drm_sg_mem * entry)
 {
+    pr_info("drm_scatter: called %s\n", __func__);
 	struct page *page;
 	int i;
 
@@ -63,6 +64,7 @@ static void drm_sg_cleanup(struct drm_sg_mem * entry)
 
 void drm_legacy_sg_cleanup(struct drm_device *dev)
 {
+    pr_info("drm_scatter: called %s\n", __func__);
 	if (drm_core_check_feature(dev, DRIVER_SG) && dev->sg &&
 	    drm_core_check_feature(dev, DRIVER_LEGACY)) {
 		drm_sg_cleanup(dev->sg);
@@ -78,6 +80,7 @@ void drm_legacy_sg_cleanup(struct drm_device *dev)
 int drm_legacy_sg_alloc(struct drm_device *dev, void *data,
 			struct drm_file *file_priv)
 {
+    pr_info("drm_scatter: called %s\n", __func__);
 	struct drm_scatter_gather *request = data;
 	struct drm_sg_mem *entry;
 	unsigned long pages, i, j;
@@ -197,6 +200,7 @@ int drm_legacy_sg_alloc(struct drm_device *dev, void *data,
 int drm_legacy_sg_free(struct drm_device *dev, void *data,
 		       struct drm_file *file_priv)
 {
+    pr_info("drm_scatter: called %s\n", __func__);
 	struct drm_scatter_gather *request = data;
 	struct drm_sg_mem *entry;
 

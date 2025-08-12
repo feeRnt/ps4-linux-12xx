@@ -51,6 +51,7 @@
 static struct drm_map_list *drm_find_matching_map(struct drm_device *dev,
 						  struct drm_local_map *map)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_map_list *entry;
 
 	list_for_each_entry(entry, &dev->maplist, head) {
@@ -90,6 +91,7 @@ static struct drm_map_list *drm_find_matching_map(struct drm_device *dev,
 static int drm_map_handle(struct drm_device *dev, struct drm_hash_item *hash,
 			  unsigned long user_token, int hashed_handle, int shm)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	int use_hashed_handle, shift;
 	unsigned long add;
 
@@ -149,6 +151,7 @@ static int drm_addmap_core(struct drm_device *dev, resource_size_t offset,
 			   enum drm_map_flags flags,
 			   struct drm_map_list **maplist)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_local_map *map;
 	struct drm_map_list *list;
 	unsigned long user_token;
@@ -380,6 +383,7 @@ int drm_legacy_addmap(struct drm_device *dev, resource_size_t offset,
 		      unsigned int size, enum drm_map_type type,
 		      enum drm_map_flags flags, struct drm_local_map **map_ptr)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_map_list *list;
 	int rc;
 
@@ -393,6 +397,7 @@ EXPORT_SYMBOL(drm_legacy_addmap);
 struct drm_local_map *drm_legacy_findmap(struct drm_device *dev,
 					 unsigned int token)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_map_list *_entry;
 
 	list_for_each_entry(_entry, &dev->maplist, head)
@@ -416,6 +421,7 @@ EXPORT_SYMBOL(drm_legacy_findmap);
 int drm_legacy_addmap_ioctl(struct drm_device *dev, void *data,
 			    struct drm_file *file_priv)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_map *map = data;
 	struct drm_map_list *maplist;
 	int err;
@@ -463,6 +469,7 @@ int drm_legacy_addmap_ioctl(struct drm_device *dev, void *data,
 int drm_legacy_getmap_ioctl(struct drm_device *dev, void *data,
 			    struct drm_file *file_priv)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_map *map = data;
 	struct drm_map_list *r_list = NULL;
 	struct list_head *list;
@@ -515,6 +522,7 @@ int drm_legacy_getmap_ioctl(struct drm_device *dev, void *data,
  */
 int drm_legacy_rmmap_locked(struct drm_device *dev, struct drm_local_map *map)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_map_list *r_list = NULL, *list_t;
 	int found = 0;
 	struct drm_master *master;
@@ -570,6 +578,7 @@ EXPORT_SYMBOL(drm_legacy_rmmap_locked);
 
 void drm_legacy_rmmap(struct drm_device *dev, struct drm_local_map *map)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
 	    !drm_core_check_feature(dev, DRIVER_LEGACY))
 		return;
@@ -582,6 +591,7 @@ EXPORT_SYMBOL(drm_legacy_rmmap);
 
 void drm_legacy_master_rmmaps(struct drm_device *dev, struct drm_master *master)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_map_list *r_list, *list_temp;
 
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
@@ -599,6 +609,7 @@ void drm_legacy_master_rmmaps(struct drm_device *dev, struct drm_master *master)
 
 void drm_legacy_rmmaps(struct drm_device *dev)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_map_list *r_list, *list_temp;
 
 	list_for_each_entry_safe(r_list, list_temp, &dev->maplist, head)
@@ -623,6 +634,7 @@ void drm_legacy_rmmaps(struct drm_device *dev)
 int drm_legacy_rmmap_ioctl(struct drm_device *dev, void *data,
 			   struct drm_file *file_priv)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_map *request = data;
 	struct drm_local_map *map = NULL;
 	struct drm_map_list *r_list;
@@ -674,6 +686,7 @@ int drm_legacy_rmmap_ioctl(struct drm_device *dev, void *data,
 static void drm_cleanup_buf_error(struct drm_device *dev,
 				  struct drm_buf_entry *entry)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	drm_dma_handle_t *dmah;
 	int i;
 
@@ -718,6 +731,7 @@ static void drm_cleanup_buf_error(struct drm_device *dev,
 int drm_legacy_addbufs_agp(struct drm_device *dev,
 			   struct drm_buf_desc *request)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_device_dma *dma = dev->dma;
 	struct drm_buf_entry *entry;
 	struct drm_agp_mem *agp_entry;
@@ -882,6 +896,7 @@ EXPORT_SYMBOL(drm_legacy_addbufs_agp);
 int drm_legacy_addbufs_pci(struct drm_device *dev,
 			   struct drm_buf_desc *request)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_device_dma *dma = dev->dma;
 	int count;
 	int order;
@@ -1104,6 +1119,7 @@ EXPORT_SYMBOL(drm_legacy_addbufs_pci);
 static int drm_legacy_addbufs_sg(struct drm_device *dev,
 				 struct drm_buf_desc *request)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_device_dma *dma = dev->dma;
 	struct drm_buf_entry *entry;
 	struct drm_buf *buf;
@@ -1273,6 +1289,7 @@ static int drm_legacy_addbufs_sg(struct drm_device *dev,
 int drm_legacy_addbufs(struct drm_device *dev, void *data,
 		       struct drm_file *file_priv)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_buf_desc *request = data;
 	int ret;
 
@@ -1318,6 +1335,7 @@ int __drm_legacy_infobufs(struct drm_device *dev,
 			void *data, int *p,
 			int (*f)(void *, int, struct drm_buf_entry *))
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_device_dma *dma = dev->dma;
 	int i;
 	int count;
@@ -1370,6 +1388,7 @@ int __drm_legacy_infobufs(struct drm_device *dev,
 
 static int copy_one_buf(void *data, int count, struct drm_buf_entry *from)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_buf_info *request = data;
 	struct drm_buf_desc __user *to = &request->list[count];
 	struct drm_buf_desc v = {.count = from->buf_count,
@@ -1385,6 +1404,7 @@ static int copy_one_buf(void *data, int count, struct drm_buf_entry *from)
 int drm_legacy_infobufs(struct drm_device *dev, void *data,
 			struct drm_file *file_priv)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_buf_info *request = data;
 
 	return __drm_legacy_infobufs(dev, data, &request->count, copy_one_buf);
@@ -1407,6 +1427,7 @@ int drm_legacy_infobufs(struct drm_device *dev, void *data,
 int drm_legacy_markbufs(struct drm_device *dev, void *data,
 			struct drm_file *file_priv)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_device_dma *dma = dev->dma;
 	struct drm_buf_desc *request = data;
 	int order;
@@ -1454,6 +1475,7 @@ int drm_legacy_markbufs(struct drm_device *dev, void *data,
 int drm_legacy_freebufs(struct drm_device *dev, void *data,
 			struct drm_file *file_priv)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_device_dma *dma = dev->dma;
 	struct drm_buf_free *request = data;
 	int i;
@@ -1511,6 +1533,7 @@ int __drm_legacy_mapbufs(struct drm_device *dev, void *data, int *p,
 				 struct drm_buf *),
 				 struct drm_file *file_priv)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_device_dma *dma = dev->dma;
 	int retcode = 0;
 	unsigned long virtual;
@@ -1577,6 +1600,7 @@ int __drm_legacy_mapbufs(struct drm_device *dev, void *data, int *p,
 static int map_one_buf(void *data, int idx, unsigned long virtual,
 			struct drm_buf *buf)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_buf_map *request = data;
 	unsigned long address = virtual + buf->offset;	/* *** */
 
@@ -1597,6 +1621,7 @@ static int map_one_buf(void *data, int idx, unsigned long virtual,
 int drm_legacy_mapbufs(struct drm_device *dev, void *data,
 		       struct drm_file *file_priv)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_buf_map *request = data;
 
 	return __drm_legacy_mapbufs(dev, data, &request->count,
@@ -1607,6 +1632,7 @@ int drm_legacy_mapbufs(struct drm_device *dev, void *data,
 int drm_legacy_dma_ioctl(struct drm_device *dev, void *data,
 		  struct drm_file *file_priv)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
 		return -EOPNOTSUPP;
 
@@ -1618,6 +1644,7 @@ int drm_legacy_dma_ioctl(struct drm_device *dev, void *data,
 
 struct drm_local_map *drm_legacy_getsarea(struct drm_device *dev)
 {
+    pr_info("drm_bufs: called %s\n", __func__);
 	struct drm_map_list *entry;
 
 	list_for_each_entry(entry, &dev->maplist, head) {

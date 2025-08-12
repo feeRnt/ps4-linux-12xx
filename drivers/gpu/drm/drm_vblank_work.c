@@ -45,6 +45,7 @@
 
 void drm_handle_vblank_works(struct drm_vblank_crtc *vblank)
 {
+    pr_info("drm_vblank_work: called %s\n", __func__);
 	struct drm_vblank_work *work, *next;
 	u64 count = atomic64_read(&vblank->count);
 	bool wake = false;
@@ -69,6 +70,7 @@ void drm_handle_vblank_works(struct drm_vblank_crtc *vblank)
  */
 void drm_vblank_cancel_pending_works(struct drm_vblank_crtc *vblank)
 {
+    pr_info("drm_vblank_work: called %s\n", __func__);
 	struct drm_vblank_work *work, *next;
 
 	assert_spin_locked(&vblank->dev->event_lock);
@@ -106,6 +108,7 @@ void drm_vblank_cancel_pending_works(struct drm_vblank_crtc *vblank)
 int drm_vblank_work_schedule(struct drm_vblank_work *work,
 			     u64 count, bool nextonmiss)
 {
+    pr_info("drm_vblank_work: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = work->vblank;
 	struct drm_device *dev = vblank->dev;
 	u64 cur_vbl;
@@ -181,6 +184,7 @@ EXPORT_SYMBOL(drm_vblank_work_schedule);
  */
 bool drm_vblank_work_cancel_sync(struct drm_vblank_work *work)
 {
+    pr_info("drm_vblank_work: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = work->vblank;
 	struct drm_device *dev = vblank->dev;
 	bool ret = false;
@@ -217,6 +221,7 @@ EXPORT_SYMBOL(drm_vblank_work_cancel_sync);
  */
 void drm_vblank_work_flush(struct drm_vblank_work *work)
 {
+    pr_info("drm_vblank_work: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = work->vblank;
 	struct drm_device *dev = vblank->dev;
 
@@ -240,6 +245,7 @@ EXPORT_SYMBOL(drm_vblank_work_flush);
 void drm_vblank_work_init(struct drm_vblank_work *work, struct drm_crtc *crtc,
 			  void (*func)(struct kthread_work *work))
 {
+    pr_info("drm_vblank_work: called %s\n", __func__);
 	kthread_init_work(&work->base, func);
 	INIT_LIST_HEAD(&work->node);
 	work->vblank = &crtc->dev->vblank[drm_crtc_index(crtc)];
@@ -248,6 +254,7 @@ EXPORT_SYMBOL(drm_vblank_work_init);
 
 int drm_vblank_worker_init(struct drm_vblank_crtc *vblank)
 {
+    pr_info("drm_vblank_work: called %s\n", __func__);
 	struct kthread_worker *worker;
 
 	INIT_LIST_HEAD(&vblank->pending_work);

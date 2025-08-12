@@ -91,6 +91,7 @@ MODULE_PARM_DESC(drm_dp_cec_unregister_delay,
 
 static int drm_dp_cec_adap_enable(struct cec_adapter *adap, bool enable)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	struct drm_dp_aux *aux = cec_get_drvdata(adap);
 	u32 val = enable ? DP_CEC_TUNNELING_ENABLE : 0;
 	ssize_t err = 0;
@@ -101,6 +102,7 @@ static int drm_dp_cec_adap_enable(struct cec_adapter *adap, bool enable)
 
 static int drm_dp_cec_adap_log_addr(struct cec_adapter *adap, u8 addr)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	struct drm_dp_aux *aux = cec_get_drvdata(adap);
 	/* Bit 15 (logical address 15) should always be set */
 	u16 la_mask = 1 << CEC_LOG_ADDR_BROADCAST;
@@ -118,6 +120,7 @@ static int drm_dp_cec_adap_log_addr(struct cec_adapter *adap, u8 addr)
 static int drm_dp_cec_adap_transmit(struct cec_adapter *adap, u8 attempts,
 				    u32 signal_free_time, struct cec_msg *msg)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	struct drm_dp_aux *aux = cec_get_drvdata(adap);
 	unsigned int retries = min(5, attempts - 1);
 	ssize_t err;
@@ -136,6 +139,7 @@ static int drm_dp_cec_adap_transmit(struct cec_adapter *adap, u8 attempts,
 static int drm_dp_cec_adap_monitor_all_enable(struct cec_adapter *adap,
 					      bool enable)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	struct drm_dp_aux *aux = cec_get_drvdata(adap);
 	ssize_t err;
 	u8 val;
@@ -157,6 +161,7 @@ static int drm_dp_cec_adap_monitor_all_enable(struct cec_adapter *adap,
 static void drm_dp_cec_adap_status(struct cec_adapter *adap,
 				   struct seq_file *file)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	struct drm_dp_aux *aux = cec_get_drvdata(adap);
 	struct drm_dp_desc desc;
 	struct drm_dp_dpcd_ident *id = &desc.ident;
@@ -188,6 +193,7 @@ static const struct cec_adap_ops drm_dp_cec_adap_ops = {
 
 static int drm_dp_cec_received(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	struct cec_adapter *adap = aux->cec.adap;
 	struct cec_msg msg;
 	u8 rx_msg_info;
@@ -211,6 +217,7 @@ static int drm_dp_cec_received(struct drm_dp_aux *aux)
 
 static void drm_dp_cec_handle_irq(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	struct cec_adapter *adap = aux->cec.adap;
 	u8 flags;
 
@@ -241,6 +248,7 @@ static void drm_dp_cec_handle_irq(struct drm_dp_aux *aux)
  */
 void drm_dp_cec_irq(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	u8 cec_irq;
 	int ret;
 
@@ -266,6 +274,7 @@ EXPORT_SYMBOL(drm_dp_cec_irq);
 
 static bool drm_dp_cec_cap(struct drm_dp_aux *aux, u8 *cec_cap)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	u8 cap = 0;
 
 	if (drm_dp_dpcd_readb(aux, DP_CEC_TUNNELING_CAPABILITY, &cap) != 1 ||
@@ -282,6 +291,7 @@ static bool drm_dp_cec_cap(struct drm_dp_aux *aux, u8 *cec_cap)
  */
 static void drm_dp_cec_unregister_work(struct work_struct *work)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	struct drm_dp_aux *aux = container_of(work, struct drm_dp_aux,
 					      cec.unregister_work.work);
 
@@ -299,6 +309,7 @@ static void drm_dp_cec_unregister_work(struct work_struct *work)
  */
 void drm_dp_cec_set_edid(struct drm_dp_aux *aux, const struct edid *edid)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	struct drm_connector *connector = aux->cec.connector;
 	u32 cec_caps = CEC_CAP_DEFAULTS | CEC_CAP_NEEDS_HPD |
 		       CEC_CAP_CONNECTOR_INFO;
@@ -382,6 +393,7 @@ EXPORT_SYMBOL(drm_dp_cec_set_edid);
  */
 void drm_dp_cec_unset_edid(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	/* No transfer function was set, so not a DP connector */
 	if (!aux->transfer)
 		return;
@@ -427,6 +439,7 @@ EXPORT_SYMBOL(drm_dp_cec_unset_edid);
 void drm_dp_cec_register_connector(struct drm_dp_aux *aux,
 				   struct drm_connector *connector)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	WARN_ON(aux->cec.adap);
 	if (WARN_ON(!aux->transfer))
 		return;
@@ -442,6 +455,7 @@ EXPORT_SYMBOL(drm_dp_cec_register_connector);
  */
 void drm_dp_cec_unregister_connector(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_cec: called %s\n", __func__);
 	if (!aux->cec.adap)
 		return;
 	cancel_delayed_work_sync(&aux->cec.unregister_work);

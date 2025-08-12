@@ -9,6 +9,7 @@
 
 static int validate_displayid(const u8 *displayid, int length, int idx)
 {
+    pr_info("drm_displayid: called %s\n", __func__);
 	int i, dispid_length;
 	u8 csum = 0;
 	const struct displayid_header *base;
@@ -37,6 +38,7 @@ static const u8 *drm_find_displayid_extension(const struct edid *edid,
 					      int *length, int *idx,
 					      int *ext_index)
 {
+    pr_info("drm_displayid: called %s\n", __func__);
 	const u8 *displayid = drm_find_edid_extension(edid, DISPLAYID_EXT, ext_index);
 	const struct displayid_header *base;
 	int ret;
@@ -61,6 +63,7 @@ static const u8 *drm_find_displayid_extension(const struct edid *edid,
 void displayid_iter_edid_begin(const struct edid *edid,
 			       struct displayid_iter *iter)
 {
+    pr_info("drm_displayid: called %s\n", __func__);
 	memset(iter, 0, sizeof(*iter));
 
 	iter->edid = edid;
@@ -69,6 +72,7 @@ void displayid_iter_edid_begin(const struct edid *edid,
 static const struct displayid_block *
 displayid_iter_block(const struct displayid_iter *iter)
 {
+    pr_info("drm_displayid: called %s\n", __func__);
 	const struct displayid_block *block;
 
 	if (!iter->section)
@@ -86,6 +90,7 @@ displayid_iter_block(const struct displayid_iter *iter)
 const struct displayid_block *
 __displayid_iter_next(struct displayid_iter *iter)
 {
+    pr_info("drm_displayid: called %s\n", __func__);
 	const struct displayid_block *block;
 
 	if (!iter->edid)
@@ -128,5 +133,6 @@ __displayid_iter_next(struct displayid_iter *iter)
 
 void displayid_iter_end(struct displayid_iter *iter)
 {
+    pr_info("drm_displayid: called %s\n", __func__);
 	memset(iter, 0, sizeof(*iter));
 }

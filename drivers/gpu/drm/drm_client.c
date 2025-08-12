@@ -34,6 +34,7 @@
 
 static int drm_client_open(struct drm_client_dev *client)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 	struct drm_file *file;
 
@@ -52,6 +53,7 @@ static int drm_client_open(struct drm_client_dev *client)
 
 static void drm_client_close(struct drm_client_dev *client)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 
 	mutex_lock(&dev->filelist_mutex);
@@ -79,6 +81,7 @@ static void drm_client_close(struct drm_client_dev *client)
 int drm_client_init(struct drm_device *dev, struct drm_client_dev *client,
 		    const char *name, const struct drm_client_funcs *funcs)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	int ret;
 
 	if (!drm_core_check_feature(dev, DRIVER_MODESET) || !dev->driver->dumb_create)
@@ -125,6 +128,7 @@ EXPORT_SYMBOL(drm_client_init);
  */
 void drm_client_register(struct drm_client_dev *client)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 
 	mutex_lock(&dev->clientlist_mutex);
@@ -149,6 +153,7 @@ EXPORT_SYMBOL(drm_client_register);
  */
 void drm_client_release(struct drm_client_dev *client)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 
 	drm_dbg_kms(dev, "%s\n", client->name);
@@ -163,6 +168,7 @@ EXPORT_SYMBOL(drm_client_release);
 
 void drm_client_dev_unregister(struct drm_device *dev)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_client_dev *client, *tmp;
 
 	if (!drm_core_check_feature(dev, DRIVER_MODESET))
@@ -192,6 +198,7 @@ void drm_client_dev_unregister(struct drm_device *dev)
  */
 void drm_client_dev_hotplug(struct drm_device *dev)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_client_dev *client;
 	int ret;
 
@@ -212,6 +219,7 @@ EXPORT_SYMBOL(drm_client_dev_hotplug);
 
 void drm_client_dev_restore(struct drm_device *dev)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_client_dev *client;
 	int ret;
 
@@ -233,6 +241,7 @@ void drm_client_dev_restore(struct drm_device *dev)
 
 static void drm_client_buffer_delete(struct drm_client_buffer *buffer)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_device *dev = buffer->client->dev;
 
 	drm_gem_vunmap(buffer->gem, &buffer->map);
@@ -249,6 +258,7 @@ static void drm_client_buffer_delete(struct drm_client_buffer *buffer)
 static struct drm_client_buffer *
 drm_client_buffer_create(struct drm_client_dev *client, u32 width, u32 height, u32 format)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	const struct drm_format_info *info = drm_format_info(format);
 	struct drm_mode_create_dumb dumb_args = { };
 	struct drm_device *dev = client->dev;
@@ -311,6 +321,7 @@ err_delete:
 int
 drm_client_buffer_vmap(struct drm_client_buffer *buffer, struct dma_buf_map *map_copy)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct dma_buf_map *map = &buffer->map;
 	int ret;
 
@@ -342,6 +353,7 @@ EXPORT_SYMBOL(drm_client_buffer_vmap);
  */
 void drm_client_buffer_vunmap(struct drm_client_buffer *buffer)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct dma_buf_map *map = &buffer->map;
 
 	drm_gem_vunmap(buffer->gem, map);
@@ -350,6 +362,7 @@ EXPORT_SYMBOL(drm_client_buffer_vunmap);
 
 static void drm_client_buffer_rmfb(struct drm_client_buffer *buffer)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	int ret;
 
 	if (!buffer->fb)
@@ -366,6 +379,7 @@ static void drm_client_buffer_rmfb(struct drm_client_buffer *buffer)
 static int drm_client_buffer_addfb(struct drm_client_buffer *buffer,
 				   u32 width, u32 height, u32 format)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_client_dev *client = buffer->client;
 	struct drm_mode_fb_cmd fb_req = { };
 	const struct drm_format_info *info;
@@ -412,6 +426,7 @@ static int drm_client_buffer_addfb(struct drm_client_buffer *buffer,
 struct drm_client_buffer *
 drm_client_framebuffer_create(struct drm_client_dev *client, u32 width, u32 height, u32 format)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_client_buffer *buffer;
 	int ret;
 
@@ -435,6 +450,7 @@ EXPORT_SYMBOL(drm_client_framebuffer_create);
  */
 void drm_client_framebuffer_delete(struct drm_client_buffer *buffer)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	if (!buffer)
 		return;
 
@@ -456,6 +472,7 @@ EXPORT_SYMBOL(drm_client_framebuffer_delete);
  */
 int drm_client_framebuffer_flush(struct drm_client_buffer *buffer, struct drm_rect *rect)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	if (!buffer || !buffer->fb || !buffer->fb->funcs->dirty)
 		return 0;
 
@@ -479,6 +496,7 @@ EXPORT_SYMBOL(drm_client_framebuffer_flush);
 #ifdef CONFIG_DEBUG_FS
 static int drm_client_debugfs_internal_clients(struct seq_file *m, void *data)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	struct drm_info_node *node = m->private;
 	struct drm_device *dev = node->minor->dev;
 	struct drm_printer p = drm_seq_file_printer(m);
@@ -498,6 +516,7 @@ static const struct drm_info_list drm_client_debugfs_list[] = {
 
 void drm_client_debugfs_init(struct drm_minor *minor)
 {
+    pr_info("drm_client: called %s\n", __func__);
 	drm_debugfs_create_files(drm_client_debugfs_list,
 				 ARRAY_SIZE(drm_client_debugfs_list),
 				 minor->debugfs_root, minor);

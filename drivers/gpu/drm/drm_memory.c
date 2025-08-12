@@ -58,6 +58,7 @@
 static void *agp_remap(unsigned long offset, unsigned long size,
 		       struct drm_device *dev)
 {
+    pr_info("drm_memory: called %s\n", __func__);
 	unsigned long i, num_pages =
 	    PAGE_ALIGN(size) / PAGE_SIZE;
 	struct drm_agp_mem *agpmem;
@@ -102,6 +103,7 @@ static void *agp_remap(unsigned long offset, unsigned long size,
 static inline void *agp_remap(unsigned long offset, unsigned long size,
 			      struct drm_device *dev)
 {
+    pr_info("drm_memory: called %s\n", __func__);
 	return NULL;
 }
 
@@ -109,6 +111,7 @@ static inline void *agp_remap(unsigned long offset, unsigned long size,
 
 void drm_legacy_ioremap(struct drm_local_map *map, struct drm_device *dev)
 {
+    pr_info("drm_memory: called %s\n", __func__);
 	if (dev->agp && dev->agp->cant_use_aperture && map->type == _DRM_AGP)
 		map->handle = agp_remap(map->offset, map->size, dev);
 	else
@@ -118,6 +121,7 @@ EXPORT_SYMBOL(drm_legacy_ioremap);
 
 void drm_legacy_ioremap_wc(struct drm_local_map *map, struct drm_device *dev)
 {
+    pr_info("drm_memory: called %s\n", __func__);
 	if (dev->agp && dev->agp->cant_use_aperture && map->type == _DRM_AGP)
 		map->handle = agp_remap(map->offset, map->size, dev);
 	else
@@ -127,6 +131,7 @@ EXPORT_SYMBOL(drm_legacy_ioremap_wc);
 
 void drm_legacy_ioremapfree(struct drm_local_map *map, struct drm_device *dev)
 {
+    pr_info("drm_memory: called %s\n", __func__);
 	if (!map->handle || !map->size)
 		return;
 

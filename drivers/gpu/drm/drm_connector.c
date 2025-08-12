@@ -100,6 +100,7 @@ static struct drm_conn_prop_enum_list drm_connector_enum_list[] = {
 
 void drm_connector_ida_init(void)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(drm_connector_enum_list); i++)
@@ -108,6 +109,7 @@ void drm_connector_ida_init(void)
 
 void drm_connector_ida_destroy(void)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(drm_connector_enum_list); i++)
@@ -122,6 +124,7 @@ void drm_connector_ida_destroy(void)
  */
 const char *drm_get_connector_type_name(unsigned int type)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	if (type < ARRAY_SIZE(drm_connector_enum_list))
 		return drm_connector_enum_list[type].name;
 
@@ -141,6 +144,7 @@ EXPORT_SYMBOL(drm_get_connector_type_name);
  */
 static void drm_connector_get_cmdline_mode(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_cmdline_mode *mode = &connector->cmdline_mode;
 	char *option = NULL;
 
@@ -176,6 +180,7 @@ static void drm_connector_get_cmdline_mode(struct drm_connector *connector)
 
 static void drm_connector_free(struct kref *kref)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_connector *connector =
 		container_of(kref, struct drm_connector, base.refcount);
 	struct drm_device *dev = connector->dev;
@@ -186,6 +191,7 @@ static void drm_connector_free(struct kref *kref)
 
 void drm_connector_free_work_fn(struct work_struct *work)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_connector *connector, *n;
 	struct drm_device *dev =
 		container_of(work, struct drm_device, mode_config.connector_free_work);
@@ -221,6 +227,7 @@ int drm_connector_init(struct drm_device *dev,
 		       const struct drm_connector_funcs *funcs,
 		       int connector_type)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_mode_config *config = &dev->mode_config;
 	int ret;
 	struct ida *connector_ida =
@@ -346,6 +353,7 @@ int drm_connector_init_with_ddc(struct drm_device *dev,
 				int connector_type,
 				struct i2c_adapter *ddc)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	int ret;
 
 	ret = drm_connector_init(dev, connector, funcs, connector_type);
@@ -369,6 +377,7 @@ EXPORT_SYMBOL(drm_connector_init_with_ddc);
  */
 void drm_connector_attach_edid_property(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_mode_config *config = &connector->dev->mode_config;
 
 	drm_object_attach_property(&connector->base,
@@ -392,6 +401,7 @@ EXPORT_SYMBOL(drm_connector_attach_edid_property);
 int drm_connector_attach_encoder(struct drm_connector *connector,
 				 struct drm_encoder *encoder)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	/*
 	 * In the past, drivers have attempted to model the static association
 	 * of connector to encoder in simple connector/encoder devices using a
@@ -424,6 +434,7 @@ EXPORT_SYMBOL(drm_connector_attach_encoder);
 bool drm_connector_has_possible_encoder(struct drm_connector *connector,
 					struct drm_encoder *encoder)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	return connector->possible_encoders & drm_encoder_mask(encoder);
 }
 EXPORT_SYMBOL(drm_connector_has_possible_encoder);
@@ -431,6 +442,7 @@ EXPORT_SYMBOL(drm_connector_has_possible_encoder);
 static void drm_mode_remove(struct drm_connector *connector,
 			    struct drm_display_mode *mode)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	list_del(&mode->head);
 	drm_mode_destroy(connector->dev, mode);
 }
@@ -443,6 +455,7 @@ static void drm_mode_remove(struct drm_connector *connector,
  */
 void drm_connector_cleanup(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *mode, *t;
 
@@ -504,6 +517,7 @@ EXPORT_SYMBOL(drm_connector_cleanup);
  */
 int drm_connector_register(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	int ret = 0;
 
 	if (!connector->dev->registered)
@@ -554,6 +568,7 @@ EXPORT_SYMBOL(drm_connector_register);
  */
 void drm_connector_unregister(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	mutex_lock(&connector->mutex);
 	if (connector->registration_state != DRM_CONNECTOR_REGISTERED) {
 		mutex_unlock(&connector->mutex);
@@ -573,6 +588,7 @@ EXPORT_SYMBOL(drm_connector_unregister);
 
 void drm_connector_unregister_all(struct drm_device *dev)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
 
@@ -584,6 +600,7 @@ void drm_connector_unregister_all(struct drm_device *dev)
 
 int drm_connector_register_all(struct drm_device *dev)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
 	int ret = 0;
@@ -610,6 +627,7 @@ int drm_connector_register_all(struct drm_device *dev)
  */
 const char *drm_get_connector_status_name(enum drm_connector_status status)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	if (status == connector_status_connected)
 		return "connected";
 	else if (status == connector_status_disconnected)
@@ -627,6 +645,7 @@ EXPORT_SYMBOL(drm_get_connector_status_name);
  */
 const char *drm_get_connector_force_name(enum drm_connector_force force)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	switch (force) {
 	case DRM_FORCE_UNSPECIFIED:
 		return "unspecified";
@@ -660,6 +679,7 @@ static struct lockdep_map connector_list_iter_dep_map = {
 void drm_connector_list_iter_begin(struct drm_device *dev,
 				   struct drm_connector_list_iter *iter)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	iter->dev = dev;
 	iter->conn = NULL;
 	lock_acquire_shared_recursive(&connector_list_iter_dep_map, 0, 1, NULL, _RET_IP_);
@@ -674,6 +694,7 @@ EXPORT_SYMBOL(drm_connector_list_iter_begin);
 static void
 __drm_connector_put_safe(struct drm_connector *conn)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_mode_config *config = &conn->dev->mode_config;
 
 	lockdep_assert_held(&config->connector_list_lock);
@@ -695,6 +716,7 @@ __drm_connector_put_safe(struct drm_connector *conn)
 struct drm_connector *
 drm_connector_list_iter_next(struct drm_connector_list_iter *iter)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_connector *old_conn = iter->conn;
 	struct drm_mode_config *config = &iter->dev->mode_config;
 	struct list_head *lhead;
@@ -734,6 +756,7 @@ EXPORT_SYMBOL(drm_connector_list_iter_next);
  */
 void drm_connector_list_iter_end(struct drm_connector_list_iter *iter)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_mode_config *config = &iter->dev->mode_config;
 	unsigned long flags;
 
@@ -765,6 +788,7 @@ static const struct drm_prop_enum_list drm_subpixel_enum_list[] = {
  */
 const char *drm_get_subpixel_order_name(enum subpixel_order order)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	return drm_subpixel_enum_list[order].name;
 }
 EXPORT_SYMBOL(drm_get_subpixel_order_name);
@@ -796,6 +820,7 @@ int drm_display_info_set_bus_formats(struct drm_display_info *info,
 				     const u32 *formats,
 				     unsigned int num_formats)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	u32 *fmts = NULL;
 
 	if (!formats && num_formats)
@@ -1250,6 +1275,7 @@ static const struct drm_prop_enum_list dp_colorspaces[] = {
 
 int drm_connector_create_standard_properties(struct drm_device *dev)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_property *prop;
 
 	prop = drm_property_create(dev, DRM_MODE_PROP_BLOB |
@@ -1311,6 +1337,7 @@ int drm_connector_create_standard_properties(struct drm_device *dev)
  */
 int drm_mode_create_dvi_i_properties(struct drm_device *dev)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_property *dvi_i_selector;
 	struct drm_property *dvi_i_subconnector;
 
@@ -1342,6 +1369,7 @@ EXPORT_SYMBOL(drm_mode_create_dvi_i_properties);
  */
 void drm_connector_attach_dp_subconnector_property(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_mode_config *mode_config = &connector->dev->mode_config;
 
 	if (!mode_config->dp_subconnector_property)
@@ -1392,6 +1420,7 @@ EXPORT_SYMBOL(drm_connector_attach_dp_subconnector_property);
  */
 int drm_connector_attach_content_type_property(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	if (!drm_mode_create_content_type_property(connector->dev))
 		drm_object_attach_property(&connector->base,
 					   connector->dev->mode_config.content_type_property,
@@ -1412,6 +1441,7 @@ EXPORT_SYMBOL(drm_connector_attach_content_type_property);
 void drm_hdmi_avi_infoframe_content_type(struct hdmi_avi_infoframe *frame,
 					 const struct drm_connector_state *conn_state)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	switch (conn_state->content_type) {
 	case DRM_MODE_CONTENT_TYPE_GRAPHICS:
 		frame->content_type = HDMI_CONTENT_TYPE_GRAPHICS;
@@ -1444,6 +1474,7 @@ EXPORT_SYMBOL(drm_hdmi_avi_infoframe_content_type);
  */
 void drm_connector_attach_tv_margin_properties(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 
 	drm_object_attach_property(&connector->base,
@@ -1472,6 +1503,7 @@ EXPORT_SYMBOL(drm_connector_attach_tv_margin_properties);
  */
 int drm_mode_create_tv_margin_properties(struct drm_device *dev)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	if (dev->mode_config.tv_left_margin_property)
 		return 0;
 
@@ -1514,6 +1546,7 @@ int drm_mode_create_tv_properties(struct drm_device *dev,
 				  unsigned int num_modes,
 				  const char * const modes[])
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_property *tv_selector;
 	struct drm_property *tv_subconnector;
 	unsigned int i;
@@ -1607,6 +1640,7 @@ EXPORT_SYMBOL(drm_mode_create_tv_properties);
  */
 int drm_mode_create_scaling_mode_property(struct drm_device *dev)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_property *scaling_mode;
 
 	if (dev->mode_config.scaling_mode_property)
@@ -1699,6 +1733,7 @@ EXPORT_SYMBOL(drm_mode_create_scaling_mode_property);
 int drm_connector_attach_vrr_capable_property(
 	struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_property *prop;
 
@@ -1733,6 +1768,7 @@ EXPORT_SYMBOL(drm_connector_attach_vrr_capable_property);
 int drm_connector_attach_scaling_mode_property(struct drm_connector *connector,
 					       u32 scaling_mode_mask)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_property *scaling_mode_property;
 	int i;
@@ -1788,6 +1824,7 @@ EXPORT_SYMBOL(drm_connector_attach_scaling_mode_property);
  */
 int drm_mode_create_aspect_ratio_property(struct drm_device *dev)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	if (dev->mode_config.aspect_ratio_property)
 		return 0;
 
@@ -1843,6 +1880,7 @@ EXPORT_SYMBOL(drm_mode_create_aspect_ratio_property);
  */
 int drm_mode_create_hdmi_colorspace_property(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 
 	if (connector->colorspace_property)
@@ -1872,6 +1910,7 @@ EXPORT_SYMBOL(drm_mode_create_hdmi_colorspace_property);
  */
 int drm_mode_create_dp_colorspace_property(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 
 	if (connector->colorspace_property)
@@ -1901,6 +1940,7 @@ EXPORT_SYMBOL(drm_mode_create_dp_colorspace_property);
  */
 int drm_mode_create_content_type_property(struct drm_device *dev)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	if (dev->mode_config.content_type_property)
 		return 0;
 
@@ -1924,6 +1964,7 @@ EXPORT_SYMBOL(drm_mode_create_content_type_property);
  */
 int drm_mode_create_suggested_offset_properties(struct drm_device *dev)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	if (dev->mode_config.suggested_x_property && dev->mode_config.suggested_y_property)
 		return 0;
 
@@ -1956,6 +1997,7 @@ EXPORT_SYMBOL(drm_mode_create_suggested_offset_properties);
 int drm_connector_set_path_property(struct drm_connector *connector,
 				    const char *path)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	int ret;
 
@@ -1984,6 +2026,7 @@ EXPORT_SYMBOL(drm_connector_set_path_property);
  */
 int drm_connector_set_tile_property(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	char tile[256];
 	int ret;
@@ -2031,6 +2074,7 @@ EXPORT_SYMBOL(drm_connector_set_tile_property);
 int drm_connector_update_edid_property(struct drm_connector *connector,
 				       const struct edid *edid)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	size_t size = 0;
 	int ret;
@@ -2110,6 +2154,7 @@ EXPORT_SYMBOL(drm_connector_update_edid_property);
 void drm_connector_set_link_status_property(struct drm_connector *connector,
 					    uint64_t link_status)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 
 	drm_modeset_lock(&dev->mode_config.connection_mutex, NULL);
@@ -2132,6 +2177,7 @@ EXPORT_SYMBOL(drm_connector_set_link_status_property);
 int drm_connector_attach_max_bpc_property(struct drm_connector *connector,
 					  int min, int max)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_property *prop;
 
@@ -2164,6 +2210,7 @@ EXPORT_SYMBOL(drm_connector_attach_max_bpc_property);
  */
 int drm_connector_attach_hdr_output_metadata_property(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_property *prop = dev->mode_config.hdr_output_metadata_property;
 
@@ -2185,6 +2232,7 @@ EXPORT_SYMBOL(drm_connector_attach_hdr_output_metadata_property);
  */
 int drm_connector_attach_colorspace_property(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_property *prop = connector->colorspace_property;
 
 	drm_object_attach_property(&connector->base, prop, DRM_MODE_COLORIMETRY_DEFAULT);
@@ -2208,6 +2256,7 @@ EXPORT_SYMBOL(drm_connector_attach_colorspace_property);
 bool drm_connector_atomic_hdr_metadata_equal(struct drm_connector_state *old_state,
 					     struct drm_connector_state *new_state)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_property_blob *old_blob = old_state->hdr_output_metadata;
 	struct drm_property_blob *new_blob = new_state->hdr_output_metadata;
 
@@ -2233,6 +2282,7 @@ EXPORT_SYMBOL(drm_connector_atomic_hdr_metadata_equal);
 void drm_connector_set_vrr_capable_property(
 		struct drm_connector *connector, bool capable)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	drm_object_property_set_value(&connector->base,
 				      connector->vrr_capable_property,
 				      capable);
@@ -2261,6 +2311,7 @@ int drm_connector_set_panel_orientation(
 	struct drm_connector *connector,
 	enum drm_panel_orientation panel_orientation)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_display_info *info = &connector->display_info;
 	struct drm_property *prop;
@@ -2312,6 +2363,7 @@ int drm_connector_set_panel_orientation_with_quirk(
 	enum drm_panel_orientation panel_orientation,
 	int width, int height)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	int orientation_quirk;
 
 	orientation_quirk = drm_get_panel_orientation_quirk(width, height);
@@ -2327,6 +2379,7 @@ int drm_connector_set_obj_prop(struct drm_mode_object *obj,
 				    struct drm_property *property,
 				    uint64_t value)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	int ret = -EINVAL;
 	struct drm_connector *connector = obj_to_connector(obj);
 
@@ -2344,6 +2397,7 @@ int drm_connector_set_obj_prop(struct drm_mode_object *obj,
 int drm_connector_property_set_ioctl(struct drm_device *dev,
 				     void *data, struct drm_file *file_priv)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_mode_connector_set_property *conn_set_prop = data;
 	struct drm_mode_obj_set_property obj_set_prop = {
 		.value = conn_set_prop->value,
@@ -2358,6 +2412,7 @@ int drm_connector_property_set_ioctl(struct drm_device *dev,
 
 static struct drm_encoder *drm_connector_get_encoder(struct drm_connector *connector)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	/* For atomic drivers only state objects are synchronously updated and
 	 * protected by modeset locks, so check those first.
 	 */
@@ -2371,6 +2426,7 @@ drm_mode_expose_to_userspace(const struct drm_display_mode *mode,
 			     const struct list_head *modes,
 			     const struct drm_file *file_priv)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	/*
 	 * If user-space hasn't configured the driver to expose the stereo 3D
 	 * modes, don't expose them.
@@ -2403,6 +2459,7 @@ drm_mode_expose_to_userspace(const struct drm_display_mode *mode,
 int drm_mode_getconnector(struct drm_device *dev, void *data,
 			  struct drm_file *file_priv)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_mode_get_connector *out_resp = data;
 	struct drm_connector *connector;
 	struct drm_encoder *encoder;
@@ -2558,6 +2615,7 @@ out:
 
 static void drm_tile_group_free(struct kref *kref)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_tile_group *tg = container_of(kref, struct drm_tile_group, refcount);
 	struct drm_device *dev = tg->dev;
 
@@ -2577,6 +2635,7 @@ static void drm_tile_group_free(struct kref *kref)
 void drm_mode_put_tile_group(struct drm_device *dev,
 			     struct drm_tile_group *tg)
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	kref_put(&tg->refcount, drm_tile_group_free);
 }
 EXPORT_SYMBOL(drm_mode_put_tile_group);
@@ -2594,6 +2653,7 @@ EXPORT_SYMBOL(drm_mode_put_tile_group);
 struct drm_tile_group *drm_mode_get_tile_group(struct drm_device *dev,
 					       const char topology[8])
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_tile_group *tg;
 	int id;
 
@@ -2625,6 +2685,7 @@ EXPORT_SYMBOL(drm_mode_get_tile_group);
 struct drm_tile_group *drm_mode_create_tile_group(struct drm_device *dev,
 						  const char topology[8])
 {
+    pr_info("drm_connector: called %s\n", __func__);
 	struct drm_tile_group *tg;
 	int ret;
 

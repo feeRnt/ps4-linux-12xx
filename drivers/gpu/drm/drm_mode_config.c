@@ -35,6 +35,7 @@
 
 int drm_modeset_register_all(struct drm_device *dev)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	int ret;
 
 	ret = drm_plane_register_all(dev);
@@ -67,6 +68,7 @@ err_plane:
 
 void drm_modeset_unregister_all(struct drm_device *dev)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	drm_connector_unregister_all(dev);
 	drm_encoder_unregister_all(dev);
 	drm_crtc_unregister_all(dev);
@@ -90,6 +92,7 @@ void drm_modeset_unregister_all(struct drm_device *dev)
 int drm_mode_getresources(struct drm_device *dev, void *data,
 			  struct drm_file *file_priv)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	struct drm_mode_card_res *card_res = data;
 	struct drm_framebuffer *fb;
 	struct drm_connector *connector;
@@ -180,6 +183,7 @@ int drm_mode_getresources(struct drm_device *dev, void *data,
  */
 void drm_mode_config_reset(struct drm_device *dev)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_plane *plane;
 	struct drm_encoder *encoder;
@@ -217,6 +221,7 @@ static const struct drm_prop_enum_list drm_plane_type_enum_list[] = {
 
 static int drm_mode_create_standard_properties(struct drm_device *dev)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	struct drm_property *prop;
 	int ret;
 
@@ -376,6 +381,7 @@ static int drm_mode_create_standard_properties(struct drm_device *dev)
 
 static void drm_mode_config_init_release(struct drm_device *dev, void *ptr)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	drm_mode_config_cleanup(dev);
 }
 
@@ -398,6 +404,7 @@ static void drm_mode_config_init_release(struct drm_device *dev, void *ptr)
  */
 int drmm_mode_config_init(struct drm_device *dev)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	mutex_init(&dev->mode_config.mutex);
 	drm_modeset_lock_init(&dev->mode_config.connection_mutex);
 	mutex_init(&dev->mode_config.idr_mutex);
@@ -476,6 +483,7 @@ EXPORT_SYMBOL(drmm_mode_config_init);
  */
 void drm_mode_config_cleanup(struct drm_device *dev)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
 	struct drm_crtc *crtc, *ct;
@@ -553,6 +561,7 @@ EXPORT_SYMBOL(drm_mode_config_cleanup);
 
 static u32 full_encoder_mask(struct drm_device *dev)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	u32 encoder_mask = 0;
 
@@ -569,12 +578,14 @@ static u32 full_encoder_mask(struct drm_device *dev)
  */
 static void fixup_encoder_possible_clones(struct drm_encoder *encoder)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	if (encoder->possible_clones == 0)
 		encoder->possible_clones = drm_encoder_mask(encoder);
 }
 
 static void validate_encoder_possible_clones(struct drm_encoder *encoder)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	u32 encoder_mask = full_encoder_mask(dev);
 	struct drm_encoder *other;
@@ -601,6 +612,7 @@ static void validate_encoder_possible_clones(struct drm_encoder *encoder)
 
 static u32 full_crtc_mask(struct drm_device *dev)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	u32 crtc_mask = 0;
 
@@ -612,6 +624,7 @@ static u32 full_crtc_mask(struct drm_device *dev)
 
 static void validate_encoder_possible_crtcs(struct drm_encoder *encoder)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	u32 crtc_mask = full_crtc_mask(encoder->dev);
 
 	WARN((encoder->possible_crtcs & crtc_mask) == 0 ||
@@ -624,6 +637,7 @@ static void validate_encoder_possible_crtcs(struct drm_encoder *encoder)
 
 void drm_mode_config_validate(struct drm_device *dev)
 {
+    pr_info("drm_mode_config: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	struct drm_crtc *crtc;
 	struct drm_plane *plane;

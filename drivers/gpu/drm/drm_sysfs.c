@@ -54,6 +54,7 @@ struct class *drm_class;
 
 static char *drm_devnode(struct device *dev, umode_t *mode)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	return kasprintf(GFP_KERNEL, "dri/%s", dev_name(dev));
 }
 
@@ -71,6 +72,7 @@ static CLASS_ATTR_STRING(version, S_IRUGO, "drm 1.1.0 20060810");
  */
 int drm_sysfs_init(void)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	int err;
 
 	drm_class = class_create(THIS_MODULE, "drm");
@@ -95,6 +97,7 @@ int drm_sysfs_init(void)
  */
 void drm_sysfs_destroy(void)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	if (IS_ERR_OR_NULL(drm_class))
 		return;
 	class_remove_file(drm_class, &class_attr_version.attr);
@@ -109,6 +112,7 @@ static ssize_t status_store(struct device *device,
 			   struct device_attribute *attr,
 			   const char *buf, size_t count)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	struct drm_connector *connector = to_drm_connector(device);
 	struct drm_device *dev = connector->dev;
 	enum drm_connector_force old_force;
@@ -151,6 +155,7 @@ static ssize_t status_show(struct device *device,
 			   struct device_attribute *attr,
 			   char *buf)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	struct drm_connector *connector = to_drm_connector(device);
 	enum drm_connector_status status;
 
@@ -164,6 +169,7 @@ static ssize_t dpms_show(struct device *device,
 			   struct device_attribute *attr,
 			   char *buf)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	struct drm_connector *connector = to_drm_connector(device);
 	int dpms;
 
@@ -176,6 +182,7 @@ static ssize_t enabled_show(struct device *device,
 			    struct device_attribute *attr,
 			   char *buf)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	struct drm_connector *connector = to_drm_connector(device);
 	bool enabled;
 
@@ -188,6 +195,7 @@ static ssize_t edid_show(struct file *filp, struct kobject *kobj,
 			 struct bin_attribute *attr, char *buf, loff_t off,
 			 size_t count)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	struct device *connector_dev = kobj_to_dev(kobj);
 	struct drm_connector *connector = to_drm_connector(connector_dev);
 	unsigned char *edid;
@@ -221,6 +229,7 @@ static ssize_t modes_show(struct device *device,
 			   struct device_attribute *attr,
 			   char *buf)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	struct drm_connector *connector = to_drm_connector(device);
 	struct drm_display_mode *mode;
 	int written = 0;
@@ -272,6 +281,7 @@ static const struct attribute_group *connector_dev_groups[] = {
 
 int drm_sysfs_connector_add(struct drm_connector *connector)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 
 	if (connector->kdev)
@@ -298,6 +308,7 @@ int drm_sysfs_connector_add(struct drm_connector *connector)
 
 void drm_sysfs_connector_remove(struct drm_connector *connector)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	if (!connector->kdev)
 		return;
 
@@ -313,6 +324,7 @@ void drm_sysfs_connector_remove(struct drm_connector *connector)
 
 void drm_sysfs_lease_event(struct drm_device *dev)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	char *event_string = "LEASE=1";
 	char *envp[] = { event_string, NULL };
 
@@ -334,6 +346,7 @@ void drm_sysfs_lease_event(struct drm_device *dev)
  */
 void drm_sysfs_hotplug_event(struct drm_device *dev)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	char *event_string = "HOTPLUG=1";
 	char *envp[] = { event_string, NULL };
 
@@ -356,6 +369,7 @@ EXPORT_SYMBOL(drm_sysfs_hotplug_event);
 void drm_sysfs_connector_status_event(struct drm_connector *connector,
 				      struct drm_property *property)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	char hotplug_str[] = "HOTPLUG=1", conn_id[21], prop_id[21];
 	char *envp[4] = { hotplug_str, conn_id, prop_id, NULL };
@@ -376,11 +390,13 @@ EXPORT_SYMBOL(drm_sysfs_connector_status_event);
 
 static void drm_sysfs_release(struct device *dev)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	kfree(dev);
 }
 
 struct device *drm_sysfs_minor_alloc(struct drm_minor *minor)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	const char *minor_str;
 	struct device *kdev;
 	int r;
@@ -423,6 +439,7 @@ err_free:
  */
 int drm_class_device_register(struct device *dev)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	if (!drm_class || IS_ERR(drm_class))
 		return -ENOENT;
 
@@ -441,6 +458,7 @@ EXPORT_SYMBOL_GPL(drm_class_device_register);
  */
 void drm_class_device_unregister(struct device *dev)
 {
+    pr_info("drm_sysfs: called %s\n", __func__);
 	return device_unregister(dev);
 }
 EXPORT_SYMBOL_GPL(drm_class_device_unregister);

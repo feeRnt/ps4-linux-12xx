@@ -59,6 +59,7 @@ struct drm_ctx_list {
  */
 void drm_legacy_ctxbitmap_free(struct drm_device * dev, int ctx_handle)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
 	    !drm_core_check_feature(dev, DRIVER_LEGACY))
 		return;
@@ -79,6 +80,7 @@ void drm_legacy_ctxbitmap_free(struct drm_device * dev, int ctx_handle)
  */
 static int drm_legacy_ctxbitmap_next(struct drm_device * dev)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	int ret;
 
 	mutex_lock(&dev->struct_mutex);
@@ -97,6 +99,7 @@ static int drm_legacy_ctxbitmap_next(struct drm_device * dev)
  */
 void drm_legacy_ctxbitmap_init(struct drm_device * dev)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
 	    !drm_core_check_feature(dev, DRIVER_LEGACY))
 		return;
@@ -114,6 +117,7 @@ void drm_legacy_ctxbitmap_init(struct drm_device * dev)
  */
 void drm_legacy_ctxbitmap_cleanup(struct drm_device * dev)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
 	    !drm_core_check_feature(dev, DRIVER_LEGACY))
 		return;
@@ -134,6 +138,7 @@ void drm_legacy_ctxbitmap_cleanup(struct drm_device * dev)
  */
 void drm_legacy_ctxbitmap_flush(struct drm_device *dev, struct drm_file *file)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	struct drm_ctx_list *pos, *tmp;
 
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
@@ -178,6 +183,7 @@ void drm_legacy_ctxbitmap_flush(struct drm_device *dev, struct drm_file *file)
 int drm_legacy_getsareactx(struct drm_device *dev, void *data,
 			   struct drm_file *file_priv)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	struct drm_ctx_priv_map *request = data;
 	struct drm_local_map *map;
 	struct drm_map_list *_entry;
@@ -226,6 +232,7 @@ int drm_legacy_getsareactx(struct drm_device *dev, void *data,
 int drm_legacy_setsareactx(struct drm_device *dev, void *data,
 			   struct drm_file *file_priv)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	struct drm_ctx_priv_map *request = data;
 	struct drm_local_map *map = NULL;
 	struct drm_map_list *r_list = NULL;
@@ -275,6 +282,7 @@ int drm_legacy_setsareactx(struct drm_device *dev, void *data,
  */
 static int drm_context_switch(struct drm_device * dev, int old, int new)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	if (test_and_set_bit(0, &dev->context_flag)) {
 		DRM_ERROR("Reentering -- FIXME\n");
 		return -EBUSY;
@@ -304,6 +312,7 @@ static int drm_context_switch(struct drm_device * dev, int old, int new)
 static int drm_context_switch_complete(struct drm_device *dev,
 				       struct drm_file *file_priv, int new)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	dev->last_context = new;	/* PRE/POST: This is the _only_ writer. */
 
 	if (!_DRM_LOCK_IS_HELD(file_priv->master->lock.hw_lock->lock)) {
@@ -331,6 +340,7 @@ static int drm_context_switch_complete(struct drm_device *dev,
 int drm_legacy_resctx(struct drm_device *dev, void *data,
 		      struct drm_file *file_priv)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	struct drm_ctx_res *res = data;
 	struct drm_ctx ctx;
 	int i;
@@ -366,6 +376,7 @@ int drm_legacy_resctx(struct drm_device *dev, void *data,
 int drm_legacy_addctx(struct drm_device *dev, void *data,
 		      struct drm_file *file_priv)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	struct drm_ctx_list *ctx_entry;
 	struct drm_ctx *ctx = data;
 	int tmp_handle;
@@ -417,6 +428,7 @@ int drm_legacy_addctx(struct drm_device *dev, void *data,
 int drm_legacy_getctx(struct drm_device *dev, void *data,
 		      struct drm_file *file_priv)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	struct drm_ctx *ctx = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
@@ -443,6 +455,7 @@ int drm_legacy_getctx(struct drm_device *dev, void *data,
 int drm_legacy_switchctx(struct drm_device *dev, void *data,
 			 struct drm_file *file_priv)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	struct drm_ctx *ctx = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
@@ -467,6 +480,7 @@ int drm_legacy_switchctx(struct drm_device *dev, void *data,
 int drm_legacy_newctx(struct drm_device *dev, void *data,
 		      struct drm_file *file_priv)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	struct drm_ctx *ctx = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&
@@ -493,6 +507,7 @@ int drm_legacy_newctx(struct drm_device *dev, void *data,
 int drm_legacy_rmctx(struct drm_device *dev, void *data,
 		     struct drm_file *file_priv)
 {
+    pr_info("drm_context: called %s\n", __func__);
 	struct drm_ctx *ctx = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_KMS_LEGACY_CONTEXT) &&

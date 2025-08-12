@@ -25,12 +25,14 @@
 
 static inline void drm_hdcp_print_ksv(const u8 *ksv)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	DRM_DEBUG("\t%#02x, %#02x, %#02x, %#02x, %#02x\n",
 		  ksv[0], ksv[1], ksv[2], ksv[3], ksv[4]);
 }
 
 static u32 drm_hdcp_get_revoked_ksv_count(const u8 *buf, u32 vrls_length)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	u32 parsed_bytes = 0, ksv_count = 0, vrl_ksv_cnt, vrl_sz;
 
 	while (parsed_bytes < vrls_length) {
@@ -55,6 +57,7 @@ static u32 drm_hdcp_get_revoked_ksv_count(const u8 *buf, u32 vrls_length)
 static u32 drm_hdcp_get_revoked_ksvs(const u8 *buf, u8 **revoked_ksv_list,
 				     u32 vrls_length)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	u32 vrl_ksv_cnt, vrl_ksv_sz, vrl_idx = 0;
 	u32 parsed_bytes = 0, ksv_count = 0;
 
@@ -80,12 +83,14 @@ static u32 drm_hdcp_get_revoked_ksvs(const u8 *buf, u8 **revoked_ksv_list,
 
 static inline u32 get_vrl_length(const u8 *buf)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	return drm_hdcp_be24_to_cpu(buf);
 }
 
 static int drm_hdcp_parse_hdcp1_srm(const u8 *buf, size_t count,
 				    u8 **revoked_ksv_list, u32 *revoked_ksv_cnt)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	struct hdcp_srm_header *header;
 	u32 vrl_length, ksv_count;
 
@@ -147,6 +152,7 @@ static int drm_hdcp_parse_hdcp1_srm(const u8 *buf, size_t count,
 static int drm_hdcp_parse_hdcp2_srm(const u8 *buf, size_t count,
 				    u8 **revoked_ksv_list, u32 *revoked_ksv_cnt)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	struct hdcp_srm_header *header;
 	u32 vrl_length, ksv_count, ksv_sz;
 
@@ -208,17 +214,20 @@ static int drm_hdcp_parse_hdcp2_srm(const u8 *buf, size_t count,
 
 static inline bool is_srm_version_hdcp1(const u8 *buf)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	return *buf == (u8)(DRM_HDCP_1_4_SRM_ID << 4);
 }
 
 static inline bool is_srm_version_hdcp2(const u8 *buf)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	return *buf == (u8)(DRM_HDCP_2_SRM_ID << 4 | DRM_HDCP_2_INDICATOR);
 }
 
 static int drm_hdcp_srm_update(const u8 *buf, size_t count,
 			       u8 **revoked_ksv_list, u32 *revoked_ksv_cnt)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	if (count < sizeof(struct hdcp_srm_header))
 		return -EINVAL;
 
@@ -235,6 +244,7 @@ static int drm_hdcp_srm_update(const u8 *buf, size_t count,
 static int drm_hdcp_request_srm(struct drm_device *drm_dev,
 				u8 **revoked_ksv_list, u32 *revoked_ksv_cnt)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	char fw_name[36] = "display_hdcp_srm.bin";
 	const struct firmware *fw;
 	int ret;
@@ -285,6 +295,7 @@ exit:
 int drm_hdcp_check_ksvs_revoked(struct drm_device *drm_dev, u8 *ksvs,
 				u32 ksv_count)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	u32 revoked_ksv_cnt = 0, i, j;
 	u8 *revoked_ksv_list = NULL;
 	int ret = 0;
@@ -357,6 +368,7 @@ DRM_ENUM_NAME_FN(drm_get_hdcp_content_type_name,
 int drm_connector_attach_content_protection_property(
 		struct drm_connector *connector, bool hdcp_content_type)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_property *prop =
 			dev->mode_config.content_protection_property;
@@ -409,6 +421,7 @@ EXPORT_SYMBOL(drm_connector_attach_content_protection_property);
 void drm_hdcp_update_content_protection(struct drm_connector *connector,
 					u64 val)
 {
+    pr_info("drm_hdcp: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_connector_state *state = connector->state;
 

@@ -78,6 +78,7 @@ drm_atomic_helper_plane_changed(struct drm_atomic_state *state,
 				struct drm_plane_state *plane_state,
 				struct drm_plane *plane)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc_state *crtc_state;
 
 	if (old_plane_state->crtc) {
@@ -103,6 +104,7 @@ drm_atomic_helper_plane_changed(struct drm_atomic_state *state,
 static int handle_conflicting_encoders(struct drm_atomic_state *state,
 				       bool disable_conflicting_encoders)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_connector_state *new_conn_state;
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
@@ -215,6 +217,7 @@ set_best_encoder(struct drm_atomic_state *state,
 		 struct drm_connector_state *conn_state,
 		 struct drm_encoder *encoder)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc_state *crtc_state;
 	struct drm_crtc *crtc;
 
@@ -255,6 +258,7 @@ static void
 steal_encoder(struct drm_atomic_state *state,
 	      struct drm_encoder *encoder)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc_state *crtc_state;
 	struct drm_connector *connector;
 	struct drm_connector_state *old_connector_state, *new_connector_state;
@@ -287,6 +291,7 @@ update_connector_routing(struct drm_atomic_state *state,
 			 struct drm_connector_state *old_connector_state,
 			 struct drm_connector_state *new_connector_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	const struct drm_connector_helper_funcs *funcs;
 	struct drm_encoder *new_encoder;
 	struct drm_crtc_state *crtc_state;
@@ -403,6 +408,7 @@ update_connector_routing(struct drm_atomic_state *state,
 static int
 mode_fixup(struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *new_crtc_state;
 	struct drm_connector *connector;
@@ -497,6 +503,7 @@ static enum drm_mode_status mode_valid_path(struct drm_connector *connector,
 					    struct drm_crtc *crtc,
 					    const struct drm_display_mode *mode)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_bridge *bridge;
 	enum drm_mode_status ret;
 
@@ -528,6 +535,7 @@ static enum drm_mode_status mode_valid_path(struct drm_connector *connector,
 static int
 mode_valid(struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_connector_state *conn_state;
 	struct drm_connector *connector;
 	int i;
@@ -605,6 +613,7 @@ int
 drm_atomic_helper_check_modeset(struct drm_device *dev,
 				struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
 	struct drm_connector *connector;
@@ -794,6 +803,7 @@ int drm_atomic_helper_check_plane_state(struct drm_plane_state *plane_state,
 					bool can_position,
 					bool can_update_disabled)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_framebuffer *fb = plane_state->fb;
 	struct drm_rect *src = &plane_state->src;
 	struct drm_rect *dst = &plane_state->dst;
@@ -882,6 +892,7 @@ int
 drm_atomic_helper_check_planes(struct drm_device *dev,
 			       struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *new_crtc_state;
 	struct drm_plane *plane;
@@ -959,6 +970,7 @@ EXPORT_SYMBOL(drm_atomic_helper_check_planes);
 int drm_atomic_helper_check(struct drm_device *dev,
 			    struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	int ret;
 
 	ret = drm_atomic_helper_check_modeset(dev, state);
@@ -988,6 +1000,7 @@ static bool
 crtc_needs_disable(struct drm_crtc_state *old_state,
 		   struct drm_crtc_state *new_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	/*
 	 * No new_state means the CRTC is off, so the only criteria is whether
 	 * it's currently active or in self refresh mode.
@@ -1008,6 +1021,7 @@ crtc_needs_disable(struct drm_crtc_state *old_state,
 static void
 disable_outputs(struct drm_device *dev, struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct drm_connector_state *old_conn_state, *new_conn_state;
 	struct drm_crtc *crtc;
@@ -1132,6 +1146,7 @@ void
 drm_atomic_helper_update_legacy_modeset_state(struct drm_device *dev,
 					      struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct drm_connector_state *old_conn_state, *new_conn_state;
 	struct drm_crtc *crtc;
@@ -1199,6 +1214,7 @@ EXPORT_SYMBOL(drm_atomic_helper_update_legacy_modeset_state);
  */
 void drm_atomic_helper_calc_timestamping_constants(struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc_state *new_crtc_state;
 	struct drm_crtc *crtc;
 	int i;
@@ -1214,6 +1230,7 @@ EXPORT_SYMBOL(drm_atomic_helper_calc_timestamping_constants);
 static void
 crtc_set_mode(struct drm_device *dev, struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *new_crtc_state;
 	struct drm_connector *connector;
@@ -1290,6 +1307,7 @@ crtc_set_mode(struct drm_device *dev, struct drm_atomic_state *old_state)
 void drm_atomic_helper_commit_modeset_disables(struct drm_device *dev,
 					       struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	disable_outputs(dev, old_state);
 
 	drm_atomic_helper_update_legacy_modeset_state(dev, old_state);
@@ -1302,6 +1320,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_modeset_disables);
 static void drm_atomic_helper_commit_writebacks(struct drm_device *dev,
 						struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct drm_connector_state *new_conn_state;
 	int i;
@@ -1337,6 +1356,7 @@ static void drm_atomic_helper_commit_writebacks(struct drm_device *dev,
 void drm_atomic_helper_commit_modeset_enables(struct drm_device *dev,
 					      struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state;
 	struct drm_crtc_state *new_crtc_state;
@@ -1432,6 +1452,7 @@ int drm_atomic_helper_wait_for_fences(struct drm_device *dev,
 				      struct drm_atomic_state *state,
 				      bool pre_swap)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_plane *plane;
 	struct drm_plane_state *new_plane_state;
 	int i, ret;
@@ -1478,6 +1499,7 @@ void
 drm_atomic_helper_wait_for_vblanks(struct drm_device *dev,
 		struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
 	int i, ret;
@@ -1537,6 +1559,7 @@ EXPORT_SYMBOL(drm_atomic_helper_wait_for_vblanks);
 void drm_atomic_helper_wait_for_flip_done(struct drm_device *dev,
 					  struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	int i;
 
@@ -1575,6 +1598,7 @@ EXPORT_SYMBOL(drm_atomic_helper_wait_for_flip_done);
  */
 void drm_atomic_helper_commit_tail(struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_device *dev = old_state->dev;
 
 	drm_atomic_helper_commit_modeset_disables(dev, old_state);
@@ -1605,6 +1629,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_tail);
  */
 void drm_atomic_helper_commit_tail_rpm(struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_device *dev = old_state->dev;
 
 	drm_atomic_helper_commit_modeset_disables(dev, old_state);
@@ -1626,6 +1651,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_tail_rpm);
 
 static void commit_tail(struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_device *dev = old_state->dev;
 	const struct drm_mode_config_helper_funcs *funcs;
 	struct drm_crtc_state *new_crtc_state;
@@ -1679,6 +1705,7 @@ static void commit_tail(struct drm_atomic_state *old_state)
 
 static void commit_work(struct work_struct *work)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_atomic_state *state = container_of(work,
 						      struct drm_atomic_state,
 						      commit_work);
@@ -1701,6 +1728,7 @@ static void commit_work(struct work_struct *work)
 int drm_atomic_helper_async_check(struct drm_device *dev,
 				   struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *crtc_state;
 	struct drm_plane *plane = NULL;
@@ -1764,6 +1792,7 @@ EXPORT_SYMBOL(drm_atomic_helper_async_check);
 void drm_atomic_helper_async_commit(struct drm_device *dev,
 				    struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_plane *plane;
 	struct drm_plane_state *plane_state;
 	const struct drm_plane_helper_funcs *funcs;
@@ -1818,6 +1847,7 @@ int drm_atomic_helper_commit(struct drm_device *dev,
 			     struct drm_atomic_state *state,
 			     bool nonblock)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	int ret;
 
 	if (state->async_update) {
@@ -1946,6 +1976,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit);
 
 static int stall_checks(struct drm_crtc *crtc, bool nonblock)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc_commit *commit, *stall_commit = NULL;
 	bool completed = true;
 	int i;
@@ -1995,6 +2026,7 @@ static int stall_checks(struct drm_crtc *crtc, bool nonblock)
 
 static void release_crtc_commit(struct completion *completion)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc_commit *commit = container_of(completion,
 						      typeof(*commit),
 						      flip_done);
@@ -2004,6 +2036,7 @@ static void release_crtc_commit(struct completion *completion)
 
 static void init_commit(struct drm_crtc_commit *commit, struct drm_crtc *crtc)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	init_completion(&commit->flip_done);
 	init_completion(&commit->hw_done);
 	init_completion(&commit->cleanup_done);
@@ -2015,6 +2048,7 @@ static void init_commit(struct drm_crtc_commit *commit, struct drm_crtc *crtc)
 static struct drm_crtc_commit *
 crtc_or_fake_commit(struct drm_atomic_state *state, struct drm_crtc *crtc)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	if (crtc) {
 		struct drm_crtc_state *new_crtc_state;
 
@@ -2083,6 +2117,7 @@ crtc_or_fake_commit(struct drm_atomic_state *state, struct drm_crtc *crtc)
 int drm_atomic_helper_setup_commit(struct drm_atomic_state *state,
 				   bool nonblock)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
 	struct drm_connector *conn;
@@ -2206,6 +2241,7 @@ EXPORT_SYMBOL(drm_atomic_helper_setup_commit);
  */
 void drm_atomic_helper_wait_for_dependencies(struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state;
 	struct drm_plane *plane;
@@ -2258,6 +2294,7 @@ EXPORT_SYMBOL(drm_atomic_helper_wait_for_dependencies);
  */
 void drm_atomic_helper_fake_vblank(struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc_state *new_crtc_state;
 	struct drm_crtc *crtc;
 	int i;
@@ -2296,6 +2333,7 @@ EXPORT_SYMBOL(drm_atomic_helper_fake_vblank);
  */
 void drm_atomic_helper_commit_hw_done(struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
 	struct drm_crtc_commit *commit;
@@ -2341,6 +2379,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_hw_done);
  */
 void drm_atomic_helper_commit_cleanup_done(struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state;
 	struct drm_crtc_commit *commit;
@@ -2382,6 +2421,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_cleanup_done);
 int drm_atomic_helper_prepare_planes(struct drm_device *dev,
 				     struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct drm_connector_state *new_conn_state;
 	struct drm_plane *plane;
@@ -2439,6 +2479,7 @@ EXPORT_SYMBOL(drm_atomic_helper_prepare_planes);
 
 static bool plane_crtc_active(const struct drm_plane_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	return state->crtc && state->crtc->state->active;
 }
 
@@ -2487,6 +2528,7 @@ void drm_atomic_helper_commit_planes(struct drm_device *dev,
 				     struct drm_atomic_state *old_state,
 				     uint32_t flags)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
 	struct drm_plane *plane;
@@ -2589,6 +2631,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_planes);
 void
 drm_atomic_helper_commit_planes_on_crtc(struct drm_crtc_state *old_crtc_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	const struct drm_crtc_helper_funcs *crtc_funcs;
 	struct drm_crtc *crtc = old_crtc_state->crtc;
 	struct drm_atomic_state *old_state = old_crtc_state->state;
@@ -2652,6 +2695,7 @@ void
 drm_atomic_helper_disable_planes_on_crtc(struct drm_crtc_state *old_crtc_state,
 					 bool atomic)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_crtc *crtc = old_crtc_state->crtc;
 	const struct drm_crtc_helper_funcs *crtc_funcs =
 		crtc->helper_private;
@@ -2692,6 +2736,7 @@ EXPORT_SYMBOL(drm_atomic_helper_disable_planes_on_crtc);
 void drm_atomic_helper_cleanup_planes(struct drm_device *dev,
 				      struct drm_atomic_state *old_state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_plane *plane;
 	struct drm_plane_state *old_plane_state, *new_plane_state;
 	int i;
@@ -2755,6 +2800,7 @@ EXPORT_SYMBOL(drm_atomic_helper_cleanup_planes);
 int drm_atomic_helper_swap_state(struct drm_atomic_state *state,
 				  bool stall)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	int i, ret;
 	struct drm_connector *connector;
 	struct drm_connector_state *old_conn_state, *new_conn_state;
@@ -2892,6 +2938,7 @@ int drm_atomic_helper_update_plane(struct drm_plane *plane,
 				   uint32_t src_w, uint32_t src_h,
 				   struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_atomic_state *state;
 	struct drm_plane_state *plane_state;
 	int ret = 0;
@@ -2943,6 +2990,7 @@ EXPORT_SYMBOL(drm_atomic_helper_update_plane);
 int drm_atomic_helper_disable_plane(struct drm_plane *plane,
 				    struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_atomic_state *state;
 	struct drm_plane_state *plane_state;
 	int ret = 0;
@@ -2991,6 +3039,7 @@ EXPORT_SYMBOL(drm_atomic_helper_disable_plane);
 int drm_atomic_helper_set_config(struct drm_mode_set *set,
 				 struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_atomic_state *state;
 	struct drm_crtc *crtc = set->crtc;
 	int ret = 0;
@@ -3042,6 +3091,7 @@ EXPORT_SYMBOL(drm_atomic_helper_set_config);
 int drm_atomic_helper_disable_all(struct drm_device *dev,
 				  struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_atomic_state *state;
 	struct drm_connector_state *conn_state;
 	struct drm_connector *conn;
@@ -3113,6 +3163,7 @@ EXPORT_SYMBOL(drm_atomic_helper_disable_all);
  */
 void drm_atomic_helper_shutdown(struct drm_device *dev)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_modeset_acquire_ctx ctx;
 	int ret;
 
@@ -3154,6 +3205,7 @@ struct drm_atomic_state *
 drm_atomic_helper_duplicate_state(struct drm_device *dev,
 				  struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_atomic_state *state;
 	struct drm_connector *conn;
 	struct drm_connector_list_iter conn_iter;
@@ -3241,6 +3293,7 @@ EXPORT_SYMBOL(drm_atomic_helper_duplicate_state);
  */
 struct drm_atomic_state *drm_atomic_helper_suspend(struct drm_device *dev)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_modeset_acquire_ctx ctx;
 	struct drm_atomic_state *state;
 	int err;
@@ -3288,6 +3341,7 @@ EXPORT_SYMBOL(drm_atomic_helper_suspend);
 int drm_atomic_helper_commit_duplicated_state(struct drm_atomic_state *state,
 					      struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	int i, ret;
 	struct drm_plane *plane;
 	struct drm_plane_state *new_plane_state;
@@ -3334,6 +3388,7 @@ EXPORT_SYMBOL(drm_atomic_helper_commit_duplicated_state);
 int drm_atomic_helper_resume(struct drm_device *dev,
 			     struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_modeset_acquire_ctx ctx;
 	int err;
 
@@ -3356,6 +3411,7 @@ static int page_flip_common(struct drm_atomic_state *state,
 			    struct drm_pending_vblank_event *event,
 			    uint32_t flags)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_plane *plane = crtc->primary;
 	struct drm_plane_state *plane_state;
 	struct drm_crtc_state *crtc_state;
@@ -3411,6 +3467,7 @@ int drm_atomic_helper_page_flip(struct drm_crtc *crtc,
 				uint32_t flags,
 				struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_plane *plane = crtc->primary;
 	struct drm_atomic_state *state;
 	int ret = 0;
@@ -3455,6 +3512,7 @@ int drm_atomic_helper_page_flip_target(struct drm_crtc *crtc,
 				       uint32_t target,
 				       struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	struct drm_plane *plane = crtc->primary;
 	struct drm_atomic_state *state;
 	struct drm_crtc_state *crtc_state;
@@ -3511,6 +3569,7 @@ drm_atomic_helper_bridge_propagate_bus_fmt(struct drm_bridge *bridge,
 					u32 output_fmt,
 					unsigned int *num_input_fmts)
 {
+    pr_info("drm_atomic_helper: called %s\n", __func__);
 	u32 *input_fmts;
 
 	input_fmts = kzalloc(sizeof(*input_fmts), GFP_KERNEL);

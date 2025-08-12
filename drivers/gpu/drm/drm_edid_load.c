@@ -25,6 +25,7 @@ MODULE_PARM_DESC(edid_firmware, "Do not probe monitor, use specified EDID blob "
 /* Use only for backward compatibility with drm_kms_helper.edid_firmware */
 int __drm_set_edid_firmware_path(const char *path)
 {
+    pr_info("drm_edid_load: called %s\n", __func__);
 	scnprintf(edid_firmware, sizeof(edid_firmware), "%s", path);
 
 	return 0;
@@ -34,6 +35,7 @@ EXPORT_SYMBOL(__drm_set_edid_firmware_path);
 /* Use only for backward compatibility with drm_kms_helper.edid_firmware */
 int __drm_get_edid_firmware_path(char *buf, size_t bufsize)
 {
+    pr_info("drm_edid_load: called %s\n", __func__);
 	return scnprintf(buf, bufsize, "%s", edid_firmware);
 }
 EXPORT_SYMBOL(__drm_get_edid_firmware_path);
@@ -161,6 +163,7 @@ static const u8 generic_edid[GENERIC_EDIDS][128] = {
 
 static int edid_size(const u8 *edid, int data_size)
 {
+    pr_info("drm_edid_load: called %s\n", __func__);
 	if (data_size < EDID_LENGTH)
 		return 0;
 
@@ -170,6 +173,7 @@ static int edid_size(const u8 *edid, int data_size)
 static void *edid_load(struct drm_connector *connector, const char *name,
 			const char *connector_name)
 {
+    pr_info("drm_edid_load: called %s\n", __func__);
 	const struct firmware *fw = NULL;
 	const u8 *fwdata;
 	u8 *edid;
@@ -265,6 +269,7 @@ out:
 
 struct edid *drm_load_edid_firmware(struct drm_connector *connector)
 {
+    pr_info("drm_edid_load: called %s\n", __func__);
 	const char *connector_name = connector->name;
 	char *edidname, *last, *colon, *fwstr, *edidstr, *fallback = NULL;
 	struct edid *edid;

@@ -218,6 +218,7 @@
  */
 int drm_plane_create_alpha_property(struct drm_plane *plane)
 {
+    pr_info("drm_blend: called %s\n", __func__);
 	struct drm_property *prop;
 
 	prop = drm_property_create_range(plane->dev, 0, "alpha",
@@ -273,6 +274,7 @@ int drm_plane_create_rotation_property(struct drm_plane *plane,
 				       unsigned int rotation,
 				       unsigned int supported_rotations)
 {
+    pr_info("drm_blend: called %s\n", __func__);
 	static const struct drm_prop_enum_list props[] = {
 		{ __builtin_ffs(DRM_MODE_ROTATE_0) - 1,   "rotate-0" },
 		{ __builtin_ffs(DRM_MODE_ROTATE_90) - 1,  "rotate-90" },
@@ -325,6 +327,7 @@ EXPORT_SYMBOL(drm_plane_create_rotation_property);
 unsigned int drm_rotation_simplify(unsigned int rotation,
 				   unsigned int supported_rotations)
 {
+    pr_info("drm_blend: called %s\n", __func__);
 	if (rotation & ~supported_rotations) {
 		rotation ^= DRM_MODE_REFLECT_X | DRM_MODE_REFLECT_Y;
 		rotation = (rotation & DRM_MODE_REFLECT_MASK) |
@@ -370,6 +373,7 @@ int drm_plane_create_zpos_property(struct drm_plane *plane,
 				   unsigned int zpos,
 				   unsigned int min, unsigned int max)
 {
+    pr_info("drm_blend: called %s\n", __func__);
 	struct drm_property *prop;
 
 	prop = drm_property_create_range(plane->dev, 0, "zpos", min, max);
@@ -408,6 +412,7 @@ EXPORT_SYMBOL(drm_plane_create_zpos_property);
 int drm_plane_create_zpos_immutable_property(struct drm_plane *plane,
 					     unsigned int zpos)
 {
+    pr_info("drm_blend: called %s\n", __func__);
 	struct drm_property *prop;
 
 	prop = drm_property_create_range(plane->dev, DRM_MODE_PROP_IMMUTABLE,
@@ -430,6 +435,7 @@ EXPORT_SYMBOL(drm_plane_create_zpos_immutable_property);
 
 static int drm_atomic_state_zpos_cmp(const void *a, const void *b)
 {
+    pr_info("drm_blend: called %s\n", __func__);
 	const struct drm_plane_state *sa = *(struct drm_plane_state **)a;
 	const struct drm_plane_state *sb = *(struct drm_plane_state **)b;
 
@@ -442,6 +448,7 @@ static int drm_atomic_state_zpos_cmp(const void *a, const void *b)
 static int drm_atomic_helper_crtc_normalize_zpos(struct drm_crtc *crtc,
 					  struct drm_crtc_state *crtc_state)
 {
+    pr_info("drm_blend: called %s\n", __func__);
 	struct drm_atomic_state *state = crtc_state->state;
 	struct drm_device *dev = crtc->dev;
 	int total_planes = dev->mode_config.num_total_plane;
@@ -511,6 +518,7 @@ done:
 int drm_atomic_normalize_zpos(struct drm_device *dev,
 			      struct drm_atomic_state *state)
 {
+    pr_info("drm_blend: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state, *new_crtc_state;
 	struct drm_plane *plane;
@@ -572,6 +580,7 @@ EXPORT_SYMBOL(drm_atomic_normalize_zpos);
 int drm_plane_create_blend_mode_property(struct drm_plane *plane,
 					 unsigned int supported_modes)
 {
+    pr_info("drm_blend: called %s\n", __func__);
 	struct drm_device *dev = plane->dev;
 	struct drm_property *prop;
 	static const struct drm_prop_enum_list props[] = {

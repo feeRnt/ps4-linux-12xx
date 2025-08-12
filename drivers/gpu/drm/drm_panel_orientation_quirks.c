@@ -299,6 +299,7 @@ static const struct dmi_system_id orientation_data[] = {
  */
 int drm_get_panel_orientation_quirk(int width, int height)
 {
+    pr_info("drm_panel_orientation_quirks: called %s\n", __func__);
 	const struct dmi_system_id *match;
 	const struct drm_dmi_panel_orientation_data *data;
 	const char *bios_date;
@@ -334,6 +335,7 @@ EXPORT_SYMBOL(drm_get_panel_orientation_quirk);
 /* There are no quirks for non x86 devices yet */
 int drm_get_panel_orientation_quirk(int width, int height)
 {
+    pr_info("drm_panel_orientation_quirks: called %s\n", __func__);
 	return DRM_MODE_PANEL_ORIENTATION_UNKNOWN;
 }
 EXPORT_SYMBOL(drm_get_panel_orientation_quirk);

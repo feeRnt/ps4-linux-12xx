@@ -65,6 +65,7 @@
 int drm_atomic_set_mode_for_crtc(struct drm_crtc_state *state,
 				 const struct drm_display_mode *mode)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_crtc *crtc = state->crtc;
 	struct drm_mode_modeinfo umode;
 
@@ -117,6 +118,7 @@ EXPORT_SYMBOL(drm_atomic_set_mode_for_crtc);
 int drm_atomic_set_mode_prop_for_crtc(struct drm_crtc_state *state,
 				      struct drm_property_blob *blob)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_crtc *crtc = state->crtc;
 
 	if (blob == state->mode_blob)
@@ -184,6 +186,7 @@ int
 drm_atomic_set_crtc_for_plane(struct drm_plane_state *plane_state,
 			      struct drm_crtc *crtc)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_plane *plane = plane_state->plane;
 	struct drm_crtc_state *crtc_state;
 	/* Nothing to do for same crtc*/
@@ -236,6 +239,7 @@ void
 drm_atomic_set_fb_for_plane(struct drm_plane_state *plane_state,
 			    struct drm_framebuffer *fb)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_plane *plane = plane_state->plane;
 
 	if (fb)
@@ -280,6 +284,7 @@ void
 drm_atomic_set_fence_for_plane(struct drm_plane_state *plane_state,
 			       struct dma_fence *fence)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	if (plane_state->fence) {
 		dma_fence_put(fence);
 		return;
@@ -307,6 +312,7 @@ int
 drm_atomic_set_crtc_for_connector(struct drm_connector_state *conn_state,
 				  struct drm_crtc *crtc)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_connector *connector = conn_state->connector;
 	struct drm_crtc_state *crtc_state;
 
@@ -353,12 +359,14 @@ EXPORT_SYMBOL(drm_atomic_set_crtc_for_connector);
 static void set_out_fence_for_crtc(struct drm_atomic_state *state,
 				   struct drm_crtc *crtc, s32 __user *fence_ptr)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	state->crtcs[drm_crtc_index(crtc)].out_fence_ptr = fence_ptr;
 }
 
 static s32 __user *get_out_fence_for_crtc(struct drm_atomic_state *state,
 					  struct drm_crtc *crtc)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	s32 __user *fence_ptr;
 
 	fence_ptr = state->crtcs[drm_crtc_index(crtc)].out_fence_ptr;
@@ -371,6 +379,7 @@ static int set_out_fence_for_connector(struct drm_atomic_state *state,
 					struct drm_connector *connector,
 					s32 __user *fence_ptr)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	unsigned int index = drm_connector_index(connector);
 
 	if (!fence_ptr)
@@ -387,6 +396,7 @@ static int set_out_fence_for_connector(struct drm_atomic_state *state,
 static s32 __user *get_out_fence_for_connector(struct drm_atomic_state *state,
 					       struct drm_connector *connector)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	unsigned int index = drm_connector_index(connector);
 	s32 __user *fence_ptr;
 
@@ -404,6 +414,7 @@ drm_atomic_replace_property_blob_from_id(struct drm_device *dev,
 					 ssize_t expected_elem_size,
 					 bool *replaced)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_property_blob *new_blob = NULL;
 
 	if (blob_id != 0) {
@@ -433,6 +444,7 @@ static int drm_atomic_crtc_set_property(struct drm_crtc *crtc,
 		struct drm_crtc_state *state, struct drm_property *property,
 		uint64_t val)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 	bool replaced = false;
@@ -502,6 +514,7 @@ drm_atomic_crtc_get_property(struct drm_crtc *crtc,
 		const struct drm_crtc_state *state,
 		struct drm_property *property, uint64_t *val)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 
@@ -533,6 +546,7 @@ static int drm_atomic_plane_set_property(struct drm_plane *plane,
 		struct drm_plane_state *state, struct drm_file *file_priv,
 		struct drm_property *property, uint64_t val)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_device *dev = plane->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 	bool replaced = false;
@@ -625,6 +639,7 @@ drm_atomic_plane_get_property(struct drm_plane *plane,
 		const struct drm_plane_state *state,
 		struct drm_property *property, uint64_t *val)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_device *dev = plane->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 
@@ -680,6 +695,7 @@ static int drm_atomic_set_writeback_fb_for_connector(
 		struct drm_connector_state *conn_state,
 		struct drm_framebuffer *fb)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	int ret;
 	struct drm_connector *conn = conn_state->connector;
 
@@ -703,6 +719,7 @@ static int drm_atomic_connector_set_property(struct drm_connector *connector,
 		struct drm_connector_state *state, struct drm_file *file_priv,
 		struct drm_property *property, uint64_t val)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 	bool replaced = false;
@@ -816,6 +833,7 @@ drm_atomic_connector_get_property(struct drm_connector *connector,
 		const struct drm_connector_state *state,
 		struct drm_property *property, uint64_t *val)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 
@@ -887,6 +905,7 @@ drm_atomic_connector_get_property(struct drm_connector *connector,
 int drm_atomic_get_property(struct drm_mode_object *obj,
 		struct drm_property *property, uint64_t *val)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_device *dev = property->dev;
 	int ret;
 
@@ -930,6 +949,7 @@ int drm_atomic_get_property(struct drm_mode_object *obj,
 static struct drm_pending_vblank_event *create_vblank_event(
 		struct drm_crtc *crtc, uint64_t user_data)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_pending_vblank_event *e = NULL;
 
 	e = kzalloc(sizeof *e, GFP_KERNEL);
@@ -948,6 +968,7 @@ int drm_atomic_connector_commit_dpms(struct drm_atomic_state *state,
 				     struct drm_connector *connector,
 				     int mode)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_connector *tmp_connector;
 	struct drm_connector_state *new_conn_state;
 	struct drm_crtc *crtc;
@@ -1000,6 +1021,7 @@ int drm_atomic_set_property(struct drm_atomic_state *state,
 			    struct drm_property *prop,
 			    uint64_t prop_value)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_mode_object *ref;
 	int ret;
 
@@ -1121,6 +1143,7 @@ struct drm_out_fence_state {
 static int setup_out_fence(struct drm_out_fence_state *fence_state,
 			   struct dma_fence *fence)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	fence_state->fd = get_unused_fd_flags(O_CLOEXEC);
 	if (fence_state->fd < 0)
 		return fence_state->fd;
@@ -1142,6 +1165,7 @@ static int prepare_signaling(struct drm_device *dev,
 				  struct drm_out_fence_state **fence_state,
 				  unsigned int *num_fences)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *crtc_state;
 	struct drm_connector *conn;
@@ -1264,6 +1288,7 @@ static void complete_signaling(struct drm_device *dev,
 			       unsigned int num_fences,
 			       bool install_fds)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *crtc_state;
 	int i;
@@ -1311,6 +1336,7 @@ static void complete_signaling(struct drm_device *dev,
 int drm_mode_atomic_ioctl(struct drm_device *dev,
 			  void *data, struct drm_file *file_priv)
 {
+    pr_info("drm_atomic_uapi: called %s\n", __func__);
 	struct drm_mode_atomic *arg = data;
 	uint32_t __user *objs_ptr = (uint32_t __user *)(unsigned long)(arg->objs_ptr);
 	uint32_t __user *count_props_ptr = (uint32_t __user *)(unsigned long)(arg->count_props_ptr);

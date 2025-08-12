@@ -46,6 +46,7 @@
 
 void __drm_crtc_commit_free(struct kref *kref)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_crtc_commit *commit =
 		container_of(kref, struct drm_crtc_commit, ref);
 
@@ -66,6 +67,7 @@ EXPORT_SYMBOL(__drm_crtc_commit_free);
  */
 int drm_crtc_commit_wait(struct drm_crtc_commit *commit)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	unsigned long timeout = 10 * HZ;
 	int ret;
 
@@ -103,6 +105,7 @@ EXPORT_SYMBOL(drm_crtc_commit_wait);
  */
 void drm_atomic_state_default_release(struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	kfree(state->connectors);
 	kfree(state->crtcs);
 	kfree(state->planes);
@@ -122,6 +125,7 @@ EXPORT_SYMBOL(drm_atomic_state_default_release);
 int
 drm_atomic_state_init(struct drm_device *dev, struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	kref_init(&state->ref);
 
 	/* TODO legacy paths should maybe do a better job about
@@ -158,6 +162,7 @@ EXPORT_SYMBOL(drm_atomic_state_init);
 struct drm_atomic_state *
 drm_atomic_state_alloc(struct drm_device *dev)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_mode_config *config = &dev->mode_config;
 
 	if (!config->funcs->atomic_state_alloc) {
@@ -187,6 +192,7 @@ EXPORT_SYMBOL(drm_atomic_state_alloc);
  */
 void drm_atomic_state_default_clear(struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_device *dev = state->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 	int i;
@@ -277,6 +283,7 @@ EXPORT_SYMBOL(drm_atomic_state_default_clear);
  */
 void drm_atomic_state_clear(struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_device *dev = state->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 
@@ -296,6 +303,7 @@ EXPORT_SYMBOL(drm_atomic_state_clear);
  */
 void __drm_atomic_state_free(struct kref *ref)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_atomic_state *state = container_of(ref, typeof(*state), ref);
 	struct drm_mode_config *config = &state->dev->mode_config;
 
@@ -335,6 +343,7 @@ struct drm_crtc_state *
 drm_atomic_get_crtc_state(struct drm_atomic_state *state,
 			  struct drm_crtc *crtc)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	int ret, index = drm_crtc_index(crtc);
 	struct drm_crtc_state *crtc_state;
 
@@ -368,6 +377,7 @@ EXPORT_SYMBOL(drm_atomic_get_crtc_state);
 static int drm_atomic_crtc_check(const struct drm_crtc_state *old_crtc_state,
 				 const struct drm_crtc_state *new_crtc_state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_crtc *crtc = new_crtc_state->crtc;
 
 	/* NOTE: we explicitly don't enforce constraints such as primary
@@ -425,6 +435,7 @@ static int drm_atomic_crtc_check(const struct drm_crtc_state *old_crtc_state,
 static void drm_atomic_crtc_print_state(struct drm_printer *p,
 		const struct drm_crtc_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_crtc *crtc = state->crtc;
 
 	drm_printf(p, "crtc[%u]: %s\n", crtc->base.id, crtc->name);
@@ -448,6 +459,7 @@ static void drm_atomic_crtc_print_state(struct drm_printer *p,
 static int drm_atomic_connector_check(struct drm_connector *connector,
 		struct drm_connector_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_crtc_state *crtc_state;
 	struct drm_writeback_job *writeback_job = state->writeback_job;
 	const struct drm_display_info *info = &connector->display_info;
@@ -509,6 +521,7 @@ struct drm_plane_state *
 drm_atomic_get_plane_state(struct drm_atomic_state *state,
 			  struct drm_plane *plane)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	int ret, index = drm_plane_index(plane);
 	struct drm_plane_state *plane_state;
 
@@ -557,6 +570,7 @@ static bool
 plane_switching_crtc(const struct drm_plane_state *old_plane_state,
 		     const struct drm_plane_state *new_plane_state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	if (!old_plane_state->crtc || !new_plane_state->crtc)
 		return false;
 
@@ -584,6 +598,7 @@ plane_switching_crtc(const struct drm_plane_state *old_plane_state,
 static int drm_atomic_plane_check(const struct drm_plane_state *old_plane_state,
 				  const struct drm_plane_state *new_plane_state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_plane *plane = new_plane_state->plane;
 	struct drm_crtc *crtc = new_plane_state->crtc;
 	const struct drm_framebuffer *fb = new_plane_state->fb;
@@ -692,6 +707,7 @@ static int drm_atomic_plane_check(const struct drm_plane_state *old_plane_state,
 static void drm_atomic_plane_print_state(struct drm_printer *p,
 		const struct drm_plane_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_plane *plane = state->plane;
 	struct drm_rect src  = drm_plane_state_src(state);
 	struct drm_rect dest = drm_plane_state_dest(state);
@@ -769,6 +785,7 @@ drm_atomic_private_obj_init(struct drm_device *dev,
 			    struct drm_private_state *state,
 			    const struct drm_private_state_funcs *funcs)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	memset(obj, 0, sizeof(*obj));
 
 	drm_modeset_lock_init(&obj->lock);
@@ -788,6 +805,7 @@ EXPORT_SYMBOL(drm_atomic_private_obj_init);
 void
 drm_atomic_private_obj_fini(struct drm_private_obj *obj)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	list_del(&obj->head);
 	obj->funcs->atomic_destroy_state(obj, obj->state);
 	drm_modeset_lock_fini(&obj->lock);
@@ -811,6 +829,7 @@ struct drm_private_state *
 drm_atomic_get_private_obj_state(struct drm_atomic_state *state,
 				 struct drm_private_obj *obj)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	int index, num_objs, i, ret;
 	size_t size;
 	struct __drm_private_objs_state *arr;
@@ -865,6 +884,7 @@ struct drm_private_state *
 drm_atomic_get_old_private_obj_state(struct drm_atomic_state *state,
 				     struct drm_private_obj *obj)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < state->num_private_objs; i++)
@@ -887,6 +907,7 @@ struct drm_private_state *
 drm_atomic_get_new_private_obj_state(struct drm_atomic_state *state,
 				     struct drm_private_obj *obj)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < state->num_private_objs; i++)
@@ -919,6 +940,7 @@ struct drm_connector *
 drm_atomic_get_old_connector_for_encoder(struct drm_atomic_state *state,
 					 struct drm_encoder *encoder)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_connector_state *conn_state;
 	struct drm_connector *connector;
 	unsigned int i;
@@ -953,6 +975,7 @@ struct drm_connector *
 drm_atomic_get_new_connector_for_encoder(struct drm_atomic_state *state,
 					 struct drm_encoder *encoder)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_connector_state *conn_state;
 	struct drm_connector *connector;
 	unsigned int i;
@@ -985,6 +1008,7 @@ struct drm_connector_state *
 drm_atomic_get_connector_state(struct drm_atomic_state *state,
 			  struct drm_connector *connector)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	int ret, index;
 	struct drm_mode_config *config = &connector->dev->mode_config;
 	struct drm_connector_state *connector_state;
@@ -1047,6 +1071,7 @@ EXPORT_SYMBOL(drm_atomic_get_connector_state);
 static void drm_atomic_connector_print_state(struct drm_printer *p,
 		const struct drm_connector_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_connector *connector = state->connector;
 
 	drm_printf(p, "connector[%u]: %s\n", connector->base.id, connector->name);
@@ -1080,6 +1105,7 @@ struct drm_bridge_state *
 drm_atomic_get_bridge_state(struct drm_atomic_state *state,
 			    struct drm_bridge *bridge)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_private_state *obj_state;
 
 	obj_state = drm_atomic_get_private_obj_state(state, &bridge->base);
@@ -1102,6 +1128,7 @@ struct drm_bridge_state *
 drm_atomic_get_old_bridge_state(struct drm_atomic_state *state,
 				struct drm_bridge *bridge)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_private_state *obj_state;
 
 	obj_state = drm_atomic_get_old_private_obj_state(state, &bridge->base);
@@ -1124,6 +1151,7 @@ struct drm_bridge_state *
 drm_atomic_get_new_bridge_state(struct drm_atomic_state *state,
 				struct drm_bridge *bridge)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_private_state *obj_state;
 
 	obj_state = drm_atomic_get_new_private_obj_state(state, &bridge->base);
@@ -1154,6 +1182,7 @@ int
 drm_atomic_add_encoder_bridges(struct drm_atomic_state *state,
 			       struct drm_encoder *encoder)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_bridge_state *bridge_state;
 	struct drm_bridge *bridge;
 
@@ -1198,6 +1227,7 @@ int
 drm_atomic_add_affected_connectors(struct drm_atomic_state *state,
 				   struct drm_crtc *crtc)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_mode_config *config = &state->dev->mode_config;
 	struct drm_connector *connector;
 	struct drm_connector_state *conn_state;
@@ -1261,6 +1291,7 @@ int
 drm_atomic_add_affected_planes(struct drm_atomic_state *state,
 			       struct drm_crtc *crtc)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	const struct drm_crtc_state *old_crtc_state =
 		drm_atomic_get_old_crtc_state(state, crtc);
 	struct drm_plane *plane;
@@ -1294,6 +1325,7 @@ EXPORT_SYMBOL(drm_atomic_add_affected_planes);
  */
 int drm_atomic_check_only(struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_device *dev = state->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 	struct drm_plane *plane;
@@ -1400,6 +1432,7 @@ EXPORT_SYMBOL(drm_atomic_check_only);
  */
 int drm_atomic_commit(struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_mode_config *config = &state->dev->mode_config;
 	int ret;
 
@@ -1429,6 +1462,7 @@ EXPORT_SYMBOL(drm_atomic_commit);
  */
 int drm_atomic_nonblocking_commit(struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_mode_config *config = &state->dev->mode_config;
 	int ret;
 
@@ -1446,6 +1480,7 @@ EXPORT_SYMBOL(drm_atomic_nonblocking_commit);
 int __drm_atomic_helper_disable_plane(struct drm_plane *plane,
 				      struct drm_plane_state *plane_state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	int ret;
 
 	ret = drm_atomic_set_crtc_for_plane(plane_state, NULL);
@@ -1469,6 +1504,7 @@ EXPORT_SYMBOL(__drm_atomic_helper_disable_plane);
 static int update_output_state(struct drm_atomic_state *state,
 			       struct drm_mode_set *set)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_device *dev = set->crtc->dev;
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *new_crtc_state;
@@ -1538,6 +1574,7 @@ static int update_output_state(struct drm_atomic_state *state,
 int __drm_atomic_helper_set_config(struct drm_mode_set *set,
 				   struct drm_atomic_state *state)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_crtc_state *crtc_state;
 	struct drm_plane_state *primary_state;
 	struct drm_crtc *crtc = set->crtc;
@@ -1624,6 +1661,7 @@ EXPORT_SYMBOL(__drm_atomic_helper_set_config);
 void drm_atomic_print_new_state(const struct drm_atomic_state *state,
 		struct drm_printer *p)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_plane *plane;
 	struct drm_plane_state *plane_state;
 	struct drm_crtc *crtc;
@@ -1653,6 +1691,7 @@ EXPORT_SYMBOL(drm_atomic_print_new_state);
 static void __drm_state_dump(struct drm_device *dev, struct drm_printer *p,
 			     bool take_locks)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_mode_config *config = &dev->mode_config;
 	struct drm_plane *plane;
 	struct drm_crtc *crtc;
@@ -1705,6 +1744,7 @@ static void __drm_state_dump(struct drm_device *dev, struct drm_printer *p,
  */
 void drm_state_dump(struct drm_device *dev, struct drm_printer *p)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	__drm_state_dump(dev, p, false);
 }
 EXPORT_SYMBOL(drm_state_dump);
@@ -1712,6 +1752,7 @@ EXPORT_SYMBOL(drm_state_dump);
 #ifdef CONFIG_DEBUG_FS
 static int drm_state_info(struct seq_file *m, void *data)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	struct drm_info_node *node = (struct drm_info_node *) m->private;
 	struct drm_device *dev = node->minor->dev;
 	struct drm_printer p = drm_seq_file_printer(m);
@@ -1728,6 +1769,7 @@ static const struct drm_info_list drm_atomic_debugfs_list[] = {
 
 void drm_atomic_debugfs_init(struct drm_minor *minor)
 {
+    pr_info("drm_atomic: called %s\n", __func__);
 	drm_debugfs_create_files(drm_atomic_debugfs_list,
 				 ARRAY_SIZE(drm_atomic_debugfs_list),
 				 minor->debugfs_root, minor);

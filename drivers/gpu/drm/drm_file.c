@@ -58,6 +58,7 @@ DEFINE_MUTEX(drm_global_mutex);
 
 bool drm_dev_needs_global_mutex(struct drm_device *dev)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	/*
 	 * Legacy drivers rely on all kinds of BKL locking semantics, don't
 	 * bother. They also still need BKL locking for their ioctls, so better
@@ -153,6 +154,7 @@ bool drm_dev_needs_global_mutex(struct drm_device *dev)
  */
 struct drm_file *drm_file_alloc(struct drm_minor *minor)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_device *dev = minor->dev;
 	struct drm_file *file;
 	int ret;
@@ -209,6 +211,7 @@ out_prime_destroy:
 
 static void drm_events_release(struct drm_file *file_priv)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_device *dev = file_priv->minor->dev;
 	struct drm_pending_event *e, *et;
 	unsigned long flags;
@@ -243,6 +246,7 @@ static void drm_events_release(struct drm_file *file_priv)
  */
 void drm_file_free(struct drm_file *file)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_device *dev;
 
 	if (!file)
@@ -298,6 +302,7 @@ void drm_file_free(struct drm_file *file)
 
 static void drm_close_helper(struct file *filp)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_file *file_priv = filp->private_data;
 	struct drm_device *dev = file_priv->minor->dev;
 
@@ -315,6 +320,7 @@ static void drm_close_helper(struct file *filp)
  */
 static int drm_cpu_valid(void)
 {
+    pr_info("drm_file: called %s\n", __func__);
 #if defined(__sparc__) && !defined(__sparc_v9__)
 	return 0;		/* No cmpxchg before v9 sparc. */
 #endif
@@ -333,6 +339,7 @@ static int drm_cpu_valid(void)
  */
 static int drm_open_helper(struct file *filp, struct drm_minor *minor)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_device *dev = minor->dev;
 	struct drm_file *priv;
 	int ret;
@@ -409,6 +416,7 @@ static int drm_open_helper(struct file *filp, struct drm_minor *minor)
  */
 int drm_open(struct inode *inode, struct file *filp)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_device *dev;
 	struct drm_minor *minor;
 	int retcode;
@@ -455,6 +463,7 @@ EXPORT_SYMBOL(drm_open);
 
 void drm_lastclose(struct drm_device * dev)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	DRM_DEBUG("\n");
 
 	if (dev->driver->lastclose)
@@ -483,6 +492,7 @@ void drm_lastclose(struct drm_device * dev)
  */
 int drm_release(struct inode *inode, struct file *filp)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_file *file_priv = filp->private_data;
 	struct drm_minor *minor = file_priv->minor;
 	struct drm_device *dev = minor->dev;
@@ -523,6 +533,7 @@ EXPORT_SYMBOL(drm_release);
  */
 int drm_release_noglobal(struct inode *inode, struct file *filp)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_file *file_priv = filp->private_data;
 	struct drm_minor *minor = file_priv->minor;
 	struct drm_device *dev = minor->dev;
@@ -569,6 +580,7 @@ EXPORT_SYMBOL(drm_release_noglobal);
 ssize_t drm_read(struct file *filp, char __user *buffer,
 		 size_t count, loff_t *offset)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_file *file_priv = filp->private_data;
 	struct drm_device *dev = file_priv->minor->dev;
 	ssize_t ret;
@@ -653,6 +665,7 @@ EXPORT_SYMBOL(drm_read);
  */
 __poll_t drm_poll(struct file *filp, struct poll_table_struct *wait)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_file *file_priv = filp->private_data;
 	__poll_t mask = 0;
 
@@ -694,6 +707,7 @@ int drm_event_reserve_init_locked(struct drm_device *dev,
 				  struct drm_pending_event *p,
 				  struct drm_event *e)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	if (file_priv->event_space < e->length)
 		return -ENOMEM;
 
@@ -736,6 +750,7 @@ int drm_event_reserve_init(struct drm_device *dev,
 			   struct drm_pending_event *p,
 			   struct drm_event *e)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	unsigned long flags;
 	int ret;
 
@@ -759,6 +774,7 @@ EXPORT_SYMBOL(drm_event_reserve_init);
 void drm_event_cancel_free(struct drm_device *dev,
 			   struct drm_pending_event *p)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&dev->event_lock, flags);
@@ -778,6 +794,7 @@ EXPORT_SYMBOL(drm_event_cancel_free);
 static void drm_send_event_helper(struct drm_device *dev,
 			   struct drm_pending_event *e, ktime_t timestamp)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	assert_spin_locked(&dev->event_lock);
 
 	if (e->completion) {
@@ -825,6 +842,7 @@ static void drm_send_event_helper(struct drm_device *dev,
 void drm_send_event_timestamp_locked(struct drm_device *dev,
 				     struct drm_pending_event *e, ktime_t timestamp)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	drm_send_event_helper(dev, e, timestamp);
 }
 EXPORT_SYMBOL(drm_send_event_timestamp_locked);
@@ -845,6 +863,7 @@ EXPORT_SYMBOL(drm_send_event_timestamp_locked);
  */
 void drm_send_event_locked(struct drm_device *dev, struct drm_pending_event *e)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	drm_send_event_helper(dev, e, 0);
 }
 EXPORT_SYMBOL(drm_send_event_locked);
@@ -866,6 +885,7 @@ EXPORT_SYMBOL(drm_send_event_locked);
  */
 void drm_send_event(struct drm_device *dev, struct drm_pending_event *e)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	unsigned long irqflags;
 
 	spin_lock_irqsave(&dev->event_lock, irqflags);
@@ -890,6 +910,7 @@ EXPORT_SYMBOL(drm_send_event);
  */
 struct file *mock_drm_getfile(struct drm_minor *minor, unsigned int flags)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	struct drm_device *dev = minor->dev;
 	struct drm_file *priv;
 	struct file *file;
@@ -927,6 +948,7 @@ static unsigned long drm_addr_inflate(unsigned long addr,
 				      unsigned long flags,
 				      unsigned long huge_size)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	unsigned long offset, inflated_len;
 	unsigned long inflated_addr;
 	unsigned long inflated_offset;
@@ -988,6 +1010,7 @@ unsigned long drm_get_unmapped_area(struct file *file,
 				    unsigned long pgoff, unsigned long flags,
 				    struct drm_vma_offset_manager *mgr)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	unsigned long addr;
 	unsigned long inflated_addr;
 	struct drm_vma_offset_node *node;
@@ -1044,6 +1067,7 @@ unsigned long drm_get_unmapped_area(struct file *file,
 				    unsigned long pgoff, unsigned long flags,
 				    struct drm_vma_offset_manager *mgr)
 {
+    pr_info("drm_file: called %s\n", __func__);
 	return current->mm->get_unmapped_area(file, uaddr, len, pgoff, flags);
 }
 #endif /* CONFIG_TRANSPARENT_HUGEPAGE */

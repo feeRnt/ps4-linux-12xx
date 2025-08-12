@@ -94,6 +94,7 @@
  */
 bool drm_helper_encoder_in_use(struct drm_encoder *encoder)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
 	struct drm_device *dev = encoder->dev;
@@ -135,6 +136,7 @@ EXPORT_SYMBOL(drm_helper_encoder_in_use);
  */
 bool drm_helper_crtc_in_use(struct drm_crtc *crtc)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	struct drm_device *dev = crtc->dev;
 
@@ -157,6 +159,7 @@ EXPORT_SYMBOL(drm_helper_crtc_in_use);
 static void
 drm_encoder_disable(struct drm_encoder *encoder)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	const struct drm_encoder_helper_funcs *encoder_funcs = encoder->helper_private;
 
 	if (!encoder_funcs)
@@ -175,6 +178,7 @@ drm_encoder_disable(struct drm_encoder *encoder)
 
 static void __drm_helper_disable_unused_functions(struct drm_device *dev)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_encoder *encoder;
 	struct drm_crtc *crtc;
 
@@ -223,6 +227,7 @@ static void __drm_helper_disable_unused_functions(struct drm_device *dev)
  */
 void drm_helper_disable_unused_functions(struct drm_device *dev)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	WARN_ON(drm_drv_uses_atomic_modeset(dev));
 
 	drm_modeset_lock_all(dev);
@@ -239,6 +244,7 @@ EXPORT_SYMBOL(drm_helper_disable_unused_functions);
 static void
 drm_crtc_prepare_encoders(struct drm_device *dev)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	const struct drm_encoder_helper_funcs *encoder_funcs;
 	struct drm_encoder *encoder;
 
@@ -278,6 +284,7 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 			      int x, int y,
 			      struct drm_framebuffer *old_fb)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_display_mode *adjusted_mode, saved_mode, saved_hwmode;
 	const struct drm_crtc_helper_funcs *crtc_funcs = crtc->helper_private;
@@ -450,6 +457,7 @@ EXPORT_SYMBOL(drm_crtc_helper_set_mode);
 static void
 drm_crtc_helper_disable(struct drm_crtc *crtc)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_connector *connector;
 	struct drm_encoder *encoder;
@@ -492,6 +500,7 @@ drm_crtc_helper_disable(struct drm_crtc *crtc)
 struct drm_encoder *
 drm_connector_get_single_encoder(struct drm_connector *connector)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	WARN_ON(hweight32(connector->possible_encoders) > 1);
@@ -542,6 +551,7 @@ drm_connector_get_single_encoder(struct drm_connector *connector)
 int drm_crtc_helper_set_config(struct drm_mode_set *set,
 			       struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_device *dev;
 	struct drm_crtc **save_encoder_crtcs, *new_crtc;
 	struct drm_encoder **save_connector_encoders, *new_encoder, *encoder;
@@ -824,6 +834,7 @@ EXPORT_SYMBOL(drm_crtc_helper_set_config);
 
 static int drm_helper_choose_encoder_dpms(struct drm_encoder *encoder)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	int dpms = DRM_MODE_DPMS_OFF;
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
@@ -842,6 +853,7 @@ static int drm_helper_choose_encoder_dpms(struct drm_encoder *encoder)
 /* Helper which handles bridge ordering around encoder dpms */
 static void drm_helper_encoder_dpms(struct drm_encoder *encoder, int mode)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_bridge* bridge = drm_bridge_chain_get_first_bridge(encoder);
 	const struct drm_encoder_helper_funcs *encoder_funcs;
 
@@ -865,6 +877,7 @@ static void drm_helper_encoder_dpms(struct drm_encoder *encoder, int mode)
 
 static int drm_helper_choose_crtc_dpms(struct drm_crtc *crtc)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	int dpms = DRM_MODE_DPMS_OFF;
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
@@ -903,6 +916,7 @@ static int drm_helper_choose_crtc_dpms(struct drm_crtc *crtc)
  */
 int drm_helper_connector_dpms(struct drm_connector *connector, int mode)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_encoder *encoder = connector->encoder;
 	struct drm_crtc *crtc = encoder ? encoder->crtc : NULL;
 	int old_dpms, encoder_dpms = DRM_MODE_DPMS_OFF;
@@ -976,6 +990,7 @@ EXPORT_SYMBOL(drm_helper_connector_dpms);
  */
 void drm_helper_resume_force_mode(struct drm_device *dev)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_encoder *encoder;
 	const struct drm_crtc_helper_funcs *crtc_funcs;
@@ -1038,6 +1053,7 @@ EXPORT_SYMBOL(drm_helper_resume_force_mode);
  */
 int drm_helper_force_disable_all(struct drm_device *dev)
 {
+    pr_info("drm_crtc_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	int ret = 0;
 

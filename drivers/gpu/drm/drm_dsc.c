@@ -42,6 +42,7 @@
  */
 void drm_dsc_dp_pps_header_init(struct dp_sdp_header *pps_header)
 {
+    pr_info("drm_dsc: called %s\n", __func__);
 	memset(pps_header, 0, sizeof(*pps_header));
 
 	pps_header->HB1 = DP_SDP_PPS;
@@ -59,6 +60,7 @@ EXPORT_SYMBOL(drm_dsc_dp_pps_header_init);
  */
 int drm_dsc_dp_rc_buffer_size(u8 rc_buffer_block_size, u8 rc_buffer_size)
 {
+    pr_info("drm_dsc: called %s\n", __func__);
 	int size = 1024 * (rc_buffer_size + 1);
 
 	switch (rc_buffer_block_size) {
@@ -96,6 +98,7 @@ EXPORT_SYMBOL(drm_dsc_dp_rc_buffer_size);
 void drm_dsc_pps_payload_pack(struct drm_dsc_picture_parameter_set *pps_payload,
 				const struct drm_dsc_config *dsc_cfg)
 {
+    pr_info("drm_dsc: called %s\n", __func__);
 	int i;
 
 	/* Protect against someone accidentally changing struct size */
@@ -281,6 +284,7 @@ EXPORT_SYMBOL(drm_dsc_pps_payload_pack);
  */
 int drm_dsc_compute_rc_parameters(struct drm_dsc_config *vdsc_cfg)
 {
+    pr_info("drm_dsc: called %s\n", __func__);
 	unsigned long groups_per_line = 0;
 	unsigned long groups_total = 0;
 	unsigned long num_extra_mux_bits = 0;

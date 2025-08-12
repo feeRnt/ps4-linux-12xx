@@ -139,6 +139,7 @@
 
 static unsigned int drm_num_planes(struct drm_device *dev)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	unsigned int num = 0;
 	struct drm_plane *tmp;
 
@@ -152,17 +153,20 @@ static unsigned int drm_num_planes(struct drm_device *dev)
 static inline u32 *
 formats_ptr(struct drm_format_modifier_blob *blob)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	return (u32 *)(((char *)blob) + blob->formats_offset);
 }
 
 static inline struct drm_format_modifier *
 modifiers_ptr(struct drm_format_modifier_blob *blob)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	return (struct drm_format_modifier *)(((char *)blob) + blob->modifiers_offset);
 }
 
 static int create_in_format_blob(struct drm_device *dev, struct drm_plane *plane)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	const struct drm_mode_config *config = &dev->mode_config;
 	struct drm_property_blob *blob;
 	struct drm_format_modifier *mod;
@@ -241,6 +245,7 @@ static int __drm_universal_plane_init(struct drm_device *dev,
 				      enum drm_plane_type type,
 				      const char *name, va_list ap)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_mode_config *config = &dev->mode_config;
 	unsigned int format_modifier_count = 0;
 	int ret;
@@ -387,6 +392,7 @@ int drm_universal_plane_init(struct drm_device *dev, struct drm_plane *plane,
 			     enum drm_plane_type type,
 			     const char *name, ...)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	va_list ap;
 	int ret;
 
@@ -403,6 +409,7 @@ EXPORT_SYMBOL(drm_universal_plane_init);
 
 static void drmm_universal_plane_alloc_release(struct drm_device *dev, void *ptr)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_plane *plane = ptr;
 
 	if (WARN_ON(!plane->dev))
@@ -419,6 +426,7 @@ void *__drmm_universal_plane_alloc(struct drm_device *dev, size_t size,
 				   enum drm_plane_type type,
 				   const char *name, ...)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	void *container;
 	struct drm_plane *plane;
 	va_list ap;
@@ -452,6 +460,7 @@ EXPORT_SYMBOL(__drmm_universal_plane_alloc);
 
 int drm_plane_register_all(struct drm_device *dev)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	unsigned int num_planes = 0;
 	unsigned int num_zpos = 0;
 	struct drm_plane *plane;
@@ -476,6 +485,7 @@ int drm_plane_register_all(struct drm_device *dev)
 
 void drm_plane_unregister_all(struct drm_device *dev)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_plane *plane;
 
 	drm_for_each_plane(plane, dev) {
@@ -507,6 +517,7 @@ int drm_plane_init(struct drm_device *dev, struct drm_plane *plane,
 		   const uint32_t *formats, unsigned int format_count,
 		   bool is_primary)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	enum drm_plane_type type;
 
 	type = is_primary ? DRM_PLANE_TYPE_PRIMARY : DRM_PLANE_TYPE_OVERLAY;
@@ -526,6 +537,7 @@ EXPORT_SYMBOL(drm_plane_init);
  */
 void drm_plane_cleanup(struct drm_plane *plane)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_device *dev = plane->dev;
 
 	drm_modeset_lock_fini(&plane->mutex);
@@ -565,6 +577,7 @@ EXPORT_SYMBOL(drm_plane_cleanup);
 struct drm_plane *
 drm_plane_from_index(struct drm_device *dev, int idx)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_plane *plane;
 
 	drm_for_each_plane(plane, dev)
@@ -592,6 +605,7 @@ EXPORT_SYMBOL(drm_plane_from_index);
  */
 void drm_plane_force_disable(struct drm_plane *plane)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	int ret;
 
 	if (!plane->fb)
@@ -631,6 +645,7 @@ int drm_mode_plane_set_obj_prop(struct drm_plane *plane,
 				struct drm_property *property,
 				uint64_t value)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	int ret = -EINVAL;
 	struct drm_mode_object *obj = &plane->base;
 
@@ -646,6 +661,7 @@ EXPORT_SYMBOL(drm_mode_plane_set_obj_prop);
 int drm_mode_getplane_res(struct drm_device *dev, void *data,
 			  struct drm_file *file_priv)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_mode_get_plane_res *plane_resp = data;
 	struct drm_plane *plane;
 	uint32_t __user *plane_ptr;
@@ -684,6 +700,7 @@ int drm_mode_getplane_res(struct drm_device *dev, void *data,
 int drm_mode_getplane(struct drm_device *dev, void *data,
 		      struct drm_file *file_priv)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_mode_get_plane *plane_resp = data;
 	struct drm_plane *plane;
 	uint32_t __user *format_ptr;
@@ -738,6 +755,7 @@ int drm_mode_getplane(struct drm_device *dev, void *data,
 int drm_plane_check_pixel_format(struct drm_plane *plane,
 				 u32 format, u64 modifier)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	unsigned int i;
 
 	for (i = 0; i < plane->format_count; i++) {
@@ -773,6 +791,7 @@ static int __setplane_check(struct drm_plane *plane,
 			    uint32_t src_x, uint32_t src_y,
 			    uint32_t src_w, uint32_t src_h)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	int ret;
 
 	/* Check whether this plane is usable on this CRTC */
@@ -819,6 +838,7 @@ static int __setplane_check(struct drm_plane *plane,
 bool drm_any_plane_has_format(struct drm_device *dev,
 			      u32 format, u64 modifier)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_plane *plane;
 
 	drm_for_each_plane(plane, dev) {
@@ -844,16 +864,19 @@ static int __setplane_internal(struct drm_plane *plane,
 			       int32_t crtc_x, int32_t crtc_y,
 			       uint32_t crtc_w, uint32_t crtc_h,
 			       /* src_{x,y,w,h} values are 16.16 fixed point */
+			       //strange there was pr_info here.. Did ctags mess up?
 			       uint32_t src_x, uint32_t src_y,
 			       uint32_t src_w, uint32_t src_h,
 			       struct drm_modeset_acquire_ctx *ctx)
 {
 	int ret = 0;
 
+        pr_info("drm_plane: called %s\n", __func__);
 	WARN_ON(drm_drv_uses_atomic_modeset(plane->dev));
 
 	/* No fb means shut it down */
 	if (!fb) {
+		pr_info("drm_plane: no framebuffer, shutting it down.\n");
 		plane->old_fb = plane->fb;
 		ret = plane->funcs->disable_plane(plane, ctx);
 		if (!ret) {
@@ -900,6 +923,7 @@ static int __setplane_atomic(struct drm_plane *plane,
 			     uint32_t src_w, uint32_t src_h,
 			     struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	int ret;
 
 	WARN_ON(!drm_drv_uses_atomic_modeset(plane->dev));
@@ -932,12 +956,14 @@ static int setplane_internal(struct drm_plane *plane,
 			     int32_t crtc_x, int32_t crtc_y,
 			     uint32_t crtc_w, uint32_t crtc_h,
 			     /* src_{x,y,w,h} values are 16.16 fixed point */
+			     //pr_info here again like before in __setplane_internal
 			     uint32_t src_x, uint32_t src_y,
 			     uint32_t src_w, uint32_t src_h)
 {
 	struct drm_modeset_acquire_ctx ctx;
 	int ret;
 
+	pr_info("drm_plane: called %s\n", __func__);
 	DRM_MODESET_LOCK_ALL_BEGIN(plane->dev, ctx,
 				   DRM_MODESET_ACQUIRE_INTERRUPTIBLE, ret);
 
@@ -958,6 +984,7 @@ static int setplane_internal(struct drm_plane *plane,
 int drm_mode_setplane(struct drm_device *dev, void *data,
 		      struct drm_file *file_priv)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_mode_set_plane *plane_req = data;
 	struct drm_plane *plane;
 	struct drm_crtc *crtc = NULL;
@@ -1012,6 +1039,7 @@ static int drm_mode_cursor_universal(struct drm_crtc *crtc,
 				     struct drm_file *file_priv,
 				     struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_plane *plane = crtc->cursor;
 	struct drm_framebuffer *fb = NULL;
@@ -1098,6 +1126,7 @@ static int drm_mode_cursor_common(struct drm_device *dev,
 				  struct drm_mode_cursor2 *req,
 				  struct drm_file *file_priv)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_modeset_acquire_ctx ctx;
 	int ret = 0;
@@ -1177,6 +1206,7 @@ out:
 int drm_mode_cursor_ioctl(struct drm_device *dev,
 			  void *data, struct drm_file *file_priv)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_mode_cursor *req = data;
 	struct drm_mode_cursor2 new_req;
 
@@ -1194,6 +1224,7 @@ int drm_mode_cursor_ioctl(struct drm_device *dev,
 int drm_mode_cursor2_ioctl(struct drm_device *dev,
 			   void *data, struct drm_file *file_priv)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_mode_cursor2 *req = data;
 
 	return drm_mode_cursor_common(dev, req, file_priv);
@@ -1202,6 +1233,7 @@ int drm_mode_cursor2_ioctl(struct drm_device *dev,
 int drm_mode_page_flip_ioctl(struct drm_device *dev,
 			     void *data, struct drm_file *file_priv)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_mode_crtc_page_flip_target *page_flip = data;
 	struct drm_crtc *crtc;
 	struct drm_plane *plane;
@@ -1443,6 +1475,7 @@ out:
  */
 void drm_plane_enable_fb_damage_clips(struct drm_plane *plane)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_device *dev = plane->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 
@@ -1463,6 +1496,7 @@ EXPORT_SYMBOL(drm_plane_enable_fb_damage_clips);
 unsigned int
 drm_plane_get_damage_clips_count(const struct drm_plane_state *state)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	return (state && state->fb_damage_clips) ?
 		state->fb_damage_clips->length/sizeof(struct drm_mode_rect) : 0;
 }
@@ -1471,6 +1505,7 @@ EXPORT_SYMBOL(drm_plane_get_damage_clips_count);
 struct drm_mode_rect *
 __drm_plane_get_damage_clips(const struct drm_plane_state *state)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	return (struct drm_mode_rect *)((state && state->fb_damage_clips) ?
 					state->fb_damage_clips->data : NULL);
 }
@@ -1489,6 +1524,7 @@ __drm_plane_get_damage_clips(const struct drm_plane_state *state)
 struct drm_mode_rect *
 drm_plane_get_damage_clips(const struct drm_plane_state *state)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_device *dev = state->plane->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 
@@ -1505,6 +1541,7 @@ struct drm_property *
 drm_create_scaling_filter_prop(struct drm_device *dev,
 			       unsigned int supported_filters)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_property *prop;
 	static const struct drm_prop_enum_list props[] = {
 		{ DRM_SCALING_FILTER_DEFAULT, "Default" },
@@ -1560,6 +1597,7 @@ drm_create_scaling_filter_prop(struct drm_device *dev,
 int drm_plane_create_scaling_filter_property(struct drm_plane *plane,
 					     unsigned int supported_filters)
 {
+    pr_info("drm_plane: called %s\n", __func__);
 	struct drm_property *prop =
 		drm_create_scaling_filter_prop(plane->dev, supported_filters);
 

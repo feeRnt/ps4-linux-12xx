@@ -38,6 +38,7 @@ static const struct drm_gem_object_funcs drm_gem_shmem_funcs = {
 static struct drm_gem_shmem_object *
 __drm_gem_shmem_create(struct drm_device *dev, size_t size, bool private)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem;
 	struct drm_gem_object *obj;
 	int ret = 0;
@@ -107,6 +108,7 @@ err_free:
  */
 struct drm_gem_shmem_object *drm_gem_shmem_create(struct drm_device *dev, size_t size)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	return __drm_gem_shmem_create(dev, size, false);
 }
 EXPORT_SYMBOL_GPL(drm_gem_shmem_create);
@@ -121,6 +123,7 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_create);
  */
 void drm_gem_shmem_free_object(struct drm_gem_object *obj)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 
 	WARN_ON(shmem->vmap_use_count);
@@ -149,6 +152,7 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_free_object);
 
 static int drm_gem_shmem_get_pages_locked(struct drm_gem_shmem_object *shmem)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_object *obj = &shmem->base;
 	struct page **pages;
 
@@ -179,6 +183,7 @@ static int drm_gem_shmem_get_pages_locked(struct drm_gem_shmem_object *shmem)
  */
 int drm_gem_shmem_get_pages(struct drm_gem_shmem_object *shmem)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	int ret;
 
 	WARN_ON(shmem->base.import_attach);
@@ -195,6 +200,7 @@ EXPORT_SYMBOL(drm_gem_shmem_get_pages);
 
 static void drm_gem_shmem_put_pages_locked(struct drm_gem_shmem_object *shmem)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_object *obj = &shmem->base;
 
 	if (WARN_ON_ONCE(!shmem->pages_use_count))
@@ -217,6 +223,7 @@ static void drm_gem_shmem_put_pages_locked(struct drm_gem_shmem_object *shmem)
  */
 void drm_gem_shmem_put_pages(struct drm_gem_shmem_object *shmem)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	mutex_lock(&shmem->pages_lock);
 	drm_gem_shmem_put_pages_locked(shmem);
 	mutex_unlock(&shmem->pages_lock);
@@ -236,6 +243,7 @@ EXPORT_SYMBOL(drm_gem_shmem_put_pages);
  */
 int drm_gem_shmem_pin(struct drm_gem_object *obj)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 
 	WARN_ON(shmem->base.import_attach);
@@ -253,6 +261,7 @@ EXPORT_SYMBOL(drm_gem_shmem_pin);
  */
 void drm_gem_shmem_unpin(struct drm_gem_object *obj)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 
 	WARN_ON(shmem->base.import_attach);
@@ -263,6 +272,7 @@ EXPORT_SYMBOL(drm_gem_shmem_unpin);
 
 static int drm_gem_shmem_vmap_locked(struct drm_gem_shmem_object *shmem, struct dma_buf_map *map)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_object *obj = &shmem->base;
 	int ret = 0;
 
@@ -333,6 +343,7 @@ err_zero_use:
  */
 int drm_gem_shmem_vmap(struct drm_gem_object *obj, struct dma_buf_map *map)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 	int ret;
 
@@ -349,6 +360,7 @@ EXPORT_SYMBOL(drm_gem_shmem_vmap);
 static void drm_gem_shmem_vunmap_locked(struct drm_gem_shmem_object *shmem,
 					struct dma_buf_map *map)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_object *obj = &shmem->base;
 
 	if (WARN_ON_ONCE(!shmem->vmap_use_count))
@@ -382,6 +394,7 @@ static void drm_gem_shmem_vunmap_locked(struct drm_gem_shmem_object *shmem,
  */
 void drm_gem_shmem_vunmap(struct drm_gem_object *obj, struct dma_buf_map *map)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 
 	mutex_lock(&shmem->vmap_lock);
@@ -395,6 +408,7 @@ drm_gem_shmem_create_with_handle(struct drm_file *file_priv,
 				 struct drm_device *dev, size_t size,
 				 uint32_t *handle)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem;
 	int ret;
 
@@ -421,6 +435,7 @@ EXPORT_SYMBOL(drm_gem_shmem_create_with_handle);
  */
 int drm_gem_shmem_madvise(struct drm_gem_object *obj, int madv)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 
 	mutex_lock(&shmem->pages_lock);
@@ -438,6 +453,7 @@ EXPORT_SYMBOL(drm_gem_shmem_madvise);
 
 void drm_gem_shmem_purge_locked(struct drm_gem_object *obj)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_device *dev = obj->dev;
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 
@@ -469,6 +485,7 @@ EXPORT_SYMBOL(drm_gem_shmem_purge_locked);
 
 bool drm_gem_shmem_purge(struct drm_gem_object *obj)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 
 	if (!mutex_trylock(&shmem->pages_lock))
@@ -500,6 +517,7 @@ EXPORT_SYMBOL(drm_gem_shmem_purge);
 int drm_gem_shmem_dumb_create(struct drm_file *file, struct drm_device *dev,
 			      struct drm_mode_create_dumb *args)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	u32 min_pitch = DIV_ROUND_UP(args->width * args->bpp, 8);
 	struct drm_gem_shmem_object *shmem;
 
@@ -522,6 +540,7 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_dumb_create);
 
 static vm_fault_t drm_gem_shmem_fault(struct vm_fault *vmf)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct vm_area_struct *vma = vmf->vma;
 	struct drm_gem_object *obj = vma->vm_private_data;
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
@@ -552,6 +571,7 @@ static vm_fault_t drm_gem_shmem_fault(struct vm_fault *vmf)
 
 static void drm_gem_shmem_vm_open(struct vm_area_struct *vma)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_object *obj = vma->vm_private_data;
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 	int ret;
@@ -566,6 +586,7 @@ static void drm_gem_shmem_vm_open(struct vm_area_struct *vma)
 
 static void drm_gem_shmem_vm_close(struct vm_area_struct *vma)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_object *obj = vma->vm_private_data;
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 
@@ -593,6 +614,7 @@ static const struct vm_operations_struct drm_gem_shmem_vm_ops = {
  */
 int drm_gem_shmem_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem;
 	int ret;
 
@@ -633,6 +655,7 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_mmap);
 void drm_gem_shmem_print_info(struct drm_printer *p, unsigned int indent,
 			      const struct drm_gem_object *obj)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	const struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 
 	drm_printf_indent(p, indent, "pages_use_count=%u\n", shmem->pages_use_count);
@@ -659,6 +682,7 @@ EXPORT_SYMBOL(drm_gem_shmem_print_info);
  */
 struct sg_table *drm_gem_shmem_get_sg_table(struct drm_gem_object *obj)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 
 	WARN_ON(shmem->base.import_attach);
@@ -685,6 +709,7 @@ EXPORT_SYMBOL_GPL(drm_gem_shmem_get_sg_table);
  */
 struct sg_table *drm_gem_shmem_get_pages_sgt(struct drm_gem_object *obj)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	int ret;
 	struct drm_gem_shmem_object *shmem = to_drm_gem_shmem_obj(obj);
 	struct sg_table *sgt;
@@ -741,6 +766,7 @@ drm_gem_shmem_prime_import_sg_table(struct drm_device *dev,
 				    struct dma_buf_attachment *attach,
 				    struct sg_table *sgt)
 {
+    pr_info("drm_gem_shmem_helper: called %s\n", __func__);
 	size_t size = PAGE_ALIGN(attach->dmabuf->size);
 	struct drm_gem_shmem_object *shmem;
 

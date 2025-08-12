@@ -49,6 +49,7 @@
 
 static int mipi_dsi_device_match(struct device *dev, struct device_driver *drv)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
 
 	/* attempt OF style match */
@@ -64,6 +65,7 @@ static int mipi_dsi_device_match(struct device *dev, struct device_driver *drv)
 
 static int mipi_dsi_uevent(struct device *dev, struct kobj_uevent_env *env)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
 	int err;
 
@@ -105,6 +107,7 @@ static struct bus_type mipi_dsi_bus_type = {
  */
 struct mipi_dsi_device *of_find_mipi_dsi_device_by_node(struct device_node *np)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct device *dev;
 
 	dev = bus_find_device_by_of_node(&mipi_dsi_bus_type, np);
@@ -115,6 +118,7 @@ EXPORT_SYMBOL(of_find_mipi_dsi_device_by_node);
 
 static void mipi_dsi_dev_release(struct device *dev)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
 
 	of_node_put(dev->of_node);
@@ -127,6 +131,7 @@ static const struct device_type mipi_dsi_device_type = {
 
 static struct mipi_dsi_device *mipi_dsi_device_alloc(struct mipi_dsi_host *host)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_device *dsi;
 
 	dsi = kzalloc(sizeof(*dsi), GFP_KERNEL);
@@ -145,6 +150,7 @@ static struct mipi_dsi_device *mipi_dsi_device_alloc(struct mipi_dsi_host *host)
 
 static int mipi_dsi_device_add(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_host *host = dsi->host;
 
 	dev_set_name(&dsi->dev, "%s.%d", dev_name(host->dev),  dsi->channel);
@@ -156,6 +162,7 @@ static int mipi_dsi_device_add(struct mipi_dsi_device *dsi)
 static struct mipi_dsi_device *
 of_mipi_dsi_device_add(struct mipi_dsi_host *host, struct device_node *node)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_device_info info = { };
 	int ret;
 	u32 reg;
@@ -181,6 +188,7 @@ of_mipi_dsi_device_add(struct mipi_dsi_host *host, struct device_node *node)
 static struct mipi_dsi_device *
 of_mipi_dsi_device_add(struct mipi_dsi_host *host, struct device_node *node)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	return ERR_PTR(-ENODEV);
 }
 #endif
@@ -201,6 +209,7 @@ struct mipi_dsi_device *
 mipi_dsi_device_register_full(struct mipi_dsi_host *host,
 			      const struct mipi_dsi_device_info *info)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_device *dsi;
 	int ret;
 
@@ -242,6 +251,7 @@ EXPORT_SYMBOL(mipi_dsi_device_register_full);
  */
 void mipi_dsi_device_unregister(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	device_unregister(&dsi->dev);
 }
 EXPORT_SYMBOL(mipi_dsi_device_unregister);
@@ -260,6 +270,7 @@ static LIST_HEAD(host_list);
  */
 struct mipi_dsi_host *of_find_mipi_dsi_host_by_node(struct device_node *node)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_host *host;
 
 	mutex_lock(&host_lock);
@@ -279,6 +290,7 @@ EXPORT_SYMBOL(of_find_mipi_dsi_host_by_node);
 
 int mipi_dsi_host_register(struct mipi_dsi_host *host)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct device_node *node;
 
 	for_each_available_child_of_node(host->dev->of_node, node) {
@@ -298,6 +310,7 @@ EXPORT_SYMBOL(mipi_dsi_host_register);
 
 static int mipi_dsi_remove_device_fn(struct device *dev, void *priv)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
 
 	mipi_dsi_device_unregister(dsi);
@@ -307,6 +320,7 @@ static int mipi_dsi_remove_device_fn(struct device *dev, void *priv)
 
 void mipi_dsi_host_unregister(struct mipi_dsi_host *host)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	device_for_each_child(host->dev, NULL, mipi_dsi_remove_device_fn);
 
 	mutex_lock(&host_lock);
@@ -321,6 +335,7 @@ EXPORT_SYMBOL(mipi_dsi_host_unregister);
  */
 int mipi_dsi_attach(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	const struct mipi_dsi_host_ops *ops = dsi->host->ops;
 
 	if (!ops || !ops->attach)
@@ -336,6 +351,7 @@ EXPORT_SYMBOL(mipi_dsi_attach);
  */
 int mipi_dsi_detach(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	const struct mipi_dsi_host_ops *ops = dsi->host->ops;
 
 	if (!ops || !ops->detach)
@@ -348,6 +364,7 @@ EXPORT_SYMBOL(mipi_dsi_detach);
 static ssize_t mipi_dsi_device_transfer(struct mipi_dsi_device *dsi,
 					struct mipi_dsi_msg *msg)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	const struct mipi_dsi_host_ops *ops = dsi->host->ops;
 
 	if (!ops || !ops->transfer)
@@ -368,6 +385,7 @@ static ssize_t mipi_dsi_device_transfer(struct mipi_dsi_device *dsi,
  */
 bool mipi_dsi_packet_format_is_short(u8 type)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	switch (type) {
 	case MIPI_DSI_V_SYNC_START:
 	case MIPI_DSI_V_SYNC_END:
@@ -406,6 +424,7 @@ EXPORT_SYMBOL(mipi_dsi_packet_format_is_short);
  */
 bool mipi_dsi_packet_format_is_long(u8 type)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	switch (type) {
 	case MIPI_DSI_NULL_PACKET:
 	case MIPI_DSI_BLANKING_PACKET:
@@ -441,6 +460,7 @@ EXPORT_SYMBOL(mipi_dsi_packet_format_is_long);
 int mipi_dsi_create_packet(struct mipi_dsi_packet *packet,
 			   const struct mipi_dsi_msg *msg)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	if (!packet || !msg)
 		return -EINVAL;
 
@@ -491,6 +511,7 @@ EXPORT_SYMBOL(mipi_dsi_create_packet);
  */
 int mipi_dsi_shutdown_peripheral(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_msg msg = {
 		.channel = dsi->channel,
 		.type = MIPI_DSI_SHUTDOWN_PERIPHERAL,
@@ -511,6 +532,7 @@ EXPORT_SYMBOL(mipi_dsi_shutdown_peripheral);
  */
 int mipi_dsi_turn_on_peripheral(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_msg msg = {
 		.channel = dsi->channel,
 		.type = MIPI_DSI_TURN_ON_PERIPHERAL,
@@ -535,6 +557,7 @@ EXPORT_SYMBOL(mipi_dsi_turn_on_peripheral);
 int mipi_dsi_set_maximum_return_packet_size(struct mipi_dsi_device *dsi,
 					    u16 value)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	u8 tx[2] = { value & 0xff, value >> 8 };
 	struct mipi_dsi_msg msg = {
 		.channel = dsi->channel,
@@ -560,6 +583,7 @@ EXPORT_SYMBOL(mipi_dsi_set_maximum_return_packet_size);
  */
 ssize_t mipi_dsi_compression_mode(struct mipi_dsi_device *dsi, bool enable)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	/* Note: Needs updating for non-default PPS or algorithm */
 	u8 tx[2] = { enable << 0, 0 };
 	struct mipi_dsi_msg msg = {
@@ -586,6 +610,7 @@ EXPORT_SYMBOL(mipi_dsi_compression_mode);
 ssize_t mipi_dsi_picture_parameter_set(struct mipi_dsi_device *dsi,
 				       const struct drm_dsc_picture_parameter_set *pps)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_msg msg = {
 		.channel = dsi->channel,
 		.type = MIPI_DSI_PICTURE_PARAMETER_SET,
@@ -613,6 +638,7 @@ EXPORT_SYMBOL(mipi_dsi_picture_parameter_set);
 ssize_t mipi_dsi_generic_write(struct mipi_dsi_device *dsi, const void *payload,
 			       size_t size)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_msg msg = {
 		.channel = dsi->channel,
 		.tx_buf = payload,
@@ -658,6 +684,7 @@ EXPORT_SYMBOL(mipi_dsi_generic_write);
 ssize_t mipi_dsi_generic_read(struct mipi_dsi_device *dsi, const void *params,
 			      size_t num_params, void *data, size_t size)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_msg msg = {
 		.channel = dsi->channel,
 		.tx_len = num_params,
@@ -702,6 +729,7 @@ EXPORT_SYMBOL(mipi_dsi_generic_read);
 ssize_t mipi_dsi_dcs_write_buffer(struct mipi_dsi_device *dsi,
 				  const void *data, size_t len)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_msg msg = {
 		.channel = dsi->channel,
 		.tx_buf = data,
@@ -745,6 +773,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_write_buffer);
 ssize_t mipi_dsi_dcs_write(struct mipi_dsi_device *dsi, u8 cmd,
 			   const void *data, size_t len)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 	size_t size;
 	u8 stack_tx[8];
@@ -785,6 +814,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_write);
 ssize_t mipi_dsi_dcs_read(struct mipi_dsi_device *dsi, u8 cmd, void *data,
 			  size_t len)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_msg msg = {
 		.channel = dsi->channel,
 		.type = MIPI_DSI_DCS_READ,
@@ -806,6 +836,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_read);
  */
 int mipi_dsi_dcs_nop(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_NOP, NULL, 0);
@@ -824,6 +855,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_nop);
  */
 int mipi_dsi_dcs_soft_reset(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_SOFT_RESET, NULL, 0);
@@ -844,6 +876,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_soft_reset);
  */
 int mipi_dsi_dcs_get_power_mode(struct mipi_dsi_device *dsi, u8 *mode)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_read(dsi, MIPI_DCS_GET_POWER_MODE, mode,
@@ -869,6 +902,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_get_power_mode);
  */
 int mipi_dsi_dcs_get_pixel_format(struct mipi_dsi_device *dsi, u8 *format)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_read(dsi, MIPI_DCS_GET_PIXEL_FORMAT, format,
@@ -893,6 +927,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_get_pixel_format);
  */
 int mipi_dsi_dcs_enter_sleep_mode(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_ENTER_SLEEP_MODE, NULL, 0);
@@ -912,6 +947,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_enter_sleep_mode);
  */
 int mipi_dsi_dcs_exit_sleep_mode(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_EXIT_SLEEP_MODE, NULL, 0);
@@ -931,6 +967,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_exit_sleep_mode);
  */
 int mipi_dsi_dcs_set_display_off(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_SET_DISPLAY_OFF, NULL, 0);
@@ -950,6 +987,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_set_display_off);
  */
 int mipi_dsi_dcs_set_display_on(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_SET_DISPLAY_ON, NULL, 0);
@@ -972,6 +1010,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_set_display_on);
 int mipi_dsi_dcs_set_column_address(struct mipi_dsi_device *dsi, u16 start,
 				    u16 end)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	u8 payload[4] = { start >> 8, start & 0xff, end >> 8, end & 0xff };
 	ssize_t err;
 
@@ -996,6 +1035,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_set_column_address);
 int mipi_dsi_dcs_set_page_address(struct mipi_dsi_device *dsi, u16 start,
 				  u16 end)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	u8 payload[4] = { start >> 8, start & 0xff, end >> 8, end & 0xff };
 	ssize_t err;
 
@@ -1017,6 +1057,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_set_page_address);
  */
 int mipi_dsi_dcs_set_tear_off(struct mipi_dsi_device *dsi)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_SET_TEAR_OFF, NULL, 0);
@@ -1038,6 +1079,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_set_tear_off);
 int mipi_dsi_dcs_set_tear_on(struct mipi_dsi_device *dsi,
 			     enum mipi_dsi_dcs_tear_mode mode)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	u8 value = mode;
 	ssize_t err;
 
@@ -1060,6 +1102,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_set_tear_on);
  */
 int mipi_dsi_dcs_set_pixel_format(struct mipi_dsi_device *dsi, u8 format)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_write(dsi, MIPI_DCS_SET_PIXEL_FORMAT, &format,
@@ -1081,6 +1124,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_set_pixel_format);
  */
 int mipi_dsi_dcs_set_tear_scanline(struct mipi_dsi_device *dsi, u16 scanline)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	u8 payload[2] = { scanline >> 8, scanline & 0xff };
 	ssize_t err;
 
@@ -1104,6 +1148,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_set_tear_scanline);
 int mipi_dsi_dcs_set_display_brightness(struct mipi_dsi_device *dsi,
 					u16 brightness)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	u8 payload[2] = { brightness & 0xff, brightness >> 8 };
 	ssize_t err;
 
@@ -1127,6 +1172,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_set_display_brightness);
 int mipi_dsi_dcs_get_display_brightness(struct mipi_dsi_device *dsi,
 					u16 *brightness)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	ssize_t err;
 
 	err = mipi_dsi_dcs_read(dsi, MIPI_DCS_GET_DISPLAY_BRIGHTNESS,
@@ -1144,6 +1190,7 @@ EXPORT_SYMBOL(mipi_dsi_dcs_get_display_brightness);
 
 static int mipi_dsi_drv_probe(struct device *dev)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_driver *drv = to_mipi_dsi_driver(dev->driver);
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
 
@@ -1152,6 +1199,7 @@ static int mipi_dsi_drv_probe(struct device *dev)
 
 static int mipi_dsi_drv_remove(struct device *dev)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_driver *drv = to_mipi_dsi_driver(dev->driver);
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
 
@@ -1160,6 +1208,7 @@ static int mipi_dsi_drv_remove(struct device *dev)
 
 static void mipi_dsi_drv_shutdown(struct device *dev)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	struct mipi_dsi_driver *drv = to_mipi_dsi_driver(dev->driver);
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(dev);
 
@@ -1176,6 +1225,7 @@ static void mipi_dsi_drv_shutdown(struct device *dev)
 int mipi_dsi_driver_register_full(struct mipi_dsi_driver *drv,
 				  struct module *owner)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	drv->driver.bus = &mipi_dsi_bus_type;
 	drv->driver.owner = owner;
 
@@ -1198,12 +1248,14 @@ EXPORT_SYMBOL(mipi_dsi_driver_register_full);
  */
 void mipi_dsi_driver_unregister(struct mipi_dsi_driver *drv)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	driver_unregister(&drv->driver);
 }
 EXPORT_SYMBOL(mipi_dsi_driver_unregister);
 
 static int __init mipi_dsi_bus_init(void)
 {
+    pr_info("drm_mipi_dsi: called %s\n", __func__);
 	return bus_register(&mipi_dsi_bus_type);
 }
 postcore_initcall(mipi_dsi_bus_init);

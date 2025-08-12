@@ -56,12 +56,14 @@ struct drmres {
 
 static void free_dr(struct drmres *dr)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	kfree_const(dr->node.name);
 	kfree(dr);
 }
 
 void drm_managed_release(struct drm_device *dev)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	struct drmres *dr, *tmp;
 
 	drm_dbg_drmres(dev, "drmres release begin\n");
@@ -85,6 +87,7 @@ void drm_managed_release(struct drm_device *dev)
 static __always_inline struct drmres * alloc_dr(drmres_release_t release,
 						size_t size, gfp_t gfp, int nid)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	size_t tot_size;
 	struct drmres *dr;
 
@@ -107,6 +110,7 @@ static __always_inline struct drmres * alloc_dr(drmres_release_t release,
 
 static void del_dr(struct drm_device *dev, struct drmres *dr)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	list_del_init(&dr->node.entry);
 
 	drm_dbg_drmres(dev, "DEL %p %s (%lu bytes)\n",
@@ -115,6 +119,7 @@ static void del_dr(struct drm_device *dev, struct drmres *dr)
 
 static void add_dr(struct drm_device *dev, struct drmres *dr)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&dev->managed.lock, flags);
@@ -127,6 +132,7 @@ static void add_dr(struct drm_device *dev, struct drmres *dr)
 
 void drmm_add_final_kfree(struct drm_device *dev, void *container)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	WARN_ON(dev->managed.final_kfree);
 	WARN_ON(dev < (struct drm_device *) container);
 	WARN_ON(dev + 1 > (struct drm_device *) (container + ksize(container)));
@@ -137,6 +143,7 @@ int __drmm_add_action(struct drm_device *dev,
 		      drmres_release_t action,
 		      void *data, const char *name)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	struct drmres *dr;
 	void **void_ptr;
 
@@ -165,6 +172,7 @@ int __drmm_add_action_or_reset(struct drm_device *dev,
 			       drmres_release_t action,
 			       void *data, const char *name)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	int ret;
 
 	ret = __drmm_add_action(dev, action, data, name);
@@ -187,6 +195,7 @@ EXPORT_SYMBOL(__drmm_add_action_or_reset);
  */
 void *drmm_kmalloc(struct drm_device *dev, size_t size, gfp_t gfp)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	struct drmres *dr;
 
 	dr = alloc_dr(NULL, size, gfp, dev_to_node(dev->dev));
@@ -215,6 +224,7 @@ EXPORT_SYMBOL(drmm_kmalloc);
  */
 char *drmm_kstrdup(struct drm_device *dev, const char *s, gfp_t gfp)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	size_t size;
 	char *buf;
 
@@ -240,6 +250,7 @@ EXPORT_SYMBOL_GPL(drmm_kstrdup);
  */
 void drmm_kfree(struct drm_device *dev, void *data)
 {
+    pr_info("drm_managed: called %s\n", __func__);
 	struct drmres *dr_match = NULL, *dr;
 	unsigned long flags;
 

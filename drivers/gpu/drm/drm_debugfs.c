@@ -50,6 +50,7 @@
 
 static int drm_name_info(struct seq_file *m, void *data)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_info_node *node = (struct drm_info_node *) m->private;
 	struct drm_minor *minor = node->minor;
 	struct drm_device *dev = minor->dev;
@@ -72,6 +73,7 @@ static int drm_name_info(struct seq_file *m, void *data)
 
 static int drm_clients_info(struct seq_file *m, void *data)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_info_node *node = (struct drm_info_node *) m->private;
 	struct drm_device *dev = node->minor->dev;
 	struct drm_file *priv;
@@ -112,6 +114,7 @@ static int drm_clients_info(struct seq_file *m, void *data)
 
 static int drm_gem_one_name_info(int id, void *ptr, void *data)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_gem_object *obj = ptr;
 	struct seq_file *m = data;
 
@@ -124,6 +127,7 @@ static int drm_gem_one_name_info(int id, void *ptr, void *data)
 
 static int drm_gem_name_info(struct seq_file *m, void *data)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_info_node *node = (struct drm_info_node *) m->private;
 	struct drm_device *dev = node->minor->dev;
 
@@ -146,6 +150,7 @@ static const struct drm_info_list drm_debugfs_list[] = {
 
 static int drm_debugfs_open(struct inode *inode, struct file *file)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_info_node *node = inode->i_private;
 
 	return single_open(file, node->info_ent->show, node);
@@ -176,6 +181,7 @@ static const struct file_operations drm_debugfs_fops = {
 void drm_debugfs_create_files(const struct drm_info_list *files, int count,
 			      struct dentry *root, struct drm_minor *minor)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_device *dev = minor->dev;
 	struct drm_info_node *tmp;
 	int i;
@@ -206,6 +212,7 @@ EXPORT_SYMBOL(drm_debugfs_create_files);
 int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 		     struct dentry *root)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_device *dev = minor->dev;
 	char name[64];
 
@@ -237,6 +244,7 @@ int drm_debugfs_init(struct drm_minor *minor, int minor_id,
 int drm_debugfs_remove_files(const struct drm_info_list *files, int count,
 			     struct drm_minor *minor)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct list_head *pos, *q;
 	struct drm_info_node *tmp;
 	int i;
@@ -259,6 +267,7 @@ EXPORT_SYMBOL(drm_debugfs_remove_files);
 
 static void drm_debugfs_remove_all_files(struct drm_minor *minor)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_info_node *node, *tmp;
 
 	mutex_lock(&minor->debugfs_lock);
@@ -272,6 +281,7 @@ static void drm_debugfs_remove_all_files(struct drm_minor *minor)
 
 void drm_debugfs_cleanup(struct drm_minor *minor)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	if (!minor->debugfs_root)
 		return;
 
@@ -283,6 +293,7 @@ void drm_debugfs_cleanup(struct drm_minor *minor)
 
 static int connector_show(struct seq_file *m, void *data)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_connector *connector = m->private;
 
 	seq_printf(m, "%s\n", drm_get_connector_force_name(connector->force));
@@ -292,6 +303,7 @@ static int connector_show(struct seq_file *m, void *data)
 
 static int connector_open(struct inode *inode, struct file *file)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_connector *dev = inode->i_private;
 
 	return single_open(file, connector_show, dev);
@@ -300,6 +312,7 @@ static int connector_open(struct inode *inode, struct file *file)
 static ssize_t connector_write(struct file *file, const char __user *ubuf,
 			       size_t len, loff_t *offp)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct seq_file *m = file->private_data;
 	struct drm_connector *connector = m->private;
 	char buf[12];
@@ -328,6 +341,7 @@ static ssize_t connector_write(struct file *file, const char __user *ubuf,
 
 static int edid_show(struct seq_file *m, void *data)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_connector *connector = m->private;
 	struct drm_property_blob *edid = connector->edid_blob_ptr;
 
@@ -339,6 +353,7 @@ static int edid_show(struct seq_file *m, void *data)
 
 static int edid_open(struct inode *inode, struct file *file)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_connector *dev = inode->i_private;
 
 	return single_open(file, edid_show, dev);
@@ -347,6 +362,7 @@ static int edid_open(struct inode *inode, struct file *file)
 static ssize_t edid_write(struct file *file, const char __user *ubuf,
 			  size_t len, loff_t *offp)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct seq_file *m = file->private_data;
 	struct drm_connector *connector = m->private;
 	char *buf;
@@ -383,6 +399,7 @@ static ssize_t edid_write(struct file *file, const char __user *ubuf,
  */
 static int vrr_range_show(struct seq_file *m, void *data)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_connector *connector = m->private;
 
 	if (connector->status != connector_status_connected)
@@ -416,6 +433,7 @@ static const struct file_operations drm_connector_fops = {
 
 void drm_debugfs_connector_add(struct drm_connector *connector)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_minor *minor = connector->dev->primary;
 	struct dentry *root;
 
@@ -440,6 +458,7 @@ void drm_debugfs_connector_add(struct drm_connector *connector)
 
 void drm_debugfs_connector_remove(struct drm_connector *connector)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	if (!connector->debugfs_entry)
 		return;
 
@@ -450,6 +469,7 @@ void drm_debugfs_connector_remove(struct drm_connector *connector)
 
 void drm_debugfs_crtc_add(struct drm_crtc *crtc)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	struct drm_minor *minor = crtc->dev->primary;
 	struct dentry *root;
 	char *name;
@@ -468,6 +488,7 @@ void drm_debugfs_crtc_add(struct drm_crtc *crtc)
 
 void drm_debugfs_crtc_remove(struct drm_crtc *crtc)
 {
+    pr_info("drm_debugfs: called %s\n", __func__);
 	debugfs_remove_recursive(crtc->debugfs_entry);
 	crtc->debugfs_entry = NULL;
 }

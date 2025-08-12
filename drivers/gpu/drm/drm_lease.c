@@ -73,6 +73,7 @@ static uint64_t drm_lease_idr_object;
 
 struct drm_master *drm_lease_owner(struct drm_master *master)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	while (master->lessor != NULL)
 		master = master->lessor;
 	return master;
@@ -81,12 +82,14 @@ struct drm_master *drm_lease_owner(struct drm_master *master)
 static struct drm_master*
 _drm_find_lessee(struct drm_master *master, int lessee_id)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	lockdep_assert_held(&master->dev->mode_config.idr_mutex);
 	return idr_find(&drm_lease_owner(master)->lessee_idr, lessee_id);
 }
 
 static int _drm_lease_held_master(struct drm_master *master, int id)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	lockdep_assert_held(&master->dev->mode_config.idr_mutex);
 	if (master->lessor)
 		return idr_find(&master->leases, id) != NULL;
@@ -96,6 +99,7 @@ static int _drm_lease_held_master(struct drm_master *master, int id)
 /* Checks if the given object has been leased to some lessee of drm_master */
 static bool _drm_has_leased(struct drm_master *master, int id)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	struct drm_master *lessee;
 
 	lockdep_assert_held(&master->dev->mode_config.idr_mutex);
@@ -108,6 +112,7 @@ static bool _drm_has_leased(struct drm_master *master, int id)
 /* Called with idr_mutex held */
 bool _drm_lease_held(struct drm_file *file_priv, int id)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	bool ret;
 	struct drm_master *master;
 
@@ -125,6 +130,7 @@ bool _drm_lease_held(struct drm_file *file_priv, int id)
 
 bool drm_lease_held(struct drm_file *file_priv, int id)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	struct drm_master *master;
 	bool ret;
 
@@ -153,6 +159,7 @@ out:
  */
 uint32_t drm_lease_filter_crtcs(struct drm_file *file_priv, uint32_t crtcs_in)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	struct drm_master *master;
 	struct drm_device *dev;
 	struct drm_crtc *crtc;
@@ -206,6 +213,7 @@ out:
  */
 static struct drm_master *drm_lease_create(struct drm_master *lessor, struct idr *leases)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	struct drm_device *dev = lessor->dev;
 	int error;
 	struct drm_master *lessee;
@@ -264,6 +272,7 @@ out_lessee:
 
 void drm_lease_destroy(struct drm_master *master)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	struct drm_device *dev = master->dev;
 
 	mutex_lock(&dev->mode_config.idr_mutex);
@@ -297,6 +306,7 @@ void drm_lease_destroy(struct drm_master *master)
 
 static void _drm_lease_revoke(struct drm_master *top)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	int object;
 	void *entry;
 	struct drm_master *master = top;
@@ -335,6 +345,7 @@ static void _drm_lease_revoke(struct drm_master *top)
 
 void drm_lease_revoke(struct drm_master *top)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	mutex_lock(&top->dev->mode_config.idr_mutex);
 	_drm_lease_revoke(top);
 	mutex_unlock(&top->dev->mode_config.idr_mutex);
@@ -345,6 +356,7 @@ static int validate_lease(struct drm_device *dev,
 			  struct drm_mode_object **objects,
 			  bool universal_planes)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	int o;
 	int has_crtc = -1;
 	int has_connector = -1;
@@ -378,6 +390,7 @@ static int fill_object_idr(struct drm_device *dev,
 			   int object_count,
 			   u32 *object_ids)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	struct drm_mode_object **objects;
 	u32 o;
 	int ret;
@@ -473,6 +486,7 @@ out_free_objects:
 int drm_mode_create_lease_ioctl(struct drm_device *dev,
 				void *data, struct drm_file *lessor_priv)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	struct drm_mode_create_lease *cl = data;
 	size_t object_count;
 	int ret = 0;
@@ -589,6 +603,7 @@ out_lessor:
 int drm_mode_list_lessees_ioctl(struct drm_device *dev,
 			       void *data, struct drm_file *lessor_priv)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	struct drm_mode_list_lessees *arg = data;
 	__u32 __user *lessee_ids = (__u32 __user *) (uintptr_t) (arg->lessees_ptr);
 	__u32 count_lessees = arg->count_lessees;
@@ -636,6 +651,7 @@ int drm_mode_list_lessees_ioctl(struct drm_device *dev,
 int drm_mode_get_lease_ioctl(struct drm_device *dev,
 			     void *data, struct drm_file *lessee_priv)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	struct drm_mode_get_lease *arg = data;
 	__u32 __user *object_ids = (__u32 __user *) (uintptr_t) (arg->objects_ptr);
 	__u32 count_objects = arg->count_objects;
@@ -694,6 +710,7 @@ int drm_mode_get_lease_ioctl(struct drm_device *dev,
 int drm_mode_revoke_lease_ioctl(struct drm_device *dev,
 				void *data, struct drm_file *lessor_priv)
 {
+    pr_info("drm_lease: called %s\n", __func__);
 	struct drm_mode_revoke_lease *arg = data;
 	struct drm_master *lessor;
 	struct drm_master *lessee;

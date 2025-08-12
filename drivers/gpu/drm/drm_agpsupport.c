@@ -58,6 +58,7 @@
  */
 int drm_legacy_agp_info(struct drm_device *dev, struct drm_agp_info *info)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct agp_kern_info *kern;
 
 	if (!dev->agp || !dev->agp->acquired)
@@ -81,6 +82,7 @@ EXPORT_SYMBOL(drm_legacy_agp_info);
 int drm_legacy_agp_info_ioctl(struct drm_device *dev, void *data,
 			      struct drm_file *file_priv)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_info *info = data;
 	int err;
 
@@ -102,6 +104,7 @@ int drm_legacy_agp_info_ioctl(struct drm_device *dev, void *data,
  */
 int drm_legacy_agp_acquire(struct drm_device *dev)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
 	if (!dev->agp)
@@ -127,6 +130,7 @@ EXPORT_SYMBOL(drm_legacy_agp_acquire);
 int drm_legacy_agp_acquire_ioctl(struct drm_device *dev, void *data,
 				 struct drm_file *file_priv)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	return drm_legacy_agp_acquire((struct drm_device *)file_priv->minor->dev);
 }
 
@@ -140,6 +144,7 @@ int drm_legacy_agp_acquire_ioctl(struct drm_device *dev, void *data,
  */
 int drm_legacy_agp_release(struct drm_device *dev)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	if (!dev->agp || !dev->agp->acquired)
 		return -EINVAL;
 	agp_backend_release(dev->agp->bridge);
@@ -151,6 +156,7 @@ EXPORT_SYMBOL(drm_legacy_agp_release);
 int drm_legacy_agp_release_ioctl(struct drm_device *dev, void *data,
 				 struct drm_file *file_priv)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	return drm_legacy_agp_release(dev);
 }
 
@@ -166,6 +172,7 @@ int drm_legacy_agp_release_ioctl(struct drm_device *dev, void *data,
  */
 int drm_legacy_agp_enable(struct drm_device *dev, struct drm_agp_mode mode)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	if (!dev->agp || !dev->agp->acquired)
 		return -EINVAL;
 
@@ -179,6 +186,7 @@ EXPORT_SYMBOL(drm_legacy_agp_enable);
 int drm_legacy_agp_enable_ioctl(struct drm_device *dev, void *data,
 				struct drm_file *file_priv)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_mode *mode = data;
 
 	return drm_legacy_agp_enable(dev, *mode);
@@ -194,6 +202,7 @@ int drm_legacy_agp_enable_ioctl(struct drm_device *dev, void *data,
  */
 int drm_legacy_agp_alloc(struct drm_device *dev, struct drm_agp_buffer *request)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_mem *entry;
 	struct agp_memory *memory;
 	unsigned long pages;
@@ -230,6 +239,7 @@ EXPORT_SYMBOL(drm_legacy_agp_alloc);
 int drm_legacy_agp_alloc_ioctl(struct drm_device *dev, void *data,
 			struct drm_file *file_priv)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_buffer *request = data;
 
 	return drm_legacy_agp_alloc(dev, request);
@@ -247,6 +257,7 @@ int drm_legacy_agp_alloc_ioctl(struct drm_device *dev, void *data,
 static struct drm_agp_mem *drm_legacy_agp_lookup_entry(struct drm_device *dev,
 						       unsigned long handle)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_mem *entry;
 
 	list_for_each_entry(entry, &dev->agp->memory, head) {
@@ -266,6 +277,7 @@ static struct drm_agp_mem *drm_legacy_agp_lookup_entry(struct drm_device *dev,
  */
 int drm_legacy_agp_unbind(struct drm_device *dev, struct drm_agp_binding *request)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_mem *entry;
 	int ret;
 
@@ -285,6 +297,7 @@ EXPORT_SYMBOL(drm_legacy_agp_unbind);
 int drm_legacy_agp_unbind_ioctl(struct drm_device *dev, void *data,
 				struct drm_file *file_priv)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_binding *request = data;
 
 	return drm_legacy_agp_unbind(dev, request);
@@ -301,6 +314,7 @@ int drm_legacy_agp_unbind_ioctl(struct drm_device *dev, void *data,
  */
 int drm_legacy_agp_bind(struct drm_device *dev, struct drm_agp_binding *request)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_mem *entry;
 	int retcode;
 	int page;
@@ -325,6 +339,7 @@ EXPORT_SYMBOL(drm_legacy_agp_bind);
 int drm_legacy_agp_bind_ioctl(struct drm_device *dev, void *data,
 			      struct drm_file *file_priv)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_binding *request = data;
 
 	return drm_legacy_agp_bind(dev, request);
@@ -342,6 +357,7 @@ int drm_legacy_agp_bind_ioctl(struct drm_device *dev, void *data,
  */
 int drm_legacy_agp_free(struct drm_device *dev, struct drm_agp_buffer *request)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_mem *entry;
 
 	if (!dev->agp || !dev->agp->acquired)
@@ -364,6 +380,7 @@ EXPORT_SYMBOL(drm_legacy_agp_free);
 int drm_legacy_agp_free_ioctl(struct drm_device *dev, void *data,
 			      struct drm_file *file_priv)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_buffer *request = data;
 
 	return drm_legacy_agp_free(dev, request);
@@ -383,6 +400,7 @@ int drm_legacy_agp_free_ioctl(struct drm_device *dev, void *data,
  */
 struct drm_agp_head *drm_legacy_agp_init(struct drm_device *dev)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	struct drm_agp_head *head = NULL;
 
@@ -426,6 +444,7 @@ EXPORT_SYMBOL(drm_legacy_agp_init);
  */
 void drm_legacy_agp_clear(struct drm_device *dev)
 {
+    pr_info("drm_agpsupport: called %s\n", __func__);
 	struct drm_agp_mem *entry, *tempe;
 
 	if (!dev->agp)

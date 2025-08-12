@@ -51,6 +51,7 @@
  */
 int drm_legacy_dma_setup(struct drm_device *dev)
 {
+    pr_info("drm_dma: called %s\n", __func__);
 	int i;
 
 	if (!drm_core_check_feature(dev, DRIVER_HAVE_DMA) ||
@@ -80,6 +81,7 @@ int drm_legacy_dma_setup(struct drm_device *dev)
  */
 void drm_legacy_dma_takedown(struct drm_device *dev)
 {
+    pr_info("drm_dma: called %s\n", __func__);
 	struct drm_device_dma *dma = dev->dma;
 	drm_dma_handle_t *dmah;
 	int i, j;
@@ -135,6 +137,7 @@ void drm_legacy_dma_takedown(struct drm_device *dev)
  */
 void drm_legacy_free_buffer(struct drm_device *dev, struct drm_buf * buf)
 {
+    pr_info("drm_dma: called %s\n", __func__);
 	if (!buf)
 		return;
 
@@ -155,6 +158,7 @@ void drm_legacy_free_buffer(struct drm_device *dev, struct drm_buf * buf)
 void drm_legacy_reclaim_buffers(struct drm_device *dev,
 				struct drm_file *file_priv)
 {
+    pr_info("drm_dma: called %s\n", __func__);
 	struct drm_device_dma *dma = dev->dma;
 	int i;
 

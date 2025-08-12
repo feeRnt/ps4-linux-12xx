@@ -40,6 +40,7 @@
  */
 uint32_t drm_mode_legacy_fb_format(uint32_t bpp, uint32_t depth)
 {
+    pr_info("drm_fourcc: called %s\n", __func__);
 	uint32_t fmt = DRM_FORMAT_INVALID;
 
 	switch (bpp) {
@@ -104,6 +105,7 @@ EXPORT_SYMBOL(drm_mode_legacy_fb_format);
 uint32_t drm_driver_legacy_fb_format(struct drm_device *dev,
 				     uint32_t bpp, uint32_t depth)
 {
+    pr_info("drm_fourcc: called %s\n", __func__);
 	uint32_t fmt = drm_mode_legacy_fb_format(bpp, depth);
 
 	if (dev->mode_config.quirk_addfb_prefer_host_byte_order) {
@@ -131,6 +133,7 @@ EXPORT_SYMBOL(drm_driver_legacy_fb_format);
  */
 const struct drm_format_info *__drm_format_info(u32 format)
 {
+    pr_info("drm_fourcc: called %s\n", __func__);
 	static const struct drm_format_info formats[] = {
 		{ .format = DRM_FORMAT_C8,		.depth = 8,  .num_planes = 1, .cpp = { 1, 0, 0 }, .hsub = 1, .vsub = 1 },
 		{ .format = DRM_FORMAT_RGB332,		.depth = 8,  .num_planes = 1, .cpp = { 1, 0, 0 }, .hsub = 1, .vsub = 1 },
@@ -291,6 +294,7 @@ const struct drm_format_info *__drm_format_info(u32 format)
  */
 const struct drm_format_info *drm_format_info(u32 format)
 {
+    pr_info("drm_fourcc: called %s\n", __func__);
 	const struct drm_format_info *info;
 
 	info = __drm_format_info(format);
@@ -312,6 +316,7 @@ const struct drm_format_info *
 drm_get_format_info(struct drm_device *dev,
 		    const struct drm_mode_fb_cmd2 *mode_cmd)
 {
+    pr_info("drm_fourcc: called %s\n", __func__);
 	const struct drm_format_info *info = NULL;
 
 	if (dev->mode_config.funcs->get_format_info)
@@ -335,6 +340,7 @@ EXPORT_SYMBOL(drm_get_format_info);
 unsigned int drm_format_info_block_width(const struct drm_format_info *info,
 					 int plane)
 {
+    pr_info("drm_fourcc: called %s\n", __func__);
 	if (!info || plane < 0 || plane >= info->num_planes)
 		return 0;
 
@@ -355,6 +361,7 @@ EXPORT_SYMBOL(drm_format_info_block_width);
 unsigned int drm_format_info_block_height(const struct drm_format_info *info,
 					  int plane)
 {
+    pr_info("drm_fourcc: called %s\n", __func__);
 	if (!info || plane < 0 || plane >= info->num_planes)
 		return 0;
 
@@ -377,6 +384,7 @@ EXPORT_SYMBOL(drm_format_info_block_height);
 uint64_t drm_format_info_min_pitch(const struct drm_format_info *info,
 				   int plane, unsigned int buffer_width)
 {
+    pr_info("drm_fourcc: called %s\n", __func__);
 	if (!info || plane < 0 || plane >= info->num_planes)
 		return 0;
 

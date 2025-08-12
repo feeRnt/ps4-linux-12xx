@@ -53,6 +53,7 @@
 ssize_t drm_scdc_read(struct i2c_adapter *adapter, u8 offset, void *buffer,
 		      size_t size)
 {
+    pr_info("drm_scdc_helper: called %s\n", __func__);
 	int ret;
 	struct i2c_msg msgs[2] = {
 		{
@@ -93,6 +94,7 @@ EXPORT_SYMBOL(drm_scdc_read);
 ssize_t drm_scdc_write(struct i2c_adapter *adapter, u8 offset,
 		       const void *buffer, size_t size)
 {
+    pr_info("drm_scdc_helper: called %s\n", __func__);
 	struct i2c_msg msg = {
 		.addr = SCDC_I2C_SLAVE_ADDRESS,
 		.flags = 0,
@@ -136,6 +138,7 @@ EXPORT_SYMBOL(drm_scdc_write);
  */
 bool drm_scdc_get_scrambling_status(struct i2c_adapter *adapter)
 {
+    pr_info("drm_scdc_helper: called %s\n", __func__);
 	u8 status;
 	int ret;
 
@@ -163,6 +166,7 @@ EXPORT_SYMBOL(drm_scdc_get_scrambling_status);
  */
 bool drm_scdc_set_scrambling(struct i2c_adapter *adapter, bool enable)
 {
+    pr_info("drm_scdc_helper: called %s\n", __func__);
 	u8 config;
 	int ret;
 
@@ -218,6 +222,7 @@ EXPORT_SYMBOL(drm_scdc_set_scrambling);
  */
 bool drm_scdc_set_high_tmds_clock_ratio(struct i2c_adapter *adapter, bool set)
 {
+    pr_info("drm_scdc_helper: called %s\n", __func__);
 	u8 config;
 	int ret;
 

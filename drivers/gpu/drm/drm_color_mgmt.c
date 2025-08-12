@@ -129,6 +129,7 @@
  */
 u64 drm_color_ctm_s31_32_to_qm_n(u64 user_input, u32 m, u32 n)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	u64 mag = (user_input & ~BIT_ULL(63)) >> (32 - n);
 	bool negative = !!(user_input & BIT_ULL(63));
 	s64 val;
@@ -162,6 +163,7 @@ void drm_crtc_enable_color_mgmt(struct drm_crtc *crtc,
 				bool has_ctm,
 				uint gamma_lut_size)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_mode_config *config = &dev->mode_config;
 
@@ -202,6 +204,7 @@ EXPORT_SYMBOL(drm_crtc_enable_color_mgmt);
 int drm_mode_crtc_set_gamma_size(struct drm_crtc *crtc,
 				 int gamma_size)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	uint16_t *r_base, *g_base, *b_base;
 	int i;
 
@@ -237,6 +240,7 @@ EXPORT_SYMBOL(drm_mode_crtc_set_gamma_size);
  */
 static bool drm_crtc_supports_legacy_gamma(struct drm_crtc *crtc)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	u32 gamma_id = crtc->dev->mode_config.gamma_lut_property->base.id;
 	u32 degamma_id = crtc->dev->mode_config.degamma_lut_property->base.id;
 
@@ -273,6 +277,7 @@ static int drm_crtc_legacy_gamma_set(struct drm_crtc *crtc,
 				     u32 size,
 				     struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_atomic_state *state;
 	struct drm_crtc_state *crtc_state;
@@ -355,6 +360,7 @@ fail:
 int drm_mode_gamma_set_ioctl(struct drm_device *dev,
 			     void *data, struct drm_file *file_priv)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	struct drm_mode_crtc_lut *crtc_lut = data;
 	struct drm_crtc *crtc;
 	void *r_base, *g_base, *b_base;
@@ -424,6 +430,7 @@ out:
 int drm_mode_gamma_get_ioctl(struct drm_device *dev,
 			     void *data, struct drm_file *file_priv)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	struct drm_mode_crtc_lut *crtc_lut = data;
 	struct drm_crtc *crtc;
 	void *r_base, *g_base, *b_base;
@@ -485,6 +492,7 @@ static const char * const color_range_name[] = {
  */
 const char *drm_get_color_encoding_name(enum drm_color_encoding encoding)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	if (WARN_ON(encoding >= ARRAY_SIZE(color_encoding_name)))
 		return "unknown";
 
@@ -500,6 +508,7 @@ const char *drm_get_color_encoding_name(enum drm_color_encoding encoding)
  */
 const char *drm_get_color_range_name(enum drm_color_range range)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	if (WARN_ON(range >= ARRAY_SIZE(color_range_name)))
 		return "unknown";
 
@@ -526,6 +535,7 @@ int drm_plane_create_color_properties(struct drm_plane *plane,
 				      enum drm_color_encoding default_encoding,
 				      enum drm_color_range default_range)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	struct drm_device *dev = plane->dev;
 	struct drm_property *prop;
 	struct drm_prop_enum_list enum_list[max_t(int, DRM_COLOR_ENCODING_MAX,
@@ -597,6 +607,7 @@ EXPORT_SYMBOL(drm_plane_create_color_properties);
  */
 int drm_color_lut_check(const struct drm_property_blob *lut, u32 tests)
 {
+    pr_info("drm_color_mgmt: called %s\n", __func__);
 	const struct drm_color_lut *entry;
 	int i;
 

@@ -59,6 +59,7 @@ static int drm_dev_major = -1;
 
 static struct drm_dp_aux_dev *drm_dp_aux_dev_get_by_minor(unsigned index)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	struct drm_dp_aux_dev *aux_dev = NULL;
 
 	mutex_lock(&aux_idr_mutex);
@@ -72,6 +73,7 @@ static struct drm_dp_aux_dev *drm_dp_aux_dev_get_by_minor(unsigned index)
 
 static struct drm_dp_aux_dev *alloc_drm_dp_aux_dev(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	struct drm_dp_aux_dev *aux_dev;
 	int index;
 
@@ -96,6 +98,7 @@ static struct drm_dp_aux_dev *alloc_drm_dp_aux_dev(struct drm_dp_aux *aux)
 
 static void release_drm_dp_aux_dev(struct kref *ref)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	struct drm_dp_aux_dev *aux_dev =
 		container_of(ref, struct drm_dp_aux_dev, refcount);
 
@@ -105,6 +108,7 @@ static void release_drm_dp_aux_dev(struct kref *ref)
 static ssize_t name_show(struct device *dev,
 			 struct device_attribute *attr, char *buf)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	ssize_t res;
 	struct drm_dp_aux_dev *aux_dev =
 		drm_dp_aux_dev_get_by_minor(MINOR(dev->devt));
@@ -127,6 +131,7 @@ ATTRIBUTE_GROUPS(drm_dp_aux);
 
 static int auxdev_open(struct inode *inode, struct file *file)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	unsigned int minor = iminor(inode);
 	struct drm_dp_aux_dev *aux_dev;
 
@@ -140,11 +145,13 @@ static int auxdev_open(struct inode *inode, struct file *file)
 
 static loff_t auxdev_llseek(struct file *file, loff_t offset, int whence)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	return fixed_size_llseek(file, offset, whence, AUX_MAX_OFFSET);
 }
 
 static ssize_t auxdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	struct drm_dp_aux_dev *aux_dev = iocb->ki_filp->private_data;
 	loff_t pos = iocb->ki_pos;
 	ssize_t res = 0;
@@ -188,6 +195,7 @@ static ssize_t auxdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
 
 static ssize_t auxdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	struct drm_dp_aux_dev *aux_dev = iocb->ki_filp->private_data;
 	loff_t pos = iocb->ki_pos;
 	ssize_t res = 0;
@@ -231,6 +239,7 @@ static ssize_t auxdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
 
 static int auxdev_release(struct inode *inode, struct file *file)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	struct drm_dp_aux_dev *aux_dev = file->private_data;
 
 	kref_put(&aux_dev->refcount, release_drm_dp_aux_dev);
@@ -250,6 +259,7 @@ static const struct file_operations auxdev_fops = {
 
 static struct drm_dp_aux_dev *drm_dp_aux_dev_get_by_aux(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	struct drm_dp_aux_dev *iter, *aux_dev = NULL;
 	int id;
 
@@ -271,6 +281,7 @@ static struct drm_dp_aux_dev *drm_dp_aux_dev_get_by_aux(struct drm_dp_aux *aux)
 
 void drm_dp_aux_unregister_devnode(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	struct drm_dp_aux_dev *aux_dev;
 	unsigned int minor;
 
@@ -302,6 +313,7 @@ void drm_dp_aux_unregister_devnode(struct drm_dp_aux *aux)
 
 int drm_dp_aux_register_devnode(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	struct drm_dp_aux_dev *aux_dev;
 	int res;
 
@@ -328,6 +340,7 @@ error:
 
 int drm_dp_aux_dev_init(void)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	int res;
 
 	drm_dp_aux_dev_class = class_create(THIS_MODULE, "drm_dp_aux_dev");
@@ -349,6 +362,7 @@ out:
 
 void drm_dp_aux_dev_exit(void)
 {
+    pr_info("drm_dp_aux_dev: called %s\n", __func__);
 	unregister_chrdev(drm_dev_major, "aux");
 	class_destroy(drm_dp_aux_dev_class);
 }

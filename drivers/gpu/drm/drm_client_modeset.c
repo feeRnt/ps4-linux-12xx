@@ -32,6 +32,7 @@ struct drm_client_offset {
 
 int drm_client_modeset_create(struct drm_client_dev *client)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 	unsigned int num_crtc = dev->mode_config.num_crtc;
 	unsigned int max_connector_count = 1;
@@ -70,6 +71,7 @@ err_free:
 
 static void drm_client_modeset_release(struct drm_client_dev *client)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_mode_set *modeset;
 	unsigned int i;
 
@@ -88,6 +90,7 @@ static void drm_client_modeset_release(struct drm_client_dev *client)
 
 void drm_client_modeset_free(struct drm_client_dev *client)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_mode_set *modeset;
 
 	mutex_lock(&client->modeset_mutex);
@@ -106,6 +109,7 @@ void drm_client_modeset_free(struct drm_client_dev *client)
 static struct drm_mode_set *
 drm_client_find_modeset(struct drm_client_dev *client, struct drm_crtc *crtc)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_mode_set *modeset;
 
 	drm_client_for_each_modeset(modeset, client)
@@ -118,6 +122,7 @@ drm_client_find_modeset(struct drm_client_dev *client, struct drm_crtc *crtc)
 static struct drm_display_mode *
 drm_connector_get_tiled_mode(struct drm_connector *connector)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_display_mode *mode;
 
 	list_for_each_entry(mode, &connector->modes, head) {
@@ -131,6 +136,7 @@ drm_connector_get_tiled_mode(struct drm_connector *connector)
 static struct drm_display_mode *
 drm_connector_fallback_non_tiled_mode(struct drm_connector *connector)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_display_mode *mode;
 
 	list_for_each_entry(mode, &connector->modes, head) {
@@ -145,6 +151,7 @@ drm_connector_fallback_non_tiled_mode(struct drm_connector *connector)
 static struct drm_display_mode *
 drm_connector_has_preferred_mode(struct drm_connector *connector, int width, int height)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_display_mode *mode;
 
 	list_for_each_entry(mode, &connector->modes, head) {
@@ -160,6 +167,7 @@ drm_connector_has_preferred_mode(struct drm_connector *connector, int width, int
 static struct drm_display_mode *
 drm_connector_pick_cmdline_mode(struct drm_connector *connector)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_cmdline_mode *cmdline_mode;
 	struct drm_display_mode *mode;
 	bool prefer_non_interlace;
@@ -216,6 +224,7 @@ create_mode:
 
 static bool drm_connector_enabled(struct drm_connector *connector, bool strict)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	bool enable;
 
 	if (connector->display_info.non_desktop)
@@ -233,6 +242,7 @@ static void drm_client_connectors_enabled(struct drm_connector **connectors,
 					  unsigned int connector_count,
 					  bool *enabled)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	bool any_enabled = false;
 	struct drm_connector *connector;
 	int i = 0;
@@ -260,6 +270,7 @@ static bool drm_client_target_cloned(struct drm_device *dev,
 				     struct drm_client_offset *offsets,
 				     bool *enabled, int width, int height)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	int count, i, j;
 	bool can_clone = false;
 	struct drm_display_mode *dmt_mode, *mode;
@@ -340,6 +351,7 @@ static int drm_client_get_tile_offsets(struct drm_connector **connectors,
 				       int idx,
 				       int h_idx, int v_idx)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_connector *connector;
 	int i;
 	int hoffset = 0, voffset = 0;
@@ -372,6 +384,7 @@ static bool drm_client_target_preferred(struct drm_connector **connectors,
 					struct drm_client_offset *offsets,
 					bool *enabled, int width, int height)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	const u64 mask = BIT_ULL(connector_count) - 1;
 	struct drm_connector *connector;
 	u64 conn_configured = 0;
@@ -471,6 +484,7 @@ retry:
 static bool connector_has_possible_crtc(struct drm_connector *connector,
 					struct drm_crtc *crtc)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_encoder *encoder;
 
 	drm_connector_for_each_possible_encoder(connector, encoder) {
@@ -488,6 +502,7 @@ static int drm_client_pick_crtcs(struct drm_client_dev *client,
 				 struct drm_display_mode **modes,
 				 int n, int width, int height)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 	struct drm_connector *connector;
 	int my_score, best_score, score;
@@ -564,6 +579,7 @@ static bool drm_client_firmware_config(struct drm_client_dev *client,
 				       struct drm_client_offset *offsets,
 				       bool *enabled, int width, int height)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	const int count = min_t(unsigned int, connector_count, BITS_PER_LONG);
 	unsigned long conn_configured, conn_seq, mask;
 	struct drm_device *dev = client->dev;
@@ -764,6 +780,7 @@ bail:
  */
 int drm_client_modeset_probe(struct drm_client_dev *client, unsigned int width, unsigned int height)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_connector *connector, **connectors = NULL;
 	struct drm_connector_list_iter conn_iter;
 	struct drm_device *dev = client->dev;
@@ -898,6 +915,7 @@ EXPORT_SYMBOL(drm_client_modeset_probe);
  */
 bool drm_client_rotation(struct drm_mode_set *modeset, unsigned int *rotation)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_connector *connector = modeset->connectors[0];
 	struct drm_plane *plane = modeset->crtc->primary;
 	struct drm_cmdline_mode *cmdline;
@@ -972,6 +990,7 @@ EXPORT_SYMBOL(drm_client_rotation);
 
 static int drm_client_modeset_commit_atomic(struct drm_client_dev *client, bool active, bool check)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 	struct drm_plane *plane;
 	struct drm_atomic_state *state;
@@ -1062,6 +1081,7 @@ backoff:
 
 static int drm_client_modeset_commit_legacy(struct drm_client_dev *client)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 	struct drm_mode_set *mode_set;
 	struct drm_plane *plane;
@@ -1112,6 +1132,7 @@ out:
  */
 int drm_client_modeset_check(struct drm_client_dev *client)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	int ret;
 
 	if (!drm_drv_uses_atomic_modeset(client->dev))
@@ -1138,6 +1159,7 @@ EXPORT_SYMBOL(drm_client_modeset_check);
  */
 int drm_client_modeset_commit_locked(struct drm_client_dev *client)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 	int ret;
 
@@ -1163,6 +1185,7 @@ EXPORT_SYMBOL(drm_client_modeset_commit_locked);
  */
 int drm_client_modeset_commit(struct drm_client_dev *client)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 	int ret;
 
@@ -1179,6 +1202,7 @@ EXPORT_SYMBOL(drm_client_modeset_commit);
 
 static void drm_client_modeset_dpms_legacy(struct drm_client_dev *client, int dpms_mode)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 	struct drm_connector *connector;
 	struct drm_mode_set *modeset;
@@ -1213,6 +1237,7 @@ static void drm_client_modeset_dpms_legacy(struct drm_client_dev *client, int dp
  */
 int drm_client_modeset_dpms(struct drm_client_dev *client, int mode)
 {
+    pr_info("drm_client_modeset: called %s\n", __func__);
 	struct drm_device *dev = client->dev;
 	int ret = 0;
 

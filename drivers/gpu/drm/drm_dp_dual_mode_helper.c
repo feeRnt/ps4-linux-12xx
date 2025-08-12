@@ -63,6 +63,7 @@
 ssize_t drm_dp_dual_mode_read(struct i2c_adapter *adapter,
 			      u8 offset, void *buffer, size_t size)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	struct i2c_msg msgs[] = {
 		{
 			.addr = DP_DUAL_MODE_SLAVE_ADDRESS,
@@ -105,6 +106,7 @@ EXPORT_SYMBOL(drm_dp_dual_mode_read);
 ssize_t drm_dp_dual_mode_write(struct i2c_adapter *adapter,
 			       u8 offset, const void *buffer, size_t size)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	struct i2c_msg msg = {
 		.addr = DP_DUAL_MODE_SLAVE_ADDRESS,
 		.flags = 0,
@@ -138,6 +140,7 @@ EXPORT_SYMBOL(drm_dp_dual_mode_write);
 
 static bool is_hdmi_adaptor(const char hdmi_id[DP_DUAL_MODE_HDMI_ID_LEN])
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	static const char dp_dual_mode_hdmi_id[DP_DUAL_MODE_HDMI_ID_LEN] =
 		"DP-HDMI ADAPTOR\x04";
 
@@ -147,11 +150,13 @@ static bool is_hdmi_adaptor(const char hdmi_id[DP_DUAL_MODE_HDMI_ID_LEN])
 
 static bool is_type1_adaptor(uint8_t adaptor_id)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	return adaptor_id == 0 || adaptor_id == 0xff;
 }
 
 static bool is_type2_adaptor(uint8_t adaptor_id)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	return adaptor_id == (DP_DUAL_MODE_TYPE_TYPE2 |
 			      DP_DUAL_MODE_REV_TYPE2);
 }
@@ -159,6 +164,7 @@ static bool is_type2_adaptor(uint8_t adaptor_id)
 static bool is_lspcon_adaptor(const char hdmi_id[DP_DUAL_MODE_HDMI_ID_LEN],
 			      const uint8_t adaptor_id)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	return is_hdmi_adaptor(hdmi_id) &&
 		(adaptor_id == (DP_DUAL_MODE_TYPE_TYPE2 |
 		 DP_DUAL_MODE_TYPE_HAS_DPCD));
@@ -183,6 +189,7 @@ static bool is_lspcon_adaptor(const char hdmi_id[DP_DUAL_MODE_HDMI_ID_LEN],
 enum drm_dp_dual_mode_type drm_dp_dual_mode_detect(const struct drm_device *dev,
 						   struct i2c_adapter *adapter)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	char hdmi_id[DP_DUAL_MODE_HDMI_ID_LEN] = {};
 	uint8_t adaptor_id = 0x00;
 	ssize_t ret;
@@ -268,6 +275,7 @@ EXPORT_SYMBOL(drm_dp_dual_mode_detect);
 int drm_dp_dual_mode_max_tmds_clock(const struct drm_device *dev, enum drm_dp_dual_mode_type type,
 				    struct i2c_adapter *adapter)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	uint8_t max_tmds_clock;
 	ssize_t ret;
 
@@ -314,6 +322,7 @@ int drm_dp_dual_mode_get_tmds_output(const struct drm_device *dev,
 				     enum drm_dp_dual_mode_type type, struct i2c_adapter *adapter,
 				     bool *enabled)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	uint8_t tmds_oen;
 	ssize_t ret;
 
@@ -354,6 +363,7 @@ EXPORT_SYMBOL(drm_dp_dual_mode_get_tmds_output);
 int drm_dp_dual_mode_set_tmds_output(const struct drm_device *dev, enum drm_dp_dual_mode_type type,
 				     struct i2c_adapter *adapter, bool enable)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	uint8_t tmds_oen = enable ? 0 : DP_DUAL_MODE_TMDS_DISABLE;
 	ssize_t ret;
 	int retry;
@@ -405,6 +415,7 @@ EXPORT_SYMBOL(drm_dp_dual_mode_set_tmds_output);
  */
 const char *drm_dp_get_dual_mode_type_name(enum drm_dp_dual_mode_type type)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	switch (type) {
 	case DRM_DP_DUAL_MODE_NONE:
 		return "none";
@@ -439,6 +450,7 @@ EXPORT_SYMBOL(drm_dp_get_dual_mode_type_name);
 int drm_lspcon_get_mode(const struct drm_device *dev, struct i2c_adapter *adapter,
 			enum drm_lspcon_mode *mode)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	u8 data;
 	int ret = 0;
 	int retry;
@@ -486,6 +498,7 @@ EXPORT_SYMBOL(drm_lspcon_get_mode);
 int drm_lspcon_set_mode(const struct drm_device *dev, struct i2c_adapter *adapter,
 			enum drm_lspcon_mode mode)
 {
+    pr_info("drm_dp_dual_mode_helper: called %s\n", __func__);
 	u8 data = 0;
 	int ret;
 	int time_out = 200;

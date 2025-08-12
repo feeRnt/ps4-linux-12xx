@@ -20,6 +20,7 @@
 static unsigned int clip_offset(struct drm_rect *clip,
 				unsigned int pitch, unsigned int cpp)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	return clip->y1 * pitch + clip->x1 * cpp;
 }
 
@@ -36,6 +37,7 @@ static unsigned int clip_offset(struct drm_rect *clip,
 void drm_fb_memcpy(void *dst, void *vaddr, struct drm_framebuffer *fb,
 		   struct drm_rect *clip)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	unsigned int cpp = fb->format->cpp[0];
 	size_t len = (clip->x2 - clip->x1) * cpp;
 	unsigned int y, lines = clip->y2 - clip->y1;
@@ -64,6 +66,7 @@ void drm_fb_memcpy_dstclip(void __iomem *dst, unsigned int dst_pitch,
 			   void *vaddr, struct drm_framebuffer *fb,
 			   struct drm_rect *clip)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	unsigned int cpp = fb->format->cpp[0];
 	unsigned int offset = clip_offset(clip, dst_pitch, cpp);
 	size_t len = (clip->x2 - clip->x1) * cpp;
@@ -96,6 +99,7 @@ EXPORT_SYMBOL(drm_fb_memcpy_dstclip);
 void drm_fb_swab(void *dst, void *src, struct drm_framebuffer *fb,
 		 struct drm_rect *clip, bool cached)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	u8 cpp = fb->format->cpp[0];
 	size_t len = drm_rect_width(clip) * cpp;
 	u16 *src16, *dst16 = dst;
@@ -139,6 +143,7 @@ static void drm_fb_xrgb8888_to_rgb565_line(u16 *dbuf, u32 *sbuf,
 					   unsigned int pixels,
 					   bool swab)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	unsigned int x;
 	u16 val16;
 
@@ -171,6 +176,7 @@ void drm_fb_xrgb8888_to_rgb565(void *dst, void *vaddr,
 			       struct drm_framebuffer *fb,
 			       struct drm_rect *clip, bool swab)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	size_t linepixels = clip->x2 - clip->x1;
 	size_t src_len = linepixels * sizeof(u32);
 	size_t dst_len = linepixels * sizeof(u16);
@@ -216,6 +222,7 @@ void drm_fb_xrgb8888_to_rgb565_dstclip(void __iomem *dst, unsigned int dst_pitch
 				       void *vaddr, struct drm_framebuffer *fb,
 				       struct drm_rect *clip, bool swab)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	size_t linepixels = clip->x2 - clip->x1;
 	size_t dst_len = linepixels * sizeof(u16);
 	unsigned y, lines = clip->y2 - clip->y1;
@@ -241,6 +248,7 @@ EXPORT_SYMBOL(drm_fb_xrgb8888_to_rgb565_dstclip);
 static void drm_fb_xrgb8888_to_rgb888_line(u8 *dbuf, u32 *sbuf,
 					   unsigned int pixels)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	unsigned int x;
 
 	for (x = 0; x < pixels; x++) {
@@ -268,6 +276,7 @@ void drm_fb_xrgb8888_to_rgb888_dstclip(void __iomem *dst, unsigned int dst_pitch
 				       void *vaddr, struct drm_framebuffer *fb,
 				       struct drm_rect *clip)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	size_t linepixels = clip->x2 - clip->x1;
 	size_t dst_len = linepixels * 3;
 	unsigned y, lines = clip->y2 - clip->y1;
@@ -309,6 +318,7 @@ EXPORT_SYMBOL(drm_fb_xrgb8888_to_rgb888_dstclip);
 void drm_fb_xrgb8888_to_gray8(u8 *dst, void *vaddr, struct drm_framebuffer *fb,
 			       struct drm_rect *clip)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	unsigned int len = (clip->x2 - clip->x1) * sizeof(u32);
 	unsigned int x, y;
 	void *buf;
@@ -369,6 +379,7 @@ int drm_fb_blit_rect_dstclip(void __iomem *dst, unsigned int dst_pitch,
 			     struct drm_framebuffer *fb,
 			     struct drm_rect *clip)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	uint32_t fb_format = fb->format->format;
 
 	/* treat alpha channel like filler bits */
@@ -421,6 +432,7 @@ int drm_fb_blit_dstclip(void __iomem *dst, unsigned int dst_pitch,
 			uint32_t dst_format, void *vmap,
 			struct drm_framebuffer *fb)
 {
+    pr_info("drm_format_helper: called %s\n", __func__);
 	struct drm_rect fullscreen = {
 		.x1 = 0,
 		.x2 = fb->width,

@@ -84,6 +84,7 @@
  */
 struct drm_crtc *drm_crtc_from_index(struct drm_device *dev, int idx)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_crtc *crtc;
 
 	drm_for_each_crtc(crtc, dev)
@@ -96,6 +97,7 @@ EXPORT_SYMBOL(drm_crtc_from_index);
 
 int drm_crtc_force_disable(struct drm_crtc *crtc)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_mode_set set = {
 		.crtc = crtc,
 	};
@@ -107,6 +109,7 @@ int drm_crtc_force_disable(struct drm_crtc *crtc)
 
 static unsigned int drm_num_crtcs(struct drm_device *dev)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	unsigned int num = 0;
 	struct drm_crtc *tmp;
 
@@ -119,6 +122,7 @@ static unsigned int drm_num_crtcs(struct drm_device *dev)
 
 int drm_crtc_register_all(struct drm_device *dev)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	int ret = 0;
 
@@ -136,6 +140,7 @@ int drm_crtc_register_all(struct drm_device *dev)
 
 void drm_crtc_unregister_all(struct drm_device *dev)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_crtc *crtc;
 
 	drm_for_each_crtc(crtc, dev) {
@@ -147,6 +152,7 @@ void drm_crtc_unregister_all(struct drm_device *dev)
 
 static int drm_crtc_crc_init(struct drm_crtc *crtc)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 #ifdef CONFIG_DEBUG_FS
 	spin_lock_init(&crtc->crc.lock);
 	init_waitqueue_head(&crtc->crc.wq);
@@ -159,6 +165,7 @@ static int drm_crtc_crc_init(struct drm_crtc *crtc)
 
 static void drm_crtc_crc_fini(struct drm_crtc *crtc)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 #ifdef CONFIG_DEBUG_FS
 	kfree(crtc->crc.source);
 #endif
@@ -168,12 +175,14 @@ static const struct dma_fence_ops drm_crtc_fence_ops;
 
 static struct drm_crtc *fence_to_crtc(struct dma_fence *fence)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	BUG_ON(fence->ops != &drm_crtc_fence_ops);
 	return container_of(fence->lock, struct drm_crtc, fence_lock);
 }
 
 static const char *drm_crtc_fence_get_driver_name(struct dma_fence *fence)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_crtc *crtc = fence_to_crtc(fence);
 
 	return crtc->dev->driver->name;
@@ -181,6 +190,7 @@ static const char *drm_crtc_fence_get_driver_name(struct dma_fence *fence)
 
 static const char *drm_crtc_fence_get_timeline_name(struct dma_fence *fence)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_crtc *crtc = fence_to_crtc(fence);
 
 	return crtc->timeline_name;
@@ -193,6 +203,7 @@ static const struct dma_fence_ops drm_crtc_fence_ops = {
 
 struct dma_fence *drm_crtc_create_fence(struct drm_crtc *crtc)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct dma_fence *fence;
 
 	fence = kzalloc(sizeof(*fence), GFP_KERNEL);
@@ -248,6 +259,7 @@ static int __drm_crtc_init_with_planes(struct drm_device *dev, struct drm_crtc *
 				       const struct drm_crtc_funcs *funcs,
 				       const char *name, va_list ap)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_mode_config *config = &dev->mode_config;
 	int ret;
 
@@ -354,6 +366,7 @@ int drm_crtc_init_with_planes(struct drm_device *dev, struct drm_crtc *crtc,
 			      const struct drm_crtc_funcs *funcs,
 			      const char *name, ...)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	va_list ap;
 	int ret;
 
@@ -371,6 +384,7 @@ EXPORT_SYMBOL(drm_crtc_init_with_planes);
 static void drmm_crtc_alloc_with_planes_cleanup(struct drm_device *dev,
 						void *ptr)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_crtc *crtc = ptr;
 
 	drm_crtc_cleanup(crtc);
@@ -383,6 +397,7 @@ void *__drmm_crtc_alloc_with_planes(struct drm_device *dev,
 				    const struct drm_crtc_funcs *funcs,
 				    const char *name, ...)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	void *container;
 	struct drm_crtc *crtc;
 	va_list ap;
@@ -423,6 +438,7 @@ EXPORT_SYMBOL(__drmm_crtc_alloc_with_planes);
  */
 void drm_crtc_cleanup(struct drm_crtc *crtc)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 
 	/* Note that the crtc_list is considered to be static; should we
@@ -467,6 +483,7 @@ EXPORT_SYMBOL(drm_crtc_cleanup);
 int drm_mode_getcrtc(struct drm_device *dev,
 		     void *data, struct drm_file *file_priv)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_mode_crtc *crtc_resp = data;
 	struct drm_crtc *crtc;
 	struct drm_plane *plane;
@@ -526,6 +543,7 @@ int drm_mode_getcrtc(struct drm_device *dev,
 static int __drm_mode_set_config_internal(struct drm_mode_set *set,
 					  struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_crtc *crtc = set->crtc;
 	struct drm_framebuffer *fb;
 	struct drm_crtc *tmp;
@@ -582,6 +600,7 @@ static int __drm_mode_set_config_internal(struct drm_mode_set *set,
  */
 int drm_mode_set_config_internal(struct drm_mode_set *set)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	WARN_ON(drm_drv_uses_atomic_modeset(set->crtc->dev));
 
 	return __drm_mode_set_config_internal(set, NULL);
@@ -603,6 +622,7 @@ int drm_crtc_check_viewport(const struct drm_crtc *crtc,
 			    const struct drm_framebuffer *fb)
 
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	int hdisplay, vdisplay;
 
 	drm_mode_get_hv_timing(mode, &hdisplay, &vdisplay);
@@ -633,6 +653,7 @@ EXPORT_SYMBOL(drm_crtc_check_viewport);
 int drm_mode_setcrtc(struct drm_device *dev, void *data,
 		     struct drm_file *file_priv)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_mode_config *config = &dev->mode_config;
 	struct drm_mode_crtc *crtc_req = data;
 	struct drm_crtc *crtc;
@@ -842,6 +863,7 @@ int drm_mode_crtc_set_obj_prop(struct drm_mode_object *obj,
 			       struct drm_property *property,
 			       uint64_t value)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	int ret = -EINVAL;
 	struct drm_crtc *crtc = obj_to_crtc(obj);
 
@@ -870,6 +892,7 @@ int drm_mode_crtc_set_obj_prop(struct drm_mode_object *obj,
 int drm_crtc_create_scaling_filter_property(struct drm_crtc *crtc,
 					    unsigned int supported_filters)
 {
+    pr_info("drm_crtc: called %s\n", __func__);
 	struct drm_property *prop =
 		drm_create_scaling_filter_prop(crtc->dev, supported_filters);
 

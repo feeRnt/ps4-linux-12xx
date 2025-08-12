@@ -56,6 +56,7 @@ module_param_named(debug, __drm_debug, int, 0600);
 
 void __drm_puts_coredump(struct drm_printer *p, const char *str)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	struct drm_print_iterator *iterator = p->arg;
 	ssize_t len;
 
@@ -98,6 +99,7 @@ EXPORT_SYMBOL(__drm_puts_coredump);
 
 void __drm_printfn_coredump(struct drm_printer *p, struct va_format *vaf)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	struct drm_print_iterator *iterator = p->arg;
 	size_t len;
 	char *buf;
@@ -144,30 +146,35 @@ EXPORT_SYMBOL(__drm_printfn_coredump);
 
 void __drm_puts_seq_file(struct drm_printer *p, const char *str)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	seq_puts(p->arg, str);
 }
 EXPORT_SYMBOL(__drm_puts_seq_file);
 
 void __drm_printfn_seq_file(struct drm_printer *p, struct va_format *vaf)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	seq_printf(p->arg, "%pV", vaf);
 }
 EXPORT_SYMBOL(__drm_printfn_seq_file);
 
 void __drm_printfn_info(struct drm_printer *p, struct va_format *vaf)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	dev_info(p->arg, "[" DRM_NAME "] %pV", vaf);
 }
 EXPORT_SYMBOL(__drm_printfn_info);
 
 void __drm_printfn_debug(struct drm_printer *p, struct va_format *vaf)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	pr_debug("%s %pV", p->prefix, vaf);
 }
 EXPORT_SYMBOL(__drm_printfn_debug);
 
 void __drm_printfn_err(struct drm_printer *p, struct va_format *vaf)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	pr_err("*ERROR* %s %pV", p->prefix, vaf);
 }
 EXPORT_SYMBOL(__drm_printfn_err);
@@ -182,6 +189,7 @@ EXPORT_SYMBOL(__drm_printfn_err);
  */
 void drm_puts(struct drm_printer *p, const char *str)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	if (p->puts)
 		p->puts(p, str);
 	else
@@ -196,6 +204,7 @@ EXPORT_SYMBOL(drm_puts);
  */
 void drm_printf(struct drm_printer *p, const char *f, ...)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	va_list args;
 
 	va_start(args, f);
@@ -217,6 +226,7 @@ EXPORT_SYMBOL(drm_printf);
 void drm_print_bits(struct drm_printer *p, unsigned long value,
 		    const char * const bits[], unsigned int nbits)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	bool first = true;
 	unsigned int i;
 
@@ -238,6 +248,7 @@ EXPORT_SYMBOL(drm_print_bits);
 void drm_dev_printk(const struct device *dev, const char *level,
 		    const char *format, ...)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	struct va_format vaf;
 	va_list args;
 
@@ -259,6 +270,7 @@ EXPORT_SYMBOL(drm_dev_printk);
 void drm_dev_dbg(const struct device *dev, enum drm_debug_category category,
 		 const char *format, ...)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	struct va_format vaf;
 	va_list args;
 
@@ -282,6 +294,7 @@ EXPORT_SYMBOL(drm_dev_dbg);
 
 void __drm_dbg(enum drm_debug_category category, const char *format, ...)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	struct va_format vaf;
 	va_list args;
 
@@ -301,6 +314,7 @@ EXPORT_SYMBOL(__drm_dbg);
 
 void __drm_err(const char *format, ...)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	struct va_format vaf;
 	va_list args;
 
@@ -329,6 +343,7 @@ EXPORT_SYMBOL(__drm_err);
  */
 void drm_print_regset32(struct drm_printer *p, struct debugfs_regset32 *regset)
 {
+    pr_info("drm_print: called %s\n", __func__);
 	int namelen = 0;
 	int i;
 

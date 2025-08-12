@@ -69,6 +69,7 @@
 #if IS_ENABLED(CONFIG_DRM_LEGACY)
 static int drm_legacy_irq_install(struct drm_device *dev, int irq)
 {
+    pr_info("drm_irq: called %s\n", __func__);
 	int ret;
 	unsigned long sh_flags = 0;
 
@@ -115,6 +116,7 @@ static int drm_legacy_irq_install(struct drm_device *dev, int irq)
 
 int drm_legacy_irq_uninstall(struct drm_device *dev)
 {
+    pr_info("drm_irq: called %s\n", __func__);
 	unsigned long irqflags;
 	bool irq_enabled;
 	int i;
@@ -164,6 +166,7 @@ EXPORT_SYMBOL(drm_legacy_irq_uninstall);
 int drm_legacy_irq_control(struct drm_device *dev, void *data,
 			   struct drm_file *file_priv)
 {
+    pr_info("drm_irq: called %s\n", __func__);
 	struct drm_control *ctl = data;
 	int ret = 0, irq;
 	struct pci_dev *pdev;

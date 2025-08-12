@@ -36,6 +36,7 @@
  */
 struct drm_flip_task *drm_flip_work_allocate_task(void *data, gfp_t flags)
 {
+    pr_info("drm_flip_work: called %s\n", __func__);
 	struct drm_flip_task *task;
 
 	task = kzalloc(sizeof(*task), flags);
@@ -57,6 +58,7 @@ EXPORT_SYMBOL(drm_flip_work_allocate_task);
 void drm_flip_work_queue_task(struct drm_flip_work *work,
 			      struct drm_flip_task *task)
 {
+    pr_info("drm_flip_work: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&work->lock, flags);
@@ -75,6 +77,7 @@ EXPORT_SYMBOL(drm_flip_work_queue_task);
  */
 void drm_flip_work_queue(struct drm_flip_work *work, void *val)
 {
+    pr_info("drm_flip_work: called %s\n", __func__);
 	struct drm_flip_task *task;
 
 	task = drm_flip_work_allocate_task(val,
@@ -101,6 +104,7 @@ EXPORT_SYMBOL(drm_flip_work_queue);
 void drm_flip_work_commit(struct drm_flip_work *work,
 		struct workqueue_struct *wq)
 {
+    pr_info("drm_flip_work: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&work->lock, flags);
@@ -113,6 +117,7 @@ EXPORT_SYMBOL(drm_flip_work_commit);
 
 static void flip_worker(struct work_struct *w)
 {
+    pr_info("drm_flip_work: called %s\n", __func__);
 	struct drm_flip_work *work = container_of(w, struct drm_flip_work, worker);
 	struct list_head tasks;
 	unsigned long flags;
@@ -147,6 +152,7 @@ static void flip_worker(struct work_struct *w)
 void drm_flip_work_init(struct drm_flip_work *work,
 		const char *name, drm_flip_func_t func)
 {
+    pr_info("drm_flip_work: called %s\n", __func__);
 	work->name = name;
 	INIT_LIST_HEAD(&work->queued);
 	INIT_LIST_HEAD(&work->commited);
@@ -165,6 +171,7 @@ EXPORT_SYMBOL(drm_flip_work_init);
  */
 void drm_flip_work_cleanup(struct drm_flip_work *work)
 {
+    pr_info("drm_flip_work: called %s\n", __func__);
 	WARN_ON(!list_empty(&work->queued) || !list_empty(&work->commited));
 }
 EXPORT_SYMBOL(drm_flip_work_cleanup);

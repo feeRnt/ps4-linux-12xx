@@ -33,6 +33,7 @@
  */
 static int dp_aux_ep_match(struct device *dev, struct device_driver *drv)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	return !!of_match_device(drv->of_match_table, dev);
 }
 
@@ -46,6 +47,7 @@ static int dp_aux_ep_match(struct device *dev, struct device_driver *drv)
  */
 static int dp_aux_ep_probe(struct device *dev)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	struct dp_aux_ep_driver *aux_ep_drv = to_dp_aux_ep_drv(dev->driver);
 	struct dp_aux_ep_device *aux_ep = to_dp_aux_ep_dev(dev);
 	int ret;
@@ -70,6 +72,7 @@ static int dp_aux_ep_probe(struct device *dev)
  */
 static void dp_aux_ep_remove(struct device *dev)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	struct dp_aux_ep_driver *aux_ep_drv = to_dp_aux_ep_drv(dev->driver);
 	struct dp_aux_ep_device *aux_ep = to_dp_aux_ep_dev(dev);
 
@@ -86,6 +89,7 @@ static void dp_aux_ep_remove(struct device *dev)
  */
 static void dp_aux_ep_shutdown(struct device *dev)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	struct dp_aux_ep_driver *aux_ep_drv;
 
 	if (!dev->driver)
@@ -107,6 +111,7 @@ static struct bus_type dp_aux_bus_type = {
 static ssize_t modalias_show(struct device *dev,
 			     struct device_attribute *attr, char *buf)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	return of_device_modalias(dev, buf, PAGE_SIZE);
 }
 static DEVICE_ATTR_RO(modalias);
@@ -125,6 +130,7 @@ ATTRIBUTE_GROUPS(dp_aux_ep_dev);
  */
 static void dp_aux_ep_dev_release(struct device *dev)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	kfree(to_dp_aux_ep_dev(dev));
 }
 
@@ -150,6 +156,7 @@ static struct device_type dp_aux_device_type_type = {
  */
 static int of_dp_aux_ep_destroy(struct device *dev, void *data)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	struct device_node *np = dev->of_node;
 
 	if (dev->bus != &dp_aux_bus_type)
@@ -175,6 +182,7 @@ static int of_dp_aux_ep_destroy(struct device *dev, void *data)
  */
 void of_dp_aux_depopulate_ep_devices(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	device_for_each_child_reverse(aux->dev, NULL, of_dp_aux_ep_destroy);
 }
 EXPORT_SYMBOL_GPL(of_dp_aux_depopulate_ep_devices);
@@ -203,6 +211,7 @@ EXPORT_SYMBOL_GPL(of_dp_aux_depopulate_ep_devices);
  */
 int of_dp_aux_populate_ep_devices(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	struct device_node *bus, *np;
 	struct dp_aux_ep_device *aux_ep;
 	int ret;
@@ -259,6 +268,7 @@ int of_dp_aux_populate_ep_devices(struct drm_dp_aux *aux)
 
 static void of_dp_aux_depopulate_ep_devices_void(void *data)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	of_dp_aux_depopulate_ep_devices(data);
 }
 
@@ -272,6 +282,7 @@ static void of_dp_aux_depopulate_ep_devices_void(void *data)
  */
 int devm_of_dp_aux_populate_ep_devices(struct drm_dp_aux *aux)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	int ret;
 
 	ret = of_dp_aux_populate_ep_devices(aux);
@@ -286,6 +297,7 @@ EXPORT_SYMBOL_GPL(devm_of_dp_aux_populate_ep_devices);
 
 int __dp_aux_dp_driver_register(struct dp_aux_ep_driver *drv, struct module *owner)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	drv->driver.owner = owner;
 	drv->driver.bus = &dp_aux_bus_type;
 
@@ -295,12 +307,14 @@ EXPORT_SYMBOL_GPL(__dp_aux_dp_driver_register);
 
 void dp_aux_dp_driver_unregister(struct dp_aux_ep_driver *drv)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	driver_unregister(&drv->driver);
 }
 EXPORT_SYMBOL_GPL(dp_aux_dp_driver_unregister);
 
 static int __init dp_aux_bus_init(void)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	int ret;
 
 	ret = bus_register(&dp_aux_bus_type);
@@ -312,6 +326,7 @@ static int __init dp_aux_bus_init(void)
 
 static void __exit dp_aux_bus_exit(void)
 {
+    pr_info("drm_dp_aux_bus: called %s\n", __func__);
 	bus_unregister(&dp_aux_bus_type);
 }
 

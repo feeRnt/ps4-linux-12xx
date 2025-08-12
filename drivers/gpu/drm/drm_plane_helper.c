@@ -72,6 +72,7 @@ static int get_connectors_for_crtc(struct drm_crtc *crtc,
 				   struct drm_connector **connector_list,
 				   int num_connectors)
 {
+    pr_info("drm_plane_helper: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
@@ -110,6 +111,7 @@ static int drm_plane_helper_check_update(struct drm_plane *plane,
 					 bool can_update_disabled,
 					 bool *visible)
 {
+    pr_info("drm_plane_helper: called %s\n", __func__);
 	struct drm_plane_state plane_state = {
 		.plane = plane,
 		.crtc = crtc,
@@ -153,6 +155,7 @@ static int drm_primary_helper_update(struct drm_plane *plane, struct drm_crtc *c
 				     uint32_t src_w, uint32_t src_h,
 				     struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_plane_helper: called %s\n", __func__);
 	struct drm_mode_set set = {
 		.crtc = crtc,
 		.fb = fb,
@@ -222,6 +225,7 @@ static int drm_primary_helper_update(struct drm_plane *plane, struct drm_crtc *c
 static int drm_primary_helper_disable(struct drm_plane *plane,
 				      struct drm_modeset_acquire_ctx *ctx)
 {
+    pr_info("drm_plane_helper: called %s\n", __func__);
 	return -EINVAL;
 }
 
@@ -235,6 +239,7 @@ static int drm_primary_helper_disable(struct drm_plane *plane,
  */
 void drm_primary_helper_destroy(struct drm_plane *plane)
 {
+    pr_info("drm_plane_helper: called %s\n", __func__);
 	drm_plane_cleanup(plane);
 	kfree(plane);
 }
