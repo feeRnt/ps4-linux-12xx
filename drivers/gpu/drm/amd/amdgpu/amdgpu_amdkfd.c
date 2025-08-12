@@ -188,7 +188,8 @@ void amdgpu_amdkfd_device_fini_sw(struct amdgpu_device *adev)
 void amdgpu_amdkfd_interrupt(struct amdgpu_device *adev,
 		const void *ih_ring_entry)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
+    //pr_info("amdgpu_amdkfd: called %s\n", __func__);
+    // possibly excess logging
 	if (adev->kfd.dev)
 		kgd2kfd_interrupt(adev->kfd.dev, ih_ring_entry);
 }

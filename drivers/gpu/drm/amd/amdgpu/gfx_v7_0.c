@@ -3810,7 +3810,8 @@ static int gfx_v7_0_cp_load_microcode(struct amdgpu_device *adev)
 static void gfx_v7_0_enable_gui_idle_interrupt(struct amdgpu_device *adev,
 					       bool enable)
 {
-    pr_info("gfx_v7_0: called %s\n", __func__);
+        //pr_info("gfx_v7_0: called %s\n", __func__);
+	//excessive logs
 	u32 tmp = RREG32(mmCP_INT_CNTL_RING0);
 
 	if (enable)

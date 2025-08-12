@@ -1336,7 +1336,8 @@ static int gmc_v7_0_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
+   	// pr_info("gmc_v7_0: called %s\n", __func__);
+	// excessive logs
 	u32 addr, status, mc_client, vmid;
 
 	addr = RREG32(mmVM_CONTEXT1_PROTECTION_FAULT_ADDR);

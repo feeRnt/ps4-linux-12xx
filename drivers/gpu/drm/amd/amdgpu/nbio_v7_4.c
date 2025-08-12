@@ -639,7 +639,7 @@ static void nbio_v7_4_query_ras_error_count(struct amdgpu_device *adev,
 static void nbio_v7_4_enable_doorbell_interrupt(struct amdgpu_device *adev,
 						bool enable)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
+        //pr_info("nbio_v7_4: called %s\n", __func__);
 	if (adev->asic_type == CHIP_ALDEBARAN)
 		WREG32_FIELD15(NBIO, 0, BIF_DOORBELL_INT_CNTL_ALDE,
 		       DOORBELL_INTERRUPT_DISABLE, enable ? 0 : 1);

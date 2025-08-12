@@ -722,7 +722,7 @@ static int uvd_v4_2_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
-    pr_info("uvd_v4_2: called %s\n", __func__);
+    	//pr_info("uvd_v4_2: called %s\n", __func__);
 	DRM_DEBUG("IH: UVD TRAP\n");
 	amdgpu_fence_process(&adev->uvd.inst->ring);
 	return 0;

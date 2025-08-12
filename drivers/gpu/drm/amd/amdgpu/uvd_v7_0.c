@@ -1614,7 +1614,7 @@ static int uvd_v7_0_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
+        //pr_info("uvd_v7_0: called %s\n", __func__);
 	uint32_t ip_instance;
 
 	switch (entry->client_id) {

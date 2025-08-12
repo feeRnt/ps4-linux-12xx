@@ -67,7 +67,8 @@ static void convert_clip_rect_to_rect(const struct drm_clip_rect *src,
 void drm_atomic_helper_check_plane_damage(struct drm_atomic_state *state,
 					  struct drm_plane_state *plane_state)
 {
-    pr_info("drm_damage_helper: called %s\n", __func__);
+    	//pr_info("drm_damage_helper: called %s\n", __func__);
+    	//too much logging. It is run on a loop for plane output damages
 	struct drm_crtc_state *crtc_state;
 
 	if (plane_state->crtc) {
@@ -226,7 +227,8 @@ drm_atomic_helper_damage_iter_init(struct drm_atomic_helper_damage_iter *iter,
 				   const struct drm_plane_state *old_state,
 				   const struct drm_plane_state *state)
 {
-    pr_info("drm_damage_helper: called %s\n", __func__);
+    //pr_info("drm_damage_helper: called %s\n", __func__);
+    //excessive logging
 	memset(iter, 0, sizeof(*iter));
 
 	if (!state || !state->crtc || !state->fb || !state->visible)
@@ -269,7 +271,7 @@ bool
 drm_atomic_helper_damage_iter_next(struct drm_atomic_helper_damage_iter *iter,
 				   struct drm_rect *rect)
 {
-    pr_info("drm_damage_helper: called %s\n", __func__);
+    //pr_info("drm_damage_helper: called %s\n", __func__);
 	bool ret = false;
 
 	if (iter->full_update) {
@@ -311,7 +313,7 @@ bool drm_atomic_helper_damage_merged(const struct drm_plane_state *old_state,
 				     struct drm_plane_state *state,
 				     struct drm_rect *rect)
 {
-    pr_info("drm_damage_helper: called %s\n", __func__);
+    //pr_info("drm_damage_helper: called %s\n", __func__);
 	struct drm_atomic_helper_damage_iter iter;
 	struct drm_rect clip;
 	bool valid = false;

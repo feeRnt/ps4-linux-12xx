@@ -584,7 +584,7 @@ static int vce_v2_0_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
+        //pr_info("vce_v2_0: called %s\n", __func__);
 	DRM_DEBUG("IH: VCE\n");
 	switch (entry->src_data[0]) {
 	case 0:

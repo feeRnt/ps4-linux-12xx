@@ -769,7 +769,7 @@ static int jpeg_v2_0_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
-    pr_info("jpeg_v2_0: called %s\n", __func__);
+ 	//pr_info("jpeg_v2_0: called %s\n", __func__);
 	DRM_DEBUG("IH: JPEG TRAP\n");
 
 	switch (entry->src_id) {

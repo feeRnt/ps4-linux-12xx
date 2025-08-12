@@ -533,7 +533,7 @@ static void nbio_v2_3_apply_l1_link_width_reconfig_wa(struct amdgpu_device *adev
 
 static void nbio_v2_3_clear_doorbell_interrupt(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
+        //pr_info("nbio_v2_3: called %s\n", __func__);
 	uint32_t reg, reg_data;
 
 	if (adev->asic_type != CHIP_SIENNA_CICHLID)
