@@ -48,7 +48,6 @@
 void psp_securedisplay_parse_resp_status(struct psp_context *psp,
 	enum ta_securedisplay_status status)
 {
-    pr_info("amdgpu_securedisplay: called %s\n", __func__);
 	switch (status) {
 	case TA_SECUREDISPLAY_STATUS__SUCCESS:
 		break;
@@ -81,7 +80,6 @@ void psp_securedisplay_parse_resp_status(struct psp_context *psp,
 void psp_prep_securedisplay_cmd_buf(struct psp_context *psp, struct securedisplay_cmd **cmd,
 	enum ta_securedisplay_command command_id)
 {
-    pr_info("amdgpu_securedisplay: called %s\n", __func__);
 	*cmd = (struct securedisplay_cmd *)psp->securedisplay_context.context.mem_context.shared_buf;
 	memset(*cmd, 0, sizeof(struct securedisplay_cmd));
 	(*cmd)->status = TA_SECUREDISPLAY_STATUS__GENERIC_FAILURE;
@@ -93,7 +91,6 @@ void psp_prep_securedisplay_cmd_buf(struct psp_context *psp, struct securedispla
 static ssize_t amdgpu_securedisplay_debugfs_write(struct file *f, const char __user *buf,
 		size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_securedisplay: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)file_inode(f)->i_private;
 	struct psp_context *psp = &adev->psp;
 	struct securedisplay_cmd *securedisplay_cmd;
@@ -171,7 +168,6 @@ static const struct file_operations amdgpu_securedisplay_debugfs_ops = {
 
 void amdgpu_securedisplay_debugfs_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_securedisplay: called %s\n", __func__);
 #if defined(CONFIG_DEBUG_FS)
 
 	if (!adev->psp.securedisplay_context.context.initialized)

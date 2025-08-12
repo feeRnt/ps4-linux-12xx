@@ -130,7 +130,6 @@ static const struct amdgpu_video_codecs cik_video_codecs_decode =
 static int cik_query_video_codecs(struct amdgpu_device *adev, bool encode,
 				  const struct amdgpu_video_codecs **codecs)
 {
-    pr_info("cik: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_BONAIRE:
 	case CHIP_HAWAII:
@@ -154,7 +153,6 @@ static int cik_query_video_codecs(struct amdgpu_device *adev, bool encode,
  */
 static u32 cik_pcie_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("cik: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -168,7 +166,6 @@ static u32 cik_pcie_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void cik_pcie_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("cik: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
@@ -181,7 +178,6 @@ static void cik_pcie_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 cik_smc_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("cik: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -194,7 +190,6 @@ static u32 cik_smc_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void cik_smc_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("cik: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->smc_idx_lock, flags);
@@ -205,7 +200,6 @@ static void cik_smc_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 cik_uvd_ctx_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("cik: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -218,7 +212,6 @@ static u32 cik_uvd_ctx_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void cik_uvd_ctx_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("cik: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->uvd_ctx_idx_lock, flags);
@@ -229,7 +222,6 @@ static void cik_uvd_ctx_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 cik_didt_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("cik: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -242,7 +234,6 @@ static u32 cik_didt_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void cik_didt_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("cik: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->didt_idx_lock, flags);
@@ -1037,10 +1028,10 @@ static const u32 godavari_golden_registers[] =
 
 static void cik_init_golden_registers(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	/* Some of the registers might be dependent on GRBM_GFX_INDEX */
 	mutex_lock(&adev->grbm_idx_mutex);
 
+	pr_info("cik: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_BONAIRE:
 		amdgpu_device_program_register_sequence(adev,
@@ -1156,7 +1147,6 @@ static void cik_init_golden_registers(struct amdgpu_device *adev)
  */
 static u32 cik_get_xclk(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	u32 reference_clock = adev->clock.spll.reference_freq;
 
 	if (adev->flags & AMD_IS_APU) {
@@ -1185,7 +1175,6 @@ static u32 cik_get_xclk(struct amdgpu_device *adev)
 void cik_srbm_select(struct amdgpu_device *adev,
 		     u32 me, u32 pipe, u32 queue, u32 vmid)
 {
-    pr_info("cik: called %s\n", __func__);
 	u32 srbm_gfx_cntl =
 		(((pipe << SRBM_GFX_CNTL__PIPEID__SHIFT) & SRBM_GFX_CNTL__PIPEID_MASK)|
 		((me << SRBM_GFX_CNTL__MEID__SHIFT) & SRBM_GFX_CNTL__MEID_MASK)|
@@ -1196,7 +1185,6 @@ void cik_srbm_select(struct amdgpu_device *adev,
 
 static void cik_vga_set_state(struct amdgpu_device *adev, bool state)
 {
-    pr_info("cik: called %s\n", __func__);
 	uint32_t tmp;
 
 	tmp = RREG32(mmCONFIG_CNTL);
@@ -1209,7 +1197,6 @@ static void cik_vga_set_state(struct amdgpu_device *adev, bool state)
 
 static bool cik_read_disabled_bios(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	u32 bus_cntl;
 	u32 d1vga_control = 0;
 	u32 d2vga_control = 0;
@@ -1256,7 +1243,6 @@ static bool cik_read_disabled_bios(struct amdgpu_device *adev)
 static bool cik_read_bios_from_rom(struct amdgpu_device *adev,
 				   u8 *bios, u32 length_bytes)
 {
-    pr_info("cik: called %s\n", __func__);
 	u32 *dw_ptr;
 	unsigned long flags;
 	u32 i, length_dw;
@@ -1368,7 +1354,6 @@ static uint32_t cik_get_register_value(struct amdgpu_device *adev,
 				       bool indexed, u32 se_num,
 				       u32 sh_num, u32 reg_offset)
 {
-    pr_info("cik: called %s\n", __func__);
 	if (indexed) {
 		uint32_t val;
 		unsigned se_idx = (se_num == 0xffffffff) ? 0 : se_num;
@@ -1464,7 +1449,6 @@ static uint32_t cik_get_register_value(struct amdgpu_device *adev,
 static int cik_read_register(struct amdgpu_device *adev, u32 se_num,
 			     u32 sh_num, u32 reg_offset, u32 *value)
 {
-    pr_info("cik: called %s\n", __func__);
 	uint32_t i;
 
 	*value = 0;
@@ -1490,7 +1474,6 @@ struct kv_reset_save_regs {
 static void kv_save_regs_for_reset(struct amdgpu_device *adev,
 				   struct kv_reset_save_regs *save)
 {
-    pr_info("cik: called %s\n", __func__);
 	save->gmcon_reng_execute = RREG32(mmGMCON_RENG_EXECUTE);
 	save->gmcon_misc = RREG32(mmGMCON_MISC);
 	save->gmcon_misc3 = RREG32(mmGMCON_MISC3);
@@ -1505,7 +1488,6 @@ static void kv_save_regs_for_reset(struct amdgpu_device *adev,
 static void kv_restore_regs_for_reset(struct amdgpu_device *adev,
 				      struct kv_reset_save_regs *save)
 {
-    pr_info("cik: called %s\n", __func__);
 	int i;
 
 	WREG32(mmGMCON_PGFSM_WRITE, 0);
@@ -1587,7 +1569,6 @@ static void kv_restore_regs_for_reset(struct amdgpu_device *adev,
  */
 static int cik_asic_pci_config_reset(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	struct kv_reset_save_regs kv_save = { 0 };
 	u32 i;
 	int r = -EINVAL;
@@ -1627,7 +1608,6 @@ static int cik_asic_pci_config_reset(struct amdgpu_device *adev)
 
 static bool cik_asic_supports_baco(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_BONAIRE:
 	case CHIP_HAWAII:
@@ -1640,7 +1620,6 @@ static bool cik_asic_supports_baco(struct amdgpu_device *adev)
 static enum amd_reset_method
 cik_asic_reset_method(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	bool baco_reset;
 
 	if (amdgpu_reset_method == AMD_RESET_METHOD_LEGACY ||
@@ -1678,7 +1657,6 @@ cik_asic_reset_method(struct amdgpu_device *adev)
  */
 static int cik_asic_reset(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	int r;
 
 	if (cik_asic_reset_method(adev) == AMD_RESET_METHOD_BACO) {
@@ -1694,14 +1672,12 @@ static int cik_asic_reset(struct amdgpu_device *adev)
 
 static u32 cik_get_config_memsize(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	return RREG32(mmCONFIG_MEMSIZE);
 }
 
 static int cik_set_uvd_clock(struct amdgpu_device *adev, u32 clock,
 			      u32 cntl_reg, u32 status_reg)
 {
-    pr_info("cik: called %s\n", __func__);
 	int r, i;
 	struct atom_clock_dividers dividers;
 	uint32_t tmp;
@@ -1731,7 +1707,6 @@ static int cik_set_uvd_clock(struct amdgpu_device *adev, u32 clock,
 
 static int cik_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 {
-    pr_info("cik: called %s\n", __func__);
 	int r = 0;
 
 	r = cik_set_uvd_clock(adev, vclk, ixCG_VCLK_CNTL, ixCG_VCLK_STATUS);
@@ -1744,7 +1719,6 @@ static int cik_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 
 static int cik_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk)
 {
-    pr_info("cik: called %s\n", __func__);
 	int r, i;
 	struct atom_clock_dividers dividers;
 	u32 tmp;
@@ -1782,7 +1756,6 @@ static int cik_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk)
 
 static void cik_pcie_gen3_enable(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	struct pci_dev *root = adev->pdev->bus->self;
 	u32 speed_cntl, current_data_rate;
 	int i;
@@ -1969,7 +1942,6 @@ static void cik_pcie_gen3_enable(struct amdgpu_device *adev)
 
 static void cik_program_aspm(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	u32 data, orig;
 	bool disable_l0s = false, disable_l1 = false, disable_plloff_in_l1 = false;
 	bool disable_clkreq = false;
@@ -2137,14 +2109,12 @@ static void cik_program_aspm(struct amdgpu_device *adev)
 
 static uint32_t cik_get_rev_id(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	return (RREG32(mmCC_DRM_ID_STRAPS) & CC_DRM_ID_STRAPS__ATI_REV_ID_MASK)
 		>> CC_DRM_ID_STRAPS__ATI_REV_ID__SHIFT;
 }
 
 static void cik_flush_hdp(struct amdgpu_device *adev, struct amdgpu_ring *ring)
 {
-    pr_info("cik: called %s\n", __func__);
 	if (!ring || !ring->funcs->emit_wreg) {
 		WREG32(mmHDP_MEM_COHERENCY_FLUSH_CNTL, 1);
 		RREG32(mmHDP_MEM_COHERENCY_FLUSH_CNTL);
@@ -2156,7 +2126,6 @@ static void cik_flush_hdp(struct amdgpu_device *adev, struct amdgpu_ring *ring)
 static void cik_invalidate_hdp(struct amdgpu_device *adev,
 			       struct amdgpu_ring *ring)
 {
-    pr_info("cik: called %s\n", __func__);
 	if (!ring || !ring->funcs->emit_wreg) {
 		WREG32(mmHDP_DEBUG0, 1);
 		RREG32(mmHDP_DEBUG0);
@@ -2167,7 +2136,6 @@ static void cik_invalidate_hdp(struct amdgpu_device *adev,
 
 static bool cik_need_full_reset(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	/* change this when we support soft reset */
 	return true;
 }
@@ -2175,7 +2143,6 @@ static bool cik_need_full_reset(struct amdgpu_device *adev)
 static void cik_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 			       uint64_t *count1)
 {
-    pr_info("cik: called %s\n", __func__);
 	uint32_t perfctr = 0;
 	uint64_t cnt0_of, cnt1_of;
 	int tmp;
@@ -2221,7 +2188,6 @@ static void cik_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 
 static bool cik_need_reset_on_init(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	u32 clock_cntl, pc;
 
 	if (adev->flags & AMD_IS_APU)
@@ -2239,7 +2205,6 @@ static bool cik_need_reset_on_init(struct amdgpu_device *adev)
 
 static uint64_t cik_get_pcie_replay_count(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	uint64_t nak_r, nak_g;
 
 	/* Get the number of NAKs received and generated */
@@ -2252,7 +2217,6 @@ static uint64_t cik_get_pcie_replay_count(struct amdgpu_device *adev)
 
 static void cik_pre_asic_init(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 }
 
 static const struct amdgpu_asic_funcs cik_asic_funcs =
@@ -2281,7 +2245,6 @@ static const struct amdgpu_asic_funcs cik_asic_funcs =
 
 static int cik_common_early_init(void *handle)
 {
-    pr_info("cik: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	adev->smc_rreg = &cik_smc_rreg;
@@ -2478,19 +2441,16 @@ static int cik_common_early_init(void *handle)
 
 static int cik_common_sw_init(void *handle)
 {
-    pr_info("cik: called %s\n", __func__);
 	return 0;
 }
 
 static int cik_common_sw_fini(void *handle)
 {
-    pr_info("cik: called %s\n", __func__);
 	return 0;
 }
 
 static int cik_common_hw_init(void *handle)
 {
-    pr_info("cik: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* move the golden regs per IP block */
@@ -2505,13 +2465,11 @@ static int cik_common_hw_init(void *handle)
 
 static int cik_common_hw_fini(void *handle)
 {
-    pr_info("cik: called %s\n", __func__);
 	return 0;
 }
 
 static int cik_common_suspend(void *handle)
 {
-    pr_info("cik: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return cik_common_hw_fini(adev);
@@ -2519,7 +2477,6 @@ static int cik_common_suspend(void *handle)
 
 static int cik_common_resume(void *handle)
 {
-    pr_info("cik: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return cik_common_hw_init(adev);
@@ -2527,19 +2484,16 @@ static int cik_common_resume(void *handle)
 
 static bool cik_common_is_idle(void *handle)
 {
-    pr_info("cik: called %s\n", __func__);
 	return true;
 }
 
 static int cik_common_wait_for_idle(void *handle)
 {
-    pr_info("cik: called %s\n", __func__);
 	return 0;
 }
 
 static int cik_common_soft_reset(void *handle)
 {
-    pr_info("cik: called %s\n", __func__);
 	/* XXX hard reset?? */
 	return 0;
 }
@@ -2547,14 +2501,12 @@ static int cik_common_soft_reset(void *handle)
 static int cik_common_set_clockgating_state(void *handle,
 					    enum amd_clockgating_state state)
 {
-    pr_info("cik: called %s\n", __func__);
 	return 0;
 }
 
 static int cik_common_set_powergating_state(void *handle,
 					    enum amd_powergating_state state)
 {
-    pr_info("cik: called %s\n", __func__);
 	return 0;
 }
 
@@ -2586,7 +2538,6 @@ static const struct amdgpu_ip_block_version cik_common_ip_block =
 
 int cik_set_ip_blocks(struct amdgpu_device *adev)
 {
-    pr_info("cik: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_BONAIRE:
 		amdgpu_device_ip_block_add(adev, &cik_common_ip_block);

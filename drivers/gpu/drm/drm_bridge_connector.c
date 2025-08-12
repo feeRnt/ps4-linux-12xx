@@ -96,7 +96,6 @@ struct drm_bridge_connector {
 static void drm_bridge_connector_hpd_notify(struct drm_connector *connector,
 					    enum drm_connector_status status)
 {
-    pr_info("drm_bridge_connector: called %s\n", __func__);
 	struct drm_bridge_connector *bridge_connector =
 		to_drm_bridge_connector(connector);
 	struct drm_bridge *bridge;
@@ -111,7 +110,6 @@ static void drm_bridge_connector_hpd_notify(struct drm_connector *connector,
 static void drm_bridge_connector_hpd_cb(void *cb_data,
 					enum drm_connector_status status)
 {
-    pr_info("drm_bridge_connector: called %s\n", __func__);
 	struct drm_bridge_connector *drm_bridge_connector = cb_data;
 	struct drm_connector *connector = &drm_bridge_connector->base;
 	struct drm_device *dev = connector->dev;
@@ -139,7 +137,6 @@ static void drm_bridge_connector_hpd_cb(void *cb_data,
  */
 void drm_bridge_connector_enable_hpd(struct drm_connector *connector)
 {
-    pr_info("drm_bridge_connector: called %s\n", __func__);
 	struct drm_bridge_connector *bridge_connector =
 		to_drm_bridge_connector(connector);
 	struct drm_bridge *hpd = bridge_connector->bridge_hpd;
@@ -160,7 +157,6 @@ EXPORT_SYMBOL_GPL(drm_bridge_connector_enable_hpd);
  */
 void drm_bridge_connector_disable_hpd(struct drm_connector *connector)
 {
-    pr_info("drm_bridge_connector: called %s\n", __func__);
 	struct drm_bridge_connector *bridge_connector =
 		to_drm_bridge_connector(connector);
 	struct drm_bridge *hpd = bridge_connector->bridge_hpd;
@@ -177,7 +173,6 @@ EXPORT_SYMBOL_GPL(drm_bridge_connector_disable_hpd);
 static enum drm_connector_status
 drm_bridge_connector_detect(struct drm_connector *connector, bool force)
 {
-    pr_info("drm_bridge_connector: called %s\n", __func__);
 	struct drm_bridge_connector *bridge_connector =
 		to_drm_bridge_connector(connector);
 	struct drm_bridge *detect = bridge_connector->bridge_detect;
@@ -206,7 +201,6 @@ drm_bridge_connector_detect(struct drm_connector *connector, bool force)
 
 static void drm_bridge_connector_destroy(struct drm_connector *connector)
 {
-    pr_info("drm_bridge_connector: called %s\n", __func__);
 	struct drm_bridge_connector *bridge_connector =
 		to_drm_bridge_connector(connector);
 
@@ -238,7 +232,6 @@ static const struct drm_connector_funcs drm_bridge_connector_funcs = {
 static int drm_bridge_connector_get_modes_edid(struct drm_connector *connector,
 					       struct drm_bridge *bridge)
 {
-    pr_info("drm_bridge_connector: called %s\n", __func__);
 	enum drm_connector_status status;
 	struct edid *edid;
 	int n;
@@ -266,7 +259,6 @@ no_edid:
 
 static int drm_bridge_connector_get_modes(struct drm_connector *connector)
 {
-    pr_info("drm_bridge_connector: called %s\n", __func__);
 	struct drm_bridge_connector *bridge_connector =
 		to_drm_bridge_connector(connector);
 	struct drm_bridge *bridge;
@@ -321,7 +313,6 @@ static const struct drm_connector_helper_funcs drm_bridge_connector_helper_funcs
 struct drm_connector *drm_bridge_connector_init(struct drm_device *drm,
 						struct drm_encoder *encoder)
 {
-    pr_info("drm_bridge_connector: called %s\n", __func__);
 	struct drm_bridge_connector *bridge_connector;
 	struct drm_connector *connector;
 	struct i2c_adapter *ddc = NULL;

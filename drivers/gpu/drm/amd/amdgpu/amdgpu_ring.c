@@ -60,7 +60,6 @@
  */
 int amdgpu_ring_alloc(struct amdgpu_ring *ring, unsigned ndw)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 	/* Align requested size with padding so unlock_commit can
 	 * pad safely */
 	ndw = (ndw + ring->funcs->align_mask) & ~ring->funcs->align_mask;
@@ -89,7 +88,6 @@ int amdgpu_ring_alloc(struct amdgpu_ring *ring, unsigned ndw)
  */
 void amdgpu_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < count; i++)
@@ -106,7 +104,6 @@ void amdgpu_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
  */
 void amdgpu_ring_generic_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 	while (ib->length_dw & ring->funcs->align_mask)
 		ib->ptr[ib->length_dw++] = ring->funcs->nop;
 }
@@ -122,7 +119,6 @@ void amdgpu_ring_generic_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib)
  */
 void amdgpu_ring_commit(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 	uint32_t count;
 
 	/* We pad to match fetch size */
@@ -147,7 +143,6 @@ void amdgpu_ring_commit(struct amdgpu_ring *ring)
  */
 void amdgpu_ring_undo(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 	ring->wptr = ring->wptr_old;
 
 	if (ring->funcs->end_use)
@@ -173,7 +168,6 @@ int amdgpu_ring_init(struct amdgpu_device *adev, struct amdgpu_ring *ring,
 		     unsigned int irq_type, unsigned int hw_prio,
 		     atomic_t *sched_score)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 	int r;
 	int sched_hw_submission = amdgpu_sched_hw_submission;
 	u32 *num_sched;
@@ -288,7 +282,6 @@ int amdgpu_ring_init(struct amdgpu_device *adev, struct amdgpu_ring *ring,
  */
 void amdgpu_ring_fini(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 
 	/* Not to finish a ring which is not initialized */
 	if (!(ring->adev) || !(ring->adev->rings[ring->idx]))
@@ -329,7 +322,6 @@ void amdgpu_ring_emit_reg_write_reg_wait_helper(struct amdgpu_ring *ring,
 						uint32_t reg0, uint32_t reg1,
 						uint32_t ref, uint32_t mask)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 	amdgpu_ring_emit_wreg(ring, reg0, ref);
 	amdgpu_ring_emit_reg_wait(ring, reg1, mask, mask);
 }
@@ -346,7 +338,6 @@ void amdgpu_ring_emit_reg_write_reg_wait_helper(struct amdgpu_ring *ring,
 bool amdgpu_ring_soft_recovery(struct amdgpu_ring *ring, unsigned int vmid,
 			       struct dma_fence *fence)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 	ktime_t deadline = ktime_add_us(ktime_get(), 10000);
 
 	if (amdgpu_sriov_vf(ring->adev) || !ring->funcs->soft_recovery || !fence)
@@ -375,7 +366,6 @@ bool amdgpu_ring_soft_recovery(struct amdgpu_ring *ring, unsigned int vmid,
 static ssize_t amdgpu_debugfs_ring_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 	struct amdgpu_ring *ring = file_inode(f)->i_private;
 	int r, i;
 	uint32_t value, result, early[3];
@@ -428,7 +418,6 @@ static const struct file_operations amdgpu_debugfs_ring_fops = {
 int amdgpu_debugfs_ring_init(struct amdgpu_device *adev,
 			     struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 #if defined(CONFIG_DEBUG_FS)
 	struct drm_minor *minor = adev_to_drm(adev)->primary;
 	struct dentry *ent, *root = minor->debugfs_root;
@@ -459,7 +448,6 @@ int amdgpu_debugfs_ring_init(struct amdgpu_device *adev,
  */
 int amdgpu_ring_test_helper(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_ring: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	int r;
 

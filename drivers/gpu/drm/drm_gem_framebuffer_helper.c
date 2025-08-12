@@ -50,7 +50,6 @@
 struct drm_gem_object *drm_gem_fb_get_obj(struct drm_framebuffer *fb,
 					  unsigned int plane)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	if (plane >= ARRAY_SIZE(fb->obj))
 		return NULL;
 
@@ -65,7 +64,6 @@ drm_gem_fb_init(struct drm_device *dev,
 		 struct drm_gem_object **obj, unsigned int num_planes,
 		 const struct drm_framebuffer_funcs *funcs)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	unsigned int i;
 	int ret;
 
@@ -91,7 +89,6 @@ drm_gem_fb_init(struct drm_device *dev,
  */
 void drm_gem_fb_destroy(struct drm_framebuffer *fb)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	size_t i;
 
 	for (i = 0; i < ARRAY_SIZE(fb->obj); i++)
@@ -118,7 +115,6 @@ EXPORT_SYMBOL(drm_gem_fb_destroy);
 int drm_gem_fb_create_handle(struct drm_framebuffer *fb, struct drm_file *file,
 			     unsigned int *handle)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	return drm_gem_handle_create(file, fb->obj[0], handle);
 }
 EXPORT_SYMBOL(drm_gem_fb_create_handle);
@@ -151,7 +147,6 @@ int drm_gem_fb_init_with_funcs(struct drm_device *dev,
 			       const struct drm_mode_fb_cmd2 *mode_cmd,
 			       const struct drm_framebuffer_funcs *funcs)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	const struct drm_format_info *info;
 	struct drm_gem_object *objs[DRM_FORMAT_MAX_PLANES];
 	unsigned int i;
@@ -225,7 +220,6 @@ drm_gem_fb_create_with_funcs(struct drm_device *dev, struct drm_file *file,
 			     const struct drm_mode_fb_cmd2 *mode_cmd,
 			     const struct drm_framebuffer_funcs *funcs)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	struct drm_framebuffer *fb;
 	int ret;
 
@@ -274,7 +268,6 @@ struct drm_framebuffer *
 drm_gem_fb_create(struct drm_device *dev, struct drm_file *file,
 		  const struct drm_mode_fb_cmd2 *mode_cmd)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	return drm_gem_fb_create_with_funcs(dev, file, mode_cmd,
 					    &drm_gem_fb_funcs);
 }
@@ -313,7 +306,6 @@ struct drm_framebuffer *
 drm_gem_fb_create_with_dirty(struct drm_device *dev, struct drm_file *file,
 			     const struct drm_mode_fb_cmd2 *mode_cmd)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	return drm_gem_fb_create_with_funcs(dev, file, mode_cmd,
 					    &drm_gem_fb_funcs_dirtyfb);
 }
@@ -343,7 +335,6 @@ int drm_gem_fb_vmap(struct drm_framebuffer *fb,
 		    struct dma_buf_map map[static DRM_FORMAT_MAX_PLANES],
 		    struct dma_buf_map data[DRM_FORMAT_MAX_PLANES])
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	struct drm_gem_object *obj;
 	unsigned int i;
 	int ret;
@@ -394,7 +385,6 @@ EXPORT_SYMBOL(drm_gem_fb_vmap);
 void drm_gem_fb_vunmap(struct drm_framebuffer *fb,
 		       struct dma_buf_map map[static DRM_FORMAT_MAX_PLANES])
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	unsigned int i = DRM_FORMAT_MAX_PLANES;
 	struct drm_gem_object *obj;
 
@@ -426,7 +416,6 @@ EXPORT_SYMBOL(drm_gem_fb_vunmap);
  */
 int drm_gem_fb_begin_cpu_access(struct drm_framebuffer *fb, enum dma_data_direction dir)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	struct dma_buf_attachment *import_attach;
 	struct drm_gem_object *obj;
 	size_t i;
@@ -480,7 +469,6 @@ EXPORT_SYMBOL(drm_gem_fb_begin_cpu_access);
  */
 void drm_gem_fb_end_cpu_access(struct drm_framebuffer *fb, enum dma_data_direction dir)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	size_t i = ARRAY_SIZE(fb->obj);
 	struct dma_buf_attachment *import_attach;
 	struct drm_gem_object *obj;
@@ -504,7 +492,6 @@ EXPORT_SYMBOL(drm_gem_fb_end_cpu_access);
 static __u32 drm_gem_afbc_get_bpp(struct drm_device *dev,
 				  const struct drm_mode_fb_cmd2 *mode_cmd)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	const struct drm_format_info *info;
 
 	info = drm_get_format_info(dev, mode_cmd);
@@ -533,7 +520,6 @@ static int drm_gem_afbc_min_size(struct drm_device *dev,
 				 const struct drm_mode_fb_cmd2 *mode_cmd,
 				 struct drm_afbc_framebuffer *afbc_fb)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	__u32 n_blocks, w_alignment, h_alignment, hdr_alignment;
 	/* remove bpp when all users properly encode cpp in drm_format_info */
 	__u32 bpp;
@@ -609,7 +595,6 @@ int drm_gem_fb_afbc_init(struct drm_device *dev,
 			 const struct drm_mode_fb_cmd2 *mode_cmd,
 			 struct drm_afbc_framebuffer *afbc_fb)
 {
-    pr_info("drm_gem_framebuffer_helper: called %s\n", __func__);
 	const struct drm_format_info *info;
 	struct drm_gem_object **objs;
 	int ret;

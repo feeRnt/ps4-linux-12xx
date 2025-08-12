@@ -222,7 +222,6 @@ static void syncobj_wait_syncobj_func(struct drm_syncobj *syncobj,
 struct drm_syncobj *drm_syncobj_find(struct drm_file *file_private,
 				     u32 handle)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj *syncobj;
 
 	spin_lock(&file_private->syncobj_table_lock);
@@ -241,7 +240,6 @@ EXPORT_SYMBOL(drm_syncobj_find);
 static void drm_syncobj_fence_add_wait(struct drm_syncobj *syncobj,
 				       struct syncobj_wait_entry *wait)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct dma_fence *fence;
 
 	if (wait->fence)
@@ -267,7 +265,6 @@ static void drm_syncobj_fence_add_wait(struct drm_syncobj *syncobj,
 static void drm_syncobj_remove_wait(struct drm_syncobj *syncobj,
 				    struct syncobj_wait_entry *wait)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	if (!wait->node.next)
 		return;
 
@@ -290,7 +287,6 @@ void drm_syncobj_add_point(struct drm_syncobj *syncobj,
 			   struct dma_fence *fence,
 			   uint64_t point)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct syncobj_wait_entry *cur, *tmp;
 	struct dma_fence *prev;
 
@@ -325,7 +321,6 @@ EXPORT_SYMBOL(drm_syncobj_add_point);
 void drm_syncobj_replace_fence(struct drm_syncobj *syncobj,
 			       struct dma_fence *fence)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct dma_fence *old_fence;
 	struct syncobj_wait_entry *cur, *tmp;
 
@@ -357,7 +352,6 @@ EXPORT_SYMBOL(drm_syncobj_replace_fence);
  */
 static int drm_syncobj_assign_null_handle(struct drm_syncobj *syncobj)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct dma_fence *fence = dma_fence_allocate_private_stub();
 
 	if (IS_ERR(fence))
@@ -389,7 +383,6 @@ int drm_syncobj_find_fence(struct drm_file *file_private,
 			   u32 handle, u64 point, u64 flags,
 			   struct dma_fence **fence)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj *syncobj = drm_syncobj_find(file_private, handle);
 	struct syncobj_wait_entry wait;
 	u64 timeout = nsecs_to_jiffies64(DRM_SYNCOBJ_WAIT_FOR_SUBMIT_TIMEOUT);
@@ -475,7 +468,6 @@ EXPORT_SYMBOL(drm_syncobj_find_fence);
  */
 void drm_syncobj_free(struct kref *kref)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj *syncobj = container_of(kref,
 						   struct drm_syncobj,
 						   refcount);
@@ -499,7 +491,6 @@ EXPORT_SYMBOL(drm_syncobj_free);
 int drm_syncobj_create(struct drm_syncobj **out_syncobj, uint32_t flags,
 		       struct dma_fence *fence)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	int ret;
 	struct drm_syncobj *syncobj;
 
@@ -541,7 +532,6 @@ EXPORT_SYMBOL(drm_syncobj_create);
 int drm_syncobj_get_handle(struct drm_file *file_private,
 			   struct drm_syncobj *syncobj, u32 *handle)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	int ret;
 
 	/* take a reference to put in the idr */
@@ -567,7 +557,6 @@ EXPORT_SYMBOL(drm_syncobj_get_handle);
 static int drm_syncobj_create_as_handle(struct drm_file *file_private,
 					u32 *handle, uint32_t flags)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	int ret;
 	struct drm_syncobj *syncobj;
 
@@ -583,7 +572,6 @@ static int drm_syncobj_create_as_handle(struct drm_file *file_private,
 static int drm_syncobj_destroy(struct drm_file *file_private,
 			       u32 handle)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj *syncobj;
 
 	spin_lock(&file_private->syncobj_table_lock);
@@ -599,7 +587,6 @@ static int drm_syncobj_destroy(struct drm_file *file_private,
 
 static int drm_syncobj_file_release(struct inode *inode, struct file *file)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj *syncobj = file->private_data;
 
 	drm_syncobj_put(syncobj);
@@ -621,7 +608,6 @@ static const struct file_operations drm_syncobj_file_fops = {
  */
 int drm_syncobj_get_fd(struct drm_syncobj *syncobj, int *p_fd)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct file *file;
 	int fd;
 
@@ -648,7 +634,6 @@ EXPORT_SYMBOL(drm_syncobj_get_fd);
 static int drm_syncobj_handle_to_fd(struct drm_file *file_private,
 				    u32 handle, int *p_fd)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj *syncobj = drm_syncobj_find(file_private, handle);
 	int ret;
 
@@ -663,7 +648,6 @@ static int drm_syncobj_handle_to_fd(struct drm_file *file_private,
 static int drm_syncobj_fd_to_handle(struct drm_file *file_private,
 				    int fd, u32 *handle)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj *syncobj;
 	struct fd f = fdget(fd);
 	int ret;
@@ -699,7 +683,6 @@ static int drm_syncobj_fd_to_handle(struct drm_file *file_private,
 static int drm_syncobj_import_sync_file_fence(struct drm_file *file_private,
 					      int fd, int handle)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct dma_fence *fence = sync_file_get_fence(fd);
 	struct drm_syncobj *syncobj;
 
@@ -721,7 +704,6 @@ static int drm_syncobj_import_sync_file_fence(struct drm_file *file_private,
 static int drm_syncobj_export_sync_file(struct drm_file *file_private,
 					int handle, int *p_fd)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	int ret;
 	struct dma_fence *fence;
 	struct sync_file *sync_file;
@@ -761,7 +743,6 @@ err_put_fd:
 void
 drm_syncobj_open(struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	idr_init_base(&file_private->syncobj_idr, 1);
 	spin_lock_init(&file_private->syncobj_table_lock);
 }
@@ -769,7 +750,6 @@ drm_syncobj_open(struct drm_file *file_private)
 static int
 drm_syncobj_release_handle(int id, void *ptr, void *data)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj *syncobj = ptr;
 
 	drm_syncobj_put(syncobj);
@@ -787,7 +767,6 @@ drm_syncobj_release_handle(int id, void *ptr, void *data)
 void
 drm_syncobj_release(struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	idr_for_each(&file_private->syncobj_idr,
 		     &drm_syncobj_release_handle, file_private);
 	idr_destroy(&file_private->syncobj_idr);
@@ -797,7 +776,6 @@ int
 drm_syncobj_create_ioctl(struct drm_device *dev, void *data,
 			 struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_create *args = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
@@ -815,7 +793,6 @@ int
 drm_syncobj_destroy_ioctl(struct drm_device *dev, void *data,
 			  struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_destroy *args = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
@@ -831,7 +808,6 @@ int
 drm_syncobj_handle_to_fd_ioctl(struct drm_device *dev, void *data,
 				   struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_handle *args = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
@@ -856,7 +832,6 @@ int
 drm_syncobj_fd_to_handle_ioctl(struct drm_device *dev, void *data,
 				   struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_handle *args = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_SYNCOBJ))
@@ -881,7 +856,6 @@ drm_syncobj_fd_to_handle_ioctl(struct drm_device *dev, void *data,
 static int drm_syncobj_transfer_to_timeline(struct drm_file *file_private,
 					    struct drm_syncobj_transfer *args)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj *timeline_syncobj = NULL;
 	struct dma_fence *fence;
 	struct dma_fence_chain *chain;
@@ -914,7 +888,6 @@ static int
 drm_syncobj_transfer_to_binary(struct drm_file *file_private,
 			       struct drm_syncobj_transfer *args)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj *binary_syncobj = NULL;
 	struct dma_fence *fence;
 	int ret;
@@ -937,7 +910,6 @@ int
 drm_syncobj_transfer_ioctl(struct drm_device *dev, void *data,
 			   struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_transfer *args = data;
 	int ret;
 
@@ -958,7 +930,6 @@ drm_syncobj_transfer_ioctl(struct drm_device *dev, void *data,
 static void syncobj_wait_fence_func(struct dma_fence *fence,
 				    struct dma_fence_cb *cb)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct syncobj_wait_entry *wait =
 		container_of(cb, struct syncobj_wait_entry, fence_cb);
 
@@ -968,7 +939,6 @@ static void syncobj_wait_fence_func(struct dma_fence *fence,
 static void syncobj_wait_syncobj_func(struct drm_syncobj *syncobj,
 				      struct syncobj_wait_entry *wait)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct dma_fence *fence;
 
 	/* This happens inside the syncobj lock */
@@ -995,7 +965,6 @@ static signed long drm_syncobj_array_wait_timeout(struct drm_syncobj **syncobjs,
 						  signed long timeout,
 						  uint32_t *idx)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct syncobj_wait_entry *entries;
 	struct dma_fence *fence;
 	uint64_t *points;
@@ -1144,7 +1113,6 @@ err_free_points:
  */
 signed long drm_timeout_abs_to_jiffies(int64_t timeout_nsec)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	ktime_t abs_timeout, now;
 	u64 timeout_ns, timeout_jiffies64;
 
@@ -1175,7 +1143,6 @@ static int drm_syncobj_array_wait(struct drm_device *dev,
 				  struct drm_syncobj_timeline_wait *timeline_wait,
 				  struct drm_syncobj **syncobjs, bool timeline)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	signed long timeout = 0;
 	uint32_t first = ~0;
 
@@ -1208,7 +1175,6 @@ static int drm_syncobj_array_find(struct drm_file *file_private,
 				  uint32_t count_handles,
 				  struct drm_syncobj ***syncobjs_out)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	uint32_t i, *handles;
 	struct drm_syncobj **syncobjs;
 	int ret;
@@ -1254,7 +1220,6 @@ err_free_handles:
 static void drm_syncobj_array_free(struct drm_syncobj **syncobjs,
 				   uint32_t count)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	uint32_t i;
 
 	for (i = 0; i < count; i++)
@@ -1266,7 +1231,6 @@ int
 drm_syncobj_wait_ioctl(struct drm_device *dev, void *data,
 		       struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_wait *args = data;
 	struct drm_syncobj **syncobjs;
 	int ret = 0;
@@ -1300,7 +1264,6 @@ int
 drm_syncobj_timeline_wait_ioctl(struct drm_device *dev, void *data,
 				struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_timeline_wait *args = data;
 	struct drm_syncobj **syncobjs;
 	int ret = 0;
@@ -1336,7 +1299,6 @@ int
 drm_syncobj_reset_ioctl(struct drm_device *dev, void *data,
 			struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_array *args = data;
 	struct drm_syncobj **syncobjs;
 	uint32_t i;
@@ -1370,7 +1332,6 @@ int
 drm_syncobj_signal_ioctl(struct drm_device *dev, void *data,
 			 struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_array *args = data;
 	struct drm_syncobj **syncobjs;
 	uint32_t i;
@@ -1407,7 +1368,6 @@ int
 drm_syncobj_timeline_signal_ioctl(struct drm_device *dev, void *data,
 				  struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_timeline_array *args = data;
 	struct drm_syncobj **syncobjs;
 	struct dma_fence_chain **chains;
@@ -1480,7 +1440,6 @@ out:
 int drm_syncobj_query_ioctl(struct drm_device *dev, void *data,
 			    struct drm_file *file_private)
 {
-    pr_info("drm_syncobj: called %s\n", __func__);
 	struct drm_syncobj_timeline_array *args = data;
 	struct drm_syncobj **syncobjs;
 	uint64_t __user *points = u64_to_user_ptr(args->points);

@@ -85,7 +85,6 @@
 void drm_vma_offset_manager_init(struct drm_vma_offset_manager *mgr,
 				 unsigned long page_offset, unsigned long size)
 {
-    pr_info("drm_vma_manager: called %s\n", __func__);
 	rwlock_init(&mgr->vm_lock);
 	drm_mm_init(&mgr->vm_addr_space_mm, page_offset, size);
 }
@@ -104,7 +103,6 @@ EXPORT_SYMBOL(drm_vma_offset_manager_init);
  */
 void drm_vma_offset_manager_destroy(struct drm_vma_offset_manager *mgr)
 {
-    pr_info("drm_vma_manager: called %s\n", __func__);
 	drm_mm_takedown(&mgr->vm_addr_space_mm);
 }
 EXPORT_SYMBOL(drm_vma_offset_manager_destroy);
@@ -143,7 +141,6 @@ struct drm_vma_offset_node *drm_vma_offset_lookup_locked(struct drm_vma_offset_m
 							 unsigned long start,
 							 unsigned long pages)
 {
-    pr_info("drm_vma_manager: called %s\n", __func__);
 	struct drm_mm_node *node, *best;
 	struct rb_node *iter;
 	unsigned long offset;
@@ -204,7 +201,6 @@ EXPORT_SYMBOL(drm_vma_offset_lookup_locked);
 int drm_vma_offset_add(struct drm_vma_offset_manager *mgr,
 		       struct drm_vma_offset_node *node, unsigned long pages)
 {
-    pr_info("drm_vma_manager: called %s\n", __func__);
 	int ret = 0;
 
 	write_lock(&mgr->vm_lock);
@@ -233,7 +229,6 @@ EXPORT_SYMBOL(drm_vma_offset_add);
 void drm_vma_offset_remove(struct drm_vma_offset_manager *mgr,
 			   struct drm_vma_offset_node *node)
 {
-    pr_info("drm_vma_manager: called %s\n", __func__);
 	write_lock(&mgr->vm_lock);
 
 	if (drm_mm_node_allocated(&node->vm_node)) {
@@ -267,7 +262,6 @@ EXPORT_SYMBOL(drm_vma_offset_remove);
  */
 int drm_vma_node_allow(struct drm_vma_offset_node *node, struct drm_file *tag)
 {
-    pr_info("drm_vma_manager: called %s\n", __func__);
 	struct rb_node **iter;
 	struct rb_node *parent = NULL;
 	struct drm_vma_offset_file *new, *entry;
@@ -331,7 +325,6 @@ EXPORT_SYMBOL(drm_vma_node_allow);
 void drm_vma_node_revoke(struct drm_vma_offset_node *node,
 			 struct drm_file *tag)
 {
-    pr_info("drm_vma_manager: called %s\n", __func__);
 	struct drm_vma_offset_file *entry;
 	struct rb_node *iter;
 
@@ -373,7 +366,6 @@ EXPORT_SYMBOL(drm_vma_node_revoke);
 bool drm_vma_node_is_allowed(struct drm_vma_offset_node *node,
 			     struct drm_file *tag)
 {
-    pr_info("drm_vma_manager: called %s\n", __func__);
 	struct drm_vma_offset_file *entry;
 	struct rb_node *iter;
 

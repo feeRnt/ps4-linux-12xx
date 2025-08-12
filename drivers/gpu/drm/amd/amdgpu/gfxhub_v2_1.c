@@ -58,7 +58,6 @@ static const char *gfxhub_client_ids[] = {
 static uint32_t gfxhub_v2_1_get_invalidate_req(unsigned int vmid,
 					       uint32_t flush_type)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	u32 req = 0;
 
 	/* invalidate using legacy mode on vmid*/
@@ -80,7 +79,6 @@ static void
 gfxhub_v2_1_print_l2_protection_fault_status(struct amdgpu_device *adev,
 					     uint32_t status)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	u32 cid = REG_GET_FIELD(status,
 				GCVM_L2_PROTECTION_FAULT_STATUS, CID);
 
@@ -109,7 +107,6 @@ gfxhub_v2_1_print_l2_protection_fault_status(struct amdgpu_device *adev,
 
 static u64 gfxhub_v2_1_get_fb_location(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	u64 base = RREG32_SOC15(GC, 0, mmGCMC_VM_FB_LOCATION_BASE);
 
 	base &= GCMC_VM_FB_LOCATION_BASE__FB_BASE_MASK;
@@ -120,14 +117,12 @@ static u64 gfxhub_v2_1_get_fb_location(struct amdgpu_device *adev)
 
 static u64 gfxhub_v2_1_get_mc_fb_offset(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	return (u64)RREG32_SOC15(GC, 0, mmGCMC_VM_FB_OFFSET) << 24;
 }
 
 static void gfxhub_v2_1_setup_vm_pt_regs(struct amdgpu_device *adev, uint32_t vmid,
 				uint64_t page_table_base)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB_0];
 
 	WREG32_SOC15_OFFSET(GC, 0, mmGCVM_CONTEXT0_PAGE_TABLE_BASE_ADDR_LO32,
@@ -141,7 +136,6 @@ static void gfxhub_v2_1_setup_vm_pt_regs(struct amdgpu_device *adev, uint32_t vm
 
 static void gfxhub_v2_1_init_gart_aperture_regs(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	uint64_t pt_base = amdgpu_gmc_pd_addr(adev->gart.bo);
 
 	gfxhub_v2_1_setup_vm_pt_regs(adev, 0, pt_base);
@@ -159,7 +153,6 @@ static void gfxhub_v2_1_init_gart_aperture_regs(struct amdgpu_device *adev)
 
 static void gfxhub_v2_1_init_system_aperture_regs(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	uint64_t value;
 
 	/* Program the AGP BAR */
@@ -193,7 +186,6 @@ static void gfxhub_v2_1_init_system_aperture_regs(struct amdgpu_device *adev)
 
 static void gfxhub_v2_1_init_tlb_regs(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* Setup TLB control */
@@ -213,7 +205,6 @@ static void gfxhub_v2_1_init_tlb_regs(struct amdgpu_device *adev)
 
 static void gfxhub_v2_1_init_cache_regs(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* These registers are not accessible to VF-SRIOV.
@@ -265,7 +256,6 @@ static void gfxhub_v2_1_init_cache_regs(struct amdgpu_device *adev)
 
 static void gfxhub_v2_1_enable_system_domain(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	uint32_t tmp;
 
 	tmp = RREG32_SOC15(GC, 0, mmGCVM_CONTEXT0_CNTL);
@@ -278,7 +268,6 @@ static void gfxhub_v2_1_enable_system_domain(struct amdgpu_device *adev)
 
 static void gfxhub_v2_1_disable_identity_aperture(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	/* These registers are not accessible to VF-SRIOV.
 	 * The PF will program them instead.
 	 */
@@ -302,7 +291,6 @@ static void gfxhub_v2_1_disable_identity_aperture(struct amdgpu_device *adev)
 
 static void gfxhub_v2_1_setup_vmid_config(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB_0];
 	int i;
 	uint32_t tmp;
@@ -350,7 +338,6 @@ static void gfxhub_v2_1_setup_vmid_config(struct amdgpu_device *adev)
 
 static void gfxhub_v2_1_program_invalidation(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB_0];
 	unsigned i;
 
@@ -364,7 +351,6 @@ static void gfxhub_v2_1_program_invalidation(struct amdgpu_device *adev)
 
 static int gfxhub_v2_1_gart_enable(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	if (amdgpu_sriov_vf(adev)) {
 		/*
 		 * GCMC_VM_FB_LOCATION_BASE/TOP is NULL for VF, becuase they are
@@ -393,7 +379,6 @@ static int gfxhub_v2_1_gart_enable(struct amdgpu_device *adev)
 
 static void gfxhub_v2_1_gart_disable(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB_0];
 	u32 tmp;
 	u32 i;
@@ -424,7 +409,6 @@ static void gfxhub_v2_1_gart_disable(struct amdgpu_device *adev)
 static void gfxhub_v2_1_set_fault_enable_default(struct amdgpu_device *adev,
 					  bool value)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	u32 tmp;
 
 	/* These registers are not accessible to VF-SRIOV.
@@ -473,7 +457,6 @@ static const struct amdgpu_vmhub_funcs gfxhub_v2_1_vmhub_funcs = {
 
 static void gfxhub_v2_1_init(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB_0];
 
 	hub->ctx0_ptb_addr_lo32 =
@@ -516,7 +499,6 @@ static void gfxhub_v2_1_init(struct amdgpu_device *adev)
 
 static int gfxhub_v2_1_get_xgmi_info(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	u32 xgmi_lfb_cntl = RREG32_SOC15(GC, 0, mmGCMC_VM_XGMI_LFB_CNTL);
 	u32 max_region =
 		REG_GET_FIELD(xgmi_lfb_cntl, GCMC_VM_XGMI_LFB_CNTL, PF_MAX_REGION);
@@ -553,7 +535,6 @@ static int gfxhub_v2_1_get_xgmi_info(struct amdgpu_device *adev)
 
 static void gfxhub_v2_1_utcl2_harvest(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v2_1: called %s\n", __func__);
 	int i;
 	u32 tmp = 0, disabled_sa = 0;
 	u32 efuse_setting, vbios_setting;

@@ -276,7 +276,6 @@ static const u32 xgpu_tonga_golden_common_all[] = {
 
 void xgpu_vi_init_golden_registers(struct amdgpu_device *adev)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_FIJI:
 		amdgpu_device_program_register_sequence(adev,
@@ -317,7 +316,6 @@ void xgpu_vi_init_golden_registers(struct amdgpu_device *adev)
  */
 static void xgpu_vi_mailbox_send_ack(struct amdgpu_device *adev)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	u32 reg;
 	int timeout = VI_MAILBOX_TIMEDOUT;
 	u32 mask = REG_FIELD_MASK(MAILBOX_CONTROL, RCV_MSG_VALID);
@@ -342,7 +340,6 @@ static void xgpu_vi_mailbox_send_ack(struct amdgpu_device *adev)
 
 static void xgpu_vi_mailbox_set_valid(struct amdgpu_device *adev, bool val)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	u32 reg;
 
 	reg = RREG32_NO_KIQ(mmMAILBOX_CONTROL);
@@ -354,7 +351,6 @@ static void xgpu_vi_mailbox_set_valid(struct amdgpu_device *adev, bool val)
 static void xgpu_vi_mailbox_trans_msg(struct amdgpu_device *adev,
 				      enum idh_request req)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	u32 reg;
 
 	reg = RREG32_NO_KIQ(mmMAILBOX_MSGBUF_TRN_DW0);
@@ -368,7 +364,6 @@ static void xgpu_vi_mailbox_trans_msg(struct amdgpu_device *adev,
 static int xgpu_vi_mailbox_rcv_msg(struct amdgpu_device *adev,
 				   enum idh_event event)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	u32 reg;
 	u32 mask = REG_FIELD_MASK(MAILBOX_CONTROL, RCV_MSG_VALID);
 
@@ -391,7 +386,6 @@ static int xgpu_vi_mailbox_rcv_msg(struct amdgpu_device *adev,
 
 static int xgpu_vi_poll_ack(struct amdgpu_device *adev)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	int r = 0, timeout = VI_MAILBOX_TIMEDOUT;
 	u32 mask = REG_FIELD_MASK(MAILBOX_CONTROL, TRN_MSG_ACK);
 	u32 reg;
@@ -414,7 +408,6 @@ static int xgpu_vi_poll_ack(struct amdgpu_device *adev)
 
 static int xgpu_vi_poll_msg(struct amdgpu_device *adev, enum idh_event event)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	int r = 0, timeout = VI_MAILBOX_TIMEDOUT;
 
 	r = xgpu_vi_mailbox_rcv_msg(adev, event);
@@ -436,7 +429,6 @@ static int xgpu_vi_poll_msg(struct amdgpu_device *adev, enum idh_event event)
 static int xgpu_vi_send_access_requests(struct amdgpu_device *adev,
 					enum idh_request request)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	int r;
 
 	xgpu_vi_mailbox_trans_msg(adev, request);
@@ -464,20 +456,17 @@ static int xgpu_vi_send_access_requests(struct amdgpu_device *adev,
 
 static int xgpu_vi_request_reset(struct amdgpu_device *adev)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	return xgpu_vi_send_access_requests(adev, IDH_REQ_GPU_RESET_ACCESS);
 }
 
 static int xgpu_vi_wait_reset_cmpl(struct amdgpu_device *adev)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	return xgpu_vi_poll_msg(adev, IDH_FLR_NOTIFICATION_CMPL);
 }
 
 static int xgpu_vi_request_full_gpu_access(struct amdgpu_device *adev,
 					   bool init)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	enum idh_request req;
 
 	req = init ? IDH_REQ_GPU_INIT_ACCESS : IDH_REQ_GPU_FINI_ACCESS;
@@ -487,7 +476,6 @@ static int xgpu_vi_request_full_gpu_access(struct amdgpu_device *adev,
 static int xgpu_vi_release_full_gpu_access(struct amdgpu_device *adev,
 					   bool init)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	enum idh_request req;
 	int r = 0;
 
@@ -502,7 +490,6 @@ static int xgpu_vi_mailbox_ack_irq(struct amdgpu_device *adev,
 				   struct amdgpu_irq_src *source,
 				   struct amdgpu_iv_entry *entry)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	DRM_DEBUG("get ack intr and do nothing.\n");
 	return 0;
 }
@@ -512,7 +499,6 @@ static int xgpu_vi_set_mailbox_ack_irq(struct amdgpu_device *adev,
 				       unsigned type,
 				       enum amdgpu_interrupt_state state)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	u32 tmp = RREG32_NO_KIQ(mmMAILBOX_INT_CNTL);
 
 	tmp = REG_SET_FIELD(tmp, MAILBOX_INT_CNTL, ACK_INT_EN,
@@ -524,7 +510,6 @@ static int xgpu_vi_set_mailbox_ack_irq(struct amdgpu_device *adev,
 
 static void xgpu_vi_mailbox_flr_work(struct work_struct *work)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	struct amdgpu_virt *virt = container_of(work, struct amdgpu_virt, flr_work);
 	struct amdgpu_device *adev = container_of(virt, struct amdgpu_device, virt);
 
@@ -544,7 +529,6 @@ static int xgpu_vi_set_mailbox_rcv_irq(struct amdgpu_device *adev,
 				       unsigned type,
 				       enum amdgpu_interrupt_state state)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	u32 tmp = RREG32_NO_KIQ(mmMAILBOX_INT_CNTL);
 
 	tmp = REG_SET_FIELD(tmp, MAILBOX_INT_CNTL, VALID_INT_EN,
@@ -558,7 +542,6 @@ static int xgpu_vi_mailbox_rcv_irq(struct amdgpu_device *adev,
 				   struct amdgpu_irq_src *source,
 				   struct amdgpu_iv_entry *entry)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	int r;
 
 	/* trigger gpu-reset by hypervisor only if TDR disbaled */
@@ -586,7 +569,6 @@ static const struct amdgpu_irq_src_funcs xgpu_vi_mailbox_rcv_irq_funcs = {
 
 void xgpu_vi_mailbox_set_irq_funcs(struct amdgpu_device *adev)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	adev->virt.ack_irq.num_types = 1;
 	adev->virt.ack_irq.funcs = &xgpu_vi_mailbox_ack_irq_funcs;
 	adev->virt.rcv_irq.num_types = 1;
@@ -595,7 +577,6 @@ void xgpu_vi_mailbox_set_irq_funcs(struct amdgpu_device *adev)
 
 int xgpu_vi_mailbox_add_irq_id(struct amdgpu_device *adev)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_irq_add_id(adev, AMDGPU_IRQ_CLIENTID_LEGACY, 135, &adev->virt.rcv_irq);
@@ -613,7 +594,6 @@ int xgpu_vi_mailbox_add_irq_id(struct amdgpu_device *adev)
 
 int xgpu_vi_mailbox_get_irq(struct amdgpu_device *adev)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_irq_get(adev, &adev->virt.rcv_irq, 0);
@@ -632,7 +612,6 @@ int xgpu_vi_mailbox_get_irq(struct amdgpu_device *adev)
 
 void xgpu_vi_mailbox_put_irq(struct amdgpu_device *adev)
 {
-    pr_info("mxgpu_vi: called %s\n", __func__);
 	amdgpu_irq_put(adev, &adev->virt.ack_irq, 0);
 	amdgpu_irq_put(adev, &adev->virt.rcv_irq, 0);
 }

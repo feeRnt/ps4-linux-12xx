@@ -41,7 +41,6 @@ static bool kfd_initialized;
 
 int amdgpu_amdkfd_init(void)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct sysinfo si;
 	int ret;
 
@@ -58,7 +57,6 @@ int amdgpu_amdkfd_init(void)
 
 void amdgpu_amdkfd_fini(void)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	if (kfd_initialized) {
 		kgd2kfd_exit();
 		kfd_initialized = false;
@@ -67,7 +65,6 @@ void amdgpu_amdkfd_fini(void)
 
 void amdgpu_amdkfd_device_probe(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	bool vf = amdgpu_sriov_vf(adev);
 
 	if (!kfd_initialized)
@@ -98,7 +95,6 @@ static void amdgpu_doorbell_get_kfd_info(struct amdgpu_device *adev,
 					 size_t *aperture_size,
 					 size_t *start_offset)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	/*
 	 * The first num_doorbells are used by amdgpu.
 	 * amdkfd takes whatever's left in the aperture.
@@ -116,7 +112,6 @@ static void amdgpu_doorbell_get_kfd_info(struct amdgpu_device *adev,
 
 void amdgpu_amdkfd_device_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	int i;
 	int last_valid_bit;
 
@@ -178,7 +173,6 @@ void amdgpu_amdkfd_device_init(struct amdgpu_device *adev)
 
 void amdgpu_amdkfd_device_fini_sw(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	if (adev->kfd.dev) {
 		kgd2kfd_device_exit(adev->kfd.dev);
 		adev->kfd.dev = NULL;
@@ -188,22 +182,18 @@ void amdgpu_amdkfd_device_fini_sw(struct amdgpu_device *adev)
 void amdgpu_amdkfd_interrupt(struct amdgpu_device *adev,
 		const void *ih_ring_entry)
 {
-    //pr_info("amdgpu_amdkfd: called %s\n", __func__);
-    // possibly excess logging
 	if (adev->kfd.dev)
 		kgd2kfd_interrupt(adev->kfd.dev, ih_ring_entry);
 }
 
 void amdgpu_amdkfd_suspend(struct amdgpu_device *adev, bool run_pm)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	if (adev->kfd.dev)
 		kgd2kfd_suspend(adev->kfd.dev, run_pm);
 }
 
 int amdgpu_amdkfd_resume_iommu(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	int r = 0;
 
 	if (adev->kfd.dev)
@@ -214,7 +204,6 @@ int amdgpu_amdkfd_resume_iommu(struct amdgpu_device *adev)
 
 int amdgpu_amdkfd_resume(struct amdgpu_device *adev, bool run_pm)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	int r = 0;
 
 	if (adev->kfd.dev)
@@ -225,7 +214,6 @@ int amdgpu_amdkfd_resume(struct amdgpu_device *adev, bool run_pm)
 
 int amdgpu_amdkfd_pre_reset(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	int r = 0;
 
 	if (adev->kfd.dev)
@@ -236,7 +224,6 @@ int amdgpu_amdkfd_pre_reset(struct amdgpu_device *adev)
 
 int amdgpu_amdkfd_post_reset(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	int r = 0;
 
 	if (adev->kfd.dev)
@@ -247,7 +234,6 @@ int amdgpu_amdkfd_post_reset(struct amdgpu_device *adev)
 
 void amdgpu_amdkfd_gpu_reset(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	if (amdgpu_device_should_recover_gpu(adev))
@@ -258,7 +244,6 @@ int amdgpu_amdkfd_alloc_gtt_mem(struct kgd_dev *kgd, size_t size,
 				void **mem_obj, uint64_t *gpu_addr,
 				void **cpu_ptr, bool cp_mqd_gfx9)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 	struct amdgpu_bo *bo = NULL;
 	struct amdgpu_bo_param bp;
@@ -330,7 +315,6 @@ allocate_mem_reserve_bo_failed:
 
 void amdgpu_amdkfd_free_gtt_mem(struct kgd_dev *kgd, void *mem_obj)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_bo *bo = (struct amdgpu_bo *) mem_obj;
 
 	amdgpu_bo_reserve(bo, true);
@@ -343,7 +327,6 @@ void amdgpu_amdkfd_free_gtt_mem(struct kgd_dev *kgd, void *mem_obj)
 int amdgpu_amdkfd_alloc_gws(struct kgd_dev *kgd, size_t size,
 				void **mem_obj)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 	struct amdgpu_bo *bo = NULL;
 	struct amdgpu_bo_user *ubo;
@@ -373,7 +356,6 @@ int amdgpu_amdkfd_alloc_gws(struct kgd_dev *kgd, size_t size,
 
 void amdgpu_amdkfd_free_gws(struct kgd_dev *kgd, void *mem_obj)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_bo *bo = (struct amdgpu_bo *)mem_obj;
 
 	amdgpu_bo_unref(&bo);
@@ -382,7 +364,6 @@ void amdgpu_amdkfd_free_gws(struct kgd_dev *kgd, void *mem_obj)
 uint32_t amdgpu_amdkfd_get_fw_version(struct kgd_dev *kgd,
 				      enum kgd_engine_type type)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	switch (type) {
@@ -420,7 +401,6 @@ uint32_t amdgpu_amdkfd_get_fw_version(struct kgd_dev *kgd,
 void amdgpu_amdkfd_get_local_mem_info(struct kgd_dev *kgd,
 				      struct kfd_local_mem_info *mem_info)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	memset(mem_info, 0, sizeof(*mem_info));
@@ -449,7 +429,6 @@ void amdgpu_amdkfd_get_local_mem_info(struct kgd_dev *kgd,
 
 uint64_t amdgpu_amdkfd_get_gpu_clock_counter(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	if (adev->gfx.funcs->get_gpu_clock_counter)
@@ -459,7 +438,6 @@ uint64_t amdgpu_amdkfd_get_gpu_clock_counter(struct kgd_dev *kgd)
 
 uint32_t amdgpu_amdkfd_get_max_engine_clock_in_mhz(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	/* the sclk is in quantas of 10kHz */
@@ -473,7 +451,6 @@ uint32_t amdgpu_amdkfd_get_max_engine_clock_in_mhz(struct kgd_dev *kgd)
 
 void amdgpu_amdkfd_get_cu_info(struct kgd_dev *kgd, struct kfd_cu_info *cu_info)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 	struct amdgpu_cu_info acu_info = adev->gfx.cu_info;
 
@@ -501,7 +478,6 @@ int amdgpu_amdkfd_get_dmabuf_info(struct kgd_dev *kgd, int dma_buf_fd,
 				  size_t buffer_size, uint32_t *metadata_size,
 				  uint32_t *flags)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 	struct dma_buf *dma_buf;
 	struct drm_gem_object *obj;
@@ -553,7 +529,6 @@ out_put:
 
 uint64_t amdgpu_amdkfd_get_vram_usage(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 	struct ttm_resource_manager *vram_man = ttm_manager_type(&adev->mman.bdev, TTM_PL_VRAM);
 
@@ -562,7 +537,6 @@ uint64_t amdgpu_amdkfd_get_vram_usage(struct kgd_dev *kgd)
 
 uint64_t amdgpu_amdkfd_get_hive_id(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	return adev->gmc.xgmi.hive_id;
@@ -570,7 +544,6 @@ uint64_t amdgpu_amdkfd_get_hive_id(struct kgd_dev *kgd)
 
 uint64_t amdgpu_amdkfd_get_unique_id(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	return adev->unique_id;
@@ -578,7 +551,6 @@ uint64_t amdgpu_amdkfd_get_unique_id(struct kgd_dev *kgd)
 
 uint8_t amdgpu_amdkfd_get_xgmi_hops_count(struct kgd_dev *dst, struct kgd_dev *src)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *peer_adev = (struct amdgpu_device *)src;
 	struct amdgpu_device *adev = (struct amdgpu_device *)dst;
 	int ret = amdgpu_xgmi_get_hops_count(adev, peer_adev);
@@ -594,7 +566,6 @@ uint8_t amdgpu_amdkfd_get_xgmi_hops_count(struct kgd_dev *dst, struct kgd_dev *s
 
 int amdgpu_amdkfd_get_xgmi_bandwidth_mbytes(struct kgd_dev *dst, struct kgd_dev *src, bool is_min)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)dst, *peer_adev;
 	int num_links;
 
@@ -619,7 +590,6 @@ int amdgpu_amdkfd_get_xgmi_bandwidth_mbytes(struct kgd_dev *dst, struct kgd_dev 
 
 int amdgpu_amdkfd_get_pcie_bandwidth_mbytes(struct kgd_dev *dev, bool is_min)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)dev;
 	int num_lanes_shift = (is_min ? ffs(adev->pm.pcie_mlw_mask) :
 							fls(adev->pm.pcie_mlw_mask)) - 1;
@@ -678,7 +648,6 @@ int amdgpu_amdkfd_get_pcie_bandwidth_mbytes(struct kgd_dev *dev, bool is_min)
 
 uint64_t amdgpu_amdkfd_get_mmio_remap_phys_addr(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	return adev->rmmio_remap.bus_addr;
@@ -686,7 +655,6 @@ uint64_t amdgpu_amdkfd_get_mmio_remap_phys_addr(struct kgd_dev *kgd)
 
 uint32_t amdgpu_amdkfd_get_num_gws(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	return adev->gds.gws_size;
@@ -694,7 +662,6 @@ uint32_t amdgpu_amdkfd_get_num_gws(struct kgd_dev *kgd)
 
 uint32_t amdgpu_amdkfd_get_asic_rev_id(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	return adev->rev_id;
@@ -702,7 +669,6 @@ uint32_t amdgpu_amdkfd_get_asic_rev_id(struct kgd_dev *kgd)
 
 int amdgpu_amdkfd_get_noretry(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	return adev->gmc.noretry;
@@ -712,7 +678,6 @@ int amdgpu_amdkfd_submit_ib(struct kgd_dev *kgd, enum kgd_engine_type engine,
 				uint32_t vmid, uint64_t gpu_addr,
 				uint32_t *ib_cmd, uint32_t ib_len)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 	struct amdgpu_job *job;
 	struct amdgpu_ib *ib;
@@ -766,7 +731,6 @@ err:
 
 void amdgpu_amdkfd_set_compute_idle(struct kgd_dev *kgd, bool idle)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	amdgpu_dpm_switch_power_profile(adev,
@@ -776,7 +740,6 @@ void amdgpu_amdkfd_set_compute_idle(struct kgd_dev *kgd, bool idle)
 
 bool amdgpu_amdkfd_is_kfd_vmid(struct amdgpu_device *adev, u32 vmid)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	if (adev->kfd.dev)
 		return vmid >= adev->vm_manager.first_kfd_vmid;
 
@@ -785,7 +748,6 @@ bool amdgpu_amdkfd_is_kfd_vmid(struct amdgpu_device *adev, u32 vmid)
 
 int amdgpu_amdkfd_flush_gpu_tlb_vmid(struct kgd_dev *kgd, uint16_t vmid)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	if (adev->family == AMDGPU_FAMILY_AI) {
@@ -803,7 +765,6 @@ int amdgpu_amdkfd_flush_gpu_tlb_vmid(struct kgd_dev *kgd, uint16_t vmid)
 int amdgpu_amdkfd_flush_gpu_tlb_pasid(struct kgd_dev *kgd, uint16_t pasid,
 				      enum TLB_FLUSH_TYPE flush_type)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 	bool all_hub = false;
 
@@ -815,7 +776,6 @@ int amdgpu_amdkfd_flush_gpu_tlb_pasid(struct kgd_dev *kgd, uint16_t pasid,
 
 bool amdgpu_amdkfd_have_atomics_support(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	return adev->have_atomics_support;

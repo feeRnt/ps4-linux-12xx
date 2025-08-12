@@ -102,7 +102,6 @@ struct amdgpu_prt_cb {
 int amdgpu_vm_set_pasid(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 			u32 pasid)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	int r;
 
 	if (vm->pasid == pasid)
@@ -136,14 +135,12 @@ int amdgpu_vm_set_pasid(struct amdgpu_device *adev, struct amdgpu_vm *vm,
  */
 static inline void amdgpu_vm_eviction_lock(struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	mutex_lock(&vm->eviction_lock);
 	vm->saved_flags = memalloc_noreclaim_save();
 }
 
 static inline int amdgpu_vm_eviction_trylock(struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (mutex_trylock(&vm->eviction_lock)) {
 		vm->saved_flags = memalloc_noreclaim_save();
 		return 1;
@@ -153,7 +150,6 @@ static inline int amdgpu_vm_eviction_trylock(struct amdgpu_vm *vm)
 
 static inline void amdgpu_vm_eviction_unlock(struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	memalloc_noreclaim_restore(vm->saved_flags);
 	mutex_unlock(&vm->eviction_lock);
 }
@@ -170,7 +166,6 @@ static inline void amdgpu_vm_eviction_unlock(struct amdgpu_vm *vm)
 static unsigned amdgpu_vm_level_shift(struct amdgpu_device *adev,
 				      unsigned level)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	switch (level) {
 	case AMDGPU_VM_PDB2:
 	case AMDGPU_VM_PDB1:
@@ -196,7 +191,6 @@ static unsigned amdgpu_vm_level_shift(struct amdgpu_device *adev,
 static unsigned amdgpu_vm_num_entries(struct amdgpu_device *adev,
 				      unsigned level)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	unsigned shift = amdgpu_vm_level_shift(adev,
 					       adev->vm_manager.root_level);
 
@@ -222,7 +216,6 @@ static unsigned amdgpu_vm_num_entries(struct amdgpu_device *adev,
  */
 static unsigned amdgpu_vm_num_ats_entries(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	unsigned shift;
 
 	shift = amdgpu_vm_level_shift(adev, adev->vm_manager.root_level);
@@ -241,7 +234,6 @@ static unsigned amdgpu_vm_num_ats_entries(struct amdgpu_device *adev)
 static uint32_t amdgpu_vm_entries_mask(struct amdgpu_device *adev,
 				       unsigned int level)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (level <= adev->vm_manager.root_level)
 		return 0xffffffff;
 	else if (level != AMDGPU_VM_PTB)
@@ -261,7 +253,6 @@ static uint32_t amdgpu_vm_entries_mask(struct amdgpu_device *adev,
  */
 static unsigned amdgpu_vm_bo_size(struct amdgpu_device *adev, unsigned level)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	return AMDGPU_GPU_PAGE_ALIGN(amdgpu_vm_num_entries(adev, level) * 8);
 }
 
@@ -275,7 +266,6 @@ static unsigned amdgpu_vm_bo_size(struct amdgpu_device *adev, unsigned level)
  */
 static void amdgpu_vm_bo_evicted(struct amdgpu_vm_bo_base *vm_bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm *vm = vm_bo->vm;
 	struct amdgpu_bo *bo = vm_bo->bo;
 
@@ -295,7 +285,6 @@ static void amdgpu_vm_bo_evicted(struct amdgpu_vm_bo_base *vm_bo)
  */
 static void amdgpu_vm_bo_moved(struct amdgpu_vm_bo_base *vm_bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	list_move(&vm_bo->vm_status, &vm_bo->vm->moved);
 }
 
@@ -309,7 +298,6 @@ static void amdgpu_vm_bo_moved(struct amdgpu_vm_bo_base *vm_bo)
  */
 static void amdgpu_vm_bo_idle(struct amdgpu_vm_bo_base *vm_bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	list_move(&vm_bo->vm_status, &vm_bo->vm->idle);
 	vm_bo->moved = false;
 }
@@ -324,7 +312,6 @@ static void amdgpu_vm_bo_idle(struct amdgpu_vm_bo_base *vm_bo)
  */
 static void amdgpu_vm_bo_invalidated(struct amdgpu_vm_bo_base *vm_bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	spin_lock(&vm_bo->vm->invalidated_lock);
 	list_move(&vm_bo->vm_status, &vm_bo->vm->invalidated);
 	spin_unlock(&vm_bo->vm->invalidated_lock);
@@ -340,7 +327,6 @@ static void amdgpu_vm_bo_invalidated(struct amdgpu_vm_bo_base *vm_bo)
  */
 static void amdgpu_vm_bo_relocated(struct amdgpu_vm_bo_base *vm_bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (vm_bo->bo->parent)
 		list_move(&vm_bo->vm_status, &vm_bo->vm->relocated);
 	else
@@ -357,7 +343,6 @@ static void amdgpu_vm_bo_relocated(struct amdgpu_vm_bo_base *vm_bo)
  */
 static void amdgpu_vm_bo_done(struct amdgpu_vm_bo_base *vm_bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	spin_lock(&vm_bo->vm->invalidated_lock);
 	list_move(&vm_bo->vm_status, &vm_bo->vm->done);
 	spin_unlock(&vm_bo->vm->invalidated_lock);
@@ -377,7 +362,6 @@ static void amdgpu_vm_bo_base_init(struct amdgpu_vm_bo_base *base,
 				   struct amdgpu_vm *vm,
 				   struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	base->vm = vm;
 	base->bo = bo;
 	base->next = NULL;
@@ -419,7 +403,6 @@ static void amdgpu_vm_bo_base_init(struct amdgpu_vm_bo_base *base,
  */
 static struct amdgpu_vm_bo_base *amdgpu_vm_pt_parent(struct amdgpu_vm_bo_base *pt)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo *parent = pt->bo->parent;
 
 	if (!parent)
@@ -452,7 +435,6 @@ static void amdgpu_vm_pt_start(struct amdgpu_device *adev,
 			       struct amdgpu_vm *vm, uint64_t start,
 			       struct amdgpu_vm_pt_cursor *cursor)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	cursor->pfn = start;
 	cursor->parent = NULL;
 	cursor->entry = &vm->root;
@@ -472,7 +454,6 @@ static void amdgpu_vm_pt_start(struct amdgpu_device *adev,
 static bool amdgpu_vm_pt_descendant(struct amdgpu_device *adev,
 				    struct amdgpu_vm_pt_cursor *cursor)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	unsigned mask, shift, idx;
 
 	if ((cursor->level == AMDGPU_VM_PTB) || !cursor->entry ||
@@ -502,7 +483,6 @@ static bool amdgpu_vm_pt_descendant(struct amdgpu_device *adev,
 static bool amdgpu_vm_pt_sibling(struct amdgpu_device *adev,
 				 struct amdgpu_vm_pt_cursor *cursor)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	unsigned shift, num_entries;
 
 	/* Root doesn't have a sibling */
@@ -533,7 +513,6 @@ static bool amdgpu_vm_pt_sibling(struct amdgpu_device *adev,
  */
 static bool amdgpu_vm_pt_ancestor(struct amdgpu_vm_pt_cursor *cursor)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (!cursor->parent)
 		return false;
 
@@ -554,7 +533,6 @@ static bool amdgpu_vm_pt_ancestor(struct amdgpu_vm_pt_cursor *cursor)
 static void amdgpu_vm_pt_next(struct amdgpu_device *adev,
 			      struct amdgpu_vm_pt_cursor *cursor)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	/* First try a newborn child */
 	if (amdgpu_vm_pt_descendant(adev, cursor))
 		return;
@@ -584,7 +562,6 @@ static void amdgpu_vm_pt_first_dfs(struct amdgpu_device *adev,
 				   struct amdgpu_vm_pt_cursor *start,
 				   struct amdgpu_vm_pt_cursor *cursor)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (start)
 		*cursor = *start;
 	else
@@ -604,7 +581,6 @@ static void amdgpu_vm_pt_first_dfs(struct amdgpu_device *adev,
 static bool amdgpu_vm_pt_continue_dfs(struct amdgpu_vm_pt_cursor *start,
 				      struct amdgpu_vm_bo_base *entry)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	return entry && (!start || entry != start->entry);
 }
 
@@ -619,7 +595,6 @@ static bool amdgpu_vm_pt_continue_dfs(struct amdgpu_vm_pt_cursor *start,
 static void amdgpu_vm_pt_next_dfs(struct amdgpu_device *adev,
 				  struct amdgpu_vm_pt_cursor *cursor)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (!cursor->entry)
 		return;
 
@@ -654,7 +629,6 @@ void amdgpu_vm_get_pd_bo(struct amdgpu_vm *vm,
 			 struct list_head *validated,
 			 struct amdgpu_bo_list_entry *entry)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	entry->priority = 0;
 	entry->tv.bo = &vm->root.bo->tbo;
 	/* Two for VM updates, one for TTM and one for the CS job */
@@ -673,7 +647,6 @@ void amdgpu_vm_get_pd_bo(struct amdgpu_vm *vm,
  */
 void amdgpu_vm_del_from_lru_notify(struct ttm_buffer_object *bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo *abo;
 	struct amdgpu_vm_bo_base *bo_base;
 
@@ -706,7 +679,6 @@ void amdgpu_vm_del_from_lru_notify(struct ttm_buffer_object *bo)
 void amdgpu_vm_move_to_lru_tail(struct amdgpu_device *adev,
 				struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_bo_base *bo_base;
 
 	if (vm->bulk_moveable) {
@@ -755,7 +727,6 @@ int amdgpu_vm_validate_pt_bos(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 			      int (*validate)(void *p, struct amdgpu_bo *bo),
 			      void *param)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_bo_base *bo_base, *tmp;
 	int r;
 
@@ -801,7 +772,6 @@ int amdgpu_vm_validate_pt_bos(struct amdgpu_device *adev, struct amdgpu_vm *vm,
  */
 bool amdgpu_vm_ready(struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	return list_empty(&vm->evicted);
 }
 
@@ -823,7 +793,6 @@ static int amdgpu_vm_clear_bo(struct amdgpu_device *adev,
 			      struct amdgpu_bo_vm *vmbo,
 			      bool immediate)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct ttm_operation_ctx ctx = { true, false };
 	unsigned level = adev->vm_manager.root_level;
 	struct amdgpu_vm_update_params params;
@@ -946,7 +915,6 @@ static int amdgpu_vm_pt_create(struct amdgpu_device *adev,
 			       int level, bool immediate,
 			       struct amdgpu_bo_vm **vmbo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_param bp;
 	struct amdgpu_bo *bo;
 	struct dma_resv *resv;
@@ -1034,7 +1002,6 @@ static int amdgpu_vm_alloc_pts(struct amdgpu_device *adev,
 			       struct amdgpu_vm_pt_cursor *cursor,
 			       bool immediate)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_bo_base *entry = cursor->entry;
 	struct amdgpu_bo *pt_bo;
 	struct amdgpu_bo_vm *pt;
@@ -1072,7 +1039,6 @@ error_free_pt:
  */
 static void amdgpu_vm_free_table(struct amdgpu_vm_bo_base *entry)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo *shadow;
 
 	if (!entry->bo)
@@ -1097,7 +1063,6 @@ static void amdgpu_vm_free_pts(struct amdgpu_device *adev,
 			       struct amdgpu_vm *vm,
 			       struct amdgpu_vm_pt_cursor *start)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_pt_cursor cursor;
 	struct amdgpu_vm_bo_base *entry;
 
@@ -1117,7 +1082,6 @@ static void amdgpu_vm_free_pts(struct amdgpu_device *adev,
  */
 void amdgpu_vm_check_compute_bug(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	const struct amdgpu_ip_block *ip_block;
 	bool has_compute_vm_bug;
 	struct amdgpu_ring *ring;
@@ -1158,7 +1122,6 @@ void amdgpu_vm_check_compute_bug(struct amdgpu_device *adev)
 bool amdgpu_vm_need_pipeline_sync(struct amdgpu_ring *ring,
 				  struct amdgpu_job *job)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned vmhub = ring->funcs->vmhub;
 	struct amdgpu_vmid_mgr *id_mgr = &adev->vm_manager.id_mgr[vmhub];
@@ -1198,7 +1161,6 @@ bool amdgpu_vm_need_pipeline_sync(struct amdgpu_ring *ring,
 int amdgpu_vm_flush(struct amdgpu_ring *ring, struct amdgpu_job *job,
 		    bool need_pipe_sync)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned vmhub = ring->funcs->vmhub;
 	struct amdgpu_vmid_mgr *id_mgr = &adev->vm_manager.id_mgr[vmhub];
@@ -1321,7 +1283,6 @@ int amdgpu_vm_flush(struct amdgpu_ring *ring, struct amdgpu_job *job,
 struct amdgpu_bo_va *amdgpu_vm_bo_find(struct amdgpu_vm *vm,
 				       struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_bo_base *base;
 
 	for (base = bo->vm_bo; base; base = base->next) {
@@ -1347,7 +1308,6 @@ struct amdgpu_bo_va *amdgpu_vm_bo_find(struct amdgpu_vm *vm,
  */
 uint64_t amdgpu_vm_map_gart(const dma_addr_t *pages_addr, uint64_t addr)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	uint64_t result;
 
 	/* page table offset */
@@ -1374,7 +1334,6 @@ static int amdgpu_vm_update_pde(struct amdgpu_vm_update_params *params,
 				struct amdgpu_vm *vm,
 				struct amdgpu_vm_bo_base *entry)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_bo_base *parent = amdgpu_vm_pt_parent(entry);
 	struct amdgpu_bo *bo = parent->bo, *pbo;
 	uint64_t pde, pt, flags;
@@ -1401,7 +1360,6 @@ static int amdgpu_vm_update_pde(struct amdgpu_vm_update_params *params,
 static void amdgpu_vm_invalidate_pds(struct amdgpu_device *adev,
 				     struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_pt_cursor cursor;
 	struct amdgpu_vm_bo_base *entry;
 
@@ -1425,7 +1383,6 @@ static void amdgpu_vm_invalidate_pds(struct amdgpu_device *adev,
 int amdgpu_vm_update_pdes(struct amdgpu_device *adev,
 			  struct amdgpu_vm *vm, bool immediate)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_update_params params;
 	int r;
 
@@ -1476,7 +1433,6 @@ static void amdgpu_vm_update_flags(struct amdgpu_vm_update_params *params,
 				   uint64_t flags)
 
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (level != AMDGPU_VM_PTB) {
 		flags |= AMDGPU_PDE_PTE;
 		amdgpu_gmc_get_vm_pde(params->adev, level, &addr, &flags);
@@ -1509,7 +1465,6 @@ static void amdgpu_vm_fragment(struct amdgpu_vm_update_params *params,
 			       uint64_t start, uint64_t end, uint64_t flags,
 			       unsigned int *frag, uint64_t *frag_end)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	/**
 	 * The MC L1 TLB supports variable sized pages, based on a fragment
 	 * field in the PTE. When this field is set to a non-zero value, page
@@ -1573,7 +1528,6 @@ static int amdgpu_vm_update_ptes(struct amdgpu_vm_update_params *params,
 				 uint64_t start, uint64_t end,
 				 uint64_t dst, uint64_t flags)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_device *adev = params->adev;
 	struct amdgpu_vm_pt_cursor cursor;
 	uint64_t frag_start = start, frag_end;
@@ -1747,7 +1701,6 @@ int amdgpu_vm_bo_update_mapping(struct amdgpu_device *adev,
 				struct dma_fence **fence,
 				bool *table_freed)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_update_params params;
 	struct amdgpu_res_cursor cursor;
 	enum amdgpu_sync_mode sync_mode;
@@ -1856,7 +1809,6 @@ error_unlock:
 void amdgpu_vm_get_memory(struct amdgpu_vm *vm, uint64_t *vram_mem,
 				uint64_t *gtt_mem, uint64_t *cpu_mem)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va *bo_va, *tmp;
 
 	list_for_each_entry_safe(bo_va, tmp, &vm->idle, base.vm_status) {
@@ -1914,7 +1866,6 @@ void amdgpu_vm_get_memory(struct amdgpu_vm *vm, uint64_t *vram_mem,
 int amdgpu_vm_bo_update(struct amdgpu_device *adev, struct amdgpu_bo_va *bo_va,
 			bool clear, bool *table_freed)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo *bo = bo_va->base.bo;
 	struct amdgpu_vm *vm = bo_va->base.vm;
 	struct amdgpu_bo_va_mapping *mapping;
@@ -2031,7 +1982,6 @@ int amdgpu_vm_bo_update(struct amdgpu_device *adev, struct amdgpu_bo_va *bo_va,
  */
 static void amdgpu_vm_update_prt_state(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	unsigned long flags;
 	bool enable;
 
@@ -2048,7 +1998,6 @@ static void amdgpu_vm_update_prt_state(struct amdgpu_device *adev)
  */
 static void amdgpu_vm_prt_get(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (!adev->gmc.gmc_funcs->set_prt)
 		return;
 
@@ -2063,7 +2012,6 @@ static void amdgpu_vm_prt_get(struct amdgpu_device *adev)
  */
 static void amdgpu_vm_prt_put(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (atomic_dec_return(&adev->vm_manager.num_prt_users) == 0)
 		amdgpu_vm_update_prt_state(adev);
 }
@@ -2076,7 +2024,6 @@ static void amdgpu_vm_prt_put(struct amdgpu_device *adev)
  */
 static void amdgpu_vm_prt_cb(struct dma_fence *fence, struct dma_fence_cb *_cb)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_prt_cb *cb = container_of(_cb, struct amdgpu_prt_cb, cb);
 
 	amdgpu_vm_prt_put(cb->adev);
@@ -2092,7 +2039,6 @@ static void amdgpu_vm_prt_cb(struct dma_fence *fence, struct dma_fence_cb *_cb)
 static void amdgpu_vm_add_prt_cb(struct amdgpu_device *adev,
 				 struct dma_fence *fence)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_prt_cb *cb;
 
 	if (!adev->gmc.gmc_funcs->set_prt)
@@ -2128,7 +2074,6 @@ static void amdgpu_vm_free_mapping(struct amdgpu_device *adev,
 				   struct amdgpu_bo_va_mapping *mapping,
 				   struct dma_fence *fence)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (mapping->flags & AMDGPU_PTE_PRT)
 		amdgpu_vm_add_prt_cb(adev, fence);
 	kfree(mapping);
@@ -2144,7 +2089,6 @@ static void amdgpu_vm_free_mapping(struct amdgpu_device *adev,
  */
 static void amdgpu_vm_prt_fini(struct amdgpu_device *adev, struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct dma_resv *resv = vm->root.bo->tbo.base.resv;
 	struct dma_fence *excl, **shared;
 	unsigned i, shared_count;
@@ -2191,7 +2135,6 @@ int amdgpu_vm_clear_freed(struct amdgpu_device *adev,
 			  struct amdgpu_vm *vm,
 			  struct dma_fence **fence)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct dma_resv *resv = vm->root.bo->tbo.base.resv;
 	struct amdgpu_bo_va_mapping *mapping;
 	uint64_t init_pte_value = 0;
@@ -2245,7 +2188,6 @@ int amdgpu_vm_clear_freed(struct amdgpu_device *adev,
 int amdgpu_vm_handle_moved(struct amdgpu_device *adev,
 			   struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va *bo_va, *tmp;
 	struct dma_resv *resv;
 	bool clear;
@@ -2304,7 +2246,6 @@ struct amdgpu_bo_va *amdgpu_vm_bo_add(struct amdgpu_device *adev,
 				      struct amdgpu_vm *vm,
 				      struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va *bo_va;
 
 	bo_va = kzalloc(sizeof(struct amdgpu_bo_va), GFP_KERNEL);
@@ -2343,7 +2284,6 @@ static void amdgpu_vm_bo_insert_map(struct amdgpu_device *adev,
 				    struct amdgpu_bo_va *bo_va,
 				    struct amdgpu_bo_va_mapping *mapping)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm *vm = bo_va->base.vm;
 	struct amdgpu_bo *bo = bo_va->base.bo;
 
@@ -2383,7 +2323,6 @@ int amdgpu_vm_bo_map(struct amdgpu_device *adev,
 		     uint64_t saddr, uint64_t offset,
 		     uint64_t size, uint64_t flags)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va_mapping *mapping, *tmp;
 	struct amdgpu_bo *bo = bo_va->base.bo;
 	struct amdgpu_vm *vm = bo_va->base.vm;
@@ -2450,7 +2389,6 @@ int amdgpu_vm_bo_replace_map(struct amdgpu_device *adev,
 			     uint64_t saddr, uint64_t offset,
 			     uint64_t size, uint64_t flags)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va_mapping *mapping;
 	struct amdgpu_bo *bo = bo_va->base.bo;
 	uint64_t eaddr;
@@ -2510,7 +2448,6 @@ int amdgpu_vm_bo_unmap(struct amdgpu_device *adev,
 		       struct amdgpu_bo_va *bo_va,
 		       uint64_t saddr)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va_mapping *mapping;
 	struct amdgpu_vm *vm = bo_va->base.vm;
 	bool valid = true;
@@ -2565,7 +2502,6 @@ int amdgpu_vm_bo_clear_mappings(struct amdgpu_device *adev,
 				struct amdgpu_vm *vm,
 				uint64_t saddr, uint64_t size)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va_mapping *before, *after, *tmp, *next;
 	LIST_HEAD(removed);
 	uint64_t eaddr;
@@ -2668,7 +2604,6 @@ int amdgpu_vm_bo_clear_mappings(struct amdgpu_device *adev,
 struct amdgpu_bo_va_mapping *amdgpu_vm_bo_lookup_mapping(struct amdgpu_vm *vm,
 							 uint64_t addr)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	return amdgpu_vm_it_iter_first(&vm->va, addr, addr);
 }
 
@@ -2682,7 +2617,6 @@ struct amdgpu_bo_va_mapping *amdgpu_vm_bo_lookup_mapping(struct amdgpu_vm *vm,
  */
 void amdgpu_vm_bo_trace_cs(struct amdgpu_vm *vm, struct ww_acquire_ctx *ticket)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va_mapping *mapping;
 
 	if (!trace_amdgpu_vm_bo_cs_enabled())
@@ -2716,7 +2650,6 @@ void amdgpu_vm_bo_trace_cs(struct amdgpu_vm *vm, struct ww_acquire_ctx *ticket)
 void amdgpu_vm_bo_rmv(struct amdgpu_device *adev,
 		      struct amdgpu_bo_va *bo_va)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va_mapping *mapping, *next;
 	struct amdgpu_bo *bo = bo_va->base.bo;
 	struct amdgpu_vm *vm = bo_va->base.vm;
@@ -2771,7 +2704,6 @@ void amdgpu_vm_bo_rmv(struct amdgpu_device *adev,
  */
 bool amdgpu_vm_evictable(struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_bo_base *bo_base = bo->vm_bo;
 
 	/* Page tables of a destroyed VM can go away immediately */
@@ -2809,7 +2741,6 @@ bool amdgpu_vm_evictable(struct amdgpu_bo *bo)
 void amdgpu_vm_bo_invalidate(struct amdgpu_device *adev,
 			     struct amdgpu_bo *bo, bool evicted)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm_bo_base *bo_base;
 
 	/* shadow bo doesn't have bo base, its validation needs its parent */
@@ -2847,7 +2778,6 @@ void amdgpu_vm_bo_invalidate(struct amdgpu_device *adev,
  */
 static uint32_t amdgpu_vm_get_block_size(uint64_t vm_size)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	/* Total bits covered by PD + PTs */
 	unsigned bits = ilog2(vm_size) + 18;
 
@@ -2873,7 +2803,6 @@ void amdgpu_vm_adjust_size(struct amdgpu_device *adev, uint32_t min_vm_size,
 			   uint32_t fragment_size_default, unsigned max_level,
 			   unsigned max_bits)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	unsigned int max_size = 1 << (max_bits - 30);
 	unsigned int vm_size;
 	uint64_t tmp;
@@ -2962,7 +2891,6 @@ void amdgpu_vm_adjust_size(struct amdgpu_device *adev, uint32_t min_vm_size,
  */
 long amdgpu_vm_wait_idle(struct amdgpu_vm *vm, long timeout)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	timeout = dma_resv_wait_timeout(vm->root.bo->tbo.base.resv, true,
 					true, timeout);
 	if (timeout <= 0)
@@ -2984,7 +2912,6 @@ long amdgpu_vm_wait_idle(struct amdgpu_vm *vm, long timeout)
  */
 int amdgpu_vm_init(struct amdgpu_device *adev, struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo *root_bo;
 	struct amdgpu_bo_vm *root;
 	int r, i;
@@ -3095,7 +3022,6 @@ error_free_immediate:
 static int amdgpu_vm_check_clean_reserved(struct amdgpu_device *adev,
 					  struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	enum amdgpu_vm_level root = adev->vm_manager.root_level;
 	unsigned int entries = amdgpu_vm_num_entries(adev, root);
 	unsigned int i = 0;
@@ -3129,7 +3055,6 @@ static int amdgpu_vm_check_clean_reserved(struct amdgpu_device *adev,
  */
 int amdgpu_vm_make_compute(struct amdgpu_device *adev, struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	bool pte_support_ats = (adev->asic_type == CHIP_RAVEN);
 	int r;
 
@@ -3198,7 +3123,6 @@ unreserve_bo:
  */
 void amdgpu_vm_release_compute(struct amdgpu_device *adev, struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	amdgpu_vm_set_pasid(adev, vm, 0);
 	vm->is_compute_context = false;
 }
@@ -3214,7 +3138,6 @@ void amdgpu_vm_release_compute(struct amdgpu_device *adev, struct amdgpu_vm *vm)
  */
 void amdgpu_vm_fini(struct amdgpu_device *adev, struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va_mapping *mapping, *tmp;
 	bool prt_fini_needed = !!adev->gmc.gmc_funcs->set_prt;
 	struct amdgpu_bo *root;
@@ -3272,7 +3195,6 @@ void amdgpu_vm_fini(struct amdgpu_device *adev, struct amdgpu_vm *vm)
  */
 void amdgpu_vm_manager_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	unsigned i;
 
 	/* Concurrent flushes are only possible starting with Vega10 and
@@ -3319,7 +3241,6 @@ void amdgpu_vm_manager_init(struct amdgpu_device *adev)
  */
 void amdgpu_vm_manager_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	WARN_ON(!xa_empty(&adev->vm_manager.pasids));
 	xa_destroy(&adev->vm_manager.pasids);
 
@@ -3338,7 +3259,6 @@ void amdgpu_vm_manager_fini(struct amdgpu_device *adev)
  */
 int amdgpu_vm_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	union drm_amdgpu_vm *args = data;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_fpriv *fpriv = filp->driver_priv;
@@ -3388,7 +3308,6 @@ int amdgpu_vm_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
 void amdgpu_vm_get_task_info(struct amdgpu_device *adev, u32 pasid,
 			 struct amdgpu_task_info *task_info)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_vm *vm;
 	unsigned long flags;
 
@@ -3408,7 +3327,6 @@ void amdgpu_vm_get_task_info(struct amdgpu_device *adev, u32 pasid,
  */
 void amdgpu_vm_set_task_info(struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	if (vm->task_info.pid)
 		return;
 
@@ -3435,7 +3353,6 @@ void amdgpu_vm_set_task_info(struct amdgpu_vm *vm)
 bool amdgpu_vm_handle_fault(struct amdgpu_device *adev, u32 pasid,
 			    uint64_t addr, bool write_fault)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	bool is_compute_context = false;
 	struct amdgpu_bo *root;
 	unsigned long irqflags;
@@ -3534,7 +3451,6 @@ error_unref:
  */
 void amdgpu_debugfs_vm_bo_info(struct amdgpu_vm *vm, struct seq_file *m)
 {
-    pr_info("amdgpu_vm: called %s\n", __func__);
 	struct amdgpu_bo_va *bo_va, *tmp;
 	u64 total_idle = 0;
 	u64 total_evicted = 0;

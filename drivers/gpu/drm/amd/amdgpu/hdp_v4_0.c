@@ -40,7 +40,6 @@
 static void hdp_v4_0_flush_hdp(struct amdgpu_device *adev,
 				struct amdgpu_ring *ring)
 {
-    pr_info("hdp_v4_0: called %s\n", __func__);
 	if (!ring || !ring->funcs->emit_wreg)
 		WREG32_NO_KIQ((adev->rmmio_remap.reg_offset + KFD_MMIO_REMAP_HDP_MEM_FLUSH_CNTL) >> 2, 0);
 	else
@@ -50,7 +49,6 @@ static void hdp_v4_0_flush_hdp(struct amdgpu_device *adev,
 static void hdp_v4_0_invalidate_hdp(struct amdgpu_device *adev,
 				    struct amdgpu_ring *ring)
 {
-    pr_info("hdp_v4_0: called %s\n", __func__);
 	if (adev->asic_type == CHIP_ALDEBARAN)
 		return;
 
@@ -64,7 +62,6 @@ static void hdp_v4_0_invalidate_hdp(struct amdgpu_device *adev,
 static void hdp_v4_0_query_ras_error_count(struct amdgpu_device *adev,
 					   void *ras_error_status)
 {
-    pr_info("hdp_v4_0: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 
 	err_data->ue_count = 0;
@@ -79,7 +76,6 @@ static void hdp_v4_0_query_ras_error_count(struct amdgpu_device *adev,
 
 static void hdp_v4_0_reset_ras_error_count(struct amdgpu_device *adev)
 {
-    pr_info("hdp_v4_0: called %s\n", __func__);
 	if (!amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__HDP))
 		return;
 
@@ -93,7 +89,6 @@ static void hdp_v4_0_reset_ras_error_count(struct amdgpu_device *adev)
 static void hdp_v4_0_update_clock_gating(struct amdgpu_device *adev,
 					 bool enable)
 {
-    pr_info("hdp_v4_0: called %s\n", __func__);
 	uint32_t def, data;
 
 	if (adev->asic_type == CHIP_VEGA10 ||
@@ -130,7 +125,6 @@ static void hdp_v4_0_update_clock_gating(struct amdgpu_device *adev,
 static void hdp_v4_0_get_clockgating_state(struct amdgpu_device *adev,
 					    u32 *flags)
 {
-    pr_info("hdp_v4_0: called %s\n", __func__);
 	int data;
 
 	/* AMD_CG_SUPPORT_HDP_LS */
@@ -141,7 +135,6 @@ static void hdp_v4_0_get_clockgating_state(struct amdgpu_device *adev,
 
 static void hdp_v4_0_init_registers(struct amdgpu_device *adev)
 {
-    pr_info("hdp_v4_0: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_ARCTURUS:
 		WREG32_FIELD15(HDP, 0, HDP_MMHUB_CNTL, HDP_MMHUB_GCC, 1);

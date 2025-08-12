@@ -58,7 +58,6 @@ static const char *mmhub_client_ids_vangogh[][2] = {
 static uint32_t mmhub_v2_3_get_invalidate_req(unsigned int vmid,
 					      uint32_t flush_type)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	u32 req = 0;
 
 	/* invalidate using legacy mode on vmid*/
@@ -80,7 +79,6 @@ static void
 mmhub_v2_3_print_l2_protection_fault_status(struct amdgpu_device *adev,
 					     uint32_t status)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	uint32_t cid, rw;
 	const char *mmhub_cid = NULL;
 
@@ -122,7 +120,6 @@ static void mmhub_v2_3_setup_vm_pt_regs(struct amdgpu_device *adev,
 					uint32_t vmid,
 					uint64_t page_table_base)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 
 	WREG32_SOC15_OFFSET(MMHUB, 0, mmMMVM_CONTEXT0_PAGE_TABLE_BASE_ADDR_LO32,
@@ -134,7 +131,6 @@ static void mmhub_v2_3_setup_vm_pt_regs(struct amdgpu_device *adev,
 
 static void mmhub_v2_3_init_gart_aperture_regs(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	uint64_t pt_base = amdgpu_gmc_pd_addr(adev->gart.bo);
 
 	mmhub_v2_3_setup_vm_pt_regs(adev, 0, pt_base);
@@ -152,7 +148,6 @@ static void mmhub_v2_3_init_gart_aperture_regs(struct amdgpu_device *adev)
 
 static void mmhub_v2_3_init_system_aperture_regs(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	uint64_t value;
 	uint32_t tmp;
 
@@ -188,7 +183,6 @@ static void mmhub_v2_3_init_system_aperture_regs(struct amdgpu_device *adev)
 
 static void mmhub_v2_3_init_tlb_regs(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* Setup TLB control */
@@ -208,7 +202,6 @@ static void mmhub_v2_3_init_tlb_regs(struct amdgpu_device *adev)
 
 static void mmhub_v2_3_init_cache_regs(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* Setup L2 cache */
@@ -254,7 +247,6 @@ static void mmhub_v2_3_init_cache_regs(struct amdgpu_device *adev)
 
 static void mmhub_v2_3_enable_system_domain(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	uint32_t tmp;
 
 	tmp = RREG32_SOC15(MMHUB, 0, mmMMVM_CONTEXT0_CNTL);
@@ -267,7 +259,6 @@ static void mmhub_v2_3_enable_system_domain(struct amdgpu_device *adev)
 
 static void mmhub_v2_3_disable_identity_aperture(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	WREG32_SOC15(MMHUB, 0,
 		     mmMMVM_L2_CONTEXT1_IDENTITY_APERTURE_LOW_ADDR_LO32,
 		     0xFFFFFFFF);
@@ -288,7 +279,6 @@ static void mmhub_v2_3_disable_identity_aperture(struct amdgpu_device *adev)
 
 static void mmhub_v2_3_setup_vmid_config(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 	int i;
 	uint32_t tmp;
@@ -337,7 +327,6 @@ static void mmhub_v2_3_setup_vmid_config(struct amdgpu_device *adev)
 
 static void mmhub_v2_3_program_invalidation(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 	unsigned i;
 
@@ -353,7 +342,6 @@ static void mmhub_v2_3_program_invalidation(struct amdgpu_device *adev)
 
 static int mmhub_v2_3_gart_enable(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	if (amdgpu_sriov_vf(adev)) {
 		/*
 		 * MMMC_VM_FB_LOCATION_BASE/TOP is NULL for VF, becuase they are
@@ -382,7 +370,6 @@ static int mmhub_v2_3_gart_enable(struct amdgpu_device *adev)
 
 static void mmhub_v2_3_gart_disable(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 	u32 tmp;
 	u32 i;
@@ -415,7 +402,6 @@ static void mmhub_v2_3_gart_disable(struct amdgpu_device *adev)
 static void mmhub_v2_3_set_fault_enable_default(struct amdgpu_device *adev,
 						bool value)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	u32 tmp;
 	tmp = RREG32_SOC15(MMHUB, 0, mmMMVM_L2_PROTECTION_FAULT_CNTL);
 	tmp = REG_SET_FIELD(tmp, MMVM_L2_PROTECTION_FAULT_CNTL,
@@ -457,7 +443,6 @@ static const struct amdgpu_vmhub_funcs mmhub_v2_3_vmhub_funcs = {
 
 static void mmhub_v2_3_init(struct amdgpu_device *adev)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_MMHUB_0];
 
 	hub->ctx0_ptb_addr_lo32 =
@@ -503,7 +488,6 @@ static void
 mmhub_v2_3_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 					    bool enable)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	uint32_t def, data, def1, data1;
 
 	def  = data  = RREG32_SOC15(MMHUB, 0, mmMM_ATC_L2_CGTT_CLK_CTRL);
@@ -538,7 +522,6 @@ static void
 mmhub_v2_3_update_medium_grain_light_sleep(struct amdgpu_device *adev,
 					   bool enable)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	uint32_t def, data, def1, data1, def2, data2;
 
 	def  = data  = RREG32_SOC15(MMHUB, 0, mmMM_ATC_L2_CGTT_CLK_CTRL);
@@ -582,7 +565,6 @@ mmhub_v2_3_update_medium_grain_light_sleep(struct amdgpu_device *adev,
 static int mmhub_v2_3_set_clockgating(struct amdgpu_device *adev,
 				      enum amd_clockgating_state state)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	if (amdgpu_sriov_vf(adev))
 		return 0;
 
@@ -596,7 +578,6 @@ static int mmhub_v2_3_set_clockgating(struct amdgpu_device *adev,
 
 static void mmhub_v2_3_get_clockgating(struct amdgpu_device *adev, u32 *flags)
 {
-    pr_info("mmhub_v2_3: called %s\n", __func__);
 	int data, data1, data2, data3;
 
 	if (amdgpu_sriov_vf(adev))

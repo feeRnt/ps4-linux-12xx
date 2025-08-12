@@ -1260,7 +1260,6 @@ static const struct drm_driver amdgpu_kms_driver;
 static bool amdgpu_is_fw_framebuffer(resource_size_t base,
 				     resource_size_t size)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	bool found = false;
 #if IS_REACHABLE(CONFIG_FB)
 	struct apertures_struct *a;
@@ -1281,7 +1280,6 @@ static bool amdgpu_is_fw_framebuffer(resource_size_t base,
 static int amdgpu_pci_probe(struct pci_dev *pdev,
 			    const struct pci_device_id *ent)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *ddev;
 	struct amdgpu_device *adev;
 	unsigned long flags = ent->driver_data;
@@ -1289,6 +1287,8 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
 	bool supports_atomic = false;
 	bool is_fw_fb;
 	resource_size_t base, size;
+
+	pr_info("amdgpu_drv: called %s\n", __func__);
 
 	if (amdgpu_virtual_display ||
 	    amdgpu_device_asic_has_dc_support(flags & AMD_ASIC_MASK))
@@ -1411,7 +1411,6 @@ err_pci:
 static void
 amdgpu_pci_remove(struct pci_dev *pdev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *dev = pci_get_drvdata(pdev);
 
 	drm_dev_unplug(dev);
@@ -1429,7 +1428,6 @@ amdgpu_pci_remove(struct pci_dev *pdev)
 static void
 amdgpu_pci_shutdown(struct pci_dev *pdev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *dev = pci_get_drvdata(pdev);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
@@ -1454,7 +1452,6 @@ amdgpu_pci_shutdown(struct pci_dev *pdev)
  */
 static void amdgpu_drv_delayed_reset_work_handler(struct work_struct *work)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct list_head device_list;
 	struct amdgpu_device *adev;
 	int i, r;
@@ -1523,7 +1520,6 @@ static void amdgpu_drv_delayed_reset_work_handler(struct work_struct *work)
 
 static int amdgpu_pmops_prepare(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *drm_dev = dev_get_drvdata(dev);
 
 	/* Return a positive number here so
@@ -1538,13 +1534,11 @@ static int amdgpu_pmops_prepare(struct device *dev)
 
 static void amdgpu_pmops_complete(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	/* nothing to do */
 }
 
 static int amdgpu_pmops_suspend(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *drm_dev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(drm_dev);
 	int r;
@@ -1563,7 +1557,6 @@ static int amdgpu_pmops_suspend(struct device *dev)
 
 static int amdgpu_pmops_resume(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *drm_dev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(drm_dev);
 	int r;
@@ -1576,7 +1569,6 @@ static int amdgpu_pmops_resume(struct device *dev)
 
 static int amdgpu_pmops_freeze(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *drm_dev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(drm_dev);
 	int r;
@@ -1591,7 +1583,6 @@ static int amdgpu_pmops_freeze(struct device *dev)
 
 static int amdgpu_pmops_thaw(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *drm_dev = dev_get_drvdata(dev);
 
 	return amdgpu_device_resume(drm_dev, true);
@@ -1599,7 +1590,6 @@ static int amdgpu_pmops_thaw(struct device *dev)
 
 static int amdgpu_pmops_poweroff(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *drm_dev = dev_get_drvdata(dev);
 
 	return amdgpu_device_suspend(drm_dev, true);
@@ -1607,7 +1597,6 @@ static int amdgpu_pmops_poweroff(struct device *dev)
 
 static int amdgpu_pmops_restore(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *drm_dev = dev_get_drvdata(dev);
 
 	return amdgpu_device_resume(drm_dev, true);
@@ -1615,7 +1604,6 @@ static int amdgpu_pmops_restore(struct device *dev)
 
 static int amdgpu_pmops_runtime_suspend(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct pci_dev *pdev = to_pci_dev(dev);
 	struct drm_device *drm_dev = pci_get_drvdata(pdev);
 	struct amdgpu_device *adev = drm_to_adev(drm_dev);
@@ -1681,7 +1669,6 @@ static int amdgpu_pmops_runtime_suspend(struct device *dev)
 
 static int amdgpu_pmops_runtime_resume(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct pci_dev *pdev = to_pci_dev(dev);
 	struct drm_device *drm_dev = pci_get_drvdata(pdev);
 	struct amdgpu_device *adev = drm_to_adev(drm_dev);
@@ -1726,7 +1713,6 @@ static int amdgpu_pmops_runtime_resume(struct device *dev)
 
 static int amdgpu_pmops_runtime_idle(struct device *dev)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_device *drm_dev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(drm_dev);
 	/* we don't want the main rpm_idle to call suspend - we want to autosuspend */
@@ -1781,7 +1767,6 @@ static int amdgpu_pmops_runtime_idle(struct device *dev)
 long amdgpu_drm_ioctl(struct file *filp,
 		      unsigned int cmd, unsigned long arg)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_file *file_priv = filp->private_data;
 	struct drm_device *dev;
 	long ret;
@@ -1814,7 +1799,6 @@ static const struct dev_pm_ops amdgpu_pm_ops = {
 
 static int amdgpu_flush(struct file *f, fl_owner_t id)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_file *file_priv = f->private_data;
 	struct amdgpu_fpriv *fpriv = file_priv->driver_priv;
 	long timeout = MAX_WAIT_SCHED_ENTITY_Q_EMPTY;
@@ -1844,7 +1828,6 @@ static const struct file_operations amdgpu_driver_kms_fops = {
 
 int amdgpu_file_to_fpriv(struct file *filp, struct amdgpu_fpriv **fpriv)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	struct drm_file *file;
 
 	if (!filp)
@@ -1940,7 +1923,6 @@ static struct pci_driver amdgpu_kms_pci_driver = {
 
 static int __init amdgpu_init(void)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	int r;
 
 	if (vgacon_text_force()) {
@@ -1975,7 +1957,6 @@ error_sync:
 
 static void __exit amdgpu_exit(void)
 {
-    pr_info("amdgpu_drv: called %s\n", __func__);
 	amdgpu_amdkfd_fini();
 	pci_unregister_driver(&amdgpu_kms_pci_driver);
 	amdgpu_unregister_atpx_handler();

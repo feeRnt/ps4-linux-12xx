@@ -34,7 +34,6 @@ static void si_ih_set_interrupt_funcs(struct amdgpu_device *adev);
 
 static void si_ih_enable_interrupts(struct amdgpu_device *adev)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	u32 ih_cntl = RREG32(IH_CNTL);
 	u32 ih_rb_cntl = RREG32(IH_RB_CNTL);
 
@@ -47,7 +46,6 @@ static void si_ih_enable_interrupts(struct amdgpu_device *adev)
 
 static void si_ih_disable_interrupts(struct amdgpu_device *adev)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	u32 ih_rb_cntl = RREG32(IH_RB_CNTL);
 	u32 ih_cntl = RREG32(IH_CNTL);
 
@@ -63,7 +61,6 @@ static void si_ih_disable_interrupts(struct amdgpu_device *adev)
 
 static int si_ih_irq_init(struct amdgpu_device *adev)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	struct amdgpu_ih_ring *ih = &adev->irq.ih;
 	int rb_bufsz;
 	u32 interrupt_cntl, ih_cntl, ih_rb_cntl;
@@ -103,7 +100,6 @@ static int si_ih_irq_init(struct amdgpu_device *adev)
 
 static void si_ih_irq_disable(struct amdgpu_device *adev)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	si_ih_disable_interrupts(adev);
 	mdelay(1);
 }
@@ -111,7 +107,6 @@ static void si_ih_irq_disable(struct amdgpu_device *adev)
 static u32 si_ih_get_wptr(struct amdgpu_device *adev,
 			  struct amdgpu_ih_ring *ih)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	u32 wptr, tmp;
 
 	wptr = le32_to_cpu(*ih->wptr_cpu);
@@ -132,7 +127,6 @@ static void si_ih_decode_iv(struct amdgpu_device *adev,
 			    struct amdgpu_ih_ring *ih,
 			    struct amdgpu_iv_entry *entry)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	u32 ring_index = ih->rptr >> 2;
 	uint32_t dw[4];
 
@@ -153,13 +147,11 @@ static void si_ih_decode_iv(struct amdgpu_device *adev,
 static void si_ih_set_rptr(struct amdgpu_device *adev,
 			   struct amdgpu_ih_ring *ih)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	WREG32(IH_RB_RPTR, ih->rptr);
 }
 
 static int si_ih_early_init(void *handle)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	si_ih_set_interrupt_funcs(adev);
@@ -169,7 +161,6 @@ static int si_ih_early_init(void *handle)
 
 static int si_ih_sw_init(void *handle)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -182,7 +173,6 @@ static int si_ih_sw_init(void *handle)
 
 static int si_ih_sw_fini(void *handle)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	amdgpu_irq_fini_sw(adev);
@@ -192,7 +182,6 @@ static int si_ih_sw_fini(void *handle)
 
 static int si_ih_hw_init(void *handle)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return si_ih_irq_init(adev);
@@ -200,7 +189,6 @@ static int si_ih_hw_init(void *handle)
 
 static int si_ih_hw_fini(void *handle)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	si_ih_irq_disable(adev);
@@ -210,7 +198,6 @@ static int si_ih_hw_fini(void *handle)
 
 static int si_ih_suspend(void *handle)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return si_ih_hw_fini(adev);
@@ -218,7 +205,6 @@ static int si_ih_suspend(void *handle)
 
 static int si_ih_resume(void *handle)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return si_ih_hw_init(adev);
@@ -226,7 +212,6 @@ static int si_ih_resume(void *handle)
 
 static bool si_ih_is_idle(void *handle)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 tmp = RREG32(SRBM_STATUS);
 
@@ -238,7 +223,6 @@ static bool si_ih_is_idle(void *handle)
 
 static int si_ih_wait_for_idle(void *handle)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	unsigned i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -252,7 +236,6 @@ static int si_ih_wait_for_idle(void *handle)
 
 static int si_ih_soft_reset(void *handle)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	u32 srbm_soft_reset = 0;
@@ -283,14 +266,12 @@ static int si_ih_soft_reset(void *handle)
 static int si_ih_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	return 0;
 }
 
 static int si_ih_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	return 0;
 }
 
@@ -319,7 +300,6 @@ static const struct amdgpu_ih_funcs si_ih_funcs = {
 
 static void si_ih_set_interrupt_funcs(struct amdgpu_device *adev)
 {
-    pr_info("si_ih: called %s\n", __func__);
 	adev->irq.ih_funcs = &si_ih_funcs;
 }
 

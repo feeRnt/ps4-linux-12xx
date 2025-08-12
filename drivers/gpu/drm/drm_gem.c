@@ -82,7 +82,6 @@
 static void
 drm_gem_init_release(struct drm_device *dev, void *ptr)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	drm_vma_offset_manager_destroy(dev->vma_offset_manager);
 }
 
@@ -93,7 +92,6 @@ drm_gem_init_release(struct drm_device *dev, void *ptr)
 int
 drm_gem_init(struct drm_device *dev)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_vma_offset_manager *vma_offset_manager;
 
 	mutex_init(&dev->object_name_lock);
@@ -126,7 +124,6 @@ drm_gem_init(struct drm_device *dev)
 int drm_gem_object_init(struct drm_device *dev,
 			struct drm_gem_object *obj, size_t size)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct file *filp;
 
 	drm_gem_private_object_init(dev, obj, size);
@@ -154,7 +151,6 @@ EXPORT_SYMBOL(drm_gem_object_init);
 void drm_gem_private_object_init(struct drm_device *dev,
 				 struct drm_gem_object *obj, size_t size)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	BUG_ON((size & (PAGE_SIZE - 1)) != 0);
 
 	obj->dev = dev;
@@ -174,7 +170,6 @@ EXPORT_SYMBOL(drm_gem_private_object_init);
 static void
 drm_gem_remove_prime_handles(struct drm_gem_object *obj, struct drm_file *filp)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	/*
 	 * Note: obj->dma_buf can't disappear as long as we still hold a
 	 * handle reference in obj->handle_count.
@@ -199,7 +194,6 @@ drm_gem_remove_prime_handles(struct drm_gem_object *obj, struct drm_file *filp)
  */
 static void drm_gem_object_handle_free(struct drm_gem_object *obj)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_device *dev = obj->dev;
 
 	/* Remove any name for this object */
@@ -211,7 +205,6 @@ static void drm_gem_object_handle_free(struct drm_gem_object *obj)
 
 static void drm_gem_object_exported_dma_buf_free(struct drm_gem_object *obj)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	/* Unbreak the reference cycle if we have an exported dma_buf. */
 	if (obj->dma_buf) {
 		dma_buf_put(obj->dma_buf);
@@ -222,7 +215,6 @@ static void drm_gem_object_exported_dma_buf_free(struct drm_gem_object *obj)
 static void
 drm_gem_object_handle_put_unlocked(struct drm_gem_object *obj)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_device *dev = obj->dev;
 	bool final = false;
 
@@ -254,7 +246,6 @@ drm_gem_object_handle_put_unlocked(struct drm_gem_object *obj)
 static int
 drm_gem_object_release_handle(int id, void *ptr, void *data)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_file *file_priv = data;
 	struct drm_gem_object *obj = ptr;
 
@@ -281,7 +272,6 @@ drm_gem_object_release_handle(int id, void *ptr, void *data)
 int
 drm_gem_handle_delete(struct drm_file *filp, u32 handle)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_gem_object *obj;
 
 	spin_lock(&filp->table_lock);
@@ -320,7 +310,6 @@ EXPORT_SYMBOL(drm_gem_handle_delete);
 int drm_gem_dumb_map_offset(struct drm_file *file, struct drm_device *dev,
 			    u32 handle, u64 *offset)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_gem_object *obj;
 	int ret;
 
@@ -350,7 +339,6 @@ int drm_gem_dumb_destroy(struct drm_file *file,
 			 struct drm_device *dev,
 			 u32 handle)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	return drm_gem_handle_delete(file, handle);
 }
 
@@ -373,7 +361,6 @@ drm_gem_handle_create_tail(struct drm_file *file_priv,
 			   struct drm_gem_object *obj,
 			   u32 *handlep)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_device *dev = obj->dev;
 	u32 handle;
 	int ret;
@@ -441,7 +428,6 @@ int drm_gem_handle_create(struct drm_file *file_priv,
 			  struct drm_gem_object *obj,
 			  u32 *handlep)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	mutex_lock(&obj->dev->object_name_lock);
 
 	return drm_gem_handle_create_tail(file_priv, obj, handlep);
@@ -462,7 +448,6 @@ EXPORT_SYMBOL(drm_gem_handle_create);
 void
 drm_gem_free_mmap_offset(struct drm_gem_object *obj)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_device *dev = obj->dev;
 
 	drm_vma_offset_remove(dev->vma_offset_manager, &obj->vma_node);
@@ -489,7 +474,6 @@ EXPORT_SYMBOL(drm_gem_free_mmap_offset);
 int
 drm_gem_create_mmap_offset_size(struct drm_gem_object *obj, size_t size)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_device *dev = obj->dev;
 
 	return drm_vma_offset_add(dev->vma_offset_manager, &obj->vma_node,
@@ -513,7 +497,6 @@ EXPORT_SYMBOL(drm_gem_create_mmap_offset_size);
  */
 int drm_gem_create_mmap_offset(struct drm_gem_object *obj)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	return drm_gem_create_mmap_offset_size(obj, obj->size);
 }
 EXPORT_SYMBOL(drm_gem_create_mmap_offset);
@@ -524,7 +507,6 @@ EXPORT_SYMBOL(drm_gem_create_mmap_offset);
  */
 static void drm_gem_check_release_pagevec(struct pagevec *pvec)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	check_move_unevictable_pages(pvec);
 	__pagevec_release(pvec);
 	cond_resched();
@@ -557,7 +539,6 @@ static void drm_gem_check_release_pagevec(struct pagevec *pvec)
  */
 struct page **drm_gem_get_pages(struct drm_gem_object *obj)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct address_space *mapping;
 	struct page *p, **pages;
 	struct pagevec pvec;
@@ -626,7 +607,6 @@ EXPORT_SYMBOL(drm_gem_get_pages);
 void drm_gem_put_pages(struct drm_gem_object *obj, struct page **pages,
 		bool dirty, bool accessed)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	int i, npages;
 	struct address_space *mapping;
 	struct pagevec pvec;
@@ -667,7 +647,6 @@ EXPORT_SYMBOL(drm_gem_put_pages);
 static int objects_lookup(struct drm_file *filp, u32 *handle, int count,
 			  struct drm_gem_object **objs)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	int i, ret = 0;
 	struct drm_gem_object *obj;
 
@@ -710,7 +689,6 @@ static int objects_lookup(struct drm_file *filp, u32 *handle, int count,
 int drm_gem_objects_lookup(struct drm_file *filp, void __user *bo_handles,
 			   int count, struct drm_gem_object ***objs_out)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	int ret;
 	u32 *handles;
 	struct drm_gem_object **objs;
@@ -760,7 +738,6 @@ EXPORT_SYMBOL(drm_gem_objects_lookup);
 struct drm_gem_object *
 drm_gem_object_lookup(struct drm_file *filp, u32 handle)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_gem_object *obj = NULL;
 
 	objects_lookup(filp, &handle, 1, &obj);
@@ -784,7 +761,6 @@ EXPORT_SYMBOL(drm_gem_object_lookup);
 long drm_gem_dma_resv_wait(struct drm_file *filep, u32 handle,
 				    bool wait_all, unsigned long timeout)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	long ret;
 	struct drm_gem_object *obj;
 
@@ -818,7 +794,6 @@ int
 drm_gem_close_ioctl(struct drm_device *dev, void *data,
 		    struct drm_file *file_priv)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_gem_close *args = data;
 	int ret;
 
@@ -845,7 +820,6 @@ int
 drm_gem_flink_ioctl(struct drm_device *dev, void *data,
 		    struct drm_file *file_priv)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_gem_flink *args = data;
 	struct drm_gem_object *obj;
 	int ret;
@@ -896,7 +870,6 @@ int
 drm_gem_open_ioctl(struct drm_device *dev, void *data,
 		   struct drm_file *file_priv)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_gem_open *args = data;
 	struct drm_gem_object *obj;
 	int ret;
@@ -938,7 +911,6 @@ err:
 void
 drm_gem_open(struct drm_device *dev, struct drm_file *file_private)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	idr_init_base(&file_private->object_idr, 1);
 	spin_lock_init(&file_private->table_lock);
 }
@@ -955,7 +927,6 @@ drm_gem_open(struct drm_device *dev, struct drm_file *file_private)
 void
 drm_gem_release(struct drm_device *dev, struct drm_file *file_private)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	idr_for_each(&file_private->object_idr,
 		     &drm_gem_object_release_handle, file_private);
 	idr_destroy(&file_private->object_idr);
@@ -971,7 +942,6 @@ drm_gem_release(struct drm_device *dev, struct drm_file *file_private)
 void
 drm_gem_object_release(struct drm_gem_object *obj)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	WARN_ON(obj->dma_buf);
 
 	if (obj->filp)
@@ -993,7 +963,6 @@ EXPORT_SYMBOL(drm_gem_object_release);
 void
 drm_gem_object_free(struct kref *kref)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_gem_object *obj =
 		container_of(kref, struct drm_gem_object, refcount);
 
@@ -1013,7 +982,6 @@ EXPORT_SYMBOL(drm_gem_object_free);
  */
 void drm_gem_vm_open(struct vm_area_struct *vma)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_gem_object *obj = vma->vm_private_data;
 
 	drm_gem_object_get(obj);
@@ -1029,7 +997,6 @@ EXPORT_SYMBOL(drm_gem_vm_open);
  */
 void drm_gem_vm_close(struct vm_area_struct *vma)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_gem_object *obj = vma->vm_private_data;
 
 	drm_gem_object_put(obj);
@@ -1063,7 +1030,6 @@ EXPORT_SYMBOL(drm_gem_vm_close);
 int drm_gem_mmap_obj(struct drm_gem_object *obj, unsigned long obj_size,
 		     struct vm_area_struct *vma)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	int ret;
 
 	/* Check for valid size. */
@@ -1122,7 +1088,6 @@ EXPORT_SYMBOL(drm_gem_mmap_obj);
  */
 int drm_gem_mmap(struct file *filp, struct vm_area_struct *vma)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct drm_file *priv = filp->private_data;
 	struct drm_device *dev = priv->minor->dev;
 	struct drm_gem_object *obj = NULL;
@@ -1173,7 +1138,6 @@ EXPORT_SYMBOL(drm_gem_mmap);
 void drm_gem_print_info(struct drm_printer *p, unsigned int indent,
 			const struct drm_gem_object *obj)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	drm_printf_indent(p, indent, "name=%d\n", obj->name);
 	drm_printf_indent(p, indent, "refcount=%u\n",
 			  kref_read(&obj->refcount));
@@ -1189,7 +1153,6 @@ void drm_gem_print_info(struct drm_printer *p, unsigned int indent,
 
 int drm_gem_pin(struct drm_gem_object *obj)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	if (obj->funcs->pin)
 		return obj->funcs->pin(obj);
 	else
@@ -1198,14 +1161,12 @@ int drm_gem_pin(struct drm_gem_object *obj)
 
 void drm_gem_unpin(struct drm_gem_object *obj)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	if (obj->funcs->unpin)
 		obj->funcs->unpin(obj);
 }
 
 int drm_gem_vmap(struct drm_gem_object *obj, struct dma_buf_map *map)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	int ret;
 
 	if (!obj->funcs->vmap)
@@ -1223,7 +1184,6 @@ EXPORT_SYMBOL(drm_gem_vmap);
 
 void drm_gem_vunmap(struct drm_gem_object *obj, struct dma_buf_map *map)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	if (dma_buf_map_is_null(map))
 		return;
 
@@ -1252,7 +1212,6 @@ int
 drm_gem_lock_reservations(struct drm_gem_object **objs, int count,
 			  struct ww_acquire_ctx *acquire_ctx)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	int contended = -1;
 	int i, ret;
 
@@ -1305,7 +1264,6 @@ void
 drm_gem_unlock_reservations(struct drm_gem_object **objs, int count,
 			    struct ww_acquire_ctx *acquire_ctx)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < count; i++)
@@ -1331,7 +1289,6 @@ EXPORT_SYMBOL(drm_gem_unlock_reservations);
 int drm_gem_fence_array_add(struct xarray *fence_array,
 			    struct dma_fence *fence)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	struct dma_fence *entry;
 	unsigned long index;
 	u32 id = 0;
@@ -1383,7 +1340,6 @@ int drm_gem_fence_array_add_implicit(struct xarray *fence_array,
 				     struct drm_gem_object *obj,
 				     bool write)
 {
-    pr_info("drm_gem: called %s\n", __func__);
 	int ret;
 	struct dma_fence **fences;
 	unsigned int i, fence_count;

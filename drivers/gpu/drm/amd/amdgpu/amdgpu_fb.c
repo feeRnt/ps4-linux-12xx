@@ -49,7 +49,6 @@
 static int
 amdgpufb_open(struct fb_info *info, int user)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	int ret = pm_runtime_get_sync(fb_helper->dev->dev);
 	if (ret < 0 && ret != -EACCES) {
@@ -63,7 +62,6 @@ amdgpufb_open(struct fb_info *info, int user)
 static int
 amdgpufb_release(struct fb_info *info, int user)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 
 	pm_runtime_mark_last_busy(fb_helper->dev->dev);
@@ -84,7 +82,6 @@ static const struct fb_ops amdgpufb_ops = {
 
 int amdgpu_align_pitch(struct amdgpu_device *adev, int width, int cpp, bool tiled)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	int aligned = width;
 	int pitch_mask = 0;
 
@@ -108,7 +105,6 @@ int amdgpu_align_pitch(struct amdgpu_device *adev, int width, int cpp, bool tile
 
 static void amdgpufb_destroy_pinned_object(struct drm_gem_object *gobj)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	struct amdgpu_bo *abo = gem_to_amdgpu_bo(gobj);
 	int ret;
 
@@ -125,7 +121,6 @@ static int amdgpufb_create_pinned_object(struct amdgpu_fbdev *rfbdev,
 					 struct drm_mode_fb_cmd2 *mode_cmd,
 					 struct drm_gem_object **gobj_p)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	const struct drm_format_info *info;
 	struct amdgpu_device *adev = rfbdev->adev;
 	struct drm_gem_object *gobj = NULL;
@@ -202,7 +197,6 @@ out_unref:
 static int amdgpufb_create(struct drm_fb_helper *helper,
 			   struct drm_fb_helper_surface_size *sizes)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	struct amdgpu_fbdev *rfbdev = (struct amdgpu_fbdev *)helper;
 	struct amdgpu_device *adev = rfbdev->adev;
 	struct fb_info *info;
@@ -290,7 +284,6 @@ out:
 
 static int amdgpu_fbdev_destroy(struct drm_device *dev, struct amdgpu_fbdev *rfbdev)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	struct amdgpu_framebuffer *rfb = &rfbdev->rfb;
 	int i;
 
@@ -315,7 +308,6 @@ static const struct drm_fb_helper_funcs amdgpu_fb_helper_funcs = {
 
 int amdgpu_fbdev_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	struct amdgpu_fbdev *rfbdev;
 	int bpp_sel = 32;
 	int ret;
@@ -358,7 +350,6 @@ int amdgpu_fbdev_init(struct amdgpu_device *adev)
 
 void amdgpu_fbdev_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	if (!adev->mode_info.rfbdev)
 		return;
 
@@ -369,7 +360,6 @@ void amdgpu_fbdev_fini(struct amdgpu_device *adev)
 
 void amdgpu_fbdev_set_suspend(struct amdgpu_device *adev, int state)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	if (adev->mode_info.rfbdev)
 		drm_fb_helper_set_suspend_unlocked(&adev->mode_info.rfbdev->helper,
 						   state);
@@ -377,7 +367,6 @@ void amdgpu_fbdev_set_suspend(struct amdgpu_device *adev, int state)
 
 int amdgpu_fbdev_total_size(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	struct amdgpu_bo *robj;
 	int size = 0;
 
@@ -391,7 +380,6 @@ int amdgpu_fbdev_total_size(struct amdgpu_device *adev)
 
 bool amdgpu_fbdev_robj_is_fb(struct amdgpu_device *adev, struct amdgpu_bo *robj)
 {
-    pr_info("amdgpu_fb: called %s\n", __func__);
 	if (!adev->mode_info.rfbdev)
 		return false;
 	if (robj == gem_to_amdgpu_bo(adev->mode_info.rfbdev->rfb.base.obj[0]))

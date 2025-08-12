@@ -118,7 +118,6 @@ const char *soc15_ih_clientid_name[] = {
  */
 static void amdgpu_hotplug_work_func(struct work_struct *work)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	struct amdgpu_device *adev = container_of(work, struct amdgpu_device,
 						  hotplug_work);
 	struct drm_device *dev = adev_to_drm(adev);
@@ -145,7 +144,6 @@ static void amdgpu_hotplug_work_func(struct work_struct *work)
  */
 void amdgpu_irq_disable_all(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	unsigned long irqflags;
 	unsigned i, j, k;
 	int r;
@@ -187,7 +185,6 @@ void amdgpu_irq_disable_all(struct amdgpu_device *adev)
  */
 static irqreturn_t amdgpu_irq_handler(int irq, void *arg)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	struct drm_device *dev = (struct drm_device *) arg;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	irqreturn_t ret;
@@ -223,7 +220,6 @@ static irqreturn_t amdgpu_irq_handler(int irq, void *arg)
  */
 static void amdgpu_irq_handle_ih1(struct work_struct *work)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	struct amdgpu_device *adev = container_of(work, struct amdgpu_device,
 						  irq.ih1_work);
 
@@ -239,7 +235,6 @@ static void amdgpu_irq_handle_ih1(struct work_struct *work)
  */
 static void amdgpu_irq_handle_ih2(struct work_struct *work)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	struct amdgpu_device *adev = container_of(work, struct amdgpu_device,
 						  irq.ih2_work);
 
@@ -255,7 +250,6 @@ static void amdgpu_irq_handle_ih2(struct work_struct *work)
  */
 static void amdgpu_irq_handle_ih_soft(struct work_struct *work)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	struct amdgpu_device *adev = container_of(work, struct amdgpu_device,
 						  irq.ih_soft_work);
 
@@ -275,7 +269,6 @@ static void amdgpu_irq_handle_ih_soft(struct work_struct *work)
  */
 static bool amdgpu_msi_ok(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	if (amdgpu_msi == 1)
 		return true;
 	else if (amdgpu_msi == 0)
@@ -286,7 +279,6 @@ static bool amdgpu_msi_ok(struct amdgpu_device *adev)
 
 static void amdgpu_restore_msix(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	u16 ctrl;
 
 	pci_read_config_word(adev->pdev, adev->pdev->msix_cap + PCI_MSIX_FLAGS, &ctrl);
@@ -313,7 +305,6 @@ static void amdgpu_restore_msix(struct amdgpu_device *adev)
  */
 int amdgpu_irq_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	int r = 0;
 	unsigned int irq;
 
@@ -383,7 +374,6 @@ int amdgpu_irq_init(struct amdgpu_device *adev)
 
 void amdgpu_irq_fini_hw(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	if (adev->irq.installed) {
 		free_irq(adev->irq.irq, adev_to_drm(adev));
 		adev->irq.installed = false;
@@ -411,7 +401,6 @@ void amdgpu_irq_fini_hw(struct amdgpu_device *adev)
  */
 void amdgpu_irq_fini_sw(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	unsigned i, j;
 
 	for (i = 0; i < AMDGPU_IRQ_CLIENTID_MAX; ++i) {
@@ -449,7 +438,6 @@ int amdgpu_irq_add_id(struct amdgpu_device *adev,
 		      unsigned client_id, unsigned src_id,
 		      struct amdgpu_irq_src *source)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	if (client_id >= AMDGPU_IRQ_CLIENTID_MAX)
 		return -EINVAL;
 
@@ -497,7 +485,6 @@ int amdgpu_irq_add_id(struct amdgpu_device *adev,
 void amdgpu_irq_dispatch(struct amdgpu_device *adev,
 			 struct amdgpu_ih_ring *ih)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	u32 ring_index = ih->rptr >> 2;
 	struct amdgpu_iv_entry entry;
 	unsigned client_id, src_id;
@@ -558,7 +545,6 @@ void amdgpu_irq_delegate(struct amdgpu_device *adev,
 			 struct amdgpu_iv_entry *entry,
 			 unsigned int num_dw)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	amdgpu_ih_ring_write(&adev->irq.ih_soft, entry->iv_entry, num_dw);
 	schedule_work(&adev->irq.ih_soft_work);
 }
@@ -575,7 +561,6 @@ void amdgpu_irq_delegate(struct amdgpu_device *adev,
 int amdgpu_irq_update(struct amdgpu_device *adev,
 			     struct amdgpu_irq_src *src, unsigned type)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	unsigned long irqflags;
 	enum amdgpu_interrupt_state state;
 	int r;
@@ -604,7 +589,6 @@ int amdgpu_irq_update(struct amdgpu_device *adev,
  */
 void amdgpu_irq_gpu_reset_resume_helper(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	int i, j, k;
 
 	if (amdgpu_sriov_vf(adev) || amdgpu_passthrough(adev))
@@ -640,7 +624,6 @@ void amdgpu_irq_gpu_reset_resume_helper(struct amdgpu_device *adev)
 int amdgpu_irq_get(struct amdgpu_device *adev, struct amdgpu_irq_src *src,
 		   unsigned type)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	if (!adev->irq.installed)
 		return -ENOENT;
 
@@ -671,7 +654,6 @@ int amdgpu_irq_get(struct amdgpu_device *adev, struct amdgpu_irq_src *src,
 int amdgpu_irq_put(struct amdgpu_device *adev, struct amdgpu_irq_src *src,
 		   unsigned type)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	if (!adev->irq.installed)
 		return -ENOENT;
 
@@ -703,7 +685,6 @@ int amdgpu_irq_put(struct amdgpu_device *adev, struct amdgpu_irq_src *src,
 bool amdgpu_irq_enabled(struct amdgpu_device *adev, struct amdgpu_irq_src *src,
 			unsigned type)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	if (!adev->irq.installed)
 		return false;
 
@@ -719,13 +700,11 @@ bool amdgpu_irq_enabled(struct amdgpu_device *adev, struct amdgpu_irq_src *src,
 /* XXX: Generic IRQ handling */
 static void amdgpu_irq_mask(struct irq_data *irqd)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	/* XXX */
 }
 
 static void amdgpu_irq_unmask(struct irq_data *irqd)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	/* XXX */
 }
 
@@ -752,7 +731,6 @@ static struct irq_chip amdgpu_irq_chip = {
 static int amdgpu_irqdomain_map(struct irq_domain *d,
 				unsigned int irq, irq_hw_number_t hwirq)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	if (hwirq >= AMDGPU_MAX_IRQ_SRC_ID)
 		return -EPERM;
 
@@ -779,7 +757,6 @@ static const struct irq_domain_ops amdgpu_hw_irqdomain_ops = {
  */
 int amdgpu_irq_add_domain(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	adev->irq.domain = irq_domain_add_linear(NULL, AMDGPU_MAX_IRQ_SRC_ID,
 						 &amdgpu_hw_irqdomain_ops, adev);
 	if (!adev->irq.domain) {
@@ -800,7 +777,6 @@ int amdgpu_irq_add_domain(struct amdgpu_device *adev)
  */
 void amdgpu_irq_remove_domain(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	if (adev->irq.domain) {
 		irq_domain_remove(adev->irq.domain);
 		adev->irq.domain = NULL;
@@ -822,7 +798,6 @@ void amdgpu_irq_remove_domain(struct amdgpu_device *adev)
  */
 unsigned amdgpu_irq_create_mapping(struct amdgpu_device *adev, unsigned src_id)
 {
-    pr_info("amdgpu_irq: called %s\n", __func__);
 	adev->irq.virq[src_id] = irq_create_mapping(adev->irq.domain, src_id);
 
 	return adev->irq.virq[src_id];

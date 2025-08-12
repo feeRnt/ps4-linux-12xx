@@ -69,7 +69,6 @@ static int amdgpu_ih_clientid_uvds[] = {
  */
 static uint64_t uvd_v7_0_ring_get_rptr(struct amdgpu_ring *ring)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	return RREG32_SOC15(UVD, ring->me, mmUVD_RBC_RB_RPTR);
@@ -84,7 +83,6 @@ static uint64_t uvd_v7_0_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t uvd_v7_0_enc_ring_get_rptr(struct amdgpu_ring *ring)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring == &adev->uvd.inst[ring->me].ring_enc[0])
@@ -102,7 +100,6 @@ static uint64_t uvd_v7_0_enc_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t uvd_v7_0_ring_get_wptr(struct amdgpu_ring *ring)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	return RREG32_SOC15(UVD, ring->me, mmUVD_RBC_RB_WPTR);
@@ -117,7 +114,6 @@ static uint64_t uvd_v7_0_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static uint64_t uvd_v7_0_enc_ring_get_wptr(struct amdgpu_ring *ring)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring->use_doorbell)
@@ -138,7 +134,6 @@ static uint64_t uvd_v7_0_enc_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static void uvd_v7_0_ring_set_wptr(struct amdgpu_ring *ring)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	WREG32_SOC15(UVD, ring->me, mmUVD_RBC_RB_WPTR, lower_32_bits(ring->wptr));
@@ -153,7 +148,6 @@ static void uvd_v7_0_ring_set_wptr(struct amdgpu_ring *ring)
  */
 static void uvd_v7_0_enc_ring_set_wptr(struct amdgpu_ring *ring)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring->use_doorbell) {
@@ -179,7 +173,6 @@ static void uvd_v7_0_enc_ring_set_wptr(struct amdgpu_ring *ring)
  */
 static int uvd_v7_0_enc_ring_test_ring(struct amdgpu_ring *ring)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t rptr;
 	unsigned i;
@@ -223,7 +216,6 @@ static int uvd_v7_0_enc_get_create_msg(struct amdgpu_ring *ring, uint32_t handle
 				       struct amdgpu_bo *bo,
 				       struct dma_fence **fence)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	const unsigned ib_size_dw = 16;
 	struct amdgpu_job *job;
 	struct amdgpu_ib *ib;
@@ -287,7 +279,6 @@ static int uvd_v7_0_enc_get_destroy_msg(struct amdgpu_ring *ring, uint32_t handl
 					struct amdgpu_bo *bo,
 					struct dma_fence **fence)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	const unsigned ib_size_dw = 16;
 	struct amdgpu_job *job;
 	struct amdgpu_ib *ib;
@@ -346,7 +337,6 @@ err:
  */
 static int uvd_v7_0_enc_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct dma_fence *fence = NULL;
 	struct amdgpu_bo *bo = NULL;
 	long r;
@@ -381,7 +371,6 @@ error:
 
 static int uvd_v7_0_early_init(void *handle)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (adev->asic_type == CHIP_VEGA20) {
@@ -416,7 +405,6 @@ static int uvd_v7_0_early_init(void *handle)
 
 static int uvd_v7_0_sw_init(void *handle)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 
 	int i, j, r;
@@ -511,7 +499,6 @@ static int uvd_v7_0_sw_init(void *handle)
 
 static int uvd_v7_0_sw_fini(void *handle)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	int i, j, r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -539,7 +526,6 @@ static int uvd_v7_0_sw_fini(void *handle)
  */
 static int uvd_v7_0_hw_init(void *handle)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct amdgpu_ring *ring;
 	uint32_t tmp;
@@ -618,7 +604,6 @@ done:
  */
 static int uvd_v7_0_hw_fini(void *handle)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	cancel_delayed_work_sync(&adev->uvd.idle_work);
@@ -635,7 +620,6 @@ static int uvd_v7_0_hw_fini(void *handle)
 
 static int uvd_v7_0_suspend(void *handle)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -672,7 +656,6 @@ static int uvd_v7_0_suspend(void *handle)
 
 static int uvd_v7_0_resume(void *handle)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -692,7 +675,6 @@ static int uvd_v7_0_resume(void *handle)
  */
 static void uvd_v7_0_mc_resume(struct amdgpu_device *adev)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	uint32_t size = AMDGPU_UVD_FIRMWARE_SIZE(adev);
 	uint32_t offset;
 	int i;
@@ -752,7 +734,6 @@ static void uvd_v7_0_mc_resume(struct amdgpu_device *adev)
 static int uvd_v7_0_mmsch_start(struct amdgpu_device *adev,
 				struct amdgpu_mm_table *table)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	uint32_t data = 0, loop;
 	uint64_t addr = table->gpu_addr;
 	struct mmsch_v1_0_init_header *header = (struct mmsch_v1_0_init_header *)table->cpu_addr;
@@ -808,7 +789,6 @@ static int uvd_v7_0_mmsch_start(struct amdgpu_device *adev,
 
 static int uvd_v7_0_sriov_start(struct amdgpu_device *adev)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	uint32_t offset, size, tmp;
 	uint32_t table_size = 0;
@@ -975,7 +955,6 @@ static int uvd_v7_0_sriov_start(struct amdgpu_device *adev)
  */
 static int uvd_v7_0_start(struct amdgpu_device *adev)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	uint32_t rb_bufsz, tmp;
 	uint32_t lmi_swap_cntl;
@@ -1163,7 +1142,6 @@ static int uvd_v7_0_start(struct amdgpu_device *adev)
  */
 static void uvd_v7_0_stop(struct amdgpu_device *adev)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	uint8_t i = 0;
 
 	for (i = 0; i < adev->uvd.num_uvd_inst; ++i) {
@@ -1205,7 +1183,6 @@ static void uvd_v7_0_stop(struct amdgpu_device *adev)
 static void uvd_v7_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				     unsigned flags)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	WARN_ON(flags & AMDGPU_FENCE_FLAG_64BIT);
@@ -1247,7 +1224,6 @@ static void uvd_v7_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq
 static void uvd_v7_0_enc_ring_emit_fence(struct amdgpu_ring *ring, u64 addr,
 			u64 seq, unsigned flags)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 
 	WARN_ON(flags & AMDGPU_FENCE_FLAG_64BIT);
 
@@ -1265,7 +1241,6 @@ static void uvd_v7_0_enc_ring_emit_fence(struct amdgpu_ring *ring, u64 addr,
  */
 static void uvd_v7_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	/* The firmware doesn't seem to like touching registers at this point. */
 }
 
@@ -1278,7 +1253,6 @@ static void uvd_v7_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
  */
 static int uvd_v7_0_ring_test_ring(struct amdgpu_ring *ring)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t tmp = 0;
 	unsigned i;
@@ -1316,7 +1290,6 @@ static int uvd_v7_0_ring_test_ring(struct amdgpu_ring *ring)
 static int uvd_v7_0_ring_patch_cs_in_place(struct amdgpu_cs_parser *p,
 					   uint32_t ib_idx)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_ring *ring = to_amdgpu_ring(p->entity->rq->sched);
 	struct amdgpu_ib *ib = &p->job->ibs[ib_idx];
 	unsigned i;
@@ -1351,7 +1324,6 @@ static void uvd_v7_0_ring_emit_ib(struct amdgpu_ring *ring,
 				  struct amdgpu_ib *ib,
 				  uint32_t flags)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
 
@@ -1385,7 +1357,6 @@ static void uvd_v7_0_enc_ring_emit_ib(struct amdgpu_ring *ring,
 					struct amdgpu_ib *ib,
 					uint32_t flags)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
 
 	amdgpu_ring_write(ring, HEVC_ENC_CMD_IB_VM);
@@ -1398,7 +1369,6 @@ static void uvd_v7_0_enc_ring_emit_ib(struct amdgpu_ring *ring,
 static void uvd_v7_0_ring_emit_wreg(struct amdgpu_ring *ring,
 				    uint32_t reg, uint32_t val)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	amdgpu_ring_write(ring,
@@ -1415,7 +1385,6 @@ static void uvd_v7_0_ring_emit_wreg(struct amdgpu_ring *ring,
 static void uvd_v7_0_ring_emit_reg_wait(struct amdgpu_ring *ring, uint32_t reg,
 					uint32_t val, uint32_t mask)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	amdgpu_ring_write(ring,
@@ -1435,7 +1404,6 @@ static void uvd_v7_0_ring_emit_reg_wait(struct amdgpu_ring *ring, uint32_t reg,
 static void uvd_v7_0_ring_emit_vm_flush(struct amdgpu_ring *ring,
 					unsigned vmid, uint64_t pd_addr)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &ring->adev->vmhub[ring->funcs->vmhub];
 	uint32_t data0, data1, mask;
 
@@ -1450,7 +1418,6 @@ static void uvd_v7_0_ring_emit_vm_flush(struct amdgpu_ring *ring,
 
 static void uvd_v7_0_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	int i;
 
@@ -1464,7 +1431,6 @@ static void uvd_v7_0_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 
 static void uvd_v7_0_enc_ring_insert_end(struct amdgpu_ring *ring)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, HEVC_ENC_CMD_END);
 }
 
@@ -1472,7 +1438,6 @@ static void uvd_v7_0_enc_ring_emit_reg_wait(struct amdgpu_ring *ring,
 					    uint32_t reg, uint32_t val,
 					    uint32_t mask)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, HEVC_ENC_CMD_REG_WAIT);
 	amdgpu_ring_write(ring,	reg << 2);
 	amdgpu_ring_write(ring, mask);
@@ -1482,7 +1447,6 @@ static void uvd_v7_0_enc_ring_emit_reg_wait(struct amdgpu_ring *ring,
 static void uvd_v7_0_enc_ring_emit_vm_flush(struct amdgpu_ring *ring,
 					    unsigned int vmid, uint64_t pd_addr)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &ring->adev->vmhub[ring->funcs->vmhub];
 
 	pd_addr = amdgpu_gmc_emit_flush_gpu_tlb(ring, vmid, pd_addr);
@@ -1496,7 +1460,6 @@ static void uvd_v7_0_enc_ring_emit_vm_flush(struct amdgpu_ring *ring,
 static void uvd_v7_0_enc_ring_emit_wreg(struct amdgpu_ring *ring,
 					uint32_t reg, uint32_t val)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, HEVC_ENC_CMD_REG_WRITE);
 	amdgpu_ring_write(ring,	reg << 2);
 	amdgpu_ring_write(ring, val);
@@ -1605,7 +1568,6 @@ static int uvd_v7_0_set_interrupt_state(struct amdgpu_device *adev,
 					unsigned type,
 					enum amdgpu_interrupt_state state)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	// TODO
 	return 0;
 }
@@ -1614,7 +1576,6 @@ static int uvd_v7_0_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
-        //pr_info("uvd_v7_0: called %s\n", __func__);
 	uint32_t ip_instance;
 
 	switch (entry->client_id) {
@@ -1819,7 +1780,6 @@ static int uvd_v7_0_set_powergating_state(void *handle,
 static int uvd_v7_0_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	/* needed for driver unload*/
 	return 0;
 }
@@ -1911,7 +1871,6 @@ static const struct amdgpu_ring_funcs uvd_v7_0_enc_ring_vm_funcs = {
 
 static void uvd_v7_0_set_ring_funcs(struct amdgpu_device *adev)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->uvd.num_uvd_inst; i++) {
@@ -1925,7 +1884,6 @@ static void uvd_v7_0_set_ring_funcs(struct amdgpu_device *adev)
 
 static void uvd_v7_0_set_enc_ring_funcs(struct amdgpu_device *adev)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	int i, j;
 
 	for (j = 0; j < adev->uvd.num_uvd_inst; j++) {
@@ -1947,7 +1905,6 @@ static const struct amdgpu_irq_src_funcs uvd_v7_0_irq_funcs = {
 
 static void uvd_v7_0_set_irq_funcs(struct amdgpu_device *adev)
 {
-    pr_info("uvd_v7_0: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->uvd.num_uvd_inst; i++) {

@@ -64,7 +64,6 @@ static bool amdgpu_mn_invalidate_gfx(struct mmu_interval_notifier *mni,
 				     const struct mmu_notifier_range *range,
 				     unsigned long cur_seq)
 {
-    pr_info("amdgpu_mn: called %s\n", __func__);
 	struct amdgpu_bo *bo = container_of(mni, struct amdgpu_bo, notifier);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	long r;
@@ -102,7 +101,6 @@ static bool amdgpu_mn_invalidate_hsa(struct mmu_interval_notifier *mni,
 				     const struct mmu_notifier_range *range,
 				     unsigned long cur_seq)
 {
-    pr_info("amdgpu_mn: called %s\n", __func__);
 	struct amdgpu_bo *bo = container_of(mni, struct amdgpu_bo, notifier);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 
@@ -134,7 +132,6 @@ static const struct mmu_interval_notifier_ops amdgpu_mn_hsa_ops = {
  */
 int amdgpu_mn_register(struct amdgpu_bo *bo, unsigned long addr)
 {
-    pr_info("amdgpu_mn: called %s\n", __func__);
 	if (bo->kfd_bo)
 		return mmu_interval_notifier_insert(&bo->notifier, current->mm,
 						    addr, amdgpu_bo_size(bo),
@@ -153,7 +150,6 @@ int amdgpu_mn_register(struct amdgpu_bo *bo, unsigned long addr)
  */
 void amdgpu_mn_unregister(struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_mn: called %s\n", __func__);
 	if (!bo->notifier.mm)
 		return;
 	mmu_interval_notifier_remove(&bo->notifier);
@@ -166,7 +162,6 @@ int amdgpu_hmm_range_get_pages(struct mmu_interval_notifier *notifier,
 			       struct hmm_range **phmm_range, bool readonly,
 			       bool mmap_locked, void *owner)
 {
-    pr_info("amdgpu_mn: called %s\n", __func__);
 	struct hmm_range *hmm_range;
 	unsigned long timeout;
 	unsigned long i;
@@ -238,7 +233,6 @@ out_free_range:
 
 int amdgpu_hmm_range_get_pages_done(struct hmm_range *hmm_range)
 {
-    pr_info("amdgpu_mn: called %s\n", __func__);
 	int r;
 
 	r = mmu_interval_read_retry(hmm_range->notifier,

@@ -63,7 +63,6 @@
 
 static bool drm_is_current_master_locked(struct drm_file *fpriv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	lockdep_assert_once(lockdep_is_held(&fpriv->master_lookup_lock) ||
 			    lockdep_is_held(&fpriv->minor->dev->master_mutex));
 
@@ -82,7 +81,6 @@ static bool drm_is_current_master_locked(struct drm_file *fpriv)
  */
 bool drm_is_current_master(struct drm_file *fpriv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	bool ret;
 
 	spin_lock(&fpriv->master_lookup_lock);
@@ -95,7 +93,6 @@ EXPORT_SYMBOL(drm_is_current_master);
 
 int drm_getmagic(struct drm_device *dev, void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	struct drm_auth *auth = data;
 	int ret = 0;
 
@@ -117,7 +114,6 @@ int drm_getmagic(struct drm_device *dev, void *data, struct drm_file *file_priv)
 int drm_authmagic(struct drm_device *dev, void *data,
 		  struct drm_file *file_priv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	struct drm_auth *auth = data;
 	struct drm_file *file;
 
@@ -136,7 +132,6 @@ int drm_authmagic(struct drm_device *dev, void *data,
 
 struct drm_master *drm_master_create(struct drm_device *dev)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	struct drm_master *master;
 
 	master = kzalloc(sizeof(*master), GFP_KERNEL);
@@ -160,7 +155,6 @@ struct drm_master *drm_master_create(struct drm_device *dev)
 static void drm_set_master(struct drm_device *dev, struct drm_file *fpriv,
 			   bool new_master)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	dev->master = drm_master_get(fpriv->master);
 	if (dev->driver->master_set)
 		dev->driver->master_set(dev, fpriv, new_master);
@@ -170,7 +164,6 @@ static void drm_set_master(struct drm_device *dev, struct drm_file *fpriv,
 
 static int drm_new_set_master(struct drm_device *dev, struct drm_file *fpriv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	struct drm_master *old_master;
 	struct drm_master *new_master;
 
@@ -242,7 +235,6 @@ static int drm_new_set_master(struct drm_device *dev, struct drm_file *fpriv)
 static int
 drm_master_check_perm(struct drm_device *dev, struct drm_file *file_priv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	if (file_priv->pid == task_pid(current) && file_priv->was_master)
 		return 0;
 
@@ -255,7 +247,6 @@ drm_master_check_perm(struct drm_device *dev, struct drm_file *file_priv)
 int drm_setmaster_ioctl(struct drm_device *dev, void *data,
 			struct drm_file *file_priv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	int ret;
 
 	mutex_lock(&dev->master_mutex);
@@ -297,7 +288,6 @@ out_unlock:
 static void drm_drop_master(struct drm_device *dev,
 			    struct drm_file *fpriv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	if (dev->driver->master_drop)
 		dev->driver->master_drop(dev, fpriv);
 	drm_master_put(&dev->master);
@@ -306,7 +296,6 @@ static void drm_drop_master(struct drm_device *dev,
 int drm_dropmaster_ioctl(struct drm_device *dev, void *data,
 			 struct drm_file *file_priv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	int ret;
 
 	mutex_lock(&dev->master_mutex);
@@ -339,7 +328,6 @@ out_unlock:
 
 int drm_master_open(struct drm_file *file_priv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	struct drm_device *dev = file_priv->minor->dev;
 	int ret = 0;
 
@@ -361,7 +349,6 @@ int drm_master_open(struct drm_file *file_priv)
 
 void drm_master_release(struct drm_file *file_priv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	struct drm_device *dev = file_priv->minor->dev;
 	struct drm_master *master;
 
@@ -399,7 +386,6 @@ out:
  */
 struct drm_master *drm_master_get(struct drm_master *master)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	kref_get(&master->refcount);
 	return master;
 }
@@ -417,7 +403,6 @@ EXPORT_SYMBOL(drm_master_get);
  */
 struct drm_master *drm_file_get_master(struct drm_file *file_priv)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	struct drm_master *master = NULL;
 
 	spin_lock(&file_priv->master_lookup_lock);
@@ -433,7 +418,6 @@ EXPORT_SYMBOL(drm_file_get_master);
 
 static void drm_master_destroy(struct kref *kref)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	struct drm_master *master = container_of(kref, struct drm_master, refcount);
 	struct drm_device *dev = master->dev;
 
@@ -458,7 +442,6 @@ static void drm_master_destroy(struct kref *kref)
  */
 void drm_master_put(struct drm_master **master)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	kref_put(&(*master)->refcount, drm_master_destroy);
 	*master = NULL;
 }
@@ -467,7 +450,6 @@ EXPORT_SYMBOL(drm_master_put);
 /* Used by drm_client and drm_fb_helper */
 bool drm_master_internal_acquire(struct drm_device *dev)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	mutex_lock(&dev->master_mutex);
 	if (dev->master) {
 		mutex_unlock(&dev->master_mutex);
@@ -481,7 +463,6 @@ EXPORT_SYMBOL(drm_master_internal_acquire);
 /* Used by drm_client and drm_fb_helper */
 void drm_master_internal_release(struct drm_device *dev)
 {
-    pr_info("drm_auth: called %s\n", __func__);
 	mutex_unlock(&dev->master_mutex);
 }
 EXPORT_SYMBOL(drm_master_internal_release);

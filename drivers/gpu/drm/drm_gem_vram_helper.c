@@ -110,7 +110,6 @@ static const struct drm_gem_object_funcs drm_gem_vram_object_funcs;
 
 static void drm_gem_vram_cleanup(struct drm_gem_vram_object *gbo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	/* We got here via ttm_bo_put(), which means that the
 	 * TTM buffer object in 'bo' has already been cleaned
 	 * up; only release the GEM object.
@@ -124,14 +123,12 @@ static void drm_gem_vram_cleanup(struct drm_gem_vram_object *gbo)
 
 static void drm_gem_vram_destroy(struct drm_gem_vram_object *gbo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	drm_gem_vram_cleanup(gbo);
 	kfree(gbo);
 }
 
 static void ttm_buffer_object_destroy(struct ttm_buffer_object *bo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_gem_vram_object *gbo = drm_gem_vram_of_bo(bo);
 
 	drm_gem_vram_destroy(gbo);
@@ -140,7 +137,6 @@ static void ttm_buffer_object_destroy(struct ttm_buffer_object *bo)
 static void drm_gem_vram_placement(struct drm_gem_vram_object *gbo,
 				   unsigned long pl_flag)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	u32 invariant_flags = 0;
 	unsigned int i;
 	unsigned int c = 0;
@@ -190,7 +186,6 @@ struct drm_gem_vram_object *drm_gem_vram_create(struct drm_device *dev,
 						size_t size,
 						unsigned long pg_align)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_gem_vram_object *gbo;
 	struct drm_gem_object *gem;
 	struct drm_vram_mm *vmm = dev->vram_mm;
@@ -248,14 +243,12 @@ EXPORT_SYMBOL(drm_gem_vram_create);
  */
 void drm_gem_vram_put(struct drm_gem_vram_object *gbo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	ttm_bo_put(&gbo->bo);
 }
 EXPORT_SYMBOL(drm_gem_vram_put);
 
 static u64 drm_gem_vram_pg_offset(struct drm_gem_vram_object *gbo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	/* Keep TTM behavior for now, remove when drivers are audited */
 	if (WARN_ON_ONCE(!gbo->bo.resource ||
 			 gbo->bo.resource->mem_type == TTM_PL_SYSTEM))
@@ -278,7 +271,6 @@ static u64 drm_gem_vram_pg_offset(struct drm_gem_vram_object *gbo)
  */
 s64 drm_gem_vram_offset(struct drm_gem_vram_object *gbo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	if (WARN_ON_ONCE(!gbo->bo.pin_count))
 		return (s64)-ENODEV;
 	return drm_gem_vram_pg_offset(gbo) << PAGE_SHIFT;
@@ -288,7 +280,6 @@ EXPORT_SYMBOL(drm_gem_vram_offset);
 static int drm_gem_vram_pin_locked(struct drm_gem_vram_object *gbo,
 				   unsigned long pl_flag)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct ttm_operation_ctx ctx = { false, false };
 	int ret;
 
@@ -333,7 +324,6 @@ out:
  */
 int drm_gem_vram_pin(struct drm_gem_vram_object *gbo, unsigned long pl_flag)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	int ret;
 
 	ret = ttm_bo_reserve(&gbo->bo, true, false, NULL);
@@ -348,7 +338,6 @@ EXPORT_SYMBOL(drm_gem_vram_pin);
 
 static void drm_gem_vram_unpin_locked(struct drm_gem_vram_object *gbo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	ttm_bo_unpin(&gbo->bo);
 }
 
@@ -362,7 +351,6 @@ static void drm_gem_vram_unpin_locked(struct drm_gem_vram_object *gbo)
  */
 int drm_gem_vram_unpin(struct drm_gem_vram_object *gbo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	int ret;
 
 	ret = ttm_bo_reserve(&gbo->bo, true, false, NULL);
@@ -379,7 +367,6 @@ EXPORT_SYMBOL(drm_gem_vram_unpin);
 static int drm_gem_vram_kmap_locked(struct drm_gem_vram_object *gbo,
 				    struct dma_buf_map *map)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	int ret;
 
 	if (gbo->vmap_use_count > 0)
@@ -406,7 +393,6 @@ out:
 static void drm_gem_vram_kunmap_locked(struct drm_gem_vram_object *gbo,
 				       struct dma_buf_map *map)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_device *dev = gbo->bo.base.dev;
 
 	if (drm_WARN_ON_ONCE(dev, !gbo->vmap_use_count))
@@ -444,7 +430,6 @@ static void drm_gem_vram_kunmap_locked(struct drm_gem_vram_object *gbo,
  */
 int drm_gem_vram_vmap(struct drm_gem_vram_object *gbo, struct dma_buf_map *map)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	int ret;
 
 	ret = ttm_bo_reserve(&gbo->bo, true, false, NULL);
@@ -480,7 +465,6 @@ EXPORT_SYMBOL(drm_gem_vram_vmap);
  */
 void drm_gem_vram_vunmap(struct drm_gem_vram_object *gbo, struct dma_buf_map *map)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	int ret;
 
 	ret = ttm_bo_reserve(&gbo->bo, false, false, NULL);
@@ -519,7 +503,6 @@ int drm_gem_vram_fill_create_dumb(struct drm_file *file,
 				  unsigned long pitch_align,
 				  struct drm_mode_create_dumb *args)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	size_t pitch, size;
 	struct drm_gem_vram_object *gbo;
 	int ret;
@@ -565,21 +548,18 @@ EXPORT_SYMBOL(drm_gem_vram_fill_create_dumb);
 
 static bool drm_is_gem_vram(struct ttm_buffer_object *bo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	return (bo->destroy == ttm_buffer_object_destroy);
 }
 
 static void drm_gem_vram_bo_driver_evict_flags(struct drm_gem_vram_object *gbo,
 					       struct ttm_placement *pl)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	drm_gem_vram_placement(gbo, DRM_GEM_VRAM_PL_FLAG_SYSTEM);
 	*pl = gbo->placement;
 }
 
 static void drm_gem_vram_bo_driver_move_notify(struct drm_gem_vram_object *gbo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct ttm_buffer_object *bo = &gbo->bo;
 	struct drm_device *dev = bo->base.dev;
 
@@ -595,7 +575,6 @@ static int drm_gem_vram_bo_driver_move(struct drm_gem_vram_object *gbo,
 				       struct ttm_operation_ctx *ctx,
 				       struct ttm_resource *new_mem)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	drm_gem_vram_bo_driver_move_notify(gbo);
 	return ttm_bo_move_memcpy(&gbo->bo, ctx, new_mem);
 }
@@ -611,7 +590,6 @@ static int drm_gem_vram_bo_driver_move(struct drm_gem_vram_object *gbo,
  */
 static void drm_gem_vram_object_free(struct drm_gem_object *gem)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_gem_vram_object *gbo = drm_gem_vram_of_gem(gem);
 
 	drm_gem_vram_put(gbo);
@@ -640,7 +618,6 @@ int drm_gem_vram_driver_dumb_create(struct drm_file *file,
 				    struct drm_device *dev,
 				    struct drm_mode_create_dumb *args)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	if (WARN_ONCE(!dev->vram_mm, "VRAM MM not initialized"))
 		return -EINVAL;
 
@@ -670,7 +647,6 @@ int
 drm_gem_vram_plane_helper_prepare_fb(struct drm_plane *plane,
 				     struct drm_plane_state *new_state)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	size_t i;
 	struct drm_gem_vram_object *gbo;
 	int ret;
@@ -717,7 +693,6 @@ void
 drm_gem_vram_plane_helper_cleanup_fb(struct drm_plane *plane,
 				     struct drm_plane_state *old_state)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	size_t i;
 	struct drm_gem_vram_object *gbo;
 
@@ -755,7 +730,6 @@ int drm_gem_vram_simple_display_pipe_prepare_fb(
 	struct drm_simple_display_pipe *pipe,
 	struct drm_plane_state *new_state)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	return drm_gem_vram_plane_helper_prepare_fb(&pipe->plane, new_state);
 }
 EXPORT_SYMBOL(drm_gem_vram_simple_display_pipe_prepare_fb);
@@ -774,7 +748,6 @@ void drm_gem_vram_simple_display_pipe_cleanup_fb(
 	struct drm_simple_display_pipe *pipe,
 	struct drm_plane_state *old_state)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	drm_gem_vram_plane_helper_cleanup_fb(&pipe->plane, old_state);
 }
 EXPORT_SYMBOL(drm_gem_vram_simple_display_pipe_cleanup_fb);
@@ -794,7 +767,6 @@ EXPORT_SYMBOL(drm_gem_vram_simple_display_pipe_cleanup_fb);
  */
 static int drm_gem_vram_object_pin(struct drm_gem_object *gem)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_gem_vram_object *gbo = drm_gem_vram_of_gem(gem);
 
 	/* Fbdev console emulation is the use case of these PRIME
@@ -815,7 +787,6 @@ static int drm_gem_vram_object_pin(struct drm_gem_object *gem)
  */
 static void drm_gem_vram_object_unpin(struct drm_gem_object *gem)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_gem_vram_object *gbo = drm_gem_vram_of_gem(gem);
 
 	drm_gem_vram_unpin(gbo);
@@ -833,7 +804,6 @@ static void drm_gem_vram_object_unpin(struct drm_gem_object *gem)
  */
 static int drm_gem_vram_object_vmap(struct drm_gem_object *gem, struct dma_buf_map *map)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_gem_vram_object *gbo = drm_gem_vram_of_gem(gem);
 
 	return drm_gem_vram_vmap(gbo, map);
@@ -847,7 +817,6 @@ static int drm_gem_vram_object_vmap(struct drm_gem_object *gem, struct dma_buf_m
  */
 static void drm_gem_vram_object_vunmap(struct drm_gem_object *gem, struct dma_buf_map *map)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_gem_vram_object *gbo = drm_gem_vram_of_gem(gem);
 
 	drm_gem_vram_vunmap(gbo, map);
@@ -877,7 +846,6 @@ static const struct drm_gem_object_funcs drm_gem_vram_object_funcs = {
 
 static void bo_driver_ttm_tt_destroy(struct ttm_device *bdev, struct ttm_tt *tt)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	ttm_tt_destroy_common(bdev, tt);
 	ttm_tt_fini(tt);
 	kfree(tt);
@@ -890,7 +858,6 @@ static void bo_driver_ttm_tt_destroy(struct ttm_device *bdev, struct ttm_tt *tt)
 static struct ttm_tt *bo_driver_ttm_tt_create(struct ttm_buffer_object *bo,
 					      uint32_t page_flags)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct ttm_tt *tt;
 	int ret;
 
@@ -912,7 +879,6 @@ err_ttm_tt_init:
 static void bo_driver_evict_flags(struct ttm_buffer_object *bo,
 				  struct ttm_placement *placement)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_gem_vram_object *gbo;
 
 	/* TTM may pass BOs that are not GEM VRAM BOs. */
@@ -926,7 +892,6 @@ static void bo_driver_evict_flags(struct ttm_buffer_object *bo,
 
 static void bo_driver_delete_mem_notify(struct ttm_buffer_object *bo)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_gem_vram_object *gbo;
 
 	/* TTM may pass BOs that are not GEM VRAM BOs. */
@@ -944,7 +909,6 @@ static int bo_driver_move(struct ttm_buffer_object *bo,
 			  struct ttm_resource *new_mem,
 			  struct ttm_place *hop)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_gem_vram_object *gbo;
 
 	gbo = drm_gem_vram_of_bo(bo);
@@ -955,7 +919,6 @@ static int bo_driver_move(struct ttm_buffer_object *bo,
 static int bo_driver_io_mem_reserve(struct ttm_device *bdev,
 				    struct ttm_resource *mem)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_vram_mm *vmm = drm_vram_mm_of_bdev(bdev);
 
 	switch (mem->mem_type) {
@@ -989,7 +952,6 @@ static struct ttm_device_funcs bo_driver = {
 
 static int drm_vram_mm_debugfs(struct seq_file *m, void *data)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_info_node *node = (struct drm_info_node *) m->private;
 	struct drm_vram_mm *vmm = node->minor->dev->vram_mm;
 	struct ttm_resource_manager *man = ttm_manager_type(&vmm->bdev, TTM_PL_VRAM);
@@ -1011,7 +973,6 @@ static const struct drm_info_list drm_vram_mm_debugfs_list[] = {
  */
 void drm_vram_mm_debugfs_init(struct drm_minor *minor)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	drm_debugfs_create_files(drm_vram_mm_debugfs_list,
 				 ARRAY_SIZE(drm_vram_mm_debugfs_list),
 				 minor->debugfs_root, minor);
@@ -1021,7 +982,6 @@ EXPORT_SYMBOL(drm_vram_mm_debugfs_init);
 static int drm_vram_mm_init(struct drm_vram_mm *vmm, struct drm_device *dev,
 			    uint64_t vram_base, size_t vram_size)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	int ret;
 
 	vmm->vram_base = vram_base;
@@ -1044,7 +1004,6 @@ static int drm_vram_mm_init(struct drm_vram_mm *vmm, struct drm_device *dev,
 
 static void drm_vram_mm_cleanup(struct drm_vram_mm *vmm)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	ttm_range_man_fini(&vmm->bdev, TTM_PL_VRAM);
 	ttm_device_fini(&vmm->bdev);
 }
@@ -1056,7 +1015,6 @@ static void drm_vram_mm_cleanup(struct drm_vram_mm *vmm)
 static struct drm_vram_mm *drm_vram_helper_alloc_mm(struct drm_device *dev, uint64_t vram_base,
 						    size_t vram_size)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	int ret;
 
 	if (WARN_ON(dev->vram_mm))
@@ -1080,7 +1038,6 @@ err_kfree:
 
 static void drm_vram_helper_release_mm(struct drm_device *dev)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	if (!dev->vram_mm)
 		return;
 
@@ -1091,7 +1048,6 @@ static void drm_vram_helper_release_mm(struct drm_device *dev)
 
 static void drm_vram_mm_release(struct drm_device *dev, void *ptr)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	drm_vram_helper_release_mm(dev);
 }
 
@@ -1113,7 +1069,6 @@ static void drm_vram_mm_release(struct drm_device *dev, void *ptr)
 int drmm_vram_helper_init(struct drm_device *dev, uint64_t vram_base,
 			  size_t vram_size)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_vram_mm *vram_mm;
 
 	if (drm_WARN_ON_ONCE(dev, dev->vram_mm))
@@ -1135,7 +1090,6 @@ drm_vram_helper_mode_valid_internal(struct drm_device *dev,
 				    const struct drm_display_mode *mode,
 				    unsigned long max_bpp)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	struct drm_vram_mm *vmm = dev->vram_mm;
 	unsigned long fbsize, fbpages, max_fbpages;
 
@@ -1182,7 +1136,6 @@ enum drm_mode_status
 drm_vram_helper_mode_valid(struct drm_device *dev,
 			   const struct drm_display_mode *mode)
 {
-    pr_info("drm_gem_vram_helper: called %s\n", __func__);
 	static const unsigned long max_bpp = 4; /* DRM_FORMAT_XRGB8888 */
 
 	return drm_vram_helper_mode_valid_internal(dev, mode, max_bpp);

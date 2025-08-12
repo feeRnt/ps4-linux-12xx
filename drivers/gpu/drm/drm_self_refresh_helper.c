@@ -66,7 +66,6 @@ struct drm_self_refresh_data {
 
 static void drm_self_refresh_helper_entry_work(struct work_struct *work)
 {
-    pr_info("drm_self_refresh_helper: called %s\n", __func__);
 	struct drm_self_refresh_data *sr_data = container_of(
 				to_delayed_work(work),
 				struct drm_self_refresh_data, entry_work);
@@ -147,7 +146,6 @@ drm_self_refresh_helper_update_avg_times(struct drm_atomic_state *state,
 					 unsigned int commit_time_ms,
 					 unsigned int new_self_refresh_mask)
 {
-    pr_info("drm_self_refresh_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *old_crtc_state;
 	int i;
@@ -188,7 +186,6 @@ EXPORT_SYMBOL(drm_self_refresh_helper_update_avg_times);
  */
 void drm_self_refresh_helper_alter_state(struct drm_atomic_state *state)
 {
-    pr_info("drm_self_refresh_helper: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_crtc_state *crtc_state;
 	int i;
@@ -234,7 +231,6 @@ EXPORT_SYMBOL(drm_self_refresh_helper_alter_state);
  */
 int drm_self_refresh_helper_init(struct drm_crtc *crtc)
 {
-    pr_info("drm_self_refresh_helper: called %s\n", __func__);
 	struct drm_self_refresh_data *sr_data = crtc->self_refresh_data;
 
 	/* Helper is already initialized */
@@ -271,7 +267,6 @@ EXPORT_SYMBOL(drm_self_refresh_helper_init);
  */
 void drm_self_refresh_helper_cleanup(struct drm_crtc *crtc)
 {
-    pr_info("drm_self_refresh_helper: called %s\n", __func__);
 	struct drm_self_refresh_data *sr_data = crtc->self_refresh_data;
 
 	/* Helper is already uninitialized */

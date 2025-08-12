@@ -35,7 +35,6 @@
 int amdgpu_to_sched_priority(int amdgpu_priority,
 			     enum drm_sched_priority *prio)
 {
-    pr_info("amdgpu_sched: called %s\n", __func__);
 	switch (amdgpu_priority) {
 	case AMDGPU_CTX_PRIORITY_VERY_HIGH:
 		*prio = DRM_SCHED_PRIORITY_HIGH;
@@ -65,7 +64,6 @@ static int amdgpu_sched_process_priority_override(struct amdgpu_device *adev,
 						  int fd,
 						  enum drm_sched_priority priority)
 {
-    pr_info("amdgpu_sched: called %s\n", __func__);
 	struct fd f = fdget(fd);
 	struct amdgpu_fpriv *fpriv;
 	struct amdgpu_ctx *ctx;
@@ -93,7 +91,6 @@ static int amdgpu_sched_context_priority_override(struct amdgpu_device *adev,
 						  unsigned ctx_id,
 						  enum drm_sched_priority priority)
 {
-    pr_info("amdgpu_sched: called %s\n", __func__);
 	struct fd f = fdget(fd);
 	struct amdgpu_fpriv *fpriv;
 	struct amdgpu_ctx *ctx;
@@ -125,7 +122,6 @@ static int amdgpu_sched_context_priority_override(struct amdgpu_device *adev,
 int amdgpu_sched_ioctl(struct drm_device *dev, void *data,
 		       struct drm_file *filp)
 {
-    pr_info("amdgpu_sched: called %s\n", __func__);
 	union drm_amdgpu_sched *args = data;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	enum drm_sched_priority priority;

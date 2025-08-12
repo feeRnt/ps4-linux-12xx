@@ -63,14 +63,12 @@ static void amdgpu_amdkfd_restore_userptr_worker(struct work_struct *work);
 
 static inline struct amdgpu_device *get_amdgpu_device(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	return (struct amdgpu_device *)kgd;
 }
 
 static bool kfd_mem_is_attached(struct amdgpu_vm *avm,
 		struct kgd_mem *mem)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct kfd_mem_attachment *entry;
 
 	list_for_each_entry(entry, &mem->attachments, list)
@@ -86,7 +84,6 @@ static bool kfd_mem_is_attached(struct amdgpu_vm *avm,
  */
 void amdgpu_amdkfd_gpuvm_init_mem_limits(void)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct sysinfo si;
 	uint64_t mem;
 
@@ -104,7 +101,6 @@ void amdgpu_amdkfd_gpuvm_init_mem_limits(void)
 
 void amdgpu_amdkfd_reserve_system_mem(uint64_t size)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	kfd_mem_limit.system_mem_used += size;
 }
 
@@ -122,7 +118,6 @@ void amdgpu_amdkfd_reserve_system_mem(uint64_t size)
 
 static size_t amdgpu_amdkfd_acc_size(uint64_t size)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	size >>= PAGE_SHIFT;
 	size *= sizeof(dma_addr_t) + sizeof(void *);
 
@@ -134,7 +129,6 @@ static size_t amdgpu_amdkfd_acc_size(uint64_t size)
 static int amdgpu_amdkfd_reserve_mem_limit(struct amdgpu_device *adev,
 		uint64_t size, u32 domain, bool sg)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	uint64_t reserved_for_pt =
 		ESTIMATE_PT_SIZE(amdgpu_amdkfd_total_mem_size);
 	size_t acc_size, system_mem_needed, ttm_mem_needed, vram_needed;
@@ -185,7 +179,6 @@ static int amdgpu_amdkfd_reserve_mem_limit(struct amdgpu_device *adev,
 static void unreserve_mem_limit(struct amdgpu_device *adev,
 		uint64_t size, u32 domain, bool sg)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	size_t acc_size;
 
 	acc_size = amdgpu_amdkfd_acc_size(size);
@@ -216,7 +209,6 @@ static void unreserve_mem_limit(struct amdgpu_device *adev,
 
 void amdgpu_amdkfd_unreserve_memory_limit(struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	u32 domain = bo->preferred_domains;
 	bool sg = (bo->preferred_domains == AMDGPU_GEM_DOMAIN_CPU);
@@ -242,7 +234,6 @@ void amdgpu_amdkfd_unreserve_memory_limit(struct amdgpu_bo *bo)
 static int amdgpu_amdkfd_remove_eviction_fence(struct amdgpu_bo *bo,
 					struct amdgpu_amdkfd_fence *ef)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct dma_resv *resv = bo->tbo.base.resv;
 	struct dma_resv_list *old, *new;
 	unsigned int i, j, k;
@@ -295,7 +286,6 @@ static int amdgpu_amdkfd_remove_eviction_fence(struct amdgpu_bo *bo,
 
 int amdgpu_amdkfd_remove_fence_on_pt_pd_bos(struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_bo *root = bo;
 	struct amdgpu_vm_bo_base *vm_bo;
 	struct amdgpu_vm *vm;
@@ -333,7 +323,6 @@ int amdgpu_amdkfd_remove_fence_on_pt_pd_bos(struct amdgpu_bo *bo)
 static int amdgpu_amdkfd_bo_validate(struct amdgpu_bo *bo, uint32_t domain,
 				     bool wait)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct ttm_operation_ctx ctx = { false, false };
 	int ret;
 
@@ -355,7 +344,6 @@ validate_fail:
 
 static int amdgpu_amdkfd_validate_vm_bo(void *_unused, struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	return amdgpu_amdkfd_bo_validate(bo, bo->allowed_domains, false);
 }
 
@@ -368,7 +356,6 @@ static int amdgpu_amdkfd_validate_vm_bo(void *_unused, struct amdgpu_bo *bo)
  */
 static int vm_validate_pt_pd_bos(struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_bo *pd = vm->root.bo;
 	struct amdgpu_device *adev = amdgpu_ttm_adev(pd->tbo.bdev);
 	int ret;
@@ -400,7 +387,6 @@ static int vm_validate_pt_pd_bos(struct amdgpu_vm *vm)
 
 static int vm_update_pds(struct amdgpu_vm *vm, struct amdgpu_sync *sync)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_bo *pd = vm->root.bo;
 	struct amdgpu_device *adev = amdgpu_ttm_adev(pd->tbo.bdev);
 	int ret;
@@ -414,7 +400,6 @@ static int vm_update_pds(struct amdgpu_vm *vm, struct amdgpu_sync *sync)
 
 static uint64_t get_pte_flags(struct amdgpu_device *adev, struct kgd_mem *mem)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_device *bo_adev = amdgpu_ttm_adev(mem->bo->tbo.bdev);
 	bool coherent = mem->alloc_flags & KFD_IOC_ALLOC_MEM_FLAGS_COHERENT;
 	bool uncached = mem->alloc_flags & KFD_IOC_ALLOC_MEM_FLAGS_UNCACHED;
@@ -481,7 +466,6 @@ static int
 kfd_mem_dmamap_userptr(struct kgd_mem *mem,
 		       struct kfd_mem_attachment *attachment)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	enum dma_data_direction direction =
 		mem->alloc_flags & KFD_IOC_ALLOC_MEM_FLAGS_WRITABLE ?
 		DMA_BIDIRECTIONAL : DMA_TO_DEVICE;
@@ -535,7 +519,6 @@ free_sg:
 static int
 kfd_mem_dmamap_dmabuf(struct kfd_mem_attachment *attachment)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct ttm_operation_ctx ctx = {.interruptible = true};
 	struct amdgpu_bo *bo = attachment->bo_va->base.bo;
 
@@ -547,7 +530,6 @@ static int
 kfd_mem_dmamap_attachment(struct kgd_mem *mem,
 			  struct kfd_mem_attachment *attachment)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	switch (attachment->type) {
 	case KFD_MEM_ATT_SHARED:
 		return 0;
@@ -565,7 +547,6 @@ static void
 kfd_mem_dmaunmap_userptr(struct kgd_mem *mem,
 			 struct kfd_mem_attachment *attachment)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	enum dma_data_direction direction =
 		mem->alloc_flags & KFD_IOC_ALLOC_MEM_FLAGS_WRITABLE ?
 		DMA_BIDIRECTIONAL : DMA_TO_DEVICE;
@@ -589,7 +570,6 @@ kfd_mem_dmaunmap_userptr(struct kgd_mem *mem,
 static void
 kfd_mem_dmaunmap_dmabuf(struct kfd_mem_attachment *attachment)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct ttm_operation_ctx ctx = {.interruptible = true};
 	struct amdgpu_bo *bo = attachment->bo_va->base.bo;
 
@@ -601,7 +581,6 @@ static void
 kfd_mem_dmaunmap_attachment(struct kgd_mem *mem,
 			    struct kfd_mem_attachment *attachment)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	switch (attachment->type) {
 	case KFD_MEM_ATT_SHARED:
 		break;
@@ -620,7 +599,6 @@ static int
 kfd_mem_attach_userptr(struct amdgpu_device *adev, struct kgd_mem *mem,
 		       struct amdgpu_bo **bo)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	unsigned long bo_size = mem->bo->tbo.base.size;
 	struct drm_gem_object *gobj;
 	int ret;
@@ -648,7 +626,6 @@ static int
 kfd_mem_attach_dmabuf(struct amdgpu_device *adev, struct kgd_mem *mem,
 		      struct amdgpu_bo **bo)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct drm_gem_object *gobj;
 	int ret;
 
@@ -696,7 +673,6 @@ kfd_mem_attach_dmabuf(struct amdgpu_device *adev, struct kgd_mem *mem,
 static int kfd_mem_attach(struct amdgpu_device *adev, struct kgd_mem *mem,
 		struct amdgpu_vm *vm, bool is_aql)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_device *bo_adev = amdgpu_ttm_adev(mem->bo->tbo.bdev);
 	unsigned long bo_size = mem->bo->tbo.base.size;
 	uint64_t va = mem->va;
@@ -793,7 +769,6 @@ unwind:
 
 static void kfd_mem_detach(struct kfd_mem_attachment *attachment)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_bo *bo = attachment->bo_va->base.bo;
 
 	pr_debug("\t remove VA 0x%llx in entry %p\n",
@@ -808,7 +783,6 @@ static void add_kgd_mem_to_kfd_bo_list(struct kgd_mem *mem,
 				struct amdkfd_process_info *process_info,
 				bool userptr)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct ttm_validate_buffer *entry = &mem->validate_list;
 	struct amdgpu_bo *bo = mem->bo;
 
@@ -826,7 +800,6 @@ static void add_kgd_mem_to_kfd_bo_list(struct kgd_mem *mem,
 static void remove_kgd_mem_from_kfd_bo_list(struct kgd_mem *mem,
 		struct amdkfd_process_info *process_info)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct ttm_validate_buffer *bo_list_entry;
 
 	bo_list_entry = &mem->validate_list;
@@ -849,7 +822,6 @@ static void remove_kgd_mem_from_kfd_bo_list(struct kgd_mem *mem,
  */
 static int init_user_pages(struct kgd_mem *mem, uint64_t user_addr)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdkfd_process_info *process_info = mem->process_info;
 	struct amdgpu_bo *bo = mem->bo;
 	struct ttm_operation_ctx ctx = { true, false };
@@ -928,7 +900,6 @@ static int reserve_bo_and_vm(struct kgd_mem *mem,
 			      struct amdgpu_vm *vm,
 			      struct bo_vm_reservation_context *ctx)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_bo *bo = mem->bo;
 	int ret;
 
@@ -979,7 +950,6 @@ static int reserve_bo_and_cond_vms(struct kgd_mem *mem,
 				struct amdgpu_vm *vm, enum bo_vm_match map_type,
 				struct bo_vm_reservation_context *ctx)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_bo *bo = mem->bo;
 	struct kfd_mem_attachment *entry;
 	unsigned int i;
@@ -1052,7 +1022,6 @@ static int reserve_bo_and_cond_vms(struct kgd_mem *mem,
 static int unreserve_bo_and_vms(struct bo_vm_reservation_context *ctx,
 				 bool wait, bool intr)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	int ret = 0;
 
 	if (wait)
@@ -1074,7 +1043,6 @@ static void unmap_bo_from_gpuvm(struct kgd_mem *mem,
 				struct kfd_mem_attachment *entry,
 				struct amdgpu_sync *sync)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_bo_va *bo_va = entry->bo_va;
 	struct amdgpu_device *adev = entry->adev;
 	struct amdgpu_vm *vm = bo_va->base.vm;
@@ -1093,7 +1061,6 @@ static int update_gpuvm_pte(struct kgd_mem *mem,
 			    struct amdgpu_sync *sync,
 			    bool *table_freed)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_bo_va *bo_va = entry->bo_va;
 	struct amdgpu_device *adev = entry->adev;
 	int ret;
@@ -1118,7 +1085,6 @@ static int map_bo_to_gpuvm(struct kgd_mem *mem,
 			   bool no_update_pte,
 			   bool *table_freed)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	int ret;
 
 	/* Set virtual address for the allocation */
@@ -1149,7 +1115,6 @@ update_gpuvm_pte_failed:
 
 static struct sg_table *create_doorbell_sg(uint64_t addr, uint32_t size)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct sg_table *sg = kmalloc(sizeof(*sg), GFP_KERNEL);
 
 	if (!sg)
@@ -1168,7 +1133,6 @@ static struct sg_table *create_doorbell_sg(uint64_t addr, uint32_t size)
 
 static int process_validate_vms(struct amdkfd_process_info *process_info)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_vm *peer_vm;
 	int ret;
 
@@ -1185,7 +1149,6 @@ static int process_validate_vms(struct amdkfd_process_info *process_info)
 static int process_sync_pds_resv(struct amdkfd_process_info *process_info,
 				 struct amdgpu_sync *sync)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_vm *peer_vm;
 	int ret;
 
@@ -1206,7 +1169,6 @@ static int process_sync_pds_resv(struct amdkfd_process_info *process_info,
 static int process_update_pds(struct amdkfd_process_info *process_info,
 			      struct amdgpu_sync *sync)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_vm *peer_vm;
 	int ret;
 
@@ -1223,7 +1185,6 @@ static int process_update_pds(struct amdkfd_process_info *process_info,
 static int init_kfd_vm(struct amdgpu_vm *vm, void **process_info,
 		       struct dma_fence **ef)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdkfd_process_info *info = NULL;
 	int ret;
 
@@ -1313,7 +1274,6 @@ int amdgpu_amdkfd_gpuvm_acquire_process_vm(struct kgd_dev *kgd,
 					   void **process_info,
 					   struct dma_fence **ef)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct amdgpu_fpriv *drv_priv;
 	struct amdgpu_vm *avm;
@@ -1357,7 +1317,6 @@ int amdgpu_amdkfd_gpuvm_acquire_process_vm(struct kgd_dev *kgd,
 void amdgpu_amdkfd_gpuvm_destroy_cb(struct amdgpu_device *adev,
 				    struct amdgpu_vm *vm)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdkfd_process_info *process_info = vm->process_info;
 	struct amdgpu_bo *pd = vm->root.bo;
 
@@ -1393,7 +1352,6 @@ void amdgpu_amdkfd_gpuvm_destroy_cb(struct amdgpu_device *adev,
 
 void amdgpu_amdkfd_gpuvm_release_process_vm(struct kgd_dev *kgd, void *drm_priv)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct amdgpu_vm *avm;
 
@@ -1415,7 +1373,6 @@ void amdgpu_amdkfd_gpuvm_release_process_vm(struct kgd_dev *kgd, void *drm_priv)
 
 uint64_t amdgpu_amdkfd_gpuvm_get_process_page_dir(void *drm_priv)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_vm *avm = drm_priv_to_vm(drm_priv);
 	struct amdgpu_bo *pd = avm->root.bo;
 	struct amdgpu_device *adev = amdgpu_ttm_adev(pd->tbo.bdev);
@@ -1430,7 +1387,6 @@ int amdgpu_amdkfd_gpuvm_alloc_memory_of_gpu(
 		void *drm_priv, struct kgd_mem **mem,
 		uint64_t *offset, uint32_t flags)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct amdgpu_vm *avm = drm_priv_to_vm(drm_priv);
 	enum ttm_bo_type bo_type = ttm_bo_type_device;
@@ -1569,7 +1525,6 @@ int amdgpu_amdkfd_gpuvm_free_memory_of_gpu(
 		struct kgd_dev *kgd, struct kgd_mem *mem, void *drm_priv,
 		uint64_t *size)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdkfd_process_info *process_info = mem->process_info;
 	unsigned long bo_size = mem->bo->tbo.base.size;
 	struct kfd_mem_attachment *entry, *tmp;
@@ -1658,7 +1613,6 @@ int amdgpu_amdkfd_gpuvm_map_memory_to_gpu(
 		struct kgd_dev *kgd, struct kgd_mem *mem,
 		void *drm_priv, bool *table_freed)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct amdgpu_vm *avm = drm_priv_to_vm(drm_priv);
 	int ret;
@@ -1788,7 +1742,6 @@ out:
 int amdgpu_amdkfd_gpuvm_unmap_memory_from_gpu(
 		struct kgd_dev *kgd, struct kgd_mem *mem, void *drm_priv)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_vm *avm = drm_priv_to_vm(drm_priv);
 	struct amdkfd_process_info *process_info = avm->process_info;
 	unsigned long bo_size = mem->bo->tbo.base.size;
@@ -1850,7 +1803,6 @@ out:
 int amdgpu_amdkfd_gpuvm_sync_memory(
 		struct kgd_dev *kgd, struct kgd_mem *mem, bool intr)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_sync sync;
 	int ret;
 
@@ -1868,7 +1820,6 @@ int amdgpu_amdkfd_gpuvm_sync_memory(
 int amdgpu_amdkfd_gpuvm_map_gtt_bo_to_kernel(struct kgd_dev *kgd,
 		struct kgd_mem *mem, void **kptr, uint64_t *size)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	int ret;
 	struct amdgpu_bo *bo = mem->bo;
 
@@ -1925,7 +1876,6 @@ bo_reserve_failed:
 int amdgpu_amdkfd_gpuvm_get_vm_fault_info(struct kgd_dev *kgd,
 					      struct kfd_vm_fault_info *mem)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_device *adev;
 
 	adev = (struct amdgpu_device *)kgd;
@@ -1943,7 +1893,6 @@ int amdgpu_amdkfd_gpuvm_import_dmabuf(struct kgd_dev *kgd,
 				      struct kgd_mem **mem, uint64_t *size,
 				      uint64_t *mmap_offset)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 	struct amdgpu_vm *avm = drm_priv_to_vm(drm_priv);
 	struct drm_gem_object *obj;
@@ -2018,7 +1967,6 @@ int amdgpu_amdkfd_gpuvm_import_dmabuf(struct kgd_dev *kgd,
 int amdgpu_amdkfd_evict_userptr(struct kgd_mem *mem,
 				struct mm_struct *mm)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdkfd_process_info *process_info = mem->process_info;
 	int evicted_bos;
 	int r = 0;
@@ -2046,7 +1994,6 @@ int amdgpu_amdkfd_evict_userptr(struct kgd_mem *mem,
 static int update_invalid_user_pages(struct amdkfd_process_info *process_info,
 				     struct mm_struct *mm)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct kgd_mem *mem, *tmp_mem;
 	struct amdgpu_bo *bo;
 	struct ttm_operation_ctx ctx = { false, false };
@@ -2127,7 +2074,6 @@ static int update_invalid_user_pages(struct amdkfd_process_info *process_info,
  */
 static int validate_invalid_user_pages(struct amdkfd_process_info *process_info)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_bo_list_entry *pd_bo_list_entries;
 	struct list_head resv_list, duplicates;
 	struct ww_acquire_ctx ticket;
@@ -2241,7 +2187,6 @@ out_no_mem:
  */
 static void amdgpu_amdkfd_restore_userptr_worker(struct work_struct *work)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct delayed_work *dwork = to_delayed_work(work);
 	struct amdkfd_process_info *process_info =
 		container_of(dwork, struct amdkfd_process_info,
@@ -2326,7 +2271,6 @@ unlock_out:
  */
 int amdgpu_amdkfd_gpuvm_restore_process_bos(void *info, struct dma_fence **ef)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_bo_list_entry *pd_bo_list;
 	struct amdkfd_process_info *process_info = info;
 	struct amdgpu_vm *peer_vm;
@@ -2480,7 +2424,6 @@ ttm_reserve_fail:
 
 int amdgpu_amdkfd_add_gws_to_process(void *info, void *gws, struct kgd_mem **mem)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdkfd_process_info *process_info = (struct amdkfd_process_info *)info;
 	struct amdgpu_bo *gws_bo = (struct amdgpu_bo *)gws;
 	int ret;
@@ -2543,7 +2486,6 @@ bo_reservation_failure:
 
 int amdgpu_amdkfd_remove_gws_from_process(void *info, void *mem)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	int ret;
 	struct amdkfd_process_info *process_info = (struct amdkfd_process_info *)info;
 	struct kgd_mem *kgd_mem = (struct kgd_mem *)mem;
@@ -2574,7 +2516,6 @@ int amdgpu_amdkfd_remove_gws_from_process(void *info, void *mem)
 int amdgpu_amdkfd_get_tile_config(struct kgd_dev *kgd,
 				struct tile_config *config)
 {
-    pr_info("amdgpu_amdkfd_gpuvm: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)kgd;
 
 	config->gb_addr_config = adev->gfx.config.gb_addr_config;

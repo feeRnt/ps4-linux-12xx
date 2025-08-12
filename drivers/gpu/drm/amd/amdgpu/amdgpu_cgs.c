@@ -43,7 +43,6 @@ struct amdgpu_cgs_device {
 
 static uint32_t amdgpu_cgs_read_register(struct cgs_device *cgs_device, unsigned offset)
 {
-    pr_info("amdgpu_cgs: called %s\n", __func__);
 	CGS_FUNC_ADEV;
 	return RREG32(offset);
 }
@@ -51,7 +50,6 @@ static uint32_t amdgpu_cgs_read_register(struct cgs_device *cgs_device, unsigned
 static void amdgpu_cgs_write_register(struct cgs_device *cgs_device, unsigned offset,
 				      uint32_t value)
 {
-    pr_info("amdgpu_cgs: called %s\n", __func__);
 	CGS_FUNC_ADEV;
 	WREG32(offset, value);
 }
@@ -60,7 +58,6 @@ static uint32_t amdgpu_cgs_read_ind_register(struct cgs_device *cgs_device,
 					     enum cgs_ind_reg space,
 					     unsigned index)
 {
-    pr_info("amdgpu_cgs: called %s\n", __func__);
 	CGS_FUNC_ADEV;
 	switch (space) {
 	case CGS_IND_REG__PCIE:
@@ -89,7 +86,6 @@ static void amdgpu_cgs_write_ind_register(struct cgs_device *cgs_device,
 					  enum cgs_ind_reg space,
 					  unsigned index, uint32_t value)
 {
-    pr_info("amdgpu_cgs: called %s\n", __func__);
 	CGS_FUNC_ADEV;
 	switch (space) {
 	case CGS_IND_REG__PCIE:
@@ -115,7 +111,6 @@ static void amdgpu_cgs_write_ind_register(struct cgs_device *cgs_device,
 
 static uint32_t fw_type_convert(struct cgs_device *cgs_device, uint32_t fw_type)
 {
-    pr_info("amdgpu_cgs: called %s\n", __func__);
 	CGS_FUNC_ADEV;
 	enum AMDGPU_UCODE_ID result = AMDGPU_UCODE_ID_MAXIMUM;
 
@@ -164,7 +159,6 @@ static uint32_t fw_type_convert(struct cgs_device *cgs_device, uint32_t fw_type)
 static uint16_t amdgpu_get_firmware_version(struct cgs_device *cgs_device,
 					enum cgs_ucode_id type)
 {
-    pr_info("amdgpu_cgs: called %s\n", __func__);
 	CGS_FUNC_ADEV;
 	uint16_t fw_version = 0;
 
@@ -209,7 +203,6 @@ static int amdgpu_cgs_get_firmware_info(struct cgs_device *cgs_device,
 					enum cgs_ucode_id type,
 					struct cgs_firmware_info *info)
 {
-    pr_info("amdgpu_cgs: called %s\n", __func__);
 	CGS_FUNC_ADEV;
 
 	if ((CGS_UCODE_ID_SMU != type) && (CGS_UCODE_ID_SMU_SK != type)) {
@@ -468,7 +461,6 @@ static const struct cgs_ops amdgpu_cgs_ops = {
 
 struct cgs_device *amdgpu_cgs_create_device(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_cgs: called %s\n", __func__);
 	struct amdgpu_cgs_device *cgs_device =
 		kmalloc(sizeof(*cgs_device), GFP_KERNEL);
 
@@ -485,6 +477,5 @@ struct cgs_device *amdgpu_cgs_create_device(struct amdgpu_device *adev)
 
 void amdgpu_cgs_destroy_device(struct cgs_device *cgs_device)
 {
-    pr_info("amdgpu_cgs: called %s\n", __func__);
 	kfree(cgs_device);
 }

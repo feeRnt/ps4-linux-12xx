@@ -73,7 +73,6 @@ static void amdgpu_vcn_idle_work_handler(struct work_struct *work);
 
 int amdgpu_vcn_sw_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	unsigned long bo_size;
 	const char *fw_name;
 	const struct common_firmware_header *hdr;
@@ -257,7 +256,6 @@ int amdgpu_vcn_sw_init(struct amdgpu_device *adev)
 
 int amdgpu_vcn_sw_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	int i, j;
 
 	for (j = 0; j < adev->vcn.num_vcn_inst; ++j) {
@@ -290,7 +288,6 @@ int amdgpu_vcn_sw_fini(struct amdgpu_device *adev)
 
 bool amdgpu_vcn_is_disabled_vcn(struct amdgpu_device *adev, enum vcn_ring_type type, uint32_t vcn_instance)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	bool ret = false;
 
 	int major;
@@ -314,7 +311,6 @@ bool amdgpu_vcn_is_disabled_vcn(struct amdgpu_device *adev, enum vcn_ring_type t
 
 int amdgpu_vcn_suspend(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	unsigned size;
 	void *ptr;
 	int i, idx;
@@ -344,7 +340,6 @@ int amdgpu_vcn_suspend(struct amdgpu_device *adev)
 
 int amdgpu_vcn_resume(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	unsigned size;
 	void *ptr;
 	int i, idx;
@@ -388,7 +383,6 @@ int amdgpu_vcn_resume(struct amdgpu_device *adev)
 
 static void amdgpu_vcn_idle_work_handler(struct work_struct *work)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct amdgpu_device *adev =
 		container_of(work, struct amdgpu_device, vcn.idle_work.work);
 	unsigned int fences = 0, fence[AMDGPU_MAX_VCN_INSTANCES] = {0};
@@ -433,7 +427,6 @@ static void amdgpu_vcn_idle_work_handler(struct work_struct *work)
 
 void amdgpu_vcn_ring_begin_use(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	int r = 0;
 
@@ -476,7 +469,6 @@ void amdgpu_vcn_ring_begin_use(struct amdgpu_ring *ring)
 
 void amdgpu_vcn_ring_end_use(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	if (ring->adev->pg_flags & AMD_PG_SUPPORT_VCN_DPG &&
 		ring->funcs->type == AMDGPU_RING_TYPE_VCN_ENC)
 		atomic_dec(&ring->adev->vcn.inst[ring->me].dpg_enc_submission_cnt);
@@ -488,7 +480,6 @@ void amdgpu_vcn_ring_end_use(struct amdgpu_ring *ring)
 
 int amdgpu_vcn_dec_ring_test_ring(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t tmp = 0;
 	unsigned i;
@@ -520,7 +511,6 @@ int amdgpu_vcn_dec_ring_test_ring(struct amdgpu_ring *ring)
 
 int amdgpu_vcn_dec_sw_ring_test_ring(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t rptr;
 	unsigned int i;
@@ -554,7 +544,6 @@ static int amdgpu_vcn_dec_send_msg(struct amdgpu_ring *ring,
 				   struct amdgpu_bo *bo,
 				   struct dma_fence **fence)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct dma_fence *f = NULL;
 	struct amdgpu_job *job;
@@ -609,7 +598,6 @@ err:
 static int amdgpu_vcn_dec_get_create_msg(struct amdgpu_ring *ring, uint32_t handle,
 					 struct amdgpu_bo **bo)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t *msg;
 	int r, i;
@@ -644,7 +632,6 @@ static int amdgpu_vcn_dec_get_create_msg(struct amdgpu_ring *ring, uint32_t hand
 static int amdgpu_vcn_dec_get_destroy_msg(struct amdgpu_ring *ring, uint32_t handle,
 					  struct amdgpu_bo **bo)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t *msg;
 	int r, i;
@@ -670,7 +657,6 @@ static int amdgpu_vcn_dec_get_destroy_msg(struct amdgpu_ring *ring, uint32_t han
 
 int amdgpu_vcn_dec_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct dma_fence *fence = NULL;
 	struct amdgpu_bo *bo;
 	long r;
@@ -705,7 +691,6 @@ static int amdgpu_vcn_dec_sw_send_msg(struct amdgpu_ring *ring,
 				   struct amdgpu_bo *bo,
 				   struct dma_fence **fence)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct amdgpu_vcn_decode_buffer *decode_buffer = NULL;
 	const unsigned int ib_size_dw = 64;
 	struct amdgpu_device *adev = ring->adev;
@@ -762,7 +747,6 @@ err:
 
 int amdgpu_vcn_dec_sw_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct dma_fence *fence = NULL;
 	struct amdgpu_bo *bo;
 	long r;
@@ -795,7 +779,6 @@ error:
 
 int amdgpu_vcn_enc_ring_test_ring(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t rptr;
 	unsigned i;
@@ -829,7 +812,6 @@ static int amdgpu_vcn_enc_get_create_msg(struct amdgpu_ring *ring, uint32_t hand
 					 struct amdgpu_bo *bo,
 					 struct dma_fence **fence)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	const unsigned ib_size_dw = 16;
 	struct amdgpu_job *job;
 	struct amdgpu_ib *ib;
@@ -884,7 +866,6 @@ static int amdgpu_vcn_enc_get_destroy_msg(struct amdgpu_ring *ring, uint32_t han
 					  struct amdgpu_bo *bo,
 					  struct dma_fence **fence)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	const unsigned ib_size_dw = 16;
 	struct amdgpu_job *job;
 	struct amdgpu_ib *ib;
@@ -937,7 +918,6 @@ err:
 
 int amdgpu_vcn_enc_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
-    pr_info("amdgpu_vcn: called %s\n", __func__);
 	struct dma_fence *fence = NULL;
 	struct amdgpu_bo *bo = NULL;
 	long r;

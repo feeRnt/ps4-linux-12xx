@@ -65,7 +65,6 @@ int amdgpu_ib_get(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 		  unsigned size, enum amdgpu_ib_pool_type pool_type,
 		  struct amdgpu_ib *ib)
 {
-    pr_info("amdgpu_ib: called %s\n", __func__);
 	int r;
 
 	if (size) {
@@ -99,7 +98,6 @@ int amdgpu_ib_get(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 void amdgpu_ib_free(struct amdgpu_device *adev, struct amdgpu_ib *ib,
 		    struct dma_fence *f)
 {
-    pr_info("amdgpu_ib: called %s\n", __func__);
 	amdgpu_sa_bo_free(adev, &ib->sa_bo, f);
 }
 
@@ -129,7 +127,6 @@ int amdgpu_ib_schedule(struct amdgpu_ring *ring, unsigned num_ibs,
 		       struct amdgpu_ib *ibs, struct amdgpu_job *job,
 		       struct dma_fence **f)
 {
-    pr_info("amdgpu_ib: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct amdgpu_ib *ib = &ibs[0];
 	struct dma_fence *tmp = NULL;
@@ -303,7 +300,6 @@ int amdgpu_ib_schedule(struct amdgpu_ring *ring, unsigned num_ibs,
  */
 int amdgpu_ib_pool_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ib: called %s\n", __func__);
 	unsigned size;
 	int r, i;
 
@@ -342,7 +338,6 @@ error:
  */
 void amdgpu_ib_pool_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ib: called %s\n", __func__);
 	int i;
 
 	if (!adev->ib_pool_ready)
@@ -365,11 +360,11 @@ void amdgpu_ib_pool_fini(struct amdgpu_device *adev)
  */
 int amdgpu_ib_ring_tests(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ib: called %s\n", __func__);
 	long tmo_gfx, tmo_mm;
 	int r, ret = 0;
 	unsigned i;
 
+	pr_info("amdgpu_ib: called %s\n", __func__);
 	tmo_mm = tmo_gfx = AMDGPU_IB_TEST_TIMEOUT;
 	if (amdgpu_sriov_vf(adev)) {
 		/* for MM engines in hypervisor side they are not scheduled together
@@ -447,7 +442,6 @@ int amdgpu_ib_ring_tests(struct amdgpu_device *adev)
 
 static int amdgpu_debugfs_sa_info_show(struct seq_file *m, void *unused)
 {
-    pr_info("amdgpu_ib: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 
 	seq_printf(m, "--------------------- DELAYED --------------------- \n");
@@ -468,7 +462,6 @@ DEFINE_SHOW_ATTRIBUTE(amdgpu_debugfs_sa_info);
 
 void amdgpu_debugfs_sa_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ib: called %s\n", __func__);
 #if defined(CONFIG_DEBUG_FS)
 	struct drm_minor *minor = adev_to_drm(adev)->primary;
 	struct dentry *root = minor->debugfs_root;

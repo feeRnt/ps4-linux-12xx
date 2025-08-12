@@ -40,7 +40,6 @@ int __drm_mode_object_add(struct drm_device *dev, struct drm_mode_object *obj,
 			  uint32_t obj_type, bool register_obj,
 			  void (*obj_free_cb)(struct kref *kref))
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	int ret;
 
 	WARN_ON(!dev->driver->load && dev->registered && !obj_free_cb);
@@ -80,14 +79,12 @@ int __drm_mode_object_add(struct drm_device *dev, struct drm_mode_object *obj,
 int drm_mode_object_add(struct drm_device *dev,
 			struct drm_mode_object *obj, uint32_t obj_type)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	return __drm_mode_object_add(dev, obj, obj_type, true, NULL);
 }
 
 void drm_mode_object_register(struct drm_device *dev,
 			      struct drm_mode_object *obj)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	mutex_lock(&dev->mode_config.idr_mutex);
 	idr_replace(&dev->mode_config.object_idr, obj, obj->id);
 	mutex_unlock(&dev->mode_config.idr_mutex);
@@ -107,7 +104,6 @@ void drm_mode_object_register(struct drm_device *dev,
 void drm_mode_object_unregister(struct drm_device *dev,
 				struct drm_mode_object *object)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	WARN_ON(!dev->driver->load && dev->registered && !object->free_cb);
 
 	mutex_lock(&dev->mode_config.idr_mutex);
@@ -127,7 +123,6 @@ void drm_mode_object_unregister(struct drm_device *dev,
  */
 bool drm_mode_object_lease_required(uint32_t type)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	switch(type) {
 	case DRM_MODE_OBJECT_CRTC:
 	case DRM_MODE_OBJECT_CONNECTOR:
@@ -142,7 +137,6 @@ struct drm_mode_object *__drm_mode_object_find(struct drm_device *dev,
 					       struct drm_file *file_priv,
 					       uint32_t id, uint32_t type)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	struct drm_mode_object *obj = NULL;
 
 	mutex_lock(&dev->mode_config.idr_mutex);
@@ -180,7 +174,6 @@ struct drm_mode_object *drm_mode_object_find(struct drm_device *dev,
 		struct drm_file *file_priv,
 		uint32_t id, uint32_t type)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	struct drm_mode_object *obj = NULL;
 
 	obj = __drm_mode_object_find(dev, file_priv, id, type);
@@ -198,7 +191,6 @@ EXPORT_SYMBOL(drm_mode_object_find);
  */
 void drm_mode_object_put(struct drm_mode_object *obj)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	if (obj->free_cb) {
 		DRM_DEBUG("OBJ ID: %d (%d)\n", obj->id, kref_read(&obj->refcount));
 		kref_put(&obj->refcount, obj->free_cb);
@@ -216,7 +208,6 @@ EXPORT_SYMBOL(drm_mode_object_put);
  */
 void drm_mode_object_get(struct drm_mode_object *obj)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	if (obj->free_cb) {
 		DRM_DEBUG("OBJ ID: %d (%d)\n", obj->id, kref_read(&obj->refcount));
 		kref_get(&obj->refcount);
@@ -241,7 +232,6 @@ void drm_object_attach_property(struct drm_mode_object *obj,
 				struct drm_property *property,
 				uint64_t init_val)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	int count = obj->properties->count;
 	struct drm_device *dev = property->dev;
 
@@ -291,7 +281,6 @@ EXPORT_SYMBOL(drm_object_attach_property);
 int drm_object_property_set_value(struct drm_mode_object *obj,
 				  struct drm_property *property, uint64_t val)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	int i;
 
 	WARN_ON(drm_drv_uses_atomic_modeset(property->dev) &&
@@ -312,7 +301,6 @@ static int __drm_object_property_get_value(struct drm_mode_object *obj,
 					   struct drm_property *property,
 					   uint64_t *val)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	int i;
 
 	/* read-only properties bypass atomic mechanism and still store
@@ -354,7 +342,6 @@ static int __drm_object_property_get_value(struct drm_mode_object *obj,
 int drm_object_property_get_value(struct drm_mode_object *obj,
 				  struct drm_property *property, uint64_t *val)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	WARN_ON(drm_drv_uses_atomic_modeset(property->dev));
 
 	return __drm_object_property_get_value(obj, property, val);
@@ -367,7 +354,6 @@ int drm_mode_object_get_properties(struct drm_mode_object *obj, bool atomic,
 				   uint64_t __user *prop_values,
 				   uint32_t *arg_count_props)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	int i, ret, count;
 
 	for (i = 0, count = 0; i < obj->properties->count; i++) {
@@ -414,7 +400,6 @@ int drm_mode_object_get_properties(struct drm_mode_object *obj, bool atomic,
 int drm_mode_obj_get_properties_ioctl(struct drm_device *dev, void *data,
 				      struct drm_file *file_priv)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	struct drm_mode_obj_get_properties *arg = data;
 	struct drm_mode_object *obj;
 	struct drm_modeset_acquire_ctx ctx;
@@ -450,7 +435,6 @@ out:
 struct drm_property *drm_mode_obj_find_prop_id(struct drm_mode_object *obj,
 					       uint32_t prop_id)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < obj->properties->count; i++)
@@ -464,7 +448,6 @@ static int set_property_legacy(struct drm_mode_object *obj,
 			       struct drm_property *prop,
 			       uint64_t prop_value)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	struct drm_device *dev = prop->dev;
 	struct drm_mode_object *ref;
 	struct drm_modeset_acquire_ctx ctx;
@@ -497,7 +480,6 @@ static int set_property_atomic(struct drm_mode_object *obj,
 			       struct drm_property *prop,
 			       uint64_t prop_value)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	struct drm_device *dev = prop->dev;
 	struct drm_atomic_state *state;
 	struct drm_modeset_acquire_ctx ctx;
@@ -544,7 +526,6 @@ out:
 int drm_mode_obj_set_property_ioctl(struct drm_device *dev, void *data,
 				    struct drm_file *file_priv)
 {
-    pr_info("drm_mode_object: called %s\n", __func__);
 	struct drm_mode_obj_set_property *arg = data;
 	struct drm_mode_object *arg_obj;
 	struct drm_property *property;

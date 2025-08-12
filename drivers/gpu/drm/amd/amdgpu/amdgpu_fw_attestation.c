@@ -57,7 +57,6 @@ static ssize_t amdgpu_fw_attestation_debugfs_read(struct file *f,
 						  size_t size,
 						  loff_t *pos)
 {
-    pr_info("amdgpu_fw_attestation: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)file_inode(f)->i_private;
 	uint64_t records_addr = 0;
 	uint64_t vram_pos = 0;
@@ -122,7 +121,6 @@ static const struct file_operations amdgpu_fw_attestation_debugfs_ops = {
 
 static int amdgpu_is_fw_attestation_supported(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_fw_attestation: called %s\n", __func__);
 	if (adev->flags & AMD_IS_APU)
 		return 0;
 
@@ -134,7 +132,6 @@ static int amdgpu_is_fw_attestation_supported(struct amdgpu_device *adev)
 
 void amdgpu_fw_attestation_debugfs_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_fw_attestation: called %s\n", __func__);
 	if (!amdgpu_is_fw_attestation_supported(adev))
 		return;
 

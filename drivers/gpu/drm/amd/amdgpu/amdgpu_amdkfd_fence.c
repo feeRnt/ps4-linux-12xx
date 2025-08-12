@@ -64,7 +64,6 @@ struct amdgpu_amdkfd_fence *amdgpu_amdkfd_fence_create(u64 context,
 				struct mm_struct *mm,
 				struct svm_range_bo *svm_bo)
 {
-    pr_info("amdgpu_amdkfd_fence: called %s\n", __func__);
 	struct amdgpu_amdkfd_fence *fence;
 
 	fence = kzalloc(sizeof(*fence), GFP_KERNEL);
@@ -85,7 +84,6 @@ struct amdgpu_amdkfd_fence *amdgpu_amdkfd_fence_create(u64 context,
 
 struct amdgpu_amdkfd_fence *to_amdgpu_amdkfd_fence(struct dma_fence *f)
 {
-    pr_info("amdgpu_amdkfd_fence: called %s\n", __func__);
 	struct amdgpu_amdkfd_fence *fence;
 
 	if (!f)
@@ -100,13 +98,11 @@ struct amdgpu_amdkfd_fence *to_amdgpu_amdkfd_fence(struct dma_fence *f)
 
 static const char *amdkfd_fence_get_driver_name(struct dma_fence *f)
 {
-    pr_info("amdgpu_amdkfd_fence: called %s\n", __func__);
 	return "amdgpu_amdkfd_fence";
 }
 
 static const char *amdkfd_fence_get_timeline_name(struct dma_fence *f)
 {
-    pr_info("amdgpu_amdkfd_fence: called %s\n", __func__);
 	struct amdgpu_amdkfd_fence *fence = to_amdgpu_amdkfd_fence(f);
 
 	return fence->timeline_name;
@@ -122,7 +118,6 @@ static const char *amdkfd_fence_get_timeline_name(struct dma_fence *f)
  */
 static bool amdkfd_fence_enable_signaling(struct dma_fence *f)
 {
-    pr_info("amdgpu_amdkfd_fence: called %s\n", __func__);
 	struct amdgpu_amdkfd_fence *fence = to_amdgpu_amdkfd_fence(f);
 
 	if (!fence)
@@ -151,7 +146,6 @@ static bool amdkfd_fence_enable_signaling(struct dma_fence *f)
  */
 static void amdkfd_fence_release(struct dma_fence *f)
 {
-    pr_info("amdgpu_amdkfd_fence: called %s\n", __func__);
 	struct amdgpu_amdkfd_fence *fence = to_amdgpu_amdkfd_fence(f);
 
 	/* Unconditionally signal the fence. The process is getting
@@ -173,7 +167,6 @@ static void amdkfd_fence_release(struct dma_fence *f)
  */
 bool amdkfd_fence_check_mm(struct dma_fence *f, struct mm_struct *mm)
 {
-    pr_info("amdgpu_amdkfd_fence: called %s\n", __func__);
 	struct amdgpu_amdkfd_fence *fence = to_amdgpu_amdkfd_fence(f);
 
 	if (!fence)

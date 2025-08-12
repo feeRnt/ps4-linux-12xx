@@ -68,7 +68,6 @@
 static int  amdgpu_debugfs_process_reg_op(bool read, struct file *f,
 		char __user *buf, size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -189,7 +188,6 @@ end:
 static ssize_t amdgpu_debugfs_regs_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	return amdgpu_debugfs_process_reg_op(true, f, buf, size, pos);
 }
 
@@ -199,7 +197,6 @@ static ssize_t amdgpu_debugfs_regs_read(struct file *f, char __user *buf,
 static ssize_t amdgpu_debugfs_regs_write(struct file *f, const char __user *buf,
 					 size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	return amdgpu_debugfs_process_reg_op(false, f, (char __user *)buf, size, pos);
 }
 
@@ -219,7 +216,6 @@ static ssize_t amdgpu_debugfs_regs_write(struct file *f, const char __user *buf,
 static ssize_t amdgpu_debugfs_regs_pcie_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -279,7 +275,6 @@ static ssize_t amdgpu_debugfs_regs_pcie_read(struct file *f, char __user *buf,
 static ssize_t amdgpu_debugfs_regs_pcie_write(struct file *f, const char __user *buf,
 					 size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -340,7 +335,6 @@ static ssize_t amdgpu_debugfs_regs_pcie_write(struct file *f, const char __user 
 static ssize_t amdgpu_debugfs_regs_didt_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -400,7 +394,6 @@ static ssize_t amdgpu_debugfs_regs_didt_read(struct file *f, char __user *buf,
 static ssize_t amdgpu_debugfs_regs_didt_write(struct file *f, const char __user *buf,
 					 size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -461,7 +454,6 @@ static ssize_t amdgpu_debugfs_regs_didt_write(struct file *f, const char __user 
 static ssize_t amdgpu_debugfs_regs_smc_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -521,7 +513,6 @@ static ssize_t amdgpu_debugfs_regs_smc_read(struct file *f, char __user *buf,
 static ssize_t amdgpu_debugfs_regs_smc_write(struct file *f, const char __user *buf,
 					 size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -584,7 +575,6 @@ static ssize_t amdgpu_debugfs_regs_smc_write(struct file *f, const char __user *
 static ssize_t amdgpu_debugfs_gca_config_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -674,7 +664,6 @@ static ssize_t amdgpu_debugfs_gca_config_read(struct file *f, char __user *buf,
 static ssize_t amdgpu_debugfs_sensor_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	int idx, x, outsize, r, valuesize;
 	uint32_t values[16];
@@ -756,7 +745,6 @@ static ssize_t amdgpu_debugfs_sensor_read(struct file *f, char __user *buf,
 static ssize_t amdgpu_debugfs_wave_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = f->f_inode->i_private;
 	int r, x;
 	ssize_t result = 0;
@@ -849,7 +837,6 @@ static ssize_t amdgpu_debugfs_wave_read(struct file *f, char __user *buf,
 static ssize_t amdgpu_debugfs_gpr_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = f->f_inode->i_private;
 	int r;
 	ssize_t result = 0;
@@ -936,7 +923,6 @@ err:
 static ssize_t amdgpu_debugfs_gfxoff_write(struct file *f, const char __user *buf,
 					 size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -986,7 +972,6 @@ static ssize_t amdgpu_debugfs_gfxoff_write(struct file *f, const char __user *bu
 static ssize_t amdgpu_debugfs_gfxoff_read(struct file *f, char __user *buf,
 					 size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = file_inode(f)->i_private;
 	ssize_t result = 0;
 	int r;
@@ -1114,7 +1099,6 @@ static const char *debugfs_regs_names[] = {
  */
 int amdgpu_debugfs_regs_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct drm_minor *minor = adev_to_drm(adev)->primary;
 	struct dentry *ent, *root = minor->debugfs_root;
 	unsigned int i;
@@ -1132,7 +1116,6 @@ int amdgpu_debugfs_regs_init(struct amdgpu_device *adev)
 
 static int amdgpu_debugfs_test_ib_show(struct seq_file *m, void *unused)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	struct drm_device *dev = adev_to_drm(adev);
 	int r = 0, i;
@@ -1183,7 +1166,6 @@ static int amdgpu_debugfs_test_ib_show(struct seq_file *m, void *unused)
 
 static int amdgpu_debugfs_evict_vram(void *data, u64 *val)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)data;
 	struct drm_device *dev = adev_to_drm(adev);
 	int r;
@@ -1205,7 +1187,6 @@ static int amdgpu_debugfs_evict_vram(void *data, u64 *val)
 
 static int amdgpu_debugfs_evict_gtt(void *data, u64 *val)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)data;
 	struct drm_device *dev = adev_to_drm(adev);
 	struct ttm_resource_manager *man;
@@ -1229,7 +1210,6 @@ static int amdgpu_debugfs_evict_gtt(void *data, u64 *val)
 
 static int amdgpu_debugfs_vm_info_show(struct seq_file *m, void *unused)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	struct drm_device *dev = adev_to_drm(adev);
 	struct drm_file *file;
@@ -1267,7 +1247,6 @@ DEFINE_DEBUGFS_ATTRIBUTE(amdgpu_evict_gtt_fops, amdgpu_debugfs_evict_gtt,
 static void amdgpu_ib_preempt_fences_swap(struct amdgpu_ring *ring,
 					  struct dma_fence **fences)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_fence_driver *drv = &ring->fence_drv;
 	uint32_t sync_seq, last_seq;
 
@@ -1298,7 +1277,6 @@ static void amdgpu_ib_preempt_fences_swap(struct amdgpu_ring *ring,
 static void amdgpu_ib_preempt_signal_fences(struct dma_fence **fences,
 					    int length)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	int i;
 	struct dma_fence *fence;
 
@@ -1313,7 +1291,6 @@ static void amdgpu_ib_preempt_signal_fences(struct dma_fence **fences,
 
 static void amdgpu_ib_preempt_job_recovery(struct drm_gpu_scheduler *sched)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct drm_sched_job *s_job;
 	struct dma_fence *fence;
 
@@ -1327,7 +1304,6 @@ static void amdgpu_ib_preempt_job_recovery(struct drm_gpu_scheduler *sched)
 
 static void amdgpu_ib_preempt_mark_partial_job(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct amdgpu_job *job;
 	struct drm_sched_job *s_job, *tmp;
 	uint32_t preempt_seq;
@@ -1368,7 +1344,6 @@ no_preempt:
 
 static int amdgpu_debugfs_ib_preempt(void *data, u64 val)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	int r, resched, length;
 	struct amdgpu_ring *ring;
 	struct dma_fence **fences = NULL;
@@ -1447,7 +1422,6 @@ pro_end:
 
 static int amdgpu_debugfs_sclk_set(void *data, u64 val)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	int ret = 0;
 	uint32_t max_freq, min_freq;
 	struct amdgpu_device *adev = (struct amdgpu_device *)data;
@@ -1487,7 +1461,6 @@ DEFINE_DEBUGFS_ATTRIBUTE(fops_sclk_set, NULL,
 
 int amdgpu_debugfs_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	struct dentry *root = adev_to_drm(adev)->primary->debugfs_root;
 	struct dentry *ent;
 	int r, i;
@@ -1560,12 +1533,10 @@ int amdgpu_debugfs_init(struct amdgpu_device *adev)
 #else
 int amdgpu_debugfs_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	return 0;
 }
 int amdgpu_debugfs_regs_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_debugfs: called %s\n", __func__);
 	return 0;
 }
 #endif

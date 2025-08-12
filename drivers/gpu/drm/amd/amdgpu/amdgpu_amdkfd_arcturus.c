@@ -59,13 +59,11 @@
 
 static inline struct amdgpu_device *get_amdgpu_device(struct kgd_dev *kgd)
 {
-    pr_info("amdgpu_amdkfd_arcturus: called %s\n", __func__);
 	return (struct amdgpu_device *)kgd;
 }
 
 static inline struct v9_sdma_mqd *get_sdma_mqd(void *mqd)
 {
-    pr_info("amdgpu_amdkfd_arcturus: called %s\n", __func__);
 	return (struct v9_sdma_mqd *)mqd;
 }
 
@@ -73,7 +71,6 @@ static uint32_t get_sdma_rlc_reg_offset(struct amdgpu_device *adev,
 				unsigned int engine_id,
 				unsigned int queue_id)
 {
-    pr_info("amdgpu_amdkfd_arcturus: called %s\n", __func__);
 	uint32_t sdma_engine_reg_base = 0;
 	uint32_t sdma_rlc_reg_offset;
 
@@ -129,7 +126,6 @@ static uint32_t get_sdma_rlc_reg_offset(struct amdgpu_device *adev,
 int kgd_arcturus_hqd_sdma_load(struct kgd_dev *kgd, void *mqd,
 			     uint32_t __user *wptr, struct mm_struct *mm)
 {
-    pr_info("amdgpu_amdkfd_arcturus: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct v9_sdma_mqd *m;
 	uint32_t sdma_rlc_reg_offset;
@@ -201,7 +197,6 @@ int kgd_arcturus_hqd_sdma_dump(struct kgd_dev *kgd,
 			     uint32_t engine_id, uint32_t queue_id,
 			     uint32_t (**dump)[2], uint32_t *n_regs)
 {
-    pr_info("amdgpu_amdkfd_arcturus: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	uint32_t sdma_rlc_reg_offset = get_sdma_rlc_reg_offset(adev,
 			engine_id, queue_id);
@@ -232,7 +227,6 @@ int kgd_arcturus_hqd_sdma_dump(struct kgd_dev *kgd,
 
 bool kgd_arcturus_hqd_sdma_is_occupied(struct kgd_dev *kgd, void *mqd)
 {
-    pr_info("amdgpu_amdkfd_arcturus: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct v9_sdma_mqd *m;
 	uint32_t sdma_rlc_reg_offset;
@@ -253,7 +247,6 @@ bool kgd_arcturus_hqd_sdma_is_occupied(struct kgd_dev *kgd, void *mqd)
 int kgd_arcturus_hqd_sdma_destroy(struct kgd_dev *kgd, void *mqd,
 				unsigned int utimeout)
 {
-    pr_info("amdgpu_amdkfd_arcturus: called %s\n", __func__);
 	struct amdgpu_device *adev = get_amdgpu_device(kgd);
 	struct v9_sdma_mqd *m;
 	uint32_t sdma_rlc_reg_offset;

@@ -25,7 +25,6 @@
 
 int amdgpu_umc_ras_late_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_umc: called %s\n", __func__);
 	int r;
 	struct ras_fs_if fs_info = {
 		.sysfs_name = "umc_err_count",
@@ -76,7 +75,6 @@ free:
 
 void amdgpu_umc_ras_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_umc: called %s\n", __func__);
 	if (amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__UMC) &&
 			adev->umc.ras_if) {
 		struct ras_common_if *ras_if = adev->umc.ras_if;
@@ -94,7 +92,6 @@ int amdgpu_umc_process_ras_data_cb(struct amdgpu_device *adev,
 		void *ras_error_status,
 		struct amdgpu_iv_entry *entry)
 {
-    pr_info("amdgpu_umc: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 
@@ -150,7 +147,6 @@ int amdgpu_umc_process_ecc_irq(struct amdgpu_device *adev,
 		struct amdgpu_irq_src *source,
 		struct amdgpu_iv_entry *entry)
 {
-    pr_info("amdgpu_umc: called %s\n", __func__);
 	struct ras_common_if *ras_if = adev->umc.ras_if;
 	struct ras_dispatch_if ih_data = {
 		.entry = entry,

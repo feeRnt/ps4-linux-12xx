@@ -38,7 +38,6 @@ static void convert_clip_rect_to_rect(const struct drm_clip_rect *src,
 				      struct drm_mode_rect *dest,
 				      uint32_t num_clips, uint32_t src_inc)
 {
-    pr_info("drm_damage_helper: called %s\n", __func__);
 	while (num_clips > 0) {
 		dest->x1 = src->x1;
 		dest->y1 = src->y1;
@@ -67,8 +66,6 @@ static void convert_clip_rect_to_rect(const struct drm_clip_rect *src,
 void drm_atomic_helper_check_plane_damage(struct drm_atomic_state *state,
 					  struct drm_plane_state *plane_state)
 {
-    	//pr_info("drm_damage_helper: called %s\n", __func__);
-    	//too much logging. It is run on a loop for plane output damages
 	struct drm_crtc_state *crtc_state;
 
 	if (plane_state->crtc) {
@@ -111,7 +108,6 @@ int drm_atomic_helper_dirtyfb(struct drm_framebuffer *fb,
 			      unsigned int color, struct drm_clip_rect *clips,
 			      unsigned int num_clips)
 {
-    pr_info("drm_damage_helper: called %s\n", __func__);
 	struct drm_modeset_acquire_ctx ctx;
 	struct drm_property_blob *damage = NULL;
 	struct drm_mode_rect *rects = NULL;
@@ -227,8 +223,6 @@ drm_atomic_helper_damage_iter_init(struct drm_atomic_helper_damage_iter *iter,
 				   const struct drm_plane_state *old_state,
 				   const struct drm_plane_state *state)
 {
-    //pr_info("drm_damage_helper: called %s\n", __func__);
-    //excessive logging
 	memset(iter, 0, sizeof(*iter));
 
 	if (!state || !state->crtc || !state->fb || !state->visible)
@@ -271,7 +265,6 @@ bool
 drm_atomic_helper_damage_iter_next(struct drm_atomic_helper_damage_iter *iter,
 				   struct drm_rect *rect)
 {
-    //pr_info("drm_damage_helper: called %s\n", __func__);
 	bool ret = false;
 
 	if (iter->full_update) {
@@ -313,7 +306,6 @@ bool drm_atomic_helper_damage_merged(const struct drm_plane_state *old_state,
 				     struct drm_plane_state *state,
 				     struct drm_rect *rect)
 {
-    //pr_info("drm_damage_helper: called %s\n", __func__);
 	struct drm_atomic_helper_damage_iter iter;
 	struct drm_rect clip;
 	bool valid = false;

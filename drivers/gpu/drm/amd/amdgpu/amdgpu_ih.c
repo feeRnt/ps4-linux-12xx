@@ -41,7 +41,6 @@
 int amdgpu_ih_ring_init(struct amdgpu_device *adev, struct amdgpu_ih_ring *ih,
 			unsigned ring_size, bool use_bus_addr)
 {
-    pr_info("amdgpu_ih: called %s\n", __func__);
 	u32 rb_bufsz;
 	int r;
 
@@ -116,7 +115,6 @@ int amdgpu_ih_ring_init(struct amdgpu_device *adev, struct amdgpu_ih_ring *ih,
  */
 void amdgpu_ih_ring_fini(struct amdgpu_device *adev, struct amdgpu_ih_ring *ih)
 {
-    pr_info("amdgpu_ih: called %s\n", __func__);
 
 	if (!ih->ring)
 		return;
@@ -150,7 +148,6 @@ void amdgpu_ih_ring_fini(struct amdgpu_device *adev, struct amdgpu_ih_ring *ih)
 void amdgpu_ih_ring_write(struct amdgpu_ih_ring *ih, const uint32_t *iv,
 			  unsigned int num_dw)
 {
-    pr_info("amdgpu_ih: called %s\n", __func__);
 	uint32_t wptr = le32_to_cpu(*ih->wptr_cpu) >> 2;
 	unsigned int i;
 
@@ -173,7 +170,6 @@ static bool amdgpu_ih_has_checkpoint_processed(struct amdgpu_device *adev,
 					uint32_t checkpoint_wptr,
 					uint32_t *prev_rptr)
 {
-    pr_info("amdgpu_ih: called %s\n", __func__);
 	uint32_t cur_rptr = ih->rptr | (*prev_rptr & ~ih->ptr_mask);
 
 	/* rptr has wrapped. */
@@ -197,7 +193,6 @@ static bool amdgpu_ih_has_checkpoint_processed(struct amdgpu_device *adev,
 int amdgpu_ih_wait_on_checkpoint_process(struct amdgpu_device *adev,
 					struct amdgpu_ih_ring *ih)
 {
-    pr_info("amdgpu_ih: called %s\n", __func__);
 	uint32_t checkpoint_wptr, rptr;
 
 	if (!ih->enabled || adev->shutdown)
@@ -228,7 +223,6 @@ int amdgpu_ih_wait_on_checkpoint_process(struct amdgpu_device *adev,
  */
 int amdgpu_ih_process(struct amdgpu_device *adev, struct amdgpu_ih_ring *ih)
 {
-    pr_info("amdgpu_ih: called %s\n", __func__);
 	unsigned int count;
 	u32 wptr;
 
@@ -275,7 +269,6 @@ void amdgpu_ih_decode_iv_helper(struct amdgpu_device *adev,
 				struct amdgpu_ih_ring *ih,
 				struct amdgpu_iv_entry *entry)
 {
-    pr_info("amdgpu_ih: called %s\n", __func__);
 	/* wptr/rptr are in bytes! */
 	u32 ring_index = ih->rptr >> 2;
 	uint32_t dw[8];

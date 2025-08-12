@@ -158,7 +158,6 @@ static const u32 polaris10_golden_settings_a11[] =
 
 static void dce_v11_0_init_golden_registers(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_CARRIZO:
 		amdgpu_device_program_register_sequence(adev,
@@ -193,7 +192,6 @@ static void dce_v11_0_init_golden_registers(struct amdgpu_device *adev)
 static u32 dce_v11_0_audio_endpt_rreg(struct amdgpu_device *adev,
 				     u32 block_offset, u32 reg)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -208,7 +206,6 @@ static u32 dce_v11_0_audio_endpt_rreg(struct amdgpu_device *adev,
 static void dce_v11_0_audio_endpt_wreg(struct amdgpu_device *adev,
 				      u32 block_offset, u32 reg, u32 v)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->audio_endpt_idx_lock, flags);
@@ -219,7 +216,6 @@ static void dce_v11_0_audio_endpt_wreg(struct amdgpu_device *adev,
 
 static u32 dce_v11_0_vblank_get_counter(struct amdgpu_device *adev, int crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	if (crtc < 0 || crtc >= adev->mode_info.num_crtc)
 		return 0;
 	else
@@ -228,7 +224,6 @@ static u32 dce_v11_0_vblank_get_counter(struct amdgpu_device *adev, int crtc)
 
 static void dce_v11_0_pageflip_interrupt_init(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	unsigned i;
 
 	/* Enable pflip interrupts */
@@ -238,7 +233,6 @@ static void dce_v11_0_pageflip_interrupt_init(struct amdgpu_device *adev)
 
 static void dce_v11_0_pageflip_interrupt_fini(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	unsigned i;
 
 	/* Disable pflip interrupts */
@@ -260,7 +254,6 @@ static void dce_v11_0_pageflip_interrupt_fini(struct amdgpu_device *adev)
 static void dce_v11_0_page_flip(struct amdgpu_device *adev,
 				int crtc_id, u64 crtc_base, bool async)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = adev->mode_info.crtcs[crtc_id];
 	struct drm_framebuffer *fb = amdgpu_crtc->base.primary->fb;
 	u32 tmp;
@@ -286,7 +279,6 @@ static void dce_v11_0_page_flip(struct amdgpu_device *adev,
 static int dce_v11_0_crtc_get_scanoutpos(struct amdgpu_device *adev, int crtc,
 					u32 *vbl, u32 *position)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	if ((crtc < 0) || (crtc >= adev->mode_info.num_crtc))
 		return -EINVAL;
 
@@ -308,7 +300,6 @@ static int dce_v11_0_crtc_get_scanoutpos(struct amdgpu_device *adev, int crtc,
 static bool dce_v11_0_hpd_sense(struct amdgpu_device *adev,
 			       enum amdgpu_hpd_id hpd)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	bool connected = false;
 
 	if (hpd >= adev->mode_info.num_hpd)
@@ -332,7 +323,6 @@ static bool dce_v11_0_hpd_sense(struct amdgpu_device *adev,
 static void dce_v11_0_hpd_set_polarity(struct amdgpu_device *adev,
 				      enum amdgpu_hpd_id hpd)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 tmp;
 	bool connected = dce_v11_0_hpd_sense(adev, hpd);
 
@@ -357,7 +347,6 @@ static void dce_v11_0_hpd_set_polarity(struct amdgpu_device *adev,
  */
 static void dce_v11_0_hpd_init(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = adev_to_drm(adev);
 	struct drm_connector *connector;
 	struct drm_connector_list_iter iter;
@@ -412,7 +401,6 @@ static void dce_v11_0_hpd_init(struct amdgpu_device *adev)
  */
 static void dce_v11_0_hpd_fini(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = adev_to_drm(adev);
 	struct drm_connector *connector;
 	struct drm_connector_list_iter iter;
@@ -436,13 +424,11 @@ static void dce_v11_0_hpd_fini(struct amdgpu_device *adev)
 
 static u32 dce_v11_0_hpd_get_gpio_reg(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	return mmDC_GPIO_HPD_A;
 }
 
 static bool dce_v11_0_is_display_hung(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 crtc_hung = 0;
 	u32 crtc_status[6];
 	u32 i, j, tmp;
@@ -474,7 +460,6 @@ static bool dce_v11_0_is_display_hung(struct amdgpu_device *adev)
 static void dce_v11_0_set_vga_render_state(struct amdgpu_device *adev,
 					   bool render)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 tmp;
 
 	/* Lockout access through VGA aperture*/
@@ -496,7 +481,6 @@ static void dce_v11_0_set_vga_render_state(struct amdgpu_device *adev,
 
 static int dce_v11_0_get_num_crtc (struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int num_crtc = 0;
 
 	switch (adev->asic_type) {
@@ -522,7 +506,6 @@ static int dce_v11_0_get_num_crtc (struct amdgpu_device *adev)
 
 void dce_v11_0_disable_dce(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	/*Disable VGA render and enabled crtc, if has DCE engine*/
 	if (amdgpu_atombios_has_dce_engine_info(adev)) {
 		u32 tmp;
@@ -547,7 +530,6 @@ void dce_v11_0_disable_dce(struct amdgpu_device *adev)
 
 static void dce_v11_0_program_fmt(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -640,7 +622,6 @@ static u32 dce_v11_0_line_buffer_adjust(struct amdgpu_device *adev,
 				       struct amdgpu_crtc *amdgpu_crtc,
 				       struct drm_display_mode *mode)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 tmp, buffer_alloc, i, mem_cfg;
 	u32 pipe_offset = amdgpu_crtc->crtc_id;
 	/*
@@ -713,7 +694,6 @@ static u32 dce_v11_0_line_buffer_adjust(struct amdgpu_device *adev,
  */
 static u32 cik_get_number_of_dram_channels(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 tmp = RREG32(mmMC_SHARED_CHMAP);
 
 	switch (REG_GET_FIELD(tmp, MC_SHARED_CHMAP, NOOFCHAN)) {
@@ -766,7 +746,6 @@ struct dce10_wm_params {
  */
 static u32 dce_v11_0_dram_bandwidth(struct dce10_wm_params *wm)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	/* Calculate raw DRAM Bandwidth */
 	fixed20_12 dram_efficiency; /* 0.7 */
 	fixed20_12 yclk, dram_channels, bandwidth;
@@ -796,7 +775,6 @@ static u32 dce_v11_0_dram_bandwidth(struct dce10_wm_params *wm)
  */
 static u32 dce_v11_0_dram_bandwidth_for_display(struct dce10_wm_params *wm)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	/* Calculate DRAM Bandwidth and the part allocated to display. */
 	fixed20_12 disp_dram_allocation; /* 0.3 to 0.7 */
 	fixed20_12 yclk, dram_channels, bandwidth;
@@ -826,7 +804,6 @@ static u32 dce_v11_0_dram_bandwidth_for_display(struct dce10_wm_params *wm)
  */
 static u32 dce_v11_0_data_return_bandwidth(struct dce10_wm_params *wm)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	/* Calculate the display Data return Bandwidth */
 	fixed20_12 return_efficiency; /* 0.8 */
 	fixed20_12 sclk, bandwidth;
@@ -856,7 +833,6 @@ static u32 dce_v11_0_data_return_bandwidth(struct dce10_wm_params *wm)
  */
 static u32 dce_v11_0_dmif_request_bandwidth(struct dce10_wm_params *wm)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	/* Calculate the DMIF Request Bandwidth */
 	fixed20_12 disp_clk_request_efficiency; /* 0.8 */
 	fixed20_12 disp_clk, bandwidth;
@@ -888,7 +864,6 @@ static u32 dce_v11_0_dmif_request_bandwidth(struct dce10_wm_params *wm)
  */
 static u32 dce_v11_0_available_bandwidth(struct dce10_wm_params *wm)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	/* Calculate the Available bandwidth. Display can use this temporarily but not in average. */
 	u32 dram_bandwidth = dce_v11_0_dram_bandwidth(wm);
 	u32 data_return_bandwidth = dce_v11_0_data_return_bandwidth(wm);
@@ -908,7 +883,6 @@ static u32 dce_v11_0_available_bandwidth(struct dce10_wm_params *wm)
  */
 static u32 dce_v11_0_average_bandwidth(struct dce10_wm_params *wm)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	/* Calculate the display mode Average Bandwidth
 	 * DisplayMode should contain the source and destination dimensions,
 	 * timing, etc.
@@ -942,7 +916,6 @@ static u32 dce_v11_0_average_bandwidth(struct dce10_wm_params *wm)
  */
 static u32 dce_v11_0_latency_watermark(struct dce10_wm_params *wm)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	/* First calculate the latency in ns */
 	u32 mc_latency = 2000; /* 2000 ns. */
 	u32 available_bandwidth = dce_v11_0_available_bandwidth(wm);
@@ -1004,7 +977,6 @@ static u32 dce_v11_0_latency_watermark(struct dce10_wm_params *wm)
  */
 static bool dce_v11_0_average_bandwidth_vs_dram_bandwidth_for_display(struct dce10_wm_params *wm)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	if (dce_v11_0_average_bandwidth(wm) <=
 	    (dce_v11_0_dram_bandwidth_for_display(wm) / wm->num_heads))
 		return true;
@@ -1025,7 +997,6 @@ static bool dce_v11_0_average_bandwidth_vs_dram_bandwidth_for_display(struct dce
  */
 static bool dce_v11_0_average_bandwidth_vs_available_bandwidth(struct dce10_wm_params *wm)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	if (dce_v11_0_average_bandwidth(wm) <=
 	    (dce_v11_0_available_bandwidth(wm) / wm->num_heads))
 		return true;
@@ -1044,7 +1015,6 @@ static bool dce_v11_0_average_bandwidth_vs_available_bandwidth(struct dce10_wm_p
  */
 static bool dce_v11_0_check_latency_hiding(struct dce10_wm_params *wm)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 lb_partitions = wm->lb_size / wm->src_width;
 	u32 line_time = wm->active_time + wm->blank_time;
 	u32 latency_tolerant_lines;
@@ -1084,7 +1054,6 @@ static void dce_v11_0_program_watermarks(struct amdgpu_device *adev,
 					struct amdgpu_crtc *amdgpu_crtc,
 					u32 lb_size, u32 num_heads)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_display_mode *mode = &amdgpu_crtc->base.mode;
 	struct dce10_wm_params wm_low, wm_high;
 	u32 active_time;
@@ -1215,7 +1184,6 @@ static void dce_v11_0_program_watermarks(struct amdgpu_device *adev,
  */
 static void dce_v11_0_bandwidth_update(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_display_mode *mode = NULL;
 	u32 num_heads = 0, lb_size;
 	int i;
@@ -1236,7 +1204,6 @@ static void dce_v11_0_bandwidth_update(struct amdgpu_device *adev)
 
 static void dce_v11_0_audio_get_connected_pins(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int i;
 	u32 offset, tmp;
 
@@ -1255,7 +1222,6 @@ static void dce_v11_0_audio_get_connected_pins(struct amdgpu_device *adev)
 
 static struct amdgpu_audio_pin *dce_v11_0_audio_get_pin(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int i;
 
 	dce_v11_0_audio_get_connected_pins(adev);
@@ -1270,7 +1236,6 @@ static struct amdgpu_audio_pin *dce_v11_0_audio_get_pin(struct amdgpu_device *ad
 
 static void dce_v11_0_afmt_audio_select_pin(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(encoder->dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct amdgpu_encoder_atom_dig *dig = amdgpu_encoder->enc_priv;
@@ -1287,7 +1252,6 @@ static void dce_v11_0_afmt_audio_select_pin(struct drm_encoder *encoder)
 static void dce_v11_0_audio_write_latency_fields(struct drm_encoder *encoder,
 						struct drm_display_mode *mode)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1334,7 +1298,6 @@ static void dce_v11_0_audio_write_latency_fields(struct drm_encoder *encoder,
 
 static void dce_v11_0_audio_write_speaker_allocation(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1391,7 +1354,6 @@ static void dce_v11_0_audio_write_speaker_allocation(struct drm_encoder *encoder
 
 static void dce_v11_0_audio_write_sad_regs(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1480,7 +1442,6 @@ static void dce_v11_0_audio_enable(struct amdgpu_device *adev,
 				  struct amdgpu_audio_pin *pin,
 				  bool enable)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	if (!pin)
 		return;
 
@@ -1502,7 +1463,6 @@ static const u32 pin_offsets[] =
 
 static int dce_v11_0_audio_init(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int i;
 
 	if (!amdgpu_audio)
@@ -1546,7 +1506,6 @@ static int dce_v11_0_audio_init(struct amdgpu_device *adev)
 
 static void dce_v11_0_audio_fini(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int i;
 
 	if (!amdgpu_audio)
@@ -1566,7 +1525,6 @@ static void dce_v11_0_audio_fini(struct amdgpu_device *adev)
  */
 static void dce_v11_0_afmt_update_ACR(struct drm_encoder *encoder, uint32_t clock)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_afmt_acr acr = amdgpu_afmt_acr(clock);
@@ -1603,7 +1561,6 @@ static void dce_v11_0_afmt_update_ACR(struct drm_encoder *encoder, uint32_t cloc
 static void dce_v11_0_afmt_update_avi_infoframe(struct drm_encoder *encoder,
 					       void *buffer, size_t size)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1623,7 +1580,6 @@ static void dce_v11_0_afmt_update_avi_infoframe(struct drm_encoder *encoder,
 
 static void dce_v11_0_audio_set_dto(struct drm_encoder *encoder, u32 clock)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1655,7 +1611,6 @@ static void dce_v11_0_audio_set_dto(struct drm_encoder *encoder, u32 clock)
 static void dce_v11_0_afmt_setmode(struct drm_encoder *encoder,
 				  struct drm_display_mode *mode)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1836,7 +1791,6 @@ static void dce_v11_0_afmt_setmode(struct drm_encoder *encoder,
 
 static void dce_v11_0_afmt_enable(struct drm_encoder *encoder, bool enable)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1864,7 +1818,6 @@ static void dce_v11_0_afmt_enable(struct drm_encoder *encoder, bool enable)
 
 static int dce_v11_0_afmt_init(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->mode_info.num_dig; i++)
@@ -1890,7 +1843,6 @@ static int dce_v11_0_afmt_init(struct amdgpu_device *adev)
 
 static void dce_v11_0_afmt_fini(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->mode_info.num_dig; i++) {
@@ -1911,7 +1863,6 @@ static const u32 vga_control_regs[6] =
 
 static void dce_v11_0_vga_enable(struct drm_crtc *crtc, bool enable)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct drm_device *dev = crtc->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -1926,7 +1877,6 @@ static void dce_v11_0_vga_enable(struct drm_crtc *crtc, bool enable)
 
 static void dce_v11_0_grph_enable(struct drm_crtc *crtc, bool enable)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct drm_device *dev = crtc->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -1941,7 +1891,6 @@ static int dce_v11_0_crtc_do_set_base(struct drm_crtc *crtc,
 				     struct drm_framebuffer *fb,
 				     int x, int y, int atomic)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct drm_device *dev = crtc->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -2187,7 +2136,6 @@ static int dce_v11_0_crtc_do_set_base(struct drm_crtc *crtc,
 static void dce_v11_0_set_interleave(struct drm_crtc *crtc,
 				     struct drm_display_mode *mode)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
@@ -2203,7 +2151,6 @@ static void dce_v11_0_set_interleave(struct drm_crtc *crtc,
 
 static void dce_v11_0_crtc_load_lut(struct drm_crtc *crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct drm_device *dev = crtc->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -2279,7 +2226,6 @@ static void dce_v11_0_crtc_load_lut(struct drm_crtc *crtc)
 
 static int dce_v11_0_pick_dig_encoder(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct amdgpu_encoder_atom_dig *dig = amdgpu_encoder->enc_priv;
 
@@ -2331,7 +2277,6 @@ static int dce_v11_0_pick_dig_encoder(struct drm_encoder *encoder)
  */
 static u32 dce_v11_0_pick_pll(struct drm_crtc *crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct drm_device *dev = crtc->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -2412,7 +2357,6 @@ static u32 dce_v11_0_pick_pll(struct drm_crtc *crtc)
 
 static void dce_v11_0_lock_cursor(struct drm_crtc *crtc, bool lock)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(crtc->dev);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	uint32_t cur_lock;
@@ -2427,7 +2371,6 @@ static void dce_v11_0_lock_cursor(struct drm_crtc *crtc, bool lock)
 
 static void dce_v11_0_hide_cursor(struct drm_crtc *crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct amdgpu_device *adev = drm_to_adev(crtc->dev);
 	u32 tmp;
@@ -2439,7 +2382,6 @@ static void dce_v11_0_hide_cursor(struct drm_crtc *crtc)
 
 static void dce_v11_0_show_cursor(struct drm_crtc *crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct amdgpu_device *adev = drm_to_adev(crtc->dev);
 	u32 tmp;
@@ -2458,7 +2400,6 @@ static void dce_v11_0_show_cursor(struct drm_crtc *crtc)
 static int dce_v11_0_cursor_move_locked(struct drm_crtc *crtc,
 					int x, int y)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct amdgpu_device *adev = drm_to_adev(crtc->dev);
 	int xorigin = 0, yorigin = 0;
@@ -2491,7 +2432,6 @@ static int dce_v11_0_cursor_move_locked(struct drm_crtc *crtc,
 static int dce_v11_0_crtc_cursor_move(struct drm_crtc *crtc,
 				      int x, int y)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int ret;
 
 	dce_v11_0_lock_cursor(crtc, true);
@@ -2509,7 +2449,6 @@ static int dce_v11_0_crtc_cursor_set2(struct drm_crtc *crtc,
 				      int32_t hot_x,
 				      int32_t hot_y)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct drm_gem_object *obj;
 	struct amdgpu_bo *aobj;
@@ -2589,7 +2528,6 @@ unpin:
 
 static void dce_v11_0_cursor_reset(struct drm_crtc *crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 
 	if (amdgpu_crtc->cursor_bo) {
@@ -2608,7 +2546,6 @@ static int dce_v11_0_crtc_gamma_set(struct drm_crtc *crtc, u16 *red, u16 *green,
 				    u16 *blue, uint32_t size,
 				    struct drm_modeset_acquire_ctx *ctx)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	dce_v11_0_crtc_load_lut(crtc);
 
 	return 0;
@@ -2616,7 +2553,6 @@ static int dce_v11_0_crtc_gamma_set(struct drm_crtc *crtc, u16 *red, u16 *green,
 
 static void dce_v11_0_crtc_destroy(struct drm_crtc *crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 
 	drm_crtc_cleanup(crtc);
@@ -2638,7 +2574,6 @@ static const struct drm_crtc_funcs dce_v11_0_crtc_funcs = {
 
 static void dce_v11_0_crtc_dpms(struct drm_crtc *crtc, int mode)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
@@ -2678,7 +2613,6 @@ static void dce_v11_0_crtc_dpms(struct drm_crtc *crtc, int mode)
 
 static void dce_v11_0_crtc_prepare(struct drm_crtc *crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	/* disable crtc pair power gating before programming */
 	amdgpu_atombios_crtc_powergate(crtc, ATOM_DISABLE);
 	amdgpu_atombios_crtc_lock(crtc, ATOM_ENABLE);
@@ -2687,14 +2621,12 @@ static void dce_v11_0_crtc_prepare(struct drm_crtc *crtc)
 
 static void dce_v11_0_crtc_commit(struct drm_crtc *crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	dce_v11_0_crtc_dpms(crtc, DRM_MODE_DPMS_ON);
 	amdgpu_atombios_crtc_lock(crtc, ATOM_DISABLE);
 }
 
 static void dce_v11_0_crtc_disable(struct drm_crtc *crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct drm_device *dev = crtc->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -2765,7 +2697,6 @@ static int dce_v11_0_crtc_mode_set(struct drm_crtc *crtc,
 				  struct drm_display_mode *adjusted_mode,
 				  int x, int y, struct drm_framebuffer *old_fb)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct drm_device *dev = crtc->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -2806,7 +2737,6 @@ static bool dce_v11_0_crtc_mode_fixup(struct drm_crtc *crtc,
 				     const struct drm_display_mode *mode,
 				     struct drm_display_mode *adjusted_mode)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 	struct drm_device *dev = crtc->dev;
 	struct drm_encoder *encoder;
@@ -2841,7 +2771,6 @@ static bool dce_v11_0_crtc_mode_fixup(struct drm_crtc *crtc,
 static int dce_v11_0_crtc_set_base(struct drm_crtc *crtc, int x, int y,
 				  struct drm_framebuffer *old_fb)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	return dce_v11_0_crtc_do_set_base(crtc, old_fb, x, y, 0);
 }
 
@@ -2849,7 +2778,6 @@ static int dce_v11_0_crtc_set_base_atomic(struct drm_crtc *crtc,
 					 struct drm_framebuffer *fb,
 					 int x, int y, enum mode_set_atomic state)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	return dce_v11_0_crtc_do_set_base(crtc, fb, x, y, 1);
 }
 
@@ -2867,7 +2795,6 @@ static const struct drm_crtc_helper_funcs dce_v11_0_crtc_helper_funcs = {
 
 static int dce_v11_0_crtc_init(struct amdgpu_device *adev, int index)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_crtc *amdgpu_crtc;
 
 	amdgpu_crtc = kzalloc(sizeof(struct amdgpu_crtc) +
@@ -2919,7 +2846,6 @@ static int dce_v11_0_crtc_init(struct amdgpu_device *adev, int index)
 
 static int dce_v11_0_early_init(void *handle)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	adev->audio_endpt_rreg = &dce_v11_0_audio_endpt_rreg;
@@ -2960,7 +2886,6 @@ static int dce_v11_0_early_init(void *handle)
 
 static int dce_v11_0_sw_init(void *handle)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int r, i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -3030,7 +2955,6 @@ static int dce_v11_0_sw_init(void *handle)
 
 static int dce_v11_0_sw_fini(void *handle)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	kfree(adev->mode_info.bios_hardcoded_edid);
@@ -3049,7 +2973,6 @@ static int dce_v11_0_sw_fini(void *handle)
 
 static int dce_v11_0_hw_init(void *handle)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -3086,7 +3009,6 @@ static int dce_v11_0_hw_init(void *handle)
 
 static int dce_v11_0_hw_fini(void *handle)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	int i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -3103,7 +3025,6 @@ static int dce_v11_0_hw_fini(void *handle)
 
 static int dce_v11_0_suspend(void *handle)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r;
 
@@ -3119,7 +3040,6 @@ static int dce_v11_0_suspend(void *handle)
 
 static int dce_v11_0_resume(void *handle)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int ret;
 
@@ -3143,19 +3063,16 @@ static int dce_v11_0_resume(void *handle)
 
 static bool dce_v11_0_is_idle(void *handle)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	return true;
 }
 
 static int dce_v11_0_wait_for_idle(void *handle)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	return 0;
 }
 
 static int dce_v11_0_soft_reset(void *handle)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 srbm_soft_reset = 0, tmp;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -3185,7 +3102,6 @@ static void dce_v11_0_set_crtc_vblank_interrupt_state(struct amdgpu_device *adev
 						     int crtc,
 						     enum amdgpu_interrupt_state state)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 lb_interrupt_mask;
 
 	if (crtc >= adev->mode_info.num_crtc) {
@@ -3215,7 +3131,6 @@ static void dce_v11_0_set_crtc_vline_interrupt_state(struct amdgpu_device *adev,
 						    int crtc,
 						    enum amdgpu_interrupt_state state)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 lb_interrupt_mask;
 
 	if (crtc >= adev->mode_info.num_crtc) {
@@ -3246,7 +3161,6 @@ static int dce_v11_0_set_hpd_irq_state(struct amdgpu_device *adev,
 					unsigned hpd,
 					enum amdgpu_interrupt_state state)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 tmp;
 
 	if (hpd >= adev->mode_info.num_hpd) {
@@ -3277,7 +3191,6 @@ static int dce_v11_0_set_crtc_irq_state(struct amdgpu_device *adev,
 					unsigned type,
 					enum amdgpu_interrupt_state state)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	switch (type) {
 	case AMDGPU_CRTC_IRQ_VBLANK1:
 		dce_v11_0_set_crtc_vblank_interrupt_state(adev, 0, state);
@@ -3326,7 +3239,6 @@ static int dce_v11_0_set_pageflip_irq_state(struct amdgpu_device *adev,
 					    unsigned type,
 					    enum amdgpu_interrupt_state state)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 reg;
 
 	if (type >= adev->mode_info.num_crtc) {
@@ -3349,7 +3261,6 @@ static int dce_v11_0_pageflip_irq(struct amdgpu_device *adev,
 				  struct amdgpu_irq_src *source,
 				  struct amdgpu_iv_entry *entry)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	unsigned long flags;
 	unsigned crtc_id;
 	struct amdgpu_crtc *amdgpu_crtc;
@@ -3402,7 +3313,6 @@ static int dce_v11_0_pageflip_irq(struct amdgpu_device *adev,
 static void dce_v11_0_hpd_int_ack(struct amdgpu_device *adev,
 				  int hpd)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 tmp;
 
 	if (hpd >= adev->mode_info.num_hpd) {
@@ -3418,7 +3328,6 @@ static void dce_v11_0_hpd_int_ack(struct amdgpu_device *adev,
 static void dce_v11_0_crtc_vblank_int_ack(struct amdgpu_device *adev,
 					  int crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 tmp;
 
 	if (crtc < 0 || crtc >= adev->mode_info.num_crtc) {
@@ -3434,7 +3343,6 @@ static void dce_v11_0_crtc_vblank_int_ack(struct amdgpu_device *adev,
 static void dce_v11_0_crtc_vline_int_ack(struct amdgpu_device *adev,
 					 int crtc)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	u32 tmp;
 
 	if (crtc < 0 || crtc >= adev->mode_info.num_crtc) {
@@ -3451,7 +3359,6 @@ static int dce_v11_0_crtc_irq(struct amdgpu_device *adev,
 				struct amdgpu_irq_src *source,
 				struct amdgpu_iv_entry *entry)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	unsigned crtc = entry->src_id - 1;
 	uint32_t disp_int = RREG32(interrupt_status_offsets[crtc].reg);
 	unsigned int irq_type = amdgpu_display_crtc_idx_to_irq_type(adev,
@@ -3491,7 +3398,6 @@ static int dce_v11_0_hpd_irq(struct amdgpu_device *adev,
 			     struct amdgpu_irq_src *source,
 			     struct amdgpu_iv_entry *entry)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	uint32_t disp_int, mask;
 	unsigned hpd;
 
@@ -3516,14 +3422,12 @@ static int dce_v11_0_hpd_irq(struct amdgpu_device *adev,
 static int dce_v11_0_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	return 0;
 }
 
 static int dce_v11_0_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	return 0;
 }
 
@@ -3549,7 +3453,6 @@ dce_v11_0_encoder_mode_set(struct drm_encoder *encoder,
 			  struct drm_display_mode *mode,
 			  struct drm_display_mode *adjusted_mode)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 
 	amdgpu_encoder->pixel_clock = adjusted_mode->clock;
@@ -3568,7 +3471,6 @@ dce_v11_0_encoder_mode_set(struct drm_encoder *encoder,
 
 static void dce_v11_0_encoder_prepare(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(encoder->dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct drm_connector *connector = amdgpu_get_connector_for_encoder(encoder);
@@ -3608,7 +3510,6 @@ static void dce_v11_0_encoder_prepare(struct drm_encoder *encoder)
 
 static void dce_v11_0_encoder_commit(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
@@ -3619,7 +3520,6 @@ static void dce_v11_0_encoder_commit(struct drm_encoder *encoder)
 
 static void dce_v11_0_encoder_disable(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct amdgpu_encoder_atom_dig *dig;
 
@@ -3637,13 +3537,11 @@ static void dce_v11_0_encoder_disable(struct drm_encoder *encoder)
 /* these are handled by the primary encoders */
 static void dce_v11_0_ext_prepare(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 
 }
 
 static void dce_v11_0_ext_commit(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 
 }
 
@@ -3652,20 +3550,17 @@ dce_v11_0_ext_mode_set(struct drm_encoder *encoder,
 		      struct drm_display_mode *mode,
 		      struct drm_display_mode *adjusted_mode)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 
 }
 
 static void dce_v11_0_ext_disable(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 
 }
 
 static void
 dce_v11_0_ext_dpms(struct drm_encoder *encoder, int mode)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 
 }
 
@@ -3699,7 +3594,6 @@ static const struct drm_encoder_helper_funcs dce_v11_0_dac_helper_funcs = {
 
 static void dce_v11_0_encoder_destroy(struct drm_encoder *encoder)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	if (amdgpu_encoder->devices & (ATOM_DEVICE_LCD_SUPPORT))
 		amdgpu_atombios_encoder_fini_backlight(amdgpu_encoder);
@@ -3717,7 +3611,6 @@ static void dce_v11_0_encoder_add(struct amdgpu_device *adev,
 				 uint32_t supported_device,
 				 u16 caps)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	struct drm_device *dev = adev_to_drm(adev);
 	struct drm_encoder *encoder;
 	struct amdgpu_encoder *amdgpu_encoder;
@@ -3839,7 +3732,6 @@ static const struct amdgpu_display_funcs dce_v11_0_display_funcs = {
 
 static void dce_v11_0_set_display_funcs(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	adev->mode_info.funcs = &dce_v11_0_display_funcs;
 }
 
@@ -3860,7 +3752,6 @@ static const struct amdgpu_irq_src_funcs dce_v11_0_hpd_irq_funcs = {
 
 static void dce_v11_0_set_irq_funcs(struct amdgpu_device *adev)
 {
-    pr_info("dce_v11_0: called %s\n", __func__);
 	if (adev->mode_info.num_crtc > 0)
 		adev->crtc_irq.num_types = AMDGPU_CRTC_IRQ_VLINE1 + adev->mode_info.num_crtc;
 	else

@@ -42,7 +42,6 @@
 
 void drm_legacy_init_members(struct drm_device *dev)
 {
-    pr_info("drm_legacy_misc: called %s\n", __func__);
 	INIT_LIST_HEAD(&dev->ctxlist);
 	INIT_LIST_HEAD(&dev->vmalist);
 	INIT_LIST_HEAD(&dev->maplist);
@@ -52,13 +51,11 @@ void drm_legacy_init_members(struct drm_device *dev)
 
 void drm_legacy_destroy_members(struct drm_device *dev)
 {
-    pr_info("drm_legacy_misc: called %s\n", __func__);
 	mutex_destroy(&dev->ctxlist_mutex);
 }
 
 int drm_legacy_setup(struct drm_device * dev)
 {
-    pr_info("drm_legacy_misc: called %s\n", __func__);
 	int ret;
 
 	if (dev->driver->firstopen &&
@@ -79,7 +76,6 @@ int drm_legacy_setup(struct drm_device * dev)
 
 void drm_legacy_dev_reinit(struct drm_device *dev)
 {
-    pr_info("drm_legacy_misc: called %s\n", __func__);
 	if (dev->irq_enabled)
 		drm_legacy_irq_uninstall(dev);
 
@@ -104,7 +100,6 @@ void drm_legacy_dev_reinit(struct drm_device *dev)
 
 void drm_master_legacy_init(struct drm_master *master)
 {
-    pr_info("drm_legacy_misc: called %s\n", __func__);
 	spin_lock_init(&master->lock.spinlock);
 	init_waitqueue_head(&master->lock.lock_queue);
 }

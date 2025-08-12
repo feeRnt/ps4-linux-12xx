@@ -45,7 +45,6 @@ static u32 df_v3_6_channel_number[] = {1, 2, 0, 4, 0, 8, 0,
 static uint64_t df_v3_6_get_fica(struct amdgpu_device *adev,
 				 uint32_t ficaa_val)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	unsigned long flags, address, data;
 	uint32_t ficadl_val, ficadh_val;
 
@@ -70,7 +69,6 @@ static uint64_t df_v3_6_get_fica(struct amdgpu_device *adev,
 static void df_v3_6_set_fica(struct amdgpu_device *adev, uint32_t ficaa_val,
 			     uint32_t ficadl_val, uint32_t ficadh_val)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	unsigned long flags, address, data;
 
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
@@ -99,7 +97,6 @@ static void df_v3_6_perfmon_rreg(struct amdgpu_device *adev,
 			    uint32_t lo_addr, uint32_t *lo_val,
 			    uint32_t hi_addr, uint32_t *hi_val)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	unsigned long flags, address, data;
 
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
@@ -122,7 +119,6 @@ static void df_v3_6_perfmon_rreg(struct amdgpu_device *adev,
 static void df_v3_6_perfmon_wreg(struct amdgpu_device *adev, uint32_t lo_addr,
 			    uint32_t lo_val, uint32_t hi_addr, uint32_t hi_val)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	unsigned long flags, address, data;
 
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
@@ -141,7 +137,6 @@ static int df_v3_6_perfmon_arm_with_status(struct amdgpu_device *adev,
 					  uint32_t lo_addr, uint32_t lo_val,
 					  uint32_t hi_addr, uint32_t  hi_val)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	unsigned long flags, address, data;
 	uint32_t lo_val_rb, hi_val_rb;
 
@@ -177,7 +172,6 @@ static int df_v3_6_perfmon_arm_with_retry(struct amdgpu_device *adev,
 					  uint32_t lo_addr, uint32_t lo_val,
 					  uint32_t hi_addr, uint32_t  hi_val)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	int countdown = ARM_RETRY_USEC_TIMEOUT;
 
 	while (countdown) {
@@ -198,7 +192,6 @@ static ssize_t df_v3_6_get_df_cntr_avail(struct device *dev,
 		struct device_attribute *attr,
 		char *buf)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	struct amdgpu_device *adev;
 	struct drm_device *ddev;
 	int i, count;
@@ -220,7 +213,6 @@ static DEVICE_ATTR(df_cntr_avail, S_IRUGO, df_v3_6_get_df_cntr_avail, NULL);
 
 static void df_v3_6_query_hashes(struct amdgpu_device *adev)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	u32 tmp;
 
 	adev->df.hash_status.hash_64k = false;
@@ -248,7 +240,6 @@ static void df_v3_6_query_hashes(struct amdgpu_device *adev)
 /* init perfmons */
 static void df_v3_6_sw_init(struct amdgpu_device *adev)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	int i, ret;
 
 	ret = device_create_file(adev->dev, &dev_attr_df_cntr_avail);
@@ -263,7 +254,6 @@ static void df_v3_6_sw_init(struct amdgpu_device *adev)
 
 static void df_v3_6_sw_fini(struct amdgpu_device *adev)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 
 	device_remove_file(adev->dev, &dev_attr_df_cntr_avail);
 
@@ -272,7 +262,6 @@ static void df_v3_6_sw_fini(struct amdgpu_device *adev)
 static void df_v3_6_enable_broadcast_mode(struct amdgpu_device *adev,
 					  bool enable)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	u32 tmp;
 
 	if (enable) {
@@ -286,7 +275,6 @@ static void df_v3_6_enable_broadcast_mode(struct amdgpu_device *adev,
 
 static u32 df_v3_6_get_fb_channel_number(struct amdgpu_device *adev)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	u32 tmp;
 
 	if (adev->asic_type == CHIP_ALDEBARAN) {
@@ -304,7 +292,6 @@ static u32 df_v3_6_get_fb_channel_number(struct amdgpu_device *adev)
 
 static u32 df_v3_6_get_hbm_channel_number(struct amdgpu_device *adev)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	int fb_channel_number;
 
 	fb_channel_number = adev->df.funcs->get_fb_channel_number(adev);
@@ -317,7 +304,6 @@ static u32 df_v3_6_get_hbm_channel_number(struct amdgpu_device *adev)
 static void df_v3_6_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 						     bool enable)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	u32 tmp;
 
 	if (adev->cg_flags & AMD_CG_SUPPORT_DF_MGCG) {
@@ -348,7 +334,6 @@ static void df_v3_6_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 static void df_v3_6_get_clockgating_state(struct amdgpu_device *adev,
 					  u32 *flags)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	u32 tmp;
 
 	/* AMD_CG_SUPPORT_DF_MGCG */
@@ -362,7 +347,6 @@ static bool df_v3_6_pmc_has_counter(struct amdgpu_device *adev,
 				      uint64_t config,
 				      int counter_idx)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 
 	return ((config & 0x0FFFFFFUL) ==
 			adev->df_perfmon_config_assign_mask[counter_idx]);
@@ -377,7 +361,6 @@ static void df_v3_6_pmc_get_addr(struct amdgpu_device *adev,
 				 uint32_t *lo_base_addr,
 				 uint32_t *hi_base_addr)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	if (!df_v3_6_pmc_has_counter(adev, config, counter_idx))
 		return;
 
@@ -411,7 +394,6 @@ static void df_v3_6_pmc_get_read_settings(struct amdgpu_device *adev,
 					  uint32_t *lo_base_addr,
 					  uint32_t *hi_base_addr)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	df_v3_6_pmc_get_addr(adev, config, counter_idx, 0, lo_base_addr,
 								hi_base_addr);
 }
@@ -426,7 +408,6 @@ static int df_v3_6_pmc_get_ctrl_settings(struct amdgpu_device *adev,
 					  uint32_t *hi_val,
 					  bool is_enable)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 
 	uint32_t eventsel, instance, unitmask;
 	uint32_t instance_10, instance_5432, instance_76;
@@ -462,7 +443,6 @@ static int df_v3_6_pmc_get_ctrl_settings(struct amdgpu_device *adev,
 static int df_v3_6_pmc_add_cntr(struct amdgpu_device *adev,
 				   uint64_t config)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < DF_V3_6_MAX_COUNTERS; i++) {
@@ -481,7 +461,6 @@ static int df_v3_6_pmc_set_deferred(struct amdgpu_device *adev,
 				    int counter_idx, uint64_t config,
 				    bool is_deferred)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 
 	if (!df_v3_6_pmc_has_counter(adev, config, counter_idx))
 		return -EINVAL;
@@ -500,7 +479,6 @@ static bool df_v3_6_pmc_is_deferred(struct amdgpu_device *adev,
 				    int counter_idx,
 				    uint64_t config)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	return	(df_v3_6_pmc_has_counter(adev, config, counter_idx) &&
 			(adev->df_perfmon_config_assign_mask[counter_idx]
 				& DEFERRED_ARM_MASK));
@@ -512,7 +490,6 @@ static void df_v3_6_pmc_release_cntr(struct amdgpu_device *adev,
 				     uint64_t config,
 				     int counter_idx)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	if (df_v3_6_pmc_has_counter(adev, config, counter_idx))
 		adev->df_perfmon_config_assign_mask[counter_idx] = 0ULL;
 }
@@ -522,7 +499,6 @@ static void df_v3_6_reset_perfmon_cntr(struct amdgpu_device *adev,
 					 uint64_t config,
 					 int counter_idx)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	uint32_t lo_base_addr = 0, hi_base_addr = 0;
 
 	df_v3_6_pmc_get_read_settings(adev, config, counter_idx, &lo_base_addr,
@@ -538,7 +514,6 @@ static void df_v3_6_reset_perfmon_cntr(struct amdgpu_device *adev,
 static int df_v3_6_pmc_start(struct amdgpu_device *adev, uint64_t config,
 			     int counter_idx, int is_add)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	uint32_t lo_base_addr, hi_base_addr, lo_val, hi_val;
 	int err = 0, ret = 0;
 
@@ -581,7 +556,6 @@ static int df_v3_6_pmc_start(struct amdgpu_device *adev, uint64_t config,
 static int df_v3_6_pmc_stop(struct amdgpu_device *adev, uint64_t config,
 			    int counter_idx, int is_remove)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	uint32_t lo_base_addr, hi_base_addr, lo_val, hi_val;
 	int ret = 0;
 
@@ -621,7 +595,6 @@ static void df_v3_6_pmc_get_count(struct amdgpu_device *adev,
 				  int counter_idx,
 				  uint64_t *count)
 {
-    pr_info("df_v3_6: called %s\n", __func__);
 	uint32_t lo_base_addr = 0, hi_base_addr = 0, lo_val = 0, hi_val = 0;
 	*count = 0;
 

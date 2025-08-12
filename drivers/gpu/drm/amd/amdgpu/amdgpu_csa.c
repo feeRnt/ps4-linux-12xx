@@ -26,7 +26,6 @@
 
 uint64_t amdgpu_csa_vaddr(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_csa: called %s\n", __func__);
 	uint64_t addr = adev->vm_manager.max_pfn << AMDGPU_GPU_PAGE_SHIFT;
 
 	addr -= AMDGPU_VA_RESERVED_SIZE;
@@ -38,7 +37,6 @@ uint64_t amdgpu_csa_vaddr(struct amdgpu_device *adev)
 int amdgpu_allocate_static_csa(struct amdgpu_device *adev, struct amdgpu_bo **bo,
 				u32 domain, uint32_t size)
 {
-    pr_info("amdgpu_csa: called %s\n", __func__);
 	void *ptr;
 
 	amdgpu_bo_create_kernel(adev, size, PAGE_SIZE,
@@ -54,7 +52,6 @@ int amdgpu_allocate_static_csa(struct amdgpu_device *adev, struct amdgpu_bo **bo
 
 void amdgpu_free_static_csa(struct amdgpu_bo **bo)
 {
-    pr_info("amdgpu_csa: called %s\n", __func__);
 	amdgpu_bo_free_kernel(bo, NULL, NULL);
 }
 
@@ -68,7 +65,6 @@ int amdgpu_map_static_csa(struct amdgpu_device *adev, struct amdgpu_vm *vm,
 			  struct amdgpu_bo *bo, struct amdgpu_bo_va **bo_va,
 			  uint64_t csa_addr, uint32_t size)
 {
-    pr_info("amdgpu_csa: called %s\n", __func__);
 	struct ww_acquire_ctx ticket;
 	struct list_head list;
 	struct amdgpu_bo_list_entry pd;

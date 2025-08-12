@@ -44,7 +44,6 @@ static DEFINE_MUTEX(legacy_dev_list_lock);
 
 static int drm_get_pci_domain(struct drm_device *dev)
 {
-    pr_info("drm_pci: called %s\n", __func__);
 #ifndef __alpha__
 	/* For historical reasons, drm_get_pci_domain() is busticated
 	 * on most archs and has to remain so for userspace interface
@@ -59,7 +58,6 @@ static int drm_get_pci_domain(struct drm_device *dev)
 
 int drm_pci_set_busid(struct drm_device *dev, struct drm_master *master)
 {
-    pr_info("drm_pci: called %s\n", __func__);
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
 	master->unique = kasprintf(GFP_KERNEL, "pci:%04x:%02x:%02x.%d",
@@ -78,7 +76,6 @@ int drm_pci_set_busid(struct drm_device *dev, struct drm_master *master)
 
 static int drm_legacy_pci_irq_by_busid(struct drm_device *dev, struct drm_irq_busid *p)
 {
-    pr_info("drm_pci: called %s\n", __func__);
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
 	if ((p->busnum >> 8) != drm_get_pci_domain(dev) ||
@@ -108,7 +105,6 @@ static int drm_legacy_pci_irq_by_busid(struct drm_device *dev, struct drm_irq_bu
 int drm_legacy_irq_by_busid(struct drm_device *dev, void *data,
 			    struct drm_file *file_priv)
 {
-    pr_info("drm_pci: called %s\n", __func__);
 	struct drm_irq_busid *p = data;
 
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
@@ -126,7 +122,6 @@ int drm_legacy_irq_by_busid(struct drm_device *dev, void *data,
 
 void drm_legacy_pci_agp_destroy(struct drm_device *dev)
 {
-    pr_info("drm_pci: called %s\n", __func__);
 	if (dev->agp) {
 		arch_phys_wc_del(dev->agp->agp_mtrr);
 		drm_legacy_agp_clear(dev);
@@ -137,7 +132,6 @@ void drm_legacy_pci_agp_destroy(struct drm_device *dev)
 
 static void drm_legacy_pci_agp_init(struct drm_device *dev)
 {
-    pr_info("drm_pci: called %s\n", __func__);
 	if (drm_core_check_feature(dev, DRIVER_USE_AGP)) {
 		if (pci_find_capability(to_pci_dev(dev->dev), PCI_CAP_ID_AGP))
 			dev->agp = drm_legacy_agp_init(dev);
@@ -154,7 +148,6 @@ static int drm_legacy_get_pci_dev(struct pci_dev *pdev,
 				  const struct pci_device_id *ent,
 				  const struct drm_driver *driver)
 {
-    pr_info("drm_pci: called %s\n", __func__);
 	struct drm_device *dev;
 	int ret;
 
@@ -206,7 +199,6 @@ err_free:
 int drm_legacy_pci_init(const struct drm_driver *driver,
 			struct pci_driver *pdriver)
 {
-    pr_info("drm_pci: called %s\n", __func__);
 	struct pci_dev *pdev = NULL;
 	const struct pci_device_id *pid;
 	int i;
@@ -253,7 +245,6 @@ EXPORT_SYMBOL(drm_legacy_pci_init);
 void drm_legacy_pci_exit(const struct drm_driver *driver,
 			 struct pci_driver *pdriver)
 {
-    pr_info("drm_pci: called %s\n", __func__);
 	struct drm_device *dev, *tmp;
 
 	DRM_DEBUG("\n");

@@ -44,7 +44,6 @@
 
 int drm_ht_create(struct drm_open_hash *ht, unsigned int order)
 {
-    pr_info("drm_hashtab: called %s\n", __func__);
 	unsigned int size = 1 << order;
 
 	ht->order = order;
@@ -63,7 +62,6 @@ EXPORT_SYMBOL(drm_ht_create);
 
 void drm_ht_verbose_list(struct drm_open_hash *ht, unsigned long key)
 {
-    pr_info("drm_hashtab: called %s\n", __func__);
 	struct drm_hash_item *entry;
 	struct hlist_head *h_list;
 	unsigned int hashed_key;
@@ -79,7 +77,6 @@ void drm_ht_verbose_list(struct drm_open_hash *ht, unsigned long key)
 static struct hlist_node *drm_ht_find_key(struct drm_open_hash *ht,
 					  unsigned long key)
 {
-    pr_info("drm_hashtab: called %s\n", __func__);
 	struct drm_hash_item *entry;
 	struct hlist_head *h_list;
 	unsigned int hashed_key;
@@ -98,7 +95,6 @@ static struct hlist_node *drm_ht_find_key(struct drm_open_hash *ht,
 static struct hlist_node *drm_ht_find_key_rcu(struct drm_open_hash *ht,
 					      unsigned long key)
 {
-    pr_info("drm_hashtab: called %s\n", __func__);
 	struct drm_hash_item *entry;
 	struct hlist_head *h_list;
 	unsigned int hashed_key;
@@ -116,7 +112,6 @@ static struct hlist_node *drm_ht_find_key_rcu(struct drm_open_hash *ht,
 
 int drm_ht_insert_item(struct drm_open_hash *ht, struct drm_hash_item *item)
 {
-    pr_info("drm_hashtab: called %s\n", __func__);
 	struct drm_hash_item *entry;
 	struct hlist_head *h_list;
 	struct hlist_node *parent;
@@ -150,7 +145,6 @@ int drm_ht_just_insert_please(struct drm_open_hash *ht, struct drm_hash_item *it
 			      unsigned long seed, int bits, int shift,
 			      unsigned long add)
 {
-    pr_info("drm_hashtab: called %s\n", __func__);
 	int ret;
 	unsigned long mask = (1UL << bits) - 1;
 	unsigned long first, unshifted_key;
@@ -175,7 +169,6 @@ EXPORT_SYMBOL(drm_ht_just_insert_please);
 int drm_ht_find_item(struct drm_open_hash *ht, unsigned long key,
 		     struct drm_hash_item **item)
 {
-    pr_info("drm_hashtab: called %s\n", __func__);
 	struct hlist_node *list;
 
 	list = drm_ht_find_key_rcu(ht, key);
@@ -189,7 +182,6 @@ EXPORT_SYMBOL(drm_ht_find_item);
 
 int drm_ht_remove_key(struct drm_open_hash *ht, unsigned long key)
 {
-    pr_info("drm_hashtab: called %s\n", __func__);
 	struct hlist_node *list;
 
 	list = drm_ht_find_key(ht, key);
@@ -202,7 +194,6 @@ int drm_ht_remove_key(struct drm_open_hash *ht, unsigned long key)
 
 int drm_ht_remove_item(struct drm_open_hash *ht, struct drm_hash_item *item)
 {
-    pr_info("drm_hashtab: called %s\n", __func__);
 	hlist_del_init_rcu(&item->head);
 	return 0;
 }
@@ -210,7 +201,6 @@ EXPORT_SYMBOL(drm_ht_remove_item);
 
 void drm_ht_remove(struct drm_open_hash *ht)
 {
-    pr_info("drm_hashtab: called %s\n", __func__);
 	if (ht->table) {
 		kvfree(ht->table);
 		ht->table = NULL;

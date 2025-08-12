@@ -169,7 +169,6 @@ static const struct soc15_reg_golden golden_settings_sdma_cyan_skillfish[] = {
 
 static u32 sdma_v5_0_get_reg_offset(struct amdgpu_device *adev, u32 instance, u32 internal_offset)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	u32 base;
 
 	if (internal_offset >= SDMA0_HYP_DEC_REG_START &&
@@ -188,7 +187,6 @@ static u32 sdma_v5_0_get_reg_offset(struct amdgpu_device *adev, u32 instance, u3
 
 static void sdma_v5_0_init_golden_registers(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_NAVI10:
 		soc15_program_register_sequence(adev,
@@ -243,7 +241,6 @@ static void sdma_v5_0_init_golden_registers(struct amdgpu_device *adev)
 // navi10 real chip need to use PSP to load firmware
 static int sdma_v5_0_init_microcode(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	const char *chip_name;
 	char fw_name[40];
 	int err = 0, i;
@@ -317,7 +314,6 @@ out:
 
 static unsigned sdma_v5_0_ring_init_cond_exec(struct amdgpu_ring *ring)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	unsigned ret;
 
 	amdgpu_ring_write(ring, SDMA_PKT_HEADER_OP(SDMA_OP_COND_EXE));
@@ -333,7 +329,6 @@ static unsigned sdma_v5_0_ring_init_cond_exec(struct amdgpu_ring *ring)
 static void sdma_v5_0_ring_patch_cond_exec(struct amdgpu_ring *ring,
 					   unsigned offset)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	unsigned cur;
 
 	BUG_ON(offset > ring->buf_mask);
@@ -355,7 +350,6 @@ static void sdma_v5_0_ring_patch_cond_exec(struct amdgpu_ring *ring,
  */
 static uint64_t sdma_v5_0_ring_get_rptr(struct amdgpu_ring *ring)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	u64 *rptr;
 
 	/* XXX check if swapping is necessary on BE */
@@ -374,7 +368,6 @@ static uint64_t sdma_v5_0_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t sdma_v5_0_ring_get_wptr(struct amdgpu_ring *ring)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	u64 wptr;
 
@@ -401,7 +394,6 @@ static uint64_t sdma_v5_0_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static void sdma_v5_0_ring_set_wptr(struct amdgpu_ring *ring)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	DRM_DEBUG("Setting write pointer\n");
@@ -436,7 +428,6 @@ static void sdma_v5_0_ring_set_wptr(struct amdgpu_ring *ring)
 
 static void sdma_v5_0_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_sdma_instance *sdma = amdgpu_sdma_get_instance_from_ring(ring);
 	int i;
 
@@ -463,7 +454,6 @@ static void sdma_v5_0_ring_emit_ib(struct amdgpu_ring *ring,
 				   struct amdgpu_ib *ib,
 				   uint32_t flags)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
 	uint64_t csa_mc_addr = amdgpu_sdma_get_csa_mc_addr(ring, vmid);
 
@@ -498,7 +488,6 @@ static void sdma_v5_0_ring_emit_ib(struct amdgpu_ring *ring,
  */
 static void sdma_v5_0_ring_emit_mem_sync(struct amdgpu_ring *ring)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	uint32_t gcr_cntl = SDMA_GCR_GL2_INV | SDMA_GCR_GL2_WB | SDMA_GCR_GLM_INV |
 			    SDMA_GCR_GL1_INV | SDMA_GCR_GLV_INV | SDMA_GCR_GLK_INV |
 			    SDMA_GCR_GLI_INV(1);
@@ -523,7 +512,6 @@ static void sdma_v5_0_ring_emit_mem_sync(struct amdgpu_ring *ring)
  */
 static void sdma_v5_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	u32 ref_and_mask = 0;
 	const struct nbio_hdp_flush_reg *nbio_hf_reg = adev->nbio.hdp_flush_reg;
@@ -559,7 +547,6 @@ static void sdma_v5_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
 static void sdma_v5_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				      unsigned flags)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	bool write64bit = flags & AMDGPU_FENCE_FLAG_64BIT;
 	/* write the fence */
 	amdgpu_ring_write(ring, SDMA_PKT_HEADER_OP(SDMA_OP_FENCE) |
@@ -599,7 +586,6 @@ static void sdma_v5_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 se
  */
 static void sdma_v5_0_gfx_stop(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_ring *sdma0 = &adev->sdma.instance[0].ring;
 	struct amdgpu_ring *sdma1 = &adev->sdma.instance[1].ring;
 	u32 rb_cntl, ib_cntl;
@@ -628,7 +614,6 @@ static void sdma_v5_0_gfx_stop(struct amdgpu_device *adev)
  */
 static void sdma_v5_0_rlc_stop(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	/* XXX todo */
 }
 
@@ -642,7 +627,6 @@ static void sdma_v5_0_rlc_stop(struct amdgpu_device *adev)
  */
 static void sdma_v5_0_ctx_switch_enable(struct amdgpu_device *adev, bool enable)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	u32 f32_cntl = 0, phase_quantum = 0;
 	int i;
 
@@ -701,7 +685,6 @@ static void sdma_v5_0_ctx_switch_enable(struct amdgpu_device *adev, bool enable)
  */
 static void sdma_v5_0_enable(struct amdgpu_device *adev, bool enable)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	u32 f32_cntl;
 	int i;
 
@@ -730,7 +713,6 @@ static void sdma_v5_0_enable(struct amdgpu_device *adev, bool enable)
  */
 static int sdma_v5_0_gfx_resume(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	u32 rb_cntl, ib_cntl;
 	u32 rb_bufsz;
@@ -899,7 +881,6 @@ static int sdma_v5_0_gfx_resume(struct amdgpu_device *adev)
  */
 static int sdma_v5_0_rlc_resume(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	return 0;
 }
 
@@ -913,7 +894,6 @@ static int sdma_v5_0_rlc_resume(struct amdgpu_device *adev)
  */
 static int sdma_v5_0_load_microcode(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	const struct sdma_firmware_header_v1_0 *hdr;
 	const __le32 *fw_data;
 	u32 fw_size;
@@ -958,7 +938,6 @@ static int sdma_v5_0_load_microcode(struct amdgpu_device *adev)
  */
 static int sdma_v5_0_start(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	int r = 0;
 
 	if (amdgpu_sriov_vf(adev)) {
@@ -1001,7 +980,6 @@ static int sdma_v5_0_start(struct amdgpu_device *adev)
  */
 static int sdma_v5_0_ring_test_ring(struct amdgpu_ring *ring)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned i;
 	unsigned index;
@@ -1063,7 +1041,6 @@ static int sdma_v5_0_ring_test_ring(struct amdgpu_ring *ring)
  */
 static int sdma_v5_0_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct amdgpu_ib ib;
 	struct dma_fence *f = NULL;
@@ -1142,7 +1119,6 @@ static void sdma_v5_0_vm_copy_pte(struct amdgpu_ib *ib,
 				  uint64_t pe, uint64_t src,
 				  unsigned count)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	unsigned bytes = count * 8;
 
 	ib->ptr[ib->length_dw++] = SDMA_PKT_HEADER_OP(SDMA_OP_COPY) |
@@ -1171,7 +1147,6 @@ static void sdma_v5_0_vm_write_pte(struct amdgpu_ib *ib, uint64_t pe,
 				   uint64_t value, unsigned count,
 				   uint32_t incr)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	unsigned ndw = count * 2;
 
 	ib->ptr[ib->length_dw++] = SDMA_PKT_HEADER_OP(SDMA_OP_WRITE) |
@@ -1203,7 +1178,6 @@ static void sdma_v5_0_vm_set_pte_pde(struct amdgpu_ib *ib,
 				     uint64_t addr, unsigned count,
 				     uint32_t incr, uint64_t flags)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	/* for physically contiguous pages (vram) */
 	ib->ptr[ib->length_dw++] = SDMA_PKT_HEADER_OP(SDMA_OP_PTEPDE);
 	ib->ptr[ib->length_dw++] = lower_32_bits(pe); /* dst addr */
@@ -1226,7 +1200,6 @@ static void sdma_v5_0_vm_set_pte_pde(struct amdgpu_ib *ib,
  */
 static void sdma_v5_0_ring_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_sdma_instance *sdma = amdgpu_sdma_get_instance_from_ring(ring);
 	u32 pad_count;
 	int i;
@@ -1252,7 +1225,6 @@ static void sdma_v5_0_ring_pad_ib(struct amdgpu_ring *ring, struct amdgpu_ib *ib
  */
 static void sdma_v5_0_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	uint32_t seq = ring->fence_drv.sync_seq;
 	uint64_t addr = ring->fence_drv.gpu_addr;
 
@@ -1283,14 +1255,12 @@ static void sdma_v5_0_ring_emit_pipeline_sync(struct amdgpu_ring *ring)
 static void sdma_v5_0_ring_emit_vm_flush(struct amdgpu_ring *ring,
 					 unsigned vmid, uint64_t pd_addr)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	amdgpu_gmc_emit_flush_gpu_tlb(ring, vmid, pd_addr);
 }
 
 static void sdma_v5_0_ring_emit_wreg(struct amdgpu_ring *ring,
 				     uint32_t reg, uint32_t val)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, SDMA_PKT_HEADER_OP(SDMA_OP_SRBM_WRITE) |
 			  SDMA_PKT_SRBM_WRITE_HEADER_BYTE_EN(0xf));
 	amdgpu_ring_write(ring, reg);
@@ -1300,7 +1270,6 @@ static void sdma_v5_0_ring_emit_wreg(struct amdgpu_ring *ring,
 static void sdma_v5_0_ring_emit_reg_wait(struct amdgpu_ring *ring, uint32_t reg,
 					 uint32_t val, uint32_t mask)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	amdgpu_ring_write(ring, SDMA_PKT_HEADER_OP(SDMA_OP_POLL_REGMEM) |
 			  SDMA_PKT_POLL_REGMEM_HEADER_HDP_FLUSH(0) |
 			  SDMA_PKT_POLL_REGMEM_HEADER_FUNC(3)); /* equal */
@@ -1316,7 +1285,6 @@ static void sdma_v5_0_ring_emit_reg_write_reg_wait(struct amdgpu_ring *ring,
 						   uint32_t reg0, uint32_t reg1,
 						   uint32_t ref, uint32_t mask)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	amdgpu_ring_emit_wreg(ring, reg0, ref);
 	/* wait for a cycle to reset vm_inv_eng*_ack */
 	amdgpu_ring_emit_reg_wait(ring, reg0, 0, 0);
@@ -1325,7 +1293,6 @@ static void sdma_v5_0_ring_emit_reg_write_reg_wait(struct amdgpu_ring *ring,
 
 static int sdma_v5_0_early_init(void *handle)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	adev->sdma.num_instances = 2;
@@ -1341,7 +1308,6 @@ static int sdma_v5_0_early_init(void *handle)
 
 static int sdma_v5_0_sw_init(void *handle)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	int r, i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -1392,7 +1358,6 @@ static int sdma_v5_0_sw_init(void *handle)
 
 static int sdma_v5_0_sw_fini(void *handle)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int i;
 
@@ -1408,7 +1373,6 @@ static int sdma_v5_0_sw_fini(void *handle)
 
 static int sdma_v5_0_hw_init(void *handle)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1421,7 +1385,6 @@ static int sdma_v5_0_hw_init(void *handle)
 
 static int sdma_v5_0_hw_fini(void *handle)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1435,7 +1398,6 @@ static int sdma_v5_0_hw_fini(void *handle)
 
 static int sdma_v5_0_suspend(void *handle)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return sdma_v5_0_hw_fini(adev);
@@ -1443,7 +1405,6 @@ static int sdma_v5_0_suspend(void *handle)
 
 static int sdma_v5_0_resume(void *handle)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return sdma_v5_0_hw_init(adev);
@@ -1451,7 +1412,6 @@ static int sdma_v5_0_resume(void *handle)
 
 static bool sdma_v5_0_is_idle(void *handle)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 i;
 
@@ -1467,7 +1427,6 @@ static bool sdma_v5_0_is_idle(void *handle)
 
 static int sdma_v5_0_wait_for_idle(void *handle)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	unsigned i;
 	u32 sdma0, sdma1;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -1485,7 +1444,6 @@ static int sdma_v5_0_wait_for_idle(void *handle)
 
 static int sdma_v5_0_soft_reset(void *handle)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	/* todo */
 
 	return 0;
@@ -1493,7 +1451,6 @@ static int sdma_v5_0_soft_reset(void *handle)
 
 static int sdma_v5_0_ring_preempt_ib(struct amdgpu_ring *ring)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	int i, r = 0;
 	struct amdgpu_device *adev = ring->adev;
 	u32 index = 0;
@@ -1544,7 +1501,6 @@ static int sdma_v5_0_set_trap_irq_state(struct amdgpu_device *adev,
 					unsigned type,
 					enum amdgpu_interrupt_state state)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	u32 sdma_cntl;
 
 	if (!amdgpu_sriov_vf(adev)) {
@@ -1565,7 +1521,6 @@ static int sdma_v5_0_process_trap_irq(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	DRM_DEBUG("IH: SDMA trap\n");
 	switch (entry->client_id) {
 	case SOC15_IH_CLIENTID_SDMA0:
@@ -1608,14 +1563,12 @@ static int sdma_v5_0_process_illegal_inst_irq(struct amdgpu_device *adev,
 					      struct amdgpu_irq_src *source,
 					      struct amdgpu_iv_entry *entry)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	return 0;
 }
 
 static void sdma_v5_0_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 						       bool enable)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	uint32_t data, def;
 	int i;
 
@@ -1653,7 +1606,6 @@ static void sdma_v5_0_update_medium_grain_clock_gating(struct amdgpu_device *ade
 static void sdma_v5_0_update_medium_grain_light_sleep(struct amdgpu_device *adev,
 						      bool enable)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	uint32_t data, def;
 	int i;
 
@@ -1679,7 +1631,6 @@ static void sdma_v5_0_update_medium_grain_light_sleep(struct amdgpu_device *adev
 static int sdma_v5_0_set_clockgating_state(void *handle,
 					   enum amd_clockgating_state state)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1704,13 +1655,11 @@ static int sdma_v5_0_set_clockgating_state(void *handle,
 static int sdma_v5_0_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	return 0;
 }
 
 static void sdma_v5_0_get_clockgating_state(void *handle, u32 *flags)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int data;
 
@@ -1785,7 +1734,6 @@ static const struct amdgpu_ring_funcs sdma_v5_0_ring_funcs = {
 
 static void sdma_v5_0_set_ring_funcs(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->sdma.num_instances; i++) {
@@ -1805,7 +1753,6 @@ static const struct amdgpu_irq_src_funcs sdma_v5_0_illegal_inst_irq_funcs = {
 
 static void sdma_v5_0_set_irq_funcs(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	adev->sdma.trap_irq.num_types = AMDGPU_SDMA_IRQ_INSTANCE0 +
 					adev->sdma.num_instances;
 	adev->sdma.trap_irq.funcs = &sdma_v5_0_trap_irq_funcs;
@@ -1831,7 +1778,6 @@ static void sdma_v5_0_emit_copy_buffer(struct amdgpu_ib *ib,
 				       uint32_t byte_count,
 				       bool tmz)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	ib->ptr[ib->length_dw++] = SDMA_PKT_HEADER_OP(SDMA_OP_COPY) |
 		SDMA_PKT_HEADER_SUB_OP(SDMA_SUBOP_COPY_LINEAR) |
 		SDMA_PKT_COPY_LINEAR_HEADER_TMZ(tmz ? 1 : 0);
@@ -1858,7 +1804,6 @@ static void sdma_v5_0_emit_fill_buffer(struct amdgpu_ib *ib,
 				       uint64_t dst_offset,
 				       uint32_t byte_count)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	ib->ptr[ib->length_dw++] = SDMA_PKT_HEADER_OP(SDMA_OP_CONST_FILL);
 	ib->ptr[ib->length_dw++] = lower_32_bits(dst_offset);
 	ib->ptr[ib->length_dw++] = upper_32_bits(dst_offset);
@@ -1878,7 +1823,6 @@ static const struct amdgpu_buffer_funcs sdma_v5_0_buffer_funcs = {
 
 static void sdma_v5_0_set_buffer_funcs(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	if (adev->mman.buffer_funcs == NULL) {
 		adev->mman.buffer_funcs = &sdma_v5_0_buffer_funcs;
 		adev->mman.buffer_funcs_ring = &adev->sdma.instance[0].ring;
@@ -1894,7 +1838,6 @@ static const struct amdgpu_vm_pte_funcs sdma_v5_0_vm_pte_funcs = {
 
 static void sdma_v5_0_set_vm_pte_funcs(struct amdgpu_device *adev)
 {
-    pr_info("sdma_v5_0: called %s\n", __func__);
 	unsigned i;
 
 	if (adev->vm_manager.vm_pte_funcs == NULL) {

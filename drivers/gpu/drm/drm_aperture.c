@@ -140,13 +140,11 @@ static DEFINE_MUTEX(drm_apertures_lock);
 static bool overlap(resource_size_t base1, resource_size_t end1,
 		    resource_size_t base2, resource_size_t end2)
 {
-    pr_info("drm_aperture: called %s\n", __func__);
 	return (base1 < end2) && (end1 > base2);
 }
 
 static void devm_aperture_acquire_release(void *data)
 {
-    pr_info("drm_aperture: called %s\n", __func__);
 	struct drm_aperture *ap = data;
 	bool detached = !ap->dev;
 
@@ -162,7 +160,6 @@ static int devm_aperture_acquire(struct drm_device *dev,
 				 resource_size_t base, resource_size_t size,
 				 void (*detach)(struct drm_device *))
 {
-    pr_info("drm_aperture: called %s\n", __func__);
 	size_t end = base + size;
 	struct list_head *pos;
 	struct drm_aperture *ap;
@@ -198,7 +195,6 @@ static int devm_aperture_acquire(struct drm_device *dev,
 
 static void drm_aperture_detach_firmware(struct drm_device *dev)
 {
-    pr_info("drm_aperture: called %s\n", __func__);
 	struct platform_device *pdev = to_platform_device(dev->dev);
 
 	/*
@@ -243,7 +239,6 @@ static void drm_aperture_detach_firmware(struct drm_device *dev)
 int devm_aperture_acquire_from_firmware(struct drm_device *dev, resource_size_t base,
 					resource_size_t size)
 {
-    pr_info("drm_aperture: called %s\n", __func__);
 	if (drm_WARN_ON(dev, !dev_is_platform(dev->dev)))
 		return -EINVAL;
 
@@ -253,7 +248,6 @@ EXPORT_SYMBOL(devm_aperture_acquire_from_firmware);
 
 static void drm_aperture_detach_drivers(resource_size_t base, resource_size_t size)
 {
-    pr_info("drm_aperture: called %s\n", __func__);
 	resource_size_t end = base + size;
 	struct list_head *pos, *n;
 
@@ -295,7 +289,6 @@ static void drm_aperture_detach_drivers(resource_size_t base, resource_size_t si
 int drm_aperture_remove_conflicting_framebuffers(resource_size_t base, resource_size_t size,
 						 bool primary, const struct drm_driver *req_driver)
 {
-    pr_info("drm_aperture: called %s\n", __func__);
 #if IS_REACHABLE(CONFIG_FB)
 	struct apertures_struct *a;
 	int ret;
@@ -335,7 +328,6 @@ EXPORT_SYMBOL(drm_aperture_remove_conflicting_framebuffers);
 int drm_aperture_remove_conflicting_pci_framebuffers(struct pci_dev *pdev,
 						     const struct drm_driver *req_driver)
 {
-    pr_info("drm_aperture: called %s\n", __func__);
 	resource_size_t base, size;
 	int bar, ret = 0;
 

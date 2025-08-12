@@ -93,7 +93,6 @@ static int debug_depth;
 #ifdef ATOM_DEBUG
 static void debug_print_spaces(int n)
 {
-    pr_info("atom: called %s\n", __func__);
 	while (n--)
 		printk("   ");
 }
@@ -108,7 +107,6 @@ static void debug_print_spaces(int n)
 static uint32_t atom_iio_execute(struct atom_context *ctx, int base,
 				 uint32_t index, uint32_t data)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint32_t temp = 0xCDCDCDCD;
 
 	while (1)
@@ -181,7 +179,6 @@ static uint32_t atom_iio_execute(struct atom_context *ctx, int base,
 static uint32_t atom_get_src_int(atom_exec_context *ctx, uint8_t attr,
 				 int *ptr, uint32_t *saved, int print)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint32_t idx, val = 0xCDCDCDCD, align, arg;
 	struct atom_context *gctx = ctx->ctx;
 	arg = attr & 7;
@@ -366,7 +363,6 @@ static uint32_t atom_get_src_int(atom_exec_context *ctx, uint8_t attr,
 
 static void atom_skip_src_int(atom_exec_context *ctx, uint8_t attr, int *ptr)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint32_t align = (attr >> 3) & 7, arg = attr & 7;
 	switch (arg) {
 	case ATOM_ARG_REG:
@@ -403,13 +399,11 @@ static void atom_skip_src_int(atom_exec_context *ctx, uint8_t attr, int *ptr)
 
 static uint32_t atom_get_src(atom_exec_context *ctx, uint8_t attr, int *ptr)
 {
-    pr_info("atom: called %s\n", __func__);
 	return atom_get_src_int(ctx, attr, ptr, NULL, 1);
 }
 
 static uint32_t atom_get_src_direct(atom_exec_context *ctx, uint8_t align, int *ptr)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint32_t val = 0xCDCDCDCD;
 
 	switch (align) {
@@ -437,7 +431,6 @@ static uint32_t atom_get_src_direct(atom_exec_context *ctx, uint8_t align, int *
 static uint32_t atom_get_dst(atom_exec_context *ctx, int arg, uint8_t attr,
 			     int *ptr, uint32_t *saved, int print)
 {
-    pr_info("atom: called %s\n", __func__);
 	return atom_get_src_int(ctx,
 				arg | atom_dst_to_src[(attr >> 3) &
 						      7][(attr >> 6) & 3] << 3,
@@ -446,7 +439,6 @@ static uint32_t atom_get_dst(atom_exec_context *ctx, int arg, uint8_t attr,
 
 static void atom_skip_dst(atom_exec_context *ctx, int arg, uint8_t attr, int *ptr)
 {
-    pr_info("atom: called %s\n", __func__);
 	atom_skip_src_int(ctx,
 			  arg | atom_dst_to_src[(attr >> 3) & 7][(attr >> 6) &
 								 3] << 3, ptr);
@@ -455,7 +447,6 @@ static void atom_skip_dst(atom_exec_context *ctx, int arg, uint8_t attr, int *pt
 static void atom_put_dst(atom_exec_context *ctx, int arg, uint8_t attr,
 			 int *ptr, uint32_t val, uint32_t saved)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint32_t align =
 	    atom_dst_to_src[(attr >> 3) & 7][(attr >> 6) & 3], old_val =
 	    val, idx;
@@ -591,7 +582,6 @@ static void atom_put_dst(atom_exec_context *ctx, int arg, uint8_t attr,
 
 static void atom_op_add(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src, saved;
 	int dptr = *ptr;
@@ -606,7 +596,6 @@ static void atom_op_add(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_and(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src, saved;
 	int dptr = *ptr;
@@ -621,13 +610,11 @@ static void atom_op_and(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_beep(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	printk("ATOM BIOS beeped!\n");
 }
 
 static void atom_op_calltable(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	int idx = U8((*ptr)++);
 	int r = 0;
 
@@ -644,7 +631,6 @@ static void atom_op_calltable(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_clear(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t saved;
 	int dptr = *ptr;
@@ -657,7 +643,6 @@ static void atom_op_clear(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_compare(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src;
 	SDEBUG("   src1: ");
@@ -672,7 +657,6 @@ static void atom_op_compare(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_delay(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	unsigned count = U8((*ptr)++);
 	SDEBUG("   count: %d\n", count);
 	if (arg == ATOM_UNIT_MICROSEC)
@@ -685,7 +669,6 @@ static void atom_op_delay(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_div(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src;
 	SDEBUG("   src1: ");
@@ -703,7 +686,6 @@ static void atom_op_div(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_div32(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint64_t val64;
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src;
@@ -725,13 +707,11 @@ static void atom_op_div32(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_eot(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	/* functionally, a nop */
 }
 
 static void atom_op_jump(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	int execute = 0, target = U16(*ptr);
 	unsigned long cjiffies;
 
@@ -786,7 +766,6 @@ static void atom_op_jump(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_mask(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, mask, src, saved;
 	int dptr = *ptr;
@@ -804,7 +783,6 @@ static void atom_op_mask(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_move(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t src, saved;
 	int dptr = *ptr;
@@ -822,7 +800,6 @@ static void atom_op_move(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_mul(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src;
 	SDEBUG("   src1: ");
@@ -834,7 +811,6 @@ static void atom_op_mul(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_mul32(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint64_t val64;
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src;
@@ -849,13 +825,11 @@ static void atom_op_mul32(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_nop(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	/* nothing */
 }
 
 static void atom_op_or(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src, saved;
 	int dptr = *ptr;
@@ -870,32 +844,27 @@ static void atom_op_or(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_postcard(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t val = U8((*ptr)++);
 	SDEBUG("POST card output: 0x%02X\n", val);
 }
 
 static void atom_op_repeat(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	pr_info("unimplemented!\n");
 }
 
 static void atom_op_restorereg(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	pr_info("unimplemented!\n");
 }
 
 static void atom_op_savereg(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	pr_info("unimplemented!\n");
 }
 
 static void atom_op_setdatablock(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	int idx = U8(*ptr);
 	(*ptr)++;
 	SDEBUG("   block: %d\n", idx);
@@ -910,7 +879,6 @@ static void atom_op_setdatablock(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_setfbbase(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	SDEBUG("   fb_base: ");
 	ctx->ctx->fb_base = atom_get_src(ctx, attr, ptr);
@@ -918,7 +886,6 @@ static void atom_op_setfbbase(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_setport(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	int port;
 	switch (arg) {
 	case ATOM_PORT_ATI:
@@ -946,7 +913,6 @@ static void atom_op_setport(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_setregblock(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	ctx->ctx->reg_block = U16(*ptr);
 	(*ptr) += 2;
 	SDEBUG("   base: 0x%04X\n", ctx->ctx->reg_block);
@@ -954,7 +920,6 @@ static void atom_op_setregblock(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_shift_left(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++), shift;
 	uint32_t saved, dst;
 	int dptr = *ptr;
@@ -971,7 +936,6 @@ static void atom_op_shift_left(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_shift_right(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++), shift;
 	uint32_t saved, dst;
 	int dptr = *ptr;
@@ -988,7 +952,6 @@ static void atom_op_shift_right(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_shl(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++), shift;
 	uint32_t saved, dst;
 	int dptr = *ptr;
@@ -1008,7 +971,6 @@ static void atom_op_shl(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_shr(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++), shift;
 	uint32_t saved, dst;
 	int dptr = *ptr;
@@ -1028,7 +990,6 @@ static void atom_op_shr(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_sub(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src, saved;
 	int dptr = *ptr;
@@ -1043,7 +1004,6 @@ static void atom_op_sub(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_switch(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t src, val, target;
 	SDEBUG("   switch: ");
@@ -1071,7 +1031,6 @@ static void atom_op_switch(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_test(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src;
 	SDEBUG("   src1: ");
@@ -1084,7 +1043,6 @@ static void atom_op_test(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_xor(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t attr = U8((*ptr)++);
 	uint32_t dst, src, saved;
 	int dptr = *ptr;
@@ -1099,14 +1057,12 @@ static void atom_op_xor(atom_exec_context *ctx, int *ptr, int arg)
 
 static void atom_op_debug(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint8_t val = U8((*ptr)++);
 	SDEBUG("DEBUG output: 0x%02X\n", val);
 }
 
 static void atom_op_processds(atom_exec_context *ctx, int *ptr, int arg)
 {
-    pr_info("atom: called %s\n", __func__);
 	uint16_t val = U16(*ptr);
 	(*ptr) += val + 2;
 	SDEBUG("PROCESSDS output: 0x%02X\n", val);
@@ -1248,7 +1204,6 @@ static struct {
 
 static int amdgpu_atom_execute_table_locked(struct atom_context *ctx, int index, uint32_t *params)
 {
-    pr_info("atom: called %s\n", __func__);
 	int base = CU16(ctx->cmd_table + 4 + 2 * index);
 	int len, ws, ps, ptr;
 	unsigned char op;
@@ -1310,7 +1265,6 @@ free:
 
 int amdgpu_atom_execute_table(struct atom_context *ctx, int index, uint32_t *params)
 {
-    pr_info("atom: called %s\n", __func__);
 	int r;
 
 	mutex_lock(&ctx->mutex);
@@ -1334,7 +1288,6 @@ static int atom_iio_len[] = { 1, 2, 3, 3, 3, 3, 4, 4, 4, 3 };
 
 static void atom_index_iio(struct atom_context *ctx, int base)
 {
-    pr_info("atom: called %s\n", __func__);
 	ctx->iio = kzalloc(2 * 256, GFP_KERNEL);
 	if (!ctx->iio)
 		return;
@@ -1349,7 +1302,6 @@ static void atom_index_iio(struct atom_context *ctx, int base)
 
 static void atom_get_vbios_name(struct atom_context *ctx)
 {
-    pr_info("atom: called %s\n", __func__);
 	unsigned char *p_rom;
 	unsigned char str_num;
 	unsigned short off_to_vbios_str;
@@ -1398,7 +1350,6 @@ static void atom_get_vbios_name(struct atom_context *ctx)
 
 static void atom_get_vbios_date(struct atom_context *ctx)
 {
-    pr_info("atom: called %s\n", __func__);
 	unsigned char *p_rom;
 	unsigned char *date_in_rom;
 
@@ -1428,7 +1379,6 @@ static void atom_get_vbios_date(struct atom_context *ctx)
 static unsigned char *atom_find_str_in_rom(struct atom_context *ctx, char *str, int start,
 					   int end, int maxlen)
 {
-    pr_info("atom: called %s\n", __func__);
 	unsigned long str_off;
 	unsigned char *p_rom;
 	unsigned short str_len;
@@ -1451,7 +1401,6 @@ static unsigned char *atom_find_str_in_rom(struct atom_context *ctx, char *str, 
 
 static void atom_get_vbios_pn(struct atom_context *ctx)
 {
-    pr_info("atom: called %s\n", __func__);
 	unsigned char *p_rom;
 	unsigned short off_to_vbios_str;
 	unsigned char *vbios_str;
@@ -1491,7 +1440,6 @@ static void atom_get_vbios_pn(struct atom_context *ctx)
 
 static void atom_get_vbios_version(struct atom_context *ctx)
 {
-    pr_info("atom: called %s\n", __func__);
 	unsigned char *vbios_ver;
 
 	/* find anchor ATOMBIOSBK-AMD */
@@ -1507,7 +1455,6 @@ static void atom_get_vbios_version(struct atom_context *ctx)
 
 struct atom_context *amdgpu_atom_parse(struct card_info *card, void *bios)
 {
-    pr_info("atom: called %s\n", __func__);
 	int base;
 	struct atom_context *ctx =
 	    kzalloc(sizeof(struct atom_context), GFP_KERNEL);
@@ -1584,7 +1531,6 @@ struct atom_context *amdgpu_atom_parse(struct card_info *card, void *bios)
 
 int amdgpu_atom_asic_init(struct atom_context *ctx)
 {
-    pr_info("atom: called %s\n", __func__);
 	int hwi = CU16(ctx->data_table + ATOM_DATA_FWI_PTR);
 	uint32_t ps[16];
 	int ret;
@@ -1609,7 +1555,6 @@ int amdgpu_atom_asic_init(struct atom_context *ctx)
 
 void amdgpu_atom_destroy(struct atom_context *ctx)
 {
-    pr_info("atom: called %s\n", __func__);
 	kfree(ctx->iio);
 	kfree(ctx);
 }
@@ -1618,7 +1563,6 @@ bool amdgpu_atom_parse_data_header(struct atom_context *ctx, int index,
 			    uint16_t *size, uint8_t *frev, uint8_t *crev,
 			    uint16_t *data_start)
 {
-    pr_info("atom: called %s\n", __func__);
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->data_table + offset);
 	u16 *mdt = (u16 *)(ctx->bios + ctx->data_table + 4);
@@ -1639,7 +1583,6 @@ bool amdgpu_atom_parse_data_header(struct atom_context *ctx, int index,
 bool amdgpu_atom_parse_cmd_header(struct atom_context *ctx, int index, uint8_t *frev,
 			   uint8_t *crev)
 {
-    pr_info("atom: called %s\n", __func__);
 	int offset = index * 2 + 4;
 	int idx = CU16(ctx->cmd_table + offset);
 	u16 *mct = (u16 *)(ctx->bios + ctx->cmd_table + 4);

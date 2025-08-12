@@ -43,7 +43,6 @@ MODULE_FIRMWARE("amdgpu/yellow_carp_ta.bin");
 
 static int psp_v13_0_init_microcode(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	const char *chip_name;
 	int err = 0;
@@ -87,7 +86,6 @@ static int psp_v13_0_init_microcode(struct psp_context *psp)
 
 static bool psp_v13_0_is_sos_alive(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	uint32_t sol_reg;
 
@@ -98,7 +96,6 @@ static bool psp_v13_0_is_sos_alive(struct psp_context *psp)
 
 static int psp_v13_0_wait_for_bootloader(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 
 	int ret;
@@ -124,7 +121,6 @@ static int psp_v13_0_bootloader_load_component(struct psp_context  	*psp,
 					       struct psp_bin_desc 	*bin_desc,
 					       enum psp_bootloader_cmd  bl_cmd)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	int ret;
 	uint32_t psp_gfxdrv_command_reg = 0;
 	struct amdgpu_device *adev = psp->adev;
@@ -158,37 +154,31 @@ static int psp_v13_0_bootloader_load_component(struct psp_context  	*psp,
 
 static int psp_v13_0_bootloader_load_kdb(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	return psp_v13_0_bootloader_load_component(psp, &psp->kdb, PSP_BL__LOAD_KEY_DATABASE);
 }
 
 static int psp_v13_0_bootloader_load_sysdrv(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	return psp_v13_0_bootloader_load_component(psp, &psp->sys, PSP_BL__LOAD_SYSDRV);
 }
 
 static int psp_v13_0_bootloader_load_soc_drv(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	return psp_v13_0_bootloader_load_component(psp, &psp->soc_drv, PSP_BL__LOAD_SOCDRV);
 }
 
 static int psp_v13_0_bootloader_load_intf_drv(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	return psp_v13_0_bootloader_load_component(psp, &psp->intf_drv, PSP_BL__LOAD_INTFDRV);
 }
 
 static int psp_v13_0_bootloader_load_dbg_drv(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	return psp_v13_0_bootloader_load_component(psp, &psp->dbg_drv, PSP_BL__LOAD_DBGDRV);
 }
 
 static int psp_v13_0_bootloader_load_sos(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	int ret;
 	unsigned int psp_gfxdrv_command_reg = 0;
 	struct amdgpu_device *adev = psp->adev;
@@ -227,7 +217,6 @@ static int psp_v13_0_bootloader_load_sos(struct psp_context *psp)
 static int psp_v13_0_ring_init(struct psp_context *psp,
 			      enum psp_ring_type ring_type)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	int ret = 0;
 	struct psp_ring *ring;
 	struct amdgpu_device *adev = psp->adev;
@@ -254,7 +243,6 @@ static int psp_v13_0_ring_init(struct psp_context *psp,
 static int psp_v13_0_ring_stop(struct psp_context *psp,
 			       enum psp_ring_type ring_type)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	int ret = 0;
 	struct amdgpu_device *adev = psp->adev;
 
@@ -284,7 +272,6 @@ static int psp_v13_0_ring_stop(struct psp_context *psp,
 static int psp_v13_0_ring_create(struct psp_context *psp,
 				 enum psp_ring_type ring_type)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	int ret = 0;
 	unsigned int psp_ring_reg = 0;
 	struct psp_ring *ring = &psp->km_ring;
@@ -352,7 +339,6 @@ static int psp_v13_0_ring_create(struct psp_context *psp,
 static int psp_v13_0_ring_destroy(struct psp_context *psp,
 				  enum psp_ring_type ring_type)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	int ret = 0;
 	struct psp_ring *ring = &psp->km_ring;
 	struct amdgpu_device *adev = psp->adev;
@@ -370,7 +356,6 @@ static int psp_v13_0_ring_destroy(struct psp_context *psp,
 
 static uint32_t psp_v13_0_ring_get_wptr(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	uint32_t data;
 	struct amdgpu_device *adev = psp->adev;
 
@@ -384,7 +369,6 @@ static uint32_t psp_v13_0_ring_get_wptr(struct psp_context *psp)
 
 static void psp_v13_0_ring_set_wptr(struct psp_context *psp, uint32_t value)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 
 	if (amdgpu_sriov_vf(adev)) {
@@ -397,7 +381,6 @@ static void psp_v13_0_ring_set_wptr(struct psp_context *psp, uint32_t value)
 
 static int psp_v13_0_load_usbc_pd_fw(struct psp_context *psp, uint64_t fw_pri_mc_addr)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	uint32_t reg_status;
 	int ret, i = 0;
@@ -441,7 +424,6 @@ done:
 
 static int psp_v13_0_read_usbc_pd_fw(struct psp_context *psp, uint32_t *fw_ver)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	struct amdgpu_device *adev = psp->adev;
 	int ret;
 
@@ -475,6 +457,5 @@ static const struct psp_funcs psp_v13_0_funcs = {
 
 void psp_v13_0_set_psp_funcs(struct psp_context *psp)
 {
-    pr_info("psp_v13_0: called %s\n", __func__);
 	psp->funcs = &psp_v13_0_funcs;
 }

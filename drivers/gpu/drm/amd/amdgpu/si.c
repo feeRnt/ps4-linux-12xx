@@ -989,7 +989,6 @@ static const struct amdgpu_video_codecs hainan_video_codecs_decode =
 static int si_query_video_codecs(struct amdgpu_device *adev, bool encode,
 				 const struct amdgpu_video_codecs **codecs)
 {
-    pr_info("si: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_VERDE:
 	case CHIP_TAHITI:
@@ -1018,7 +1017,6 @@ static int si_query_video_codecs(struct amdgpu_device *adev, bool encode,
 
 static u32 si_pcie_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -1032,7 +1030,6 @@ static u32 si_pcie_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void si_pcie_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
@@ -1045,7 +1042,6 @@ static void si_pcie_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 si_pciep_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -1059,7 +1055,6 @@ static u32 si_pciep_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void si_pciep_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
@@ -1072,7 +1067,6 @@ static void si_pciep_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 si_smc_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -1085,7 +1079,6 @@ static u32 si_smc_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void si_smc_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->smc_idx_lock, flags);
@@ -1096,7 +1089,6 @@ static void si_smc_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 si_uvd_ctx_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -1109,7 +1101,6 @@ static u32 si_uvd_ctx_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void si_uvd_ctx_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->uvd_ctx_idx_lock, flags);
@@ -1174,7 +1165,6 @@ static uint32_t si_get_register_value(struct amdgpu_device *adev,
 				      bool indexed, u32 se_num,
 				      u32 sh_num, u32 reg_offset)
 {
-    pr_info("si: called %s\n", __func__);
 	if (indexed) {
 		uint32_t val;
 		unsigned se_idx = (se_num == 0xffffffff) ? 0 : se_num;
@@ -1249,7 +1239,6 @@ static uint32_t si_get_register_value(struct amdgpu_device *adev,
 static int si_read_register(struct amdgpu_device *adev, u32 se_num,
 			     u32 sh_num, u32 reg_offset, u32 *value)
 {
-    pr_info("si: called %s\n", __func__);
 	uint32_t i;
 
 	*value = 0;
@@ -1268,7 +1257,6 @@ static int si_read_register(struct amdgpu_device *adev, u32 se_num,
 
 static bool si_read_disabled_bios(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	u32 bus_cntl;
 	u32 d1vga_control = 0;
 	u32 d2vga_control = 0;
@@ -1318,7 +1306,6 @@ static bool si_read_disabled_bios(struct amdgpu_device *adev)
 static bool si_read_bios_from_rom(struct amdgpu_device *adev,
 				  u8 *bios, u32 length_bytes)
 {
-    pr_info("si: called %s\n", __func__);
 	u32 *dw_ptr;
 	u32 i, length_dw;
 
@@ -1342,7 +1329,6 @@ static bool si_read_bios_from_rom(struct amdgpu_device *adev,
 
 static void si_set_clk_bypass_mode(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	u32 tmp, i;
 
 	tmp = RREG32(CG_SPLL_FUNC_CNTL);
@@ -1370,7 +1356,6 @@ static void si_set_clk_bypass_mode(struct amdgpu_device *adev)
 
 static void si_spll_powerdown(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	u32 tmp;
 
 	tmp = RREG32(SPLL_CNTL_MODE);
@@ -1392,7 +1377,6 @@ static void si_spll_powerdown(struct amdgpu_device *adev)
 
 static int si_gpu_pci_config_reset(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	u32 i;
 	int r = -EINVAL;
 
@@ -1427,14 +1411,12 @@ static int si_gpu_pci_config_reset(struct amdgpu_device *adev)
 
 static bool si_asic_supports_baco(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	return false;
 }
 
 static enum amd_reset_method
 si_asic_reset_method(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	if (amdgpu_reset_method == AMD_RESET_METHOD_PCI)
 		return amdgpu_reset_method;
 	else if (amdgpu_reset_method != AMD_RESET_METHOD_LEGACY &&
@@ -1447,7 +1429,6 @@ si_asic_reset_method(struct amdgpu_device *adev)
 
 static int si_asic_reset(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	int r;
 
 	switch (si_asic_reset_method(adev)) {
@@ -1466,13 +1447,11 @@ static int si_asic_reset(struct amdgpu_device *adev)
 
 static u32 si_get_config_memsize(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	return RREG32(mmCONFIG_MEMSIZE);
 }
 
 static void si_vga_set_state(struct amdgpu_device *adev, bool state)
 {
-    pr_info("si: called %s\n", __func__);
 	uint32_t temp;
 
 	temp = RREG32(CONFIG_CNTL);
@@ -1487,7 +1466,6 @@ static void si_vga_set_state(struct amdgpu_device *adev, bool state)
 
 static u32 si_get_xclk(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	u32 reference_clock = adev->clock.spll.reference_freq;
 	u32 tmp;
 
@@ -1504,7 +1482,6 @@ static u32 si_get_xclk(struct amdgpu_device *adev)
 
 static void si_flush_hdp(struct amdgpu_device *adev, struct amdgpu_ring *ring)
 {
-    pr_info("si: called %s\n", __func__);
 	if (!ring || !ring->funcs->emit_wreg) {
 		WREG32(mmHDP_MEM_COHERENCY_FLUSH_CNTL, 1);
 		RREG32(mmHDP_MEM_COHERENCY_FLUSH_CNTL);
@@ -1516,7 +1493,6 @@ static void si_flush_hdp(struct amdgpu_device *adev, struct amdgpu_ring *ring)
 static void si_invalidate_hdp(struct amdgpu_device *adev,
 			      struct amdgpu_ring *ring)
 {
-    pr_info("si: called %s\n", __func__);
 	if (!ring || !ring->funcs->emit_wreg) {
 		WREG32(mmHDP_DEBUG0, 1);
 		RREG32(mmHDP_DEBUG0);
@@ -1527,20 +1503,17 @@ static void si_invalidate_hdp(struct amdgpu_device *adev,
 
 static bool si_need_full_reset(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	/* change this when we support soft reset */
 	return true;
 }
 
 static bool si_need_reset_on_init(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	return false;
 }
 
 static int si_get_pcie_lanes(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	u32 link_width_cntl;
 
 	if (adev->flags & AMD_IS_APU)
@@ -1566,7 +1539,6 @@ static int si_get_pcie_lanes(struct amdgpu_device *adev)
 
 static void si_set_pcie_lanes(struct amdgpu_device *adev, int lanes)
 {
-    pr_info("si: called %s\n", __func__);
 	u32 link_width_cntl, mask;
 
 	if (adev->flags & AMD_IS_APU)
@@ -1608,7 +1580,6 @@ static void si_set_pcie_lanes(struct amdgpu_device *adev, int lanes)
 static void si_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 			      uint64_t *count1)
 {
-    pr_info("si: called %s\n", __func__);
 	uint32_t perfctr = 0;
 	uint64_t cnt0_of, cnt1_of;
 	int tmp;
@@ -1654,7 +1625,6 @@ static void si_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 
 static uint64_t si_get_pcie_replay_count(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	uint64_t nak_r, nak_g;
 
 	/* Get the number of NAKs received and generated */
@@ -1668,7 +1638,6 @@ static uint64_t si_get_pcie_replay_count(struct amdgpu_device *adev)
 static int si_uvd_send_upll_ctlreq(struct amdgpu_device *adev,
 				   unsigned cg_upll_func_cntl)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned i;
 
 	/* Make sure UPLL_CTLREQ is deasserted */
@@ -1704,7 +1673,6 @@ static unsigned si_uvd_calc_upll_post_div(unsigned vco_freq,
 					  unsigned pd_min,
 					  unsigned pd_even)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned post_div = vco_freq / target_freq;
 
 	/* Adjust to post divider minimum value */
@@ -1752,7 +1720,6 @@ static int si_calc_upll_dividers(struct amdgpu_device *adev,
 				 unsigned *optimal_vclk_div,
 				 unsigned *optimal_dclk_div)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned vco_freq, ref_freq = adev->clock.spll.reference_freq;
 
 	/* Start off with something large */
@@ -1807,7 +1774,6 @@ static int si_calc_upll_dividers(struct amdgpu_device *adev,
 
 static int si_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned fb_div = 0, vclk_div = 0, dclk_div = 0;
 	int r;
 
@@ -1899,7 +1865,6 @@ static int si_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 
 static int si_vce_send_vcepll_ctlreq(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned i;
 
 	/* Make sure VCEPLL_CTLREQ is deasserted */
@@ -1932,7 +1897,6 @@ static int si_vce_send_vcepll_ctlreq(struct amdgpu_device *adev)
 
 static int si_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned fb_div = 0, evclk_div = 0, ecclk_div = 0;
 	int r;
 
@@ -2025,7 +1989,6 @@ static int si_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk)
 
 static void si_pre_asic_init(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 }
 
 static const struct amdgpu_asic_funcs si_asic_funcs =
@@ -2055,14 +2018,12 @@ static const struct amdgpu_asic_funcs si_asic_funcs =
 
 static uint32_t si_get_rev_id(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	return (RREG32(CC_DRM_ID_STRAPS) & CC_DRM_ID_STRAPS__ATI_REV_ID_MASK)
 		>> CC_DRM_ID_STRAPS__ATI_REV_ID__SHIFT;
 }
 
 static int si_common_early_init(void *handle)
 {
-    pr_info("si: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	adev->smc_rreg = &si_smc_rreg;
@@ -2189,20 +2150,17 @@ static int si_common_early_init(void *handle)
 
 static int si_common_sw_init(void *handle)
 {
-    pr_info("si: called %s\n", __func__);
 	return 0;
 }
 
 static int si_common_sw_fini(void *handle)
 {
-    pr_info("si: called %s\n", __func__);
 	return 0;
 }
 
 
 static void si_init_golden_registers(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_TAHITI:
 		amdgpu_device_program_register_sequence(adev,
@@ -2274,7 +2232,6 @@ static void si_init_golden_registers(struct amdgpu_device *adev)
 
 static void si_pcie_gen3_enable(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	struct pci_dev *root = adev->pdev->bus->self;
 	u32 speed_cntl, current_data_rate;
 	int i;
@@ -2449,7 +2406,6 @@ static void si_pcie_gen3_enable(struct amdgpu_device *adev)
 
 static inline u32 si_pif_phy0_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -2462,7 +2418,6 @@ static inline u32 si_pif_phy0_rreg(struct amdgpu_device *adev, u32 reg)
 
 static inline void si_pif_phy0_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
@@ -2473,7 +2428,6 @@ static inline void si_pif_phy0_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static inline u32 si_pif_phy1_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -2486,7 +2440,6 @@ static inline u32 si_pif_phy1_rreg(struct amdgpu_device *adev, u32 reg)
 
 static inline void si_pif_phy1_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("si: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->pcie_idx_lock, flags);
@@ -2496,7 +2449,6 @@ static inline void si_pif_phy1_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 }
 static void si_program_aspm(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	u32 data, orig;
 	bool disable_l0s = false, disable_l1 = false, disable_plloff_in_l1 = false;
 	bool disable_clkreq = false;
@@ -2701,7 +2653,6 @@ static void si_program_aspm(struct amdgpu_device *adev)
 
 static void si_fix_pci_max_read_req_size(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	int readrq;
 	u16 v;
 
@@ -2713,7 +2664,6 @@ static void si_fix_pci_max_read_req_size(struct amdgpu_device *adev)
 
 static int si_common_hw_init(void *handle)
 {
-    pr_info("si: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	si_fix_pci_max_read_req_size(adev);
@@ -2726,13 +2676,11 @@ static int si_common_hw_init(void *handle)
 
 static int si_common_hw_fini(void *handle)
 {
-    pr_info("si: called %s\n", __func__);
 	return 0;
 }
 
 static int si_common_suspend(void *handle)
 {
-    pr_info("si: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return si_common_hw_fini(adev);
@@ -2740,7 +2688,6 @@ static int si_common_suspend(void *handle)
 
 static int si_common_resume(void *handle)
 {
-    pr_info("si: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return si_common_hw_init(adev);
@@ -2748,33 +2695,28 @@ static int si_common_resume(void *handle)
 
 static bool si_common_is_idle(void *handle)
 {
-    pr_info("si: called %s\n", __func__);
 	return true;
 }
 
 static int si_common_wait_for_idle(void *handle)
 {
-    pr_info("si: called %s\n", __func__);
 	return 0;
 }
 
 static int si_common_soft_reset(void *handle)
 {
-    pr_info("si: called %s\n", __func__);
 	return 0;
 }
 
 static int si_common_set_clockgating_state(void *handle,
 					    enum amd_clockgating_state state)
 {
-    pr_info("si: called %s\n", __func__);
 	return 0;
 }
 
 static int si_common_set_powergating_state(void *handle,
 					    enum amd_powergating_state state)
 {
-    pr_info("si: called %s\n", __func__);
 	return 0;
 }
 
@@ -2806,7 +2748,6 @@ static const struct amdgpu_ip_block_version si_common_ip_block =
 
 int si_set_ip_blocks(struct amdgpu_device *adev)
 {
-    pr_info("si: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_VERDE:
 	case CHIP_TAHITI:

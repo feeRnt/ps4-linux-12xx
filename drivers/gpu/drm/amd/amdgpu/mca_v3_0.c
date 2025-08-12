@@ -32,7 +32,6 @@
 static void mca_v3_0_mp0_query_ras_error_count(struct amdgpu_device *adev,
 					       void *ras_error_status)
 {
-    pr_info("mca_v3_0: called %s\n", __func__);
 	amdgpu_mca_query_ras_error_count(adev,
 				         smnMCMP0_STATUST0,
 				         ras_error_status);
@@ -40,13 +39,11 @@ static void mca_v3_0_mp0_query_ras_error_count(struct amdgpu_device *adev,
 
 static int mca_v3_0_mp0_ras_late_init(struct amdgpu_device *adev)
 {
-    pr_info("mca_v3_0: called %s\n", __func__);
 	return amdgpu_mca_ras_late_init(adev, &adev->mca.mp0);
 }
 
 static void mca_v3_0_mp0_ras_fini(struct amdgpu_device *adev)
 {
-    pr_info("mca_v3_0: called %s\n", __func__);
 	amdgpu_mca_ras_fini(adev, &adev->mca.mp0);
 }
 
@@ -62,7 +59,6 @@ const struct amdgpu_mca_ras_funcs mca_v3_0_mp0_ras_funcs = {
 static void mca_v3_0_mp1_query_ras_error_count(struct amdgpu_device *adev,
 					       void *ras_error_status)
 {
-    pr_info("mca_v3_0: called %s\n", __func__);
 	amdgpu_mca_query_ras_error_count(adev,
 				         smnMCMP1_STATUST0,
 				         ras_error_status);
@@ -70,13 +66,11 @@ static void mca_v3_0_mp1_query_ras_error_count(struct amdgpu_device *adev,
 
 static int mca_v3_0_mp1_ras_late_init(struct amdgpu_device *adev)
 {
-    pr_info("mca_v3_0: called %s\n", __func__);
 	return amdgpu_mca_ras_late_init(adev, &adev->mca.mp1);
 }
 
 static void mca_v3_0_mp1_ras_fini(struct amdgpu_device *adev)
 {
-    pr_info("mca_v3_0: called %s\n", __func__);
 	amdgpu_mca_ras_fini(adev, &adev->mca.mp1);
 }
 
@@ -92,7 +86,6 @@ const struct amdgpu_mca_ras_funcs mca_v3_0_mp1_ras_funcs = {
 static void mca_v3_0_mpio_query_ras_error_count(struct amdgpu_device *adev,
 					       void *ras_error_status)
 {
-    pr_info("mca_v3_0: called %s\n", __func__);
 	amdgpu_mca_query_ras_error_count(adev,
 				         smnMCMPIO_STATUST0,
 				         ras_error_status);
@@ -100,13 +93,11 @@ static void mca_v3_0_mpio_query_ras_error_count(struct amdgpu_device *adev,
 
 static int mca_v3_0_mpio_ras_late_init(struct amdgpu_device *adev)
 {
-    pr_info("mca_v3_0: called %s\n", __func__);
 	return amdgpu_mca_ras_late_init(adev, &adev->mca.mpio);
 }
 
 static void mca_v3_0_mpio_ras_fini(struct amdgpu_device *adev)
 {
-    pr_info("mca_v3_0: called %s\n", __func__);
 	amdgpu_mca_ras_fini(adev, &adev->mca.mpio);
 }
 
@@ -122,7 +113,6 @@ const struct amdgpu_mca_ras_funcs mca_v3_0_mpio_ras_funcs = {
 
 static void mca_v3_0_init(struct amdgpu_device *adev)
 {
-    pr_info("mca_v3_0: called %s\n", __func__);
 	struct amdgpu_mca *mca = &adev->mca;
 
 	mca->mp0.ras_funcs = &mca_v3_0_mp0_ras_funcs;

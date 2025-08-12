@@ -154,7 +154,6 @@ static const struct amdgpu_video_codecs rn_video_codecs_decode =
 static int soc15_query_video_codecs(struct amdgpu_device *adev, bool encode,
 				    const struct amdgpu_video_codecs **codecs)
 {
-    pr_info("soc15: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_VEGA20:
 	case CHIP_VEGA10:
@@ -188,7 +187,6 @@ static int soc15_query_video_codecs(struct amdgpu_device *adev, bool encode,
  */
 static u32 soc15_pcie_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long address, data;
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
 	data = adev->nbio.funcs->get_pcie_data_offset(adev);
@@ -198,7 +196,6 @@ static u32 soc15_pcie_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void soc15_pcie_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long address, data;
 
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
@@ -209,7 +206,6 @@ static void soc15_pcie_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u64 soc15_pcie_rreg64(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long address, data;
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
 	data = adev->nbio.funcs->get_pcie_data_offset(adev);
@@ -219,7 +215,6 @@ static u64 soc15_pcie_rreg64(struct amdgpu_device *adev, u32 reg)
 
 static void soc15_pcie_wreg64(struct amdgpu_device *adev, u32 reg, u64 v)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long address, data;
 
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
@@ -230,7 +225,6 @@ static void soc15_pcie_wreg64(struct amdgpu_device *adev, u32 reg, u64 v)
 
 static u32 soc15_uvd_ctx_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long flags, address, data;
 	u32 r;
 
@@ -246,7 +240,6 @@ static u32 soc15_uvd_ctx_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void soc15_uvd_ctx_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long flags, address, data;
 
 	address = SOC15_REG_OFFSET(UVD, 0, mmUVD_CTX_INDEX);
@@ -260,7 +253,6 @@ static void soc15_uvd_ctx_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 soc15_didt_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long flags, address, data;
 	u32 r;
 
@@ -276,7 +268,6 @@ static u32 soc15_didt_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void soc15_didt_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long flags, address, data;
 
 	address = SOC15_REG_OFFSET(GC, 0, mmDIDT_IND_INDEX);
@@ -290,7 +281,6 @@ static void soc15_didt_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 soc15_gc_cac_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -303,7 +293,6 @@ static u32 soc15_gc_cac_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void soc15_gc_cac_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->gc_cac_idx_lock, flags);
@@ -314,7 +303,6 @@ static void soc15_gc_cac_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 soc15_se_cac_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long flags;
 	u32 r;
 
@@ -327,7 +315,6 @@ static u32 soc15_se_cac_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void soc15_se_cac_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("soc15: called %s\n", __func__);
 	unsigned long flags;
 
 	spin_lock_irqsave(&adev->se_cac_idx_lock, flags);
@@ -338,13 +325,11 @@ static void soc15_se_cac_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 soc15_get_config_memsize(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	return adev->nbio.funcs->get_memsize(adev);
 }
 
 static u32 soc15_get_xclk(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	u32 reference_clock = adev->clock.spll.reference_freq;
 
 	if (adev->asic_type == CHIP_RENOIR)
@@ -359,7 +344,6 @@ static u32 soc15_get_xclk(struct amdgpu_device *adev)
 void soc15_grbm_select(struct amdgpu_device *adev,
 		     u32 me, u32 pipe, u32 queue, u32 vmid)
 {
-    pr_info("soc15: called %s\n", __func__);
 	u32 grbm_gfx_cntl = 0;
 	grbm_gfx_cntl = REG_SET_FIELD(grbm_gfx_cntl, GRBM_GFX_CNTL, PIPEID, pipe);
 	grbm_gfx_cntl = REG_SET_FIELD(grbm_gfx_cntl, GRBM_GFX_CNTL, MEID, me);
@@ -371,13 +355,11 @@ void soc15_grbm_select(struct amdgpu_device *adev,
 
 static void soc15_vga_set_state(struct amdgpu_device *adev, bool state)
 {
-    pr_info("soc15: called %s\n", __func__);
 	/* todo */
 }
 
 static bool soc15_read_disabled_bios(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	/* todo */
 	return false;
 }
@@ -385,7 +367,6 @@ static bool soc15_read_disabled_bios(struct amdgpu_device *adev)
 static bool soc15_read_bios_from_rom(struct amdgpu_device *adev,
 				     u8 *bios, u32 length_bytes)
 {
-    pr_info("soc15: called %s\n", __func__);
 	u32 *dw_ptr;
 	u32 i, length_dw;
 	uint32_t rom_index_offset;
@@ -442,7 +423,6 @@ static struct soc15_allowed_register_entry soc15_allowed_read_registers[] = {
 static uint32_t soc15_read_indexed_register(struct amdgpu_device *adev, u32 se_num,
 					 u32 sh_num, u32 reg_offset)
 {
-    pr_info("soc15: called %s\n", __func__);
 	uint32_t val;
 
 	mutex_lock(&adev->grbm_idx_mutex);
@@ -461,7 +441,6 @@ static uint32_t soc15_get_register_value(struct amdgpu_device *adev,
 					 bool indexed, u32 se_num,
 					 u32 sh_num, u32 reg_offset)
 {
-    pr_info("soc15: called %s\n", __func__);
 	if (indexed) {
 		return soc15_read_indexed_register(adev, se_num, sh_num, reg_offset);
 	} else {
@@ -476,7 +455,6 @@ static uint32_t soc15_get_register_value(struct amdgpu_device *adev,
 static int soc15_read_register(struct amdgpu_device *adev, u32 se_num,
 			    u32 sh_num, u32 reg_offset, u32 *value)
 {
-    pr_info("soc15: called %s\n", __func__);
 	uint32_t i;
 	struct soc15_allowed_register_entry  *en;
 
@@ -512,7 +490,6 @@ void soc15_program_register_sequence(struct amdgpu_device *adev,
 					     const struct soc15_reg_golden *regs,
 					     const u32 array_size)
 {
-    pr_info("soc15: called %s\n", __func__);
 	const struct soc15_reg_golden *entry;
 	u32 tmp, reg;
 	int i;
@@ -546,7 +523,6 @@ void soc15_program_register_sequence(struct amdgpu_device *adev,
 
 static int soc15_asic_baco_reset(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
 	int ret = 0;
 
@@ -568,7 +544,6 @@ static int soc15_asic_baco_reset(struct amdgpu_device *adev)
 static enum amd_reset_method
 soc15_asic_reset_method(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	bool baco_reset = false;
 	bool connected_to_cpu = false;
 	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
@@ -631,7 +606,6 @@ soc15_asic_reset_method(struct amdgpu_device *adev)
 
 static int soc15_asic_reset(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	/* original raven doesn't have full asic reset */
 	if ((adev->apu_flags & AMD_APU_IS_RAVEN) &&
 	    !(adev->apu_flags & AMD_APU_IS_RAVEN2))
@@ -655,7 +629,6 @@ static int soc15_asic_reset(struct amdgpu_device *adev)
 
 static bool soc15_supports_baco(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_VEGA10:
 	case CHIP_VEGA12:
@@ -678,7 +651,6 @@ static bool soc15_supports_baco(struct amdgpu_device *adev)
 
 static int soc15_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 {
-    pr_info("soc15: called %s\n", __func__);
 	/*int r;
 
 	r = soc15_set_uvd_clock(adev, vclk, ixCG_VCLK_CNTL, ixCG_VCLK_STATUS);
@@ -692,7 +664,6 @@ static int soc15_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 
 static int soc15_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk)
 {
-    pr_info("soc15: called %s\n", __func__);
 	/* todo */
 
 	return 0;
@@ -700,7 +671,6 @@ static int soc15_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk
 
 static void soc15_pcie_gen3_enable(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	if (pci_is_root_bus(adev->pdev->bus))
 		return;
 
@@ -719,7 +689,6 @@ static void soc15_pcie_gen3_enable(struct amdgpu_device *adev)
 
 static void soc15_program_aspm(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	if (!amdgpu_aspm)
 		return;
 
@@ -731,7 +700,6 @@ static void soc15_program_aspm(struct amdgpu_device *adev)
 static void soc15_enable_doorbell_aperture(struct amdgpu_device *adev,
 					   bool enable)
 {
-    pr_info("soc15: called %s\n", __func__);
 	adev->nbio.funcs->enable_doorbell_aperture(adev, enable);
 	adev->nbio.funcs->enable_doorbell_selfring_aperture(adev, enable);
 }
@@ -747,13 +715,11 @@ static const struct amdgpu_ip_block_version vega10_common_ip_block =
 
 static uint32_t soc15_get_rev_id(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	return adev->nbio.funcs->get_rev_id(adev);
 }
 
 static void soc15_reg_base_init(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	int r;
 
 	/* Set IP register base before any HW register access */
@@ -792,7 +758,6 @@ static void soc15_reg_base_init(struct amdgpu_device *adev)
 
 void soc15_set_virt_ops(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	adev->virt.ops = &xgpu_ai_virt_ops;
 
 	/* init soc15 reg base early enough so we can
@@ -803,7 +768,6 @@ void soc15_set_virt_ops(struct amdgpu_device *adev)
 
 int soc15_set_ip_blocks(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	/* for bare metal case */
 	if (!amdgpu_sriov_vf(adev))
 		soc15_reg_base_init(adev);
@@ -983,7 +947,6 @@ int soc15_set_ip_blocks(struct amdgpu_device *adev)
 
 static bool soc15_need_full_reset(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	/* change this when we implement soft reset */
 	return true;
 }
@@ -991,7 +954,6 @@ static bool soc15_need_full_reset(struct amdgpu_device *adev)
 static void soc15_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 				 uint64_t *count1)
 {
-    pr_info("soc15: called %s\n", __func__);
 	uint32_t perfctr = 0;
 	uint64_t cnt0_of, cnt1_of;
 	int tmp;
@@ -1039,7 +1001,6 @@ static void soc15_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 static void vega20_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 				 uint64_t *count1)
 {
-    pr_info("soc15: called %s\n", __func__);
 	uint32_t perfctr = 0;
 	uint64_t cnt0_of, cnt1_of;
 	int tmp;
@@ -1088,7 +1049,6 @@ static void vega20_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 
 static bool soc15_need_reset_on_init(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	u32 sol_reg;
 
 	/* Just return false for soc15 GPUs.  Reset does not seem to
@@ -1112,7 +1072,6 @@ static bool soc15_need_reset_on_init(struct amdgpu_device *adev)
 
 static uint64_t soc15_get_pcie_replay_count(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	uint64_t nak_r, nak_g;
 
 	/* Get the number of NAKs received and generated */
@@ -1125,7 +1084,6 @@ static uint64_t soc15_get_pcie_replay_count(struct amdgpu_device *adev)
 
 static void soc15_pre_asic_init(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	gmc_v9_0_restore_registers(adev);
 }
 
@@ -1175,7 +1133,6 @@ static const struct amdgpu_asic_funcs vega20_asic_funcs =
 
 static int soc15_common_early_init(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 #define MMIO_REG_HOLE_OFFSET (0x80000 - PAGE_SIZE)
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1420,7 +1377,6 @@ static int soc15_common_early_init(void *handle)
 
 static int soc15_common_late_init(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r = 0;
 
@@ -1436,7 +1392,6 @@ static int soc15_common_late_init(void *handle)
 
 static int soc15_common_sw_init(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1449,7 +1404,6 @@ static int soc15_common_sw_init(void *handle)
 
 static int soc15_common_sw_fini(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (adev->nbio.ras_funcs &&
@@ -1461,7 +1415,6 @@ static int soc15_common_sw_fini(void *handle)
 
 static void soc15_doorbell_range_init(struct amdgpu_device *adev)
 {
-    pr_info("soc15: called %s\n", __func__);
 	int i;
 	struct amdgpu_ring *ring;
 
@@ -1481,7 +1434,6 @@ static void soc15_doorbell_range_init(struct amdgpu_device *adev)
 
 static int soc15_common_hw_init(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* enable pcie gen2/3 link */
@@ -1511,7 +1463,6 @@ static int soc15_common_hw_init(void *handle)
 
 static int soc15_common_hw_fini(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* disable the doorbell aperture */
@@ -1534,7 +1485,6 @@ static int soc15_common_hw_fini(void *handle)
 
 static int soc15_common_suspend(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return soc15_common_hw_fini(adev);
@@ -1542,7 +1492,6 @@ static int soc15_common_suspend(void *handle)
 
 static int soc15_common_resume(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return soc15_common_hw_init(adev);
@@ -1550,25 +1499,21 @@ static int soc15_common_resume(void *handle)
 
 static bool soc15_common_is_idle(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 	return true;
 }
 
 static int soc15_common_wait_for_idle(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 	return 0;
 }
 
 static int soc15_common_soft_reset(void *handle)
 {
-    pr_info("soc15: called %s\n", __func__);
 	return 0;
 }
 
 static void soc15_update_drm_clock_gating(struct amdgpu_device *adev, bool enable)
 {
-    pr_info("soc15: called %s\n", __func__);
 	uint32_t def, data;
 
 	def = data = RREG32(SOC15_REG_OFFSET(MP0, 0, mmMP0_MISC_CGTT_CTRL0));
@@ -1598,7 +1543,6 @@ static void soc15_update_drm_clock_gating(struct amdgpu_device *adev, bool enabl
 
 static void soc15_update_drm_light_sleep(struct amdgpu_device *adev, bool enable)
 {
-    pr_info("soc15: called %s\n", __func__);
 	uint32_t def, data;
 
 	def = data = RREG32(SOC15_REG_OFFSET(MP0, 0, mmMP0_MISC_LIGHT_SLEEP_CTRL));
@@ -1615,7 +1559,6 @@ static void soc15_update_drm_light_sleep(struct amdgpu_device *adev, bool enable
 static int soc15_common_set_clockgating_state(void *handle,
 					    enum amd_clockgating_state state)
 {
-    pr_info("soc15: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1666,7 +1609,6 @@ static int soc15_common_set_clockgating_state(void *handle,
 
 static void soc15_common_get_clockgating_state(void *handle, u32 *flags)
 {
-    pr_info("soc15: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int data;
 
@@ -1699,7 +1641,6 @@ static void soc15_common_get_clockgating_state(void *handle, u32 *flags)
 static int soc15_common_set_powergating_state(void *handle,
 					    enum amd_powergating_state state)
 {
-    pr_info("soc15: called %s\n", __func__);
 	/* todo */
 	return 0;
 }

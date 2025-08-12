@@ -180,7 +180,6 @@ static const struct amdgpu_video_codecs yc_video_codecs_decode = {
 static int nv_query_video_codecs(struct amdgpu_device *adev, bool encode,
 				 const struct amdgpu_video_codecs **codecs)
 {
-    pr_info("nv: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_SIENNA_CICHLID:
 		if (amdgpu_sriov_vf(adev)) {
@@ -233,7 +232,6 @@ static int nv_query_video_codecs(struct amdgpu_device *adev, bool encode,
  */
 static u32 nv_pcie_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("nv: called %s\n", __func__);
 	unsigned long address, data;
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
 	data = adev->nbio.funcs->get_pcie_data_offset(adev);
@@ -243,7 +241,6 @@ static u32 nv_pcie_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void nv_pcie_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("nv: called %s\n", __func__);
 	unsigned long address, data;
 
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
@@ -254,7 +251,6 @@ static void nv_pcie_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u64 nv_pcie_rreg64(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("nv: called %s\n", __func__);
 	unsigned long address, data;
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
 	data = adev->nbio.funcs->get_pcie_data_offset(adev);
@@ -264,7 +260,6 @@ static u64 nv_pcie_rreg64(struct amdgpu_device *adev, u32 reg)
 
 static u32 nv_pcie_port_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("nv: called %s\n", __func__);
 	unsigned long flags, address, data;
 	u32 r;
 	address = adev->nbio.funcs->get_pcie_port_index_offset(adev);
@@ -280,7 +275,6 @@ static u32 nv_pcie_port_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void nv_pcie_wreg64(struct amdgpu_device *adev, u32 reg, u64 v)
 {
-    pr_info("nv: called %s\n", __func__);
 	unsigned long address, data;
 
 	address = adev->nbio.funcs->get_pcie_index_offset(adev);
@@ -291,7 +285,6 @@ static void nv_pcie_wreg64(struct amdgpu_device *adev, u32 reg, u64 v)
 
 static void nv_pcie_port_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("nv: called %s\n", __func__);
 	unsigned long flags, address, data;
 
 	address = adev->nbio.funcs->get_pcie_port_index_offset(adev);
@@ -307,7 +300,6 @@ static void nv_pcie_port_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 nv_didt_rreg(struct amdgpu_device *adev, u32 reg)
 {
-    pr_info("nv: called %s\n", __func__);
 	unsigned long flags, address, data;
 	u32 r;
 
@@ -323,7 +315,6 @@ static u32 nv_didt_rreg(struct amdgpu_device *adev, u32 reg)
 
 static void nv_didt_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 {
-    pr_info("nv: called %s\n", __func__);
 	unsigned long flags, address, data;
 
 	address = SOC15_REG_OFFSET(GC, 0, mmDIDT_IND_INDEX);
@@ -337,13 +328,11 @@ static void nv_didt_wreg(struct amdgpu_device *adev, u32 reg, u32 v)
 
 static u32 nv_get_config_memsize(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	return adev->nbio.funcs->get_memsize(adev);
 }
 
 static u32 nv_get_xclk(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	return adev->clock.spll.reference_freq;
 }
 
@@ -351,7 +340,6 @@ static u32 nv_get_xclk(struct amdgpu_device *adev)
 void nv_grbm_select(struct amdgpu_device *adev,
 		     u32 me, u32 pipe, u32 queue, u32 vmid)
 {
-    pr_info("nv: called %s\n", __func__);
 	u32 grbm_gfx_cntl = 0;
 	grbm_gfx_cntl = REG_SET_FIELD(grbm_gfx_cntl, GRBM_GFX_CNTL, PIPEID, pipe);
 	grbm_gfx_cntl = REG_SET_FIELD(grbm_gfx_cntl, GRBM_GFX_CNTL, MEID, me);
@@ -363,13 +351,11 @@ void nv_grbm_select(struct amdgpu_device *adev,
 
 static void nv_vga_set_state(struct amdgpu_device *adev, bool state)
 {
-    pr_info("nv: called %s\n", __func__);
 	/* todo */
 }
 
 static bool nv_read_disabled_bios(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	/* todo */
 	return false;
 }
@@ -377,7 +363,6 @@ static bool nv_read_disabled_bios(struct amdgpu_device *adev)
 static bool nv_read_bios_from_rom(struct amdgpu_device *adev,
 				  u8 *bios, u32 length_bytes)
 {
-    pr_info("nv: called %s\n", __func__);
 	u32 *dw_ptr;
 	u32 i, length_dw;
 	u32 rom_index_offset, rom_data_offset;
@@ -432,7 +417,6 @@ static struct soc15_allowed_register_entry nv_allowed_read_registers[] = {
 static uint32_t nv_read_indexed_register(struct amdgpu_device *adev, u32 se_num,
 					 u32 sh_num, u32 reg_offset)
 {
-    pr_info("nv: called %s\n", __func__);
 	uint32_t val;
 
 	mutex_lock(&adev->grbm_idx_mutex);
@@ -451,7 +435,6 @@ static uint32_t nv_get_register_value(struct amdgpu_device *adev,
 				      bool indexed, u32 se_num,
 				      u32 sh_num, u32 reg_offset)
 {
-    pr_info("nv: called %s\n", __func__);
 	if (indexed) {
 		return nv_read_indexed_register(adev, se_num, sh_num, reg_offset);
 	} else {
@@ -464,7 +447,6 @@ static uint32_t nv_get_register_value(struct amdgpu_device *adev,
 static int nv_read_register(struct amdgpu_device *adev, u32 se_num,
 			    u32 sh_num, u32 reg_offset, u32 *value)
 {
-    pr_info("nv: called %s\n", __func__);
 	uint32_t i;
 	struct soc15_allowed_register_entry  *en;
 
@@ -486,7 +468,6 @@ static int nv_read_register(struct amdgpu_device *adev, u32 se_num,
 
 static int nv_asic_mode2_reset(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	u32 i;
 	int ret = 0;
 
@@ -520,7 +501,6 @@ static int nv_asic_mode2_reset(struct amdgpu_device *adev)
 static enum amd_reset_method
 nv_asic_reset_method(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	if (amdgpu_reset_method == AMD_RESET_METHOD_MODE1 ||
 	    amdgpu_reset_method == AMD_RESET_METHOD_MODE2 ||
 	    amdgpu_reset_method == AMD_RESET_METHOD_BACO ||
@@ -550,7 +530,6 @@ nv_asic_reset_method(struct amdgpu_device *adev)
 
 static int nv_asic_reset(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	int ret = 0;
 
 	switch (nv_asic_reset_method(adev)) {
@@ -577,21 +556,18 @@ static int nv_asic_reset(struct amdgpu_device *adev)
 
 static int nv_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 {
-    pr_info("nv: called %s\n", __func__);
 	/* todo */
 	return 0;
 }
 
 static int nv_set_vce_clocks(struct amdgpu_device *adev, u32 evclk, u32 ecclk)
 {
-    pr_info("nv: called %s\n", __func__);
 	/* todo */
 	return 0;
 }
 
 static void nv_pcie_gen3_enable(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	if (pci_is_root_bus(adev->pdev->bus))
 		return;
 
@@ -607,7 +583,6 @@ static void nv_pcie_gen3_enable(struct amdgpu_device *adev)
 
 static void nv_program_aspm(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	if (!amdgpu_aspm)
 		return;
 
@@ -620,7 +595,6 @@ static void nv_program_aspm(struct amdgpu_device *adev)
 static void nv_enable_doorbell_aperture(struct amdgpu_device *adev,
 					bool enable)
 {
-    pr_info("nv: called %s\n", __func__);
 	adev->nbio.funcs->enable_doorbell_aperture(adev, enable);
 	adev->nbio.funcs->enable_doorbell_selfring_aperture(adev, enable);
 }
@@ -636,7 +610,6 @@ static const struct amdgpu_ip_block_version nv_common_ip_block =
 
 static bool nv_is_headless_sku(struct pci_dev *pdev)
 {
-    pr_info("nv: called %s\n", __func__);
 	if ((pdev->device == 0x731E &&
 	    (pdev->revision == 0xC6 || pdev->revision == 0xC7)) ||
 	    (pdev->device == 0x7340 && pdev->revision == 0xC9)  ||
@@ -647,7 +620,6 @@ static bool nv_is_headless_sku(struct pci_dev *pdev)
 
 static int nv_reg_base_init(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	int r;
 
 	if (amdgpu_discovery) {
@@ -706,13 +678,11 @@ legacy_init:
 
 void nv_set_virt_ops(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	adev->virt.ops = &xgpu_nv_virt_ops;
 }
 
 int nv_set_ip_blocks(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	int r;
 
 	if (adev->asic_type == CHIP_CYAN_SKILLFISH) {
@@ -948,19 +918,16 @@ int nv_set_ip_blocks(struct amdgpu_device *adev)
 
 static uint32_t nv_get_rev_id(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	return adev->nbio.funcs->get_rev_id(adev);
 }
 
 static bool nv_need_full_reset(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	return true;
 }
 
 static bool nv_need_reset_on_init(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	u32 sol_reg;
 
 	if (adev->flags & AMD_IS_APU)
@@ -978,7 +945,6 @@ static bool nv_need_reset_on_init(struct amdgpu_device *adev)
 
 static uint64_t nv_get_pcie_replay_count(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 
 	/* TODO
 	 * dummy implement for pcie_replay_count sysfs interface
@@ -989,7 +955,6 @@ static uint64_t nv_get_pcie_replay_count(struct amdgpu_device *adev)
 
 static void nv_init_doorbell_index(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 	adev->doorbell_index.kiq = AMDGPU_NAVI10_DOORBELL_KIQ;
 	adev->doorbell_index.mec_ring0 = AMDGPU_NAVI10_DOORBELL_MEC_RING0;
 	adev->doorbell_index.mec_ring1 = AMDGPU_NAVI10_DOORBELL_MEC_RING1;
@@ -1022,13 +987,11 @@ static void nv_init_doorbell_index(struct amdgpu_device *adev)
 
 static void nv_pre_asic_init(struct amdgpu_device *adev)
 {
-    pr_info("nv: called %s\n", __func__);
 }
 
 static int nv_update_umd_stable_pstate(struct amdgpu_device *adev,
 				       bool enter)
 {
-    pr_info("nv: called %s\n", __func__);
 	if (enter)
 		amdgpu_gfx_rlc_enter_safe_mode(adev);
 	else
@@ -1068,7 +1031,6 @@ static const struct amdgpu_asic_funcs nv_asic_funcs =
 
 static int nv_common_early_init(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 #define MMIO_REG_HOLE_OFFSET (0x80000 - PAGE_SIZE)
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1324,7 +1286,6 @@ static int nv_common_early_init(void *handle)
 
 static int nv_common_late_init(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev)) {
@@ -1339,7 +1300,6 @@ static int nv_common_late_init(void *handle)
 
 static int nv_common_sw_init(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1350,13 +1310,11 @@ static int nv_common_sw_init(void *handle)
 
 static int nv_common_sw_fini(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 	return 0;
 }
 
 static int nv_common_hw_init(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (adev->nbio.funcs->apply_lc_spc_mode_wa)
@@ -1385,7 +1343,6 @@ static int nv_common_hw_init(void *handle)
 
 static int nv_common_hw_fini(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	/* disable the doorbell aperture */
@@ -1396,7 +1353,6 @@ static int nv_common_hw_fini(void *handle)
 
 static int nv_common_suspend(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return nv_common_hw_fini(adev);
@@ -1404,7 +1360,6 @@ static int nv_common_suspend(void *handle)
 
 static int nv_common_resume(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return nv_common_hw_init(adev);
@@ -1412,26 +1367,22 @@ static int nv_common_resume(void *handle)
 
 static bool nv_common_is_idle(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 	return true;
 }
 
 static int nv_common_wait_for_idle(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 	return 0;
 }
 
 static int nv_common_soft_reset(void *handle)
 {
-    pr_info("nv: called %s\n", __func__);
 	return 0;
 }
 
 static int nv_common_set_clockgating_state(void *handle,
 					   enum amd_clockgating_state state)
 {
-    pr_info("nv: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))
@@ -1463,14 +1414,12 @@ static int nv_common_set_clockgating_state(void *handle,
 static int nv_common_set_powergating_state(void *handle,
 					   enum amd_powergating_state state)
 {
-    pr_info("nv: called %s\n", __func__);
 	/* TODO */
 	return 0;
 }
 
 static void nv_common_get_clockgating_state(void *handle, u32 *flags)
 {
-    pr_info("nv: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_sriov_vf(adev))

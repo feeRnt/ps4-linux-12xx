@@ -37,7 +37,6 @@ static void jpeg_v1_0_ring_begin_use(struct amdgpu_ring *ring);
 
 static void jpeg_v1_0_decode_ring_patch_wreg(struct amdgpu_ring *ring, uint32_t *ptr, uint32_t reg_offset, uint32_t val)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	ring->ring[(*ptr)++] = PACKETJ(SOC15_REG_OFFSET(JPEG, 0, mmUVD_JRBC_EXTERNAL_REG_BASE), 0, 0, PACKETJ_TYPE0);
 	if (((reg_offset >= 0x1f800) && (reg_offset <= 0x21fff)) ||
@@ -53,7 +52,6 @@ static void jpeg_v1_0_decode_ring_patch_wreg(struct amdgpu_ring *ring, uint32_t 
 
 static void jpeg_v1_0_decode_ring_set_patch_ring(struct amdgpu_ring *ring, uint32_t ptr)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	uint32_t reg, reg_offset, val, mask, i;
@@ -137,7 +135,6 @@ static void jpeg_v1_0_decode_ring_set_patch_ring(struct amdgpu_ring *ring, uint3
  */
 static uint64_t jpeg_v1_0_decode_ring_get_rptr(struct amdgpu_ring *ring)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	return RREG32_SOC15(JPEG, 0, mmUVD_JRBC_RB_RPTR);
@@ -152,7 +149,6 @@ static uint64_t jpeg_v1_0_decode_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t jpeg_v1_0_decode_ring_get_wptr(struct amdgpu_ring *ring)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	return RREG32_SOC15(JPEG, 0, mmUVD_JRBC_RB_WPTR);
@@ -167,7 +163,6 @@ static uint64_t jpeg_v1_0_decode_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static void jpeg_v1_0_decode_ring_set_wptr(struct amdgpu_ring *ring)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	WREG32_SOC15(JPEG, 0, mmUVD_JRBC_RB_WPTR, lower_32_bits(ring->wptr));
@@ -182,7 +177,6 @@ static void jpeg_v1_0_decode_ring_set_wptr(struct amdgpu_ring *ring)
  */
 static void jpeg_v1_0_decode_ring_insert_start(struct amdgpu_ring *ring)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	amdgpu_ring_write(ring,
@@ -202,7 +196,6 @@ static void jpeg_v1_0_decode_ring_insert_start(struct amdgpu_ring *ring)
  */
 static void jpeg_v1_0_decode_ring_insert_end(struct amdgpu_ring *ring)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	amdgpu_ring_write(ring,
@@ -226,7 +219,6 @@ static void jpeg_v1_0_decode_ring_insert_end(struct amdgpu_ring *ring)
 static void jpeg_v1_0_decode_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				     unsigned flags)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	WARN_ON(flags & AMDGPU_FENCE_FLAG_64BIT);
@@ -303,7 +295,6 @@ static void jpeg_v1_0_decode_ring_emit_ib(struct amdgpu_ring *ring,
 					struct amdgpu_ib *ib,
 					uint32_t flags)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	unsigned vmid = AMDGPU_JOB_GET_VMID(job);
 
@@ -356,7 +347,6 @@ static void jpeg_v1_0_decode_ring_emit_reg_wait(struct amdgpu_ring *ring,
 					    uint32_t reg, uint32_t val,
 					    uint32_t mask)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t reg_offset = (reg << 2);
 
@@ -386,7 +376,6 @@ static void jpeg_v1_0_decode_ring_emit_reg_wait(struct amdgpu_ring *ring,
 static void jpeg_v1_0_decode_ring_emit_vm_flush(struct amdgpu_ring *ring,
 		unsigned vmid, uint64_t pd_addr)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &ring->adev->vmhub[ring->funcs->vmhub];
 	uint32_t data0, data1, mask;
 
@@ -402,7 +391,6 @@ static void jpeg_v1_0_decode_ring_emit_vm_flush(struct amdgpu_ring *ring,
 static void jpeg_v1_0_decode_ring_emit_wreg(struct amdgpu_ring *ring,
 					uint32_t reg, uint32_t val)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t reg_offset = (reg << 2);
 
@@ -423,7 +411,6 @@ static void jpeg_v1_0_decode_ring_emit_wreg(struct amdgpu_ring *ring,
 
 static void jpeg_v1_0_decode_ring_nop(struct amdgpu_ring *ring, uint32_t count)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	int i;
 
 	WARN_ON(ring->wptr % 2 || count % 2);
@@ -439,7 +426,6 @@ static int jpeg_v1_0_set_interrupt_state(struct amdgpu_device *adev,
 					unsigned type,
 					enum amdgpu_interrupt_state state)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	return 0;
 }
 
@@ -447,7 +433,6 @@ static int jpeg_v1_0_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
-    //pr_info("jpeg_v1_0: called %s\n", __func__);
 	DRM_DEBUG("IH: JPEG decode TRAP\n");
 
 	switch (entry->src_id) {
@@ -472,7 +457,6 @@ static int jpeg_v1_0_process_interrupt(struct amdgpu_device *adev,
  */
 int jpeg_v1_0_early_init(void *handle)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	adev->jpeg.num_jpeg_inst = 1;
@@ -491,7 +475,6 @@ int jpeg_v1_0_early_init(void *handle)
  */
 int jpeg_v1_0_sw_init(void *handle)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	struct amdgpu_ring *ring;
 	int r;
@@ -523,7 +506,6 @@ int jpeg_v1_0_sw_init(void *handle)
  */
 void jpeg_v1_0_sw_fini(void *handle)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	amdgpu_ring_fini(&adev->jpeg.inst[0].ring_dec);
@@ -539,7 +521,6 @@ void jpeg_v1_0_sw_fini(void *handle)
  */
 void jpeg_v1_0_start(struct amdgpu_device *adev, int mode)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct amdgpu_ring *ring = &adev->jpeg.inst->ring_dec;
 
 	if (mode == 0) {
@@ -598,7 +579,6 @@ static const struct amdgpu_ring_funcs jpeg_v1_0_decode_ring_vm_funcs = {
 
 static void jpeg_v1_0_set_dec_ring_funcs(struct amdgpu_device *adev)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	adev->jpeg.inst->ring_dec.funcs = &jpeg_v1_0_decode_ring_vm_funcs;
 	DRM_INFO("JPEG decode is enabled in VM mode\n");
 }
@@ -610,13 +590,11 @@ static const struct amdgpu_irq_src_funcs jpeg_v1_0_irq_funcs = {
 
 static void jpeg_v1_0_set_irq_funcs(struct amdgpu_device *adev)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	adev->jpeg.inst->irq.funcs = &jpeg_v1_0_irq_funcs;
 }
 
 static void jpeg_v1_0_ring_begin_use(struct amdgpu_ring *ring)
 {
-    pr_info("jpeg_v1_0: called %s\n", __func__);
 	struct	amdgpu_device *adev = ring->adev;
 	bool	set_clocks = !cancel_delayed_work_sync(&adev->vcn.idle_work);
 	int		cnt = 0;

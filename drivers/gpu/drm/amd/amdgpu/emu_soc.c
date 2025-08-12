@@ -28,7 +28,6 @@
 
 int emu_soc_asic_init(struct amdgpu_device *adev)
 {
-    pr_info("emu_soc: called %s\n", __func__);
 	return 0;
 }
 

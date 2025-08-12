@@ -59,7 +59,6 @@ static
 int drm_lock_take(struct drm_lock_data *lock_data,
 		  unsigned int context)
 {
-    pr_info("drm_lock: called %s\n", __func__);
 	unsigned int old, new, prev;
 	volatile unsigned int *lock = &lock_data->hw_lock->lock;
 
@@ -109,7 +108,6 @@ int drm_lock_take(struct drm_lock_data *lock_data,
 static int drm_lock_transfer(struct drm_lock_data *lock_data,
 			     unsigned int context)
 {
-    pr_info("drm_lock: called %s\n", __func__);
 	unsigned int old, new, prev;
 	volatile unsigned int *lock = &lock_data->hw_lock->lock;
 
@@ -125,7 +123,6 @@ static int drm_lock_transfer(struct drm_lock_data *lock_data,
 static int drm_legacy_lock_free(struct drm_lock_data *lock_data,
 				unsigned int context)
 {
-    pr_info("drm_lock: called %s\n", __func__);
 	unsigned int old, new, prev;
 	volatile unsigned int *lock = &lock_data->hw_lock->lock;
 
@@ -167,7 +164,6 @@ static int drm_legacy_lock_free(struct drm_lock_data *lock_data,
 int drm_legacy_lock(struct drm_device *dev, void *data,
 		    struct drm_file *file_priv)
 {
-    pr_info("drm_lock: called %s\n", __func__);
 	DECLARE_WAITQUEUE(entry, current);
 	struct drm_lock *lock = data;
 	struct drm_master *master = file_priv->master;
@@ -260,7 +256,6 @@ int drm_legacy_lock(struct drm_device *dev, void *data,
  */
 int drm_legacy_unlock(struct drm_device *dev, void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_lock: called %s\n", __func__);
 	struct drm_lock *lock = data;
 	struct drm_master *master = file_priv->master;
 
@@ -294,7 +289,6 @@ int drm_legacy_unlock(struct drm_device *dev, void *data, struct drm_file *file_
  */
 void drm_legacy_idlelock_take(struct drm_lock_data *lock_data)
 {
-    pr_info("drm_lock: called %s\n", __func__);
 	int ret;
 
 	spin_lock_bh(&lock_data->spinlock);
@@ -314,7 +308,6 @@ EXPORT_SYMBOL(drm_legacy_idlelock_take);
 
 void drm_legacy_idlelock_release(struct drm_lock_data *lock_data)
 {
-    pr_info("drm_lock: called %s\n", __func__);
 	unsigned int old, prev;
 	volatile unsigned int *lock = &lock_data->hw_lock->lock;
 
@@ -336,7 +329,6 @@ EXPORT_SYMBOL(drm_legacy_idlelock_release);
 static int drm_legacy_i_have_hw_lock(struct drm_device *dev,
 				     struct drm_file *file_priv)
 {
-    pr_info("drm_lock: called %s\n", __func__);
 	struct drm_master *master = file_priv->master;
 
 	return (file_priv->lock_count && master->lock.hw_lock &&
@@ -346,7 +338,6 @@ static int drm_legacy_i_have_hw_lock(struct drm_device *dev,
 
 void drm_legacy_lock_release(struct drm_device *dev, struct file *filp)
 {
-    pr_info("drm_lock: called %s\n", __func__);
 	struct drm_file *file_priv = filp->private_data;
 
 	/* if the master has gone away we can't do anything with the lock */
@@ -363,7 +354,6 @@ void drm_legacy_lock_release(struct drm_device *dev, struct file *filp)
 
 void drm_legacy_lock_master_cleanup(struct drm_device *dev, struct drm_master *master)
 {
-    pr_info("drm_lock: called %s\n", __func__);
 	if (!drm_core_check_feature(dev, DRIVER_LEGACY))
 		return;
 

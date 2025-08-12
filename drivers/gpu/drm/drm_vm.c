@@ -66,7 +66,6 @@ static void drm_vm_close(struct vm_area_struct *vma);
 static pgprot_t drm_io_prot(struct drm_local_map *map,
 			    struct vm_area_struct *vma)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	pgprot_t tmp = vm_get_page_prot(vma->vm_flags);
 
 #if defined(__i386__) || defined(__x86_64__) || defined(__powerpc__) || \
@@ -89,7 +88,6 @@ static pgprot_t drm_io_prot(struct drm_local_map *map,
 
 static pgprot_t drm_dma_prot(uint32_t map_type, struct vm_area_struct *vma)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	pgprot_t tmp = vm_get_page_prot(vma->vm_flags);
 
 #if defined(__powerpc__) && defined(CONFIG_NOT_COHERENT_CACHE)
@@ -111,7 +109,6 @@ static pgprot_t drm_dma_prot(uint32_t map_type, struct vm_area_struct *vma)
 #if IS_ENABLED(CONFIG_AGP)
 static vm_fault_t drm_vm_fault(struct vm_fault *vmf)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct vm_area_struct *vma = vmf->vma;
 	struct drm_file *priv = vma->vm_file->private_data;
 	struct drm_device *dev = priv->minor->dev;
@@ -185,7 +182,6 @@ vm_fault_error:
 #else
 static vm_fault_t drm_vm_fault(struct vm_fault *vmf)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	return VM_FAULT_SIGBUS;
 }
 #endif
@@ -202,7 +198,6 @@ static vm_fault_t drm_vm_fault(struct vm_fault *vmf)
  */
 static vm_fault_t drm_vm_shm_fault(struct vm_fault *vmf)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct vm_area_struct *vma = vmf->vma;
 	struct drm_local_map *map = vma->vm_private_data;
 	unsigned long offset;
@@ -234,7 +229,6 @@ static vm_fault_t drm_vm_shm_fault(struct vm_fault *vmf)
  */
 static void drm_vm_shm_close(struct vm_area_struct *vma)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct drm_file *priv = vma->vm_file->private_data;
 	struct drm_device *dev = priv->minor->dev;
 	struct drm_vma_entry *pt, *temp;
@@ -304,7 +298,6 @@ static void drm_vm_shm_close(struct vm_area_struct *vma)
  */
 static vm_fault_t drm_vm_dma_fault(struct vm_fault *vmf)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct vm_area_struct *vma = vmf->vma;
 	struct drm_file *priv = vma->vm_file->private_data;
 	struct drm_device *dev = priv->minor->dev;
@@ -340,7 +333,6 @@ static vm_fault_t drm_vm_dma_fault(struct vm_fault *vmf)
  */
 static vm_fault_t drm_vm_sg_fault(struct vm_fault *vmf)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct vm_area_struct *vma = vmf->vma;
 	struct drm_local_map *map = vma->vm_private_data;
 	struct drm_file *priv = vma->vm_file->private_data;
@@ -397,7 +389,6 @@ static const struct vm_operations_struct drm_vm_sg_ops = {
 static void drm_vm_open_locked(struct drm_device *dev,
 			       struct vm_area_struct *vma)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct drm_vma_entry *vma_entry;
 
 	DRM_DEBUG("0x%08lx,0x%08lx\n",
@@ -413,7 +404,6 @@ static void drm_vm_open_locked(struct drm_device *dev,
 
 static void drm_vm_open(struct vm_area_struct *vma)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct drm_file *priv = vma->vm_file->private_data;
 	struct drm_device *dev = priv->minor->dev;
 
@@ -425,7 +415,6 @@ static void drm_vm_open(struct vm_area_struct *vma)
 static void drm_vm_close_locked(struct drm_device *dev,
 				struct vm_area_struct *vma)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct drm_vma_entry *pt, *temp;
 
 	DRM_DEBUG("0x%08lx,0x%08lx\n",
@@ -450,7 +439,6 @@ static void drm_vm_close_locked(struct drm_device *dev,
  */
 static void drm_vm_close(struct vm_area_struct *vma)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct drm_file *priv = vma->vm_file->private_data;
 	struct drm_device *dev = priv->minor->dev;
 
@@ -471,7 +459,6 @@ static void drm_vm_close(struct vm_area_struct *vma)
  */
 static int drm_mmap_dma(struct file *filp, struct vm_area_struct *vma)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct drm_file *priv = filp->private_data;
 	struct drm_device *dev;
 	struct drm_device_dma *dma;
@@ -513,7 +500,6 @@ static int drm_mmap_dma(struct file *filp, struct vm_area_struct *vma)
 
 static resource_size_t drm_core_get_reg_ofs(struct drm_device *dev)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 #ifdef __alpha__
 	return dev->hose->dense_mem_base;
 #else
@@ -536,7 +522,6 @@ static resource_size_t drm_core_get_reg_ofs(struct drm_device *dev)
  */
 static int drm_mmap_locked(struct file *filp, struct vm_area_struct *vma)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct drm_file *priv = filp->private_data;
 	struct drm_device *dev = priv->minor->dev;
 	struct drm_local_map *map = NULL;
@@ -651,7 +636,6 @@ static int drm_mmap_locked(struct file *filp, struct vm_area_struct *vma)
 
 int drm_legacy_mmap(struct file *filp, struct vm_area_struct *vma)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct drm_file *priv = filp->private_data;
 	struct drm_device *dev = priv->minor->dev;
 	int ret;
@@ -670,7 +654,6 @@ EXPORT_SYMBOL(drm_legacy_mmap);
 #if IS_ENABLED(CONFIG_DRM_LEGACY)
 void drm_legacy_vma_flush(struct drm_device *dev)
 {
-    pr_info("drm_vm: called %s\n", __func__);
 	struct drm_vma_entry *vma, *vma_temp;
 
 	/* Clear vma list (only needed for legacy drivers) */

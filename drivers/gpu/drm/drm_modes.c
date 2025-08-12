@@ -53,7 +53,6 @@
  */
 void drm_mode_debug_printmodeline(const struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	DRM_DEBUG_KMS("Modeline " DRM_MODE_FMT "\n", DRM_MODE_ARG(mode));
 }
 EXPORT_SYMBOL(drm_mode_debug_printmodeline);
@@ -70,7 +69,6 @@ EXPORT_SYMBOL(drm_mode_debug_printmodeline);
  */
 struct drm_display_mode *drm_mode_create(struct drm_device *dev)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	struct drm_display_mode *nmode;
 	
 	//should return
@@ -91,7 +89,6 @@ EXPORT_SYMBOL(drm_mode_create);
  */
 void drm_mode_destroy(struct drm_device *dev, struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	if (!mode)
 		return;
 
@@ -111,7 +108,6 @@ EXPORT_SYMBOL(drm_mode_destroy);
 void drm_mode_probed_add(struct drm_connector *connector,
 			 struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	WARN_ON(!mutex_is_locked(&connector->dev->mode_config.mutex));
 	//should return
 
@@ -147,7 +143,6 @@ struct drm_display_mode *drm_cvt_mode(struct drm_device *dev, int hdisplay,
 				      int vdisplay, int vrefresh,
 				      bool reduced, bool interlaced, bool margins)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 #define HV_FACTOR			1000
 	/* 1) top/bottom margin size (% of height) - default: 1.8, */
 #define	CVT_MARGIN_PERCENTAGE		18
@@ -374,7 +369,6 @@ drm_gtf_mode_complex(struct drm_device *dev, int hdisplay, int vdisplay,
 		     int vrefresh, bool interlaced, int margins,
 		     int GTF_M, int GTF_2C, int GTF_K, int GTF_2J)
 {	/* 1) top/bottom margin size (% of height) - default: 1.8, */
-    pr_info("drm_modes: called %s\n", __func__);
 #define	GTF_MARGIN_PERCENTAGE		18
 	/* 2) character cell horizontal granularity (pixels) - default 8 */
 #define	GTF_CELL_GRAN			8
@@ -579,7 +573,6 @@ struct drm_display_mode *
 drm_gtf_mode(struct drm_device *dev, int hdisplay, int vdisplay, int vrefresh,
 	     bool interlaced, int margins)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	return drm_gtf_mode_complex(dev, hdisplay, vdisplay, vrefresh,
 				    interlaced, margins,
 				    600, 40 * 2, 128, 20 * 2);
@@ -597,7 +590,6 @@ EXPORT_SYMBOL(drm_gtf_mode);
 void drm_display_mode_from_videomode(const struct videomode *vm,
 				     struct drm_display_mode *dmode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	dmode->hdisplay = vm->hactive;
 	dmode->hsync_start = dmode->hdisplay + vm->hfront_porch;
 	dmode->hsync_end = dmode->hsync_start + vm->hsync_len;
@@ -639,7 +631,6 @@ EXPORT_SYMBOL_GPL(drm_display_mode_from_videomode);
 void drm_display_mode_to_videomode(const struct drm_display_mode *dmode,
 				   struct videomode *vm)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	vm->hactive = dmode->hdisplay;
 	vm->hfront_porch = dmode->hsync_start - dmode->hdisplay;
 	vm->hsync_len = dmode->hsync_end - dmode->hsync_start;
@@ -683,7 +674,6 @@ EXPORT_SYMBOL_GPL(drm_display_mode_to_videomode);
  */
 void drm_bus_flags_from_videomode(const struct videomode *vm, u32 *bus_flags)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	*bus_flags = 0;
 	if (vm->flags & DISPLAY_FLAGS_PIXDATA_POSEDGE)
 		*bus_flags |= DRM_BUS_FLAG_PIXDATA_DRIVE_POSEDGE;
@@ -721,7 +711,6 @@ int of_get_drm_display_mode(struct device_node *np,
 			    struct drm_display_mode *dmode, u32 *bus_flags,
 			    int index)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	struct videomode vm;
 	int ret;
 
@@ -752,7 +741,6 @@ EXPORT_SYMBOL_GPL(of_get_drm_display_mode);
  */
 void drm_mode_set_name(struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	bool interlaced = !!(mode->flags & DRM_MODE_FLAG_INTERLACE);
 
 	snprintf(mode->name, DRM_DISPLAY_MODE_LEN, "%dx%d%s",
@@ -771,7 +759,6 @@ EXPORT_SYMBOL(drm_mode_set_name);
  */
 int drm_mode_vrefresh(const struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	unsigned int num, den;
 
 	if (mode->htotal == 0 || mode->vtotal == 0)
@@ -803,7 +790,6 @@ EXPORT_SYMBOL(drm_mode_vrefresh);
 void drm_mode_get_hv_timing(const struct drm_display_mode *mode,
 			    int *hdisplay, int *vdisplay)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	struct drm_display_mode adjusted = *mode;
 
 	drm_mode_set_crtcinfo(&adjusted, CRTC_STEREO_DOUBLE_ONLY);
@@ -829,7 +815,6 @@ EXPORT_SYMBOL(drm_mode_get_hv_timing);
  */
 void drm_mode_set_crtcinfo(struct drm_display_mode *p, int adjust_flags)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	if (!p)
 		return;
 
@@ -902,7 +887,6 @@ EXPORT_SYMBOL(drm_mode_set_crtcinfo);
  */
 void drm_mode_copy(struct drm_display_mode *dst, const struct drm_display_mode *src)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	struct list_head head = dst->head;
 	// Should return
 
@@ -925,7 +909,6 @@ EXPORT_SYMBOL(drm_mode_copy);
 struct drm_display_mode *drm_mode_duplicate(struct drm_device *dev,
 					    const struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	struct drm_display_mode *nmode;
 
 	nmode = drm_mode_create(dev);
@@ -943,7 +926,6 @@ EXPORT_SYMBOL(drm_mode_duplicate);
 static bool drm_mode_match_timings(const struct drm_display_mode *mode1,
 				   const struct drm_display_mode *mode2)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	return mode1->hdisplay == mode2->hdisplay &&
 		mode1->hsync_start == mode2->hsync_start &&
 		mode1->hsync_end == mode2->hsync_end &&
@@ -959,7 +941,6 @@ static bool drm_mode_match_timings(const struct drm_display_mode *mode1,
 static bool drm_mode_match_clock(const struct drm_display_mode *mode1,
 				  const struct drm_display_mode *mode2)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	/*
 	 * do clock check convert to PICOS
 	 * so fb modes get matched the same
@@ -973,7 +954,6 @@ static bool drm_mode_match_clock(const struct drm_display_mode *mode1,
 static bool drm_mode_match_flags(const struct drm_display_mode *mode1,
 				 const struct drm_display_mode *mode2)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	return (mode1->flags & ~DRM_MODE_FLAG_3D_MASK) ==
 		(mode2->flags & ~DRM_MODE_FLAG_3D_MASK);
 }
@@ -981,7 +961,6 @@ static bool drm_mode_match_flags(const struct drm_display_mode *mode1,
 static bool drm_mode_match_3d_flags(const struct drm_display_mode *mode1,
 				    const struct drm_display_mode *mode2)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	return (mode1->flags & DRM_MODE_FLAG_3D_MASK) ==
 		(mode2->flags & DRM_MODE_FLAG_3D_MASK);
 }
@@ -989,7 +968,6 @@ static bool drm_mode_match_3d_flags(const struct drm_display_mode *mode1,
 static bool drm_mode_match_aspect_ratio(const struct drm_display_mode *mode1,
 					const struct drm_display_mode *mode2)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	return mode1->picture_aspect_ratio == mode2->picture_aspect_ratio;
 }
 
@@ -1008,7 +986,6 @@ bool drm_mode_match(const struct drm_display_mode *mode1,
 		    const struct drm_display_mode *mode2,
 		    unsigned int match_flags)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	if (!mode1 && !mode2)
 		return true;
 
@@ -1052,7 +1029,6 @@ EXPORT_SYMBOL(drm_mode_match);
 bool drm_mode_equal(const struct drm_display_mode *mode1,
 		    const struct drm_display_mode *mode2)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	return drm_mode_match(mode1, mode2,
 			      DRM_MODE_MATCH_TIMINGS |
 			      DRM_MODE_MATCH_CLOCK |
@@ -1076,7 +1052,6 @@ EXPORT_SYMBOL(drm_mode_equal);
 bool drm_mode_equal_no_clocks(const struct drm_display_mode *mode1,
 			      const struct drm_display_mode *mode2)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	return drm_mode_match(mode1, mode2,
 			      DRM_MODE_MATCH_TIMINGS |
 			      DRM_MODE_MATCH_FLAGS |
@@ -1098,7 +1073,6 @@ EXPORT_SYMBOL(drm_mode_equal_no_clocks);
 bool drm_mode_equal_no_clocks_no_stereo(const struct drm_display_mode *mode1,
 					const struct drm_display_mode *mode2)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	return drm_mode_match(mode1, mode2,
 			      DRM_MODE_MATCH_TIMINGS |
 			      DRM_MODE_MATCH_FLAGS);
@@ -1108,7 +1082,6 @@ EXPORT_SYMBOL(drm_mode_equal_no_clocks_no_stereo);
 static enum drm_mode_status
 drm_mode_validate_basic(const struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	if (mode->type & ~DRM_MODE_TYPE_ALL)
 		return MODE_BAD;
 
@@ -1152,7 +1125,6 @@ enum drm_mode_status
 drm_mode_validate_driver(struct drm_device *dev,
 			const struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	enum drm_mode_status status;
 
 	status = drm_mode_validate_basic(mode);
@@ -1184,7 +1156,6 @@ enum drm_mode_status
 drm_mode_validate_size(const struct drm_display_mode *mode,
 		       int maxX, int maxY)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	if (maxX > 0 && mode->hdisplay > maxX)
 		return MODE_VIRTUAL_X;
 
@@ -1210,7 +1181,6 @@ enum drm_mode_status
 drm_mode_validate_ycbcr420(const struct drm_display_mode *mode,
 			   struct drm_connector *connector)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	if (!connector->ycbcr_420_allowed &&
 	    drm_mode_is_420_only(&connector->display_info, mode))
 		return MODE_NO_420;
@@ -1268,7 +1238,6 @@ static const char * const drm_mode_status_names[] = {
 
 const char *drm_get_mode_status_name(enum drm_mode_status status)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	int index = status + 3;
 
 	if (WARN_ON(index < 0 || index >= ARRAY_SIZE(drm_mode_status_names)))
@@ -1291,7 +1260,6 @@ const char *drm_get_mode_status_name(enum drm_mode_status status)
 void drm_mode_prune_invalid(struct drm_device *dev,
 			    struct list_head *mode_list, bool verbose)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	struct drm_display_mode *mode, *t;
 
 	list_for_each_entry_safe(mode, t, mode_list, head) {
@@ -1325,7 +1293,6 @@ EXPORT_SYMBOL(drm_mode_prune_invalid);
 static int drm_mode_compare(void *priv, const struct list_head *lh_a,
 			    const struct list_head *lh_b)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	struct drm_display_mode *a = list_entry(lh_a, struct drm_display_mode, head);
 	struct drm_display_mode *b = list_entry(lh_b, struct drm_display_mode, head);
 	int diff;
@@ -1354,7 +1321,6 @@ static int drm_mode_compare(void *priv, const struct list_head *lh_a,
  */
 void drm_mode_sort(struct list_head *mode_list)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	list_sort(NULL, mode_list, drm_mode_compare);
 }
 EXPORT_SYMBOL(drm_mode_sort);
@@ -1372,7 +1338,6 @@ EXPORT_SYMBOL(drm_mode_sort);
  */
 void drm_connector_list_update(struct drm_connector *connector)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	struct drm_display_mode *pmode, *pt;
 
 	WARN_ON(!mutex_is_locked(&connector->dev->mode_config.mutex));
@@ -1425,7 +1390,6 @@ EXPORT_SYMBOL(drm_connector_list_update);
 static int drm_mode_parse_cmdline_bpp(const char *str, char **end_ptr,
 				      struct drm_cmdline_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	unsigned int bpp;
 
 	if (str[0] != '-')
@@ -1445,7 +1409,6 @@ static int drm_mode_parse_cmdline_bpp(const char *str, char **end_ptr,
 static int drm_mode_parse_cmdline_refresh(const char *str, char **end_ptr,
 					  struct drm_cmdline_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	unsigned int refresh;
 
 	if (str[0] != '@')
@@ -1467,7 +1430,6 @@ static int drm_mode_parse_cmdline_extra(const char *str, int length,
 					const struct drm_connector *connector,
 					struct drm_cmdline_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < length; i++) {
@@ -1519,7 +1481,6 @@ static int drm_mode_parse_cmdline_res_mode(const char *str, unsigned int length,
 					   const struct drm_connector *connector,
 					   struct drm_cmdline_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	const char *str_start = str;
 	bool rb = false, cvt = false;
 	int xres = 0, yres = 0;
@@ -1581,7 +1542,6 @@ static int drm_mode_parse_cmdline_res_mode(const char *str, unsigned int length,
 
 static int drm_mode_parse_cmdline_int(const char *delim, unsigned int *int_ret)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	const char *value;
 	char *endp;
 
@@ -1606,7 +1566,6 @@ static int drm_mode_parse_cmdline_int(const char *delim, unsigned int *int_ret)
 static int drm_mode_parse_panel_orientation(const char *delim,
 					    struct drm_cmdline_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	const char *value;
 
 	if (*delim != '=')
@@ -1636,7 +1595,6 @@ static int drm_mode_parse_cmdline_options(const char *str,
 					  const struct drm_connector *connector,
 					  struct drm_cmdline_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	unsigned int deg, margin, rotation = 0;
 	const char *delim, *option, *sep;
 
@@ -1757,7 +1715,6 @@ bool drm_mode_parse_command_line_for_connector(const char *mode_option,
 					       const struct drm_connector *connector,
 					       struct drm_cmdline_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	const char *name;
 	bool freestanding = false, parse_extras = false;
 	unsigned int bpp_off = 0, refresh_off = 0, options_off = 0;
@@ -1906,7 +1863,6 @@ struct drm_display_mode *
 drm_mode_create_from_cmdline_mode(struct drm_device *dev,
 				  struct drm_cmdline_mode *cmd)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	struct drm_display_mode *mode;
 
 	if (cmd->xres == 0 || cmd->yres == 0)
@@ -1947,7 +1903,6 @@ EXPORT_SYMBOL(drm_mode_create_from_cmdline_mode);
 void drm_mode_convert_to_umode(struct drm_mode_modeinfo *out,
 			       const struct drm_display_mode *in)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	out->clock = in->clock;
 	out->hdisplay = in->hdisplay;
 	out->hsync_start = in->hsync_start;
@@ -2005,7 +1960,6 @@ int drm_mode_convert_umode(struct drm_device *dev,
 			   struct drm_display_mode *out,
 			   const struct drm_mode_modeinfo *in)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	if (in->clock > INT_MAX || in->vrefresh > INT_MAX)
 		return -ERANGE;
 
@@ -2080,7 +2034,6 @@ int drm_mode_convert_umode(struct drm_device *dev,
 bool drm_mode_is_420_only(const struct drm_display_info *display,
 			  const struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	u8 vic = drm_match_cea_mode(mode);
 
 	return test_bit(vic, display->hdmi.y420_vdb_modes);
@@ -2101,7 +2054,6 @@ EXPORT_SYMBOL(drm_mode_is_420_only);
 bool drm_mode_is_420_also(const struct drm_display_info *display,
 			  const struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	u8 vic = drm_match_cea_mode(mode);
 
 	return test_bit(vic, display->hdmi.y420_cmdb_modes);
@@ -2121,7 +2073,6 @@ EXPORT_SYMBOL(drm_mode_is_420_also);
 bool drm_mode_is_420(const struct drm_display_info *display,
 		     const struct drm_display_mode *mode)
 {
-    pr_info("drm_modes: called %s\n", __func__);
 	return drm_mode_is_420_only(display, mode) ||
 		drm_mode_is_420_also(display, mode);
 }

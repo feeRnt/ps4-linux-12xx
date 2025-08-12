@@ -28,7 +28,6 @@
 
 int navi14_reg_base_init(struct amdgpu_device *adev)
 {
-    pr_info("navi14_reg_init: called %s\n", __func__);
 	int i;
 
 	for (i = 0 ; i < MAX_INSTANCE ; ++i) {

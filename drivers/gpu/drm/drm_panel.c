@@ -57,7 +57,6 @@ static LIST_HEAD(panel_list);
 void drm_panel_init(struct drm_panel *panel, struct device *dev,
 		    const struct drm_panel_funcs *funcs, int connector_type)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	INIT_LIST_HEAD(&panel->list);
 	panel->dev = dev;
 	panel->funcs = funcs;
@@ -74,7 +73,6 @@ EXPORT_SYMBOL(drm_panel_init);
  */
 void drm_panel_add(struct drm_panel *panel)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	mutex_lock(&panel_lock);
 	list_add_tail(&panel->list, &panel_list);
 	mutex_unlock(&panel_lock);
@@ -89,7 +87,6 @@ EXPORT_SYMBOL(drm_panel_add);
  */
 void drm_panel_remove(struct drm_panel *panel)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	mutex_lock(&panel_lock);
 	list_del_init(&panel->list);
 	mutex_unlock(&panel_lock);
@@ -108,7 +105,6 @@ EXPORT_SYMBOL(drm_panel_remove);
  */
 int drm_panel_prepare(struct drm_panel *panel)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	if (!panel)
 		return -EINVAL;
 
@@ -132,7 +128,6 @@ EXPORT_SYMBOL(drm_panel_prepare);
  */
 int drm_panel_unprepare(struct drm_panel *panel)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	if (!panel)
 		return -EINVAL;
 
@@ -155,7 +150,6 @@ EXPORT_SYMBOL(drm_panel_unprepare);
  */
 int drm_panel_enable(struct drm_panel *panel)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	int ret;
 
 	if (!panel)
@@ -188,7 +182,6 @@ EXPORT_SYMBOL(drm_panel_enable);
  */
 int drm_panel_disable(struct drm_panel *panel)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	int ret;
 
 	if (!panel)
@@ -220,7 +213,6 @@ EXPORT_SYMBOL(drm_panel_disable);
 int drm_panel_get_modes(struct drm_panel *panel,
 			struct drm_connector *connector)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	if (!panel)
 		return -EINVAL;
 
@@ -250,7 +242,6 @@ EXPORT_SYMBOL(drm_panel_get_modes);
  */
 struct drm_panel *of_drm_find_panel(const struct device_node *np)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	struct drm_panel *panel;
 
 	if (!of_device_is_available(np))
@@ -286,7 +277,6 @@ EXPORT_SYMBOL(of_drm_find_panel);
 int of_drm_get_panel_orientation(const struct device_node *np,
 				 enum drm_panel_orientation *orientation)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	int rotation, ret;
 
 	ret = of_property_read_u32(np, "rotation", &rotation);
@@ -338,7 +328,6 @@ EXPORT_SYMBOL(of_drm_get_panel_orientation);
  */
 int drm_panel_of_backlight(struct drm_panel *panel)
 {
-    pr_info("drm_panel: called %s\n", __func__);
 	struct backlight_device *backlight;
 
 	if (!panel || !panel->dev)

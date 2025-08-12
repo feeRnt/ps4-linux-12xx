@@ -71,7 +71,6 @@ static enum drm_mode_status
 drm_mode_validate_flag(const struct drm_display_mode *mode,
 		       int flags)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	if ((mode->flags & DRM_MODE_FLAG_INTERLACE) &&
 	    !(flags & DRM_MODE_FLAG_INTERLACE))
 		return MODE_NO_INTERLACE;
@@ -93,7 +92,6 @@ drm_mode_validate_pipeline(struct drm_display_mode *mode,
 			   struct drm_modeset_acquire_ctx *ctx,
 			   enum drm_mode_status *status)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_encoder *encoder;
 	int ret;
@@ -146,7 +144,6 @@ drm_mode_validate_pipeline(struct drm_display_mode *mode,
 
 static int drm_helper_probe_add_cmdline_mode(struct drm_connector *connector)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	struct drm_cmdline_mode *cmdline_mode;
 	struct drm_display_mode *mode;
 
@@ -183,7 +180,6 @@ static int drm_helper_probe_add_cmdline_mode(struct drm_connector *connector)
 enum drm_mode_status drm_crtc_mode_valid(struct drm_crtc *crtc,
 					 const struct drm_display_mode *mode)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	const struct drm_crtc_helper_funcs *crtc_funcs = crtc->helper_private;
 
 	if (!crtc_funcs || !crtc_funcs->mode_valid)
@@ -195,7 +191,6 @@ enum drm_mode_status drm_crtc_mode_valid(struct drm_crtc *crtc,
 enum drm_mode_status drm_encoder_mode_valid(struct drm_encoder *encoder,
 					    const struct drm_display_mode *mode)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	const struct drm_encoder_helper_funcs *encoder_funcs =
 		encoder->helper_private;
 
@@ -211,7 +206,6 @@ drm_connector_mode_valid(struct drm_connector *connector,
 			 struct drm_modeset_acquire_ctx *ctx,
 			 enum drm_mode_status *status)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	const struct drm_connector_helper_funcs *connector_funcs =
 		connector->helper_private;
 	int ret = 0;
@@ -247,7 +241,6 @@ drm_connector_mode_valid(struct drm_connector *connector,
  */
 void drm_kms_helper_poll_enable(struct drm_device *dev)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	bool poll = false;
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
@@ -287,7 +280,6 @@ EXPORT_SYMBOL(drm_kms_helper_poll_enable);
 static enum drm_connector_status
 drm_helper_probe_detect_ctx(struct drm_connector *connector, bool force)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	const struct drm_connector_helper_funcs *funcs = connector->helper_private;
 	struct drm_modeset_acquire_ctx ctx;
 	int ret;
@@ -337,7 +329,6 @@ drm_helper_probe_detect(struct drm_connector *connector,
 			struct drm_modeset_acquire_ctx *ctx,
 			bool force)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	const struct drm_connector_helper_funcs *funcs = connector->helper_private;
 	struct drm_device *dev = connector->dev;
 	int ret;
@@ -425,7 +416,6 @@ EXPORT_SYMBOL(drm_helper_probe_detect);
 int drm_helper_probe_single_connector_modes(struct drm_connector *connector,
 					    uint32_t maxX, uint32_t maxY)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *mode;
 	const struct drm_connector_helper_funcs *connector_funcs =
@@ -617,7 +607,6 @@ EXPORT_SYMBOL(drm_helper_probe_single_connector_modes);
  */
 void drm_kms_helper_hotplug_event(struct drm_device *dev)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	/* send a uevent + call fbdev */
 	drm_sysfs_hotplug_event(dev);
 	if (dev->mode_config.funcs->output_poll_changed)
@@ -629,7 +618,6 @@ EXPORT_SYMBOL(drm_kms_helper_hotplug_event);
 
 static void output_poll_execute(struct work_struct *work)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	struct delayed_work *delayed_work = to_delayed_work(work);
 	struct drm_device *dev = container_of(delayed_work, struct drm_device, mode_config.output_poll_work);
 	struct drm_connector *connector;
@@ -737,7 +725,6 @@ out:
  */
 bool drm_kms_helper_is_poll_worker(void)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	struct work_struct *work = current_work();
 
 	return work && work->func == output_poll_execute;
@@ -760,7 +747,6 @@ EXPORT_SYMBOL(drm_kms_helper_is_poll_worker);
  */
 void drm_kms_helper_poll_disable(struct drm_device *dev)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	if (!dev->mode_config.poll_enabled)
 		return;
 	cancel_delayed_work_sync(&dev->mode_config.output_poll_work);
@@ -788,7 +774,6 @@ EXPORT_SYMBOL(drm_kms_helper_poll_disable);
  */
 void drm_kms_helper_poll_init(struct drm_device *dev)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	INIT_DELAYED_WORK(&dev->mode_config.output_poll_work, output_poll_execute);
 	dev->mode_config.poll_enabled = true;
 
@@ -802,7 +787,6 @@ EXPORT_SYMBOL(drm_kms_helper_poll_init);
  */
 void drm_kms_helper_poll_fini(struct drm_device *dev)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	if (!dev->mode_config.poll_enabled)
 		return;
 
@@ -836,7 +820,6 @@ EXPORT_SYMBOL(drm_kms_helper_poll_fini);
  */
 bool drm_helper_hpd_irq_event(struct drm_device *dev)
 {
-    pr_info("drm_probe_helper: called %s\n", __func__);
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
 	enum drm_connector_status old_status;

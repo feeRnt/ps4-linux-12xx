@@ -84,7 +84,6 @@
 
 static const char *drm_writeback_fence_get_driver_name(struct dma_fence *fence)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	struct drm_writeback_connector *wb_connector =
 		fence_to_wb_connector(fence);
 
@@ -94,7 +93,6 @@ static const char *drm_writeback_fence_get_driver_name(struct dma_fence *fence)
 static const char *
 drm_writeback_fence_get_timeline_name(struct dma_fence *fence)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	struct drm_writeback_connector *wb_connector =
 		fence_to_wb_connector(fence);
 
@@ -103,7 +101,6 @@ drm_writeback_fence_get_timeline_name(struct dma_fence *fence)
 
 static bool drm_writeback_fence_enable_signaling(struct dma_fence *fence)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	return true;
 }
 
@@ -115,7 +112,6 @@ static const struct dma_fence_ops drm_writeback_fence_ops = {
 
 static int create_writeback_properties(struct drm_device *dev)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	struct drm_property *prop;
 
 	if (!dev->mode_config.writeback_fb_id_property) {
@@ -180,7 +176,6 @@ int drm_writeback_connector_init(struct drm_device *dev,
 				 const struct drm_encoder_helper_funcs *enc_helper_funcs,
 				 const u32 *formats, int n_formats)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	struct drm_property_blob *blob;
 	struct drm_connector *connector = &wb_connector->base;
 	struct drm_mode_config *config = &dev->mode_config;
@@ -248,7 +243,6 @@ EXPORT_SYMBOL(drm_writeback_connector_init);
 int drm_writeback_set_fb(struct drm_connector_state *conn_state,
 			 struct drm_framebuffer *fb)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	WARN_ON(conn_state->connector->connector_type != DRM_MODE_CONNECTOR_WRITEBACK);
 
 	if (!conn_state->writeback_job) {
@@ -267,7 +261,6 @@ int drm_writeback_set_fb(struct drm_connector_state *conn_state,
 
 int drm_writeback_prepare_job(struct drm_writeback_job *job)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	struct drm_writeback_connector *connector = job->connector;
 	const struct drm_connector_helper_funcs *funcs =
 		connector->base.helper_private;
@@ -306,7 +299,6 @@ EXPORT_SYMBOL(drm_writeback_prepare_job);
 void drm_writeback_queue_job(struct drm_writeback_connector *wb_connector,
 			     struct drm_connector_state *conn_state)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	struct drm_writeback_job *job;
 	unsigned long flags;
 
@@ -321,7 +313,6 @@ EXPORT_SYMBOL(drm_writeback_queue_job);
 
 void drm_writeback_cleanup_job(struct drm_writeback_job *job)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	struct drm_writeback_connector *connector = job->connector;
 	const struct drm_connector_helper_funcs *funcs =
 		connector->base.helper_private;
@@ -348,7 +339,6 @@ EXPORT_SYMBOL(drm_writeback_cleanup_job);
  */
 static void cleanup_work(struct work_struct *work)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	struct drm_writeback_job *job = container_of(work,
 						     struct drm_writeback_job,
 						     cleanup_work);
@@ -376,7 +366,6 @@ void
 drm_writeback_signal_completion(struct drm_writeback_connector *wb_connector,
 				int status)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	unsigned long flags;
 	struct drm_writeback_job *job;
 	struct dma_fence *out_fence;
@@ -410,7 +399,6 @@ EXPORT_SYMBOL(drm_writeback_signal_completion);
 struct dma_fence *
 drm_writeback_get_out_fence(struct drm_writeback_connector *wb_connector)
 {
-    pr_info("drm_writeback: called %s\n", __func__);
 	struct dma_fence *fence;
 
 	if (WARN_ON(wb_connector->base.connector_type !=

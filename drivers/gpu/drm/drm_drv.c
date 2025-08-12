@@ -84,7 +84,6 @@ DEFINE_STATIC_SRCU(drm_unplug_srcu);
 static struct drm_minor **drm_minor_get_slot(struct drm_device *dev,
 					     unsigned int type)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	switch (type) {
 	case DRM_MINOR_PRIMARY:
 		return &dev->primary;
@@ -97,7 +96,6 @@ static struct drm_minor **drm_minor_get_slot(struct drm_device *dev,
 
 static void drm_minor_alloc_release(struct drm_device *dev, void *data)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	struct drm_minor *minor = data;
 	unsigned long flags;
 
@@ -112,7 +110,6 @@ static void drm_minor_alloc_release(struct drm_device *dev, void *data)
 
 static int drm_minor_alloc(struct drm_device *dev, unsigned int type)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	struct drm_minor *minor;
 	unsigned long flags;
 	int r;
@@ -153,7 +150,6 @@ static int drm_minor_alloc(struct drm_device *dev, unsigned int type)
 
 static int drm_minor_register(struct drm_device *dev, unsigned int type)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	struct drm_minor *minor;
 	unsigned long flags;
 	int ret;
@@ -189,7 +185,6 @@ err_debugfs:
 
 static void drm_minor_unregister(struct drm_device *dev, unsigned int type)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	struct drm_minor *minor;
 	unsigned long flags;
 
@@ -218,7 +213,6 @@ static void drm_minor_unregister(struct drm_device *dev, unsigned int type)
  */
 struct drm_minor *drm_minor_acquire(unsigned int minor_id)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	struct drm_minor *minor;
 	unsigned long flags;
 
@@ -240,7 +234,6 @@ struct drm_minor *drm_minor_acquire(unsigned int minor_id)
 
 void drm_minor_release(struct drm_minor *minor)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	drm_dev_put(minor->dev);
 }
 
@@ -405,7 +398,6 @@ void drm_minor_release(struct drm_minor *minor)
  */
 void drm_put_dev(struct drm_device *dev)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	DRM_DEBUG("\n");
 
 	if (!dev) {
@@ -432,7 +424,6 @@ EXPORT_SYMBOL(drm_put_dev);
  */
 bool drm_dev_enter(struct drm_device *dev, int *idx)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	*idx = srcu_read_lock(&drm_unplug_srcu);
 
 	if (dev->unplugged) {
@@ -453,7 +444,6 @@ EXPORT_SYMBOL(drm_dev_enter);
  */
 void drm_dev_exit(int idx)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	srcu_read_unlock(&drm_unplug_srcu, idx);
 }
 EXPORT_SYMBOL(drm_dev_exit);
@@ -470,7 +460,6 @@ EXPORT_SYMBOL(drm_dev_exit);
  */
 void drm_dev_unplug(struct drm_device *dev)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	/*
 	 * After synchronizing any critical read section is guaranteed to see
 	 * the new value of ->unplugged, and any critical section which might
@@ -510,7 +499,6 @@ static struct vfsmount *drm_fs_mnt;
 
 static int drm_fs_init_fs_context(struct fs_context *fc)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	return init_pseudo(fc, 0x010203ff) ? 0 : -ENOMEM;
 }
 
@@ -523,7 +511,6 @@ static struct file_system_type drm_fs_type = {
 
 static struct inode *drm_fs_inode_new(void)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	struct inode *inode;
 	int r;
 
@@ -542,7 +529,6 @@ static struct inode *drm_fs_inode_new(void)
 
 static void drm_fs_inode_free(struct inode *inode)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	if (inode) {
 		iput(inode);
 		simple_release_fs(&drm_fs_mnt, &drm_fs_cnt);
@@ -576,7 +562,6 @@ static void drm_fs_inode_free(struct inode *inode)
 
 static void drm_dev_init_release(struct drm_device *dev, void *res)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	drm_legacy_ctxbitmap_cleanup(dev);
 	drm_legacy_remove_map_hash(dev);
 	drm_fs_inode_free(dev->anon_inode);
@@ -596,7 +581,6 @@ static int drm_dev_init(struct drm_device *dev,
 			const struct drm_driver *driver,
 			struct device *parent)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	int ret;
 
 	if (!drm_core_init_complete) {
@@ -678,7 +662,6 @@ err:
 
 static void devm_drm_dev_init_release(void *data)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	drm_dev_put(data);
 }
 
@@ -686,7 +669,6 @@ static int devm_drm_dev_init(struct device *parent,
 			     struct drm_device *dev,
 			     const struct drm_driver *driver)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	int ret;
 
 	ret = drm_dev_init(dev, driver, parent);
@@ -701,7 +683,6 @@ void *__devm_drm_dev_alloc(struct device *parent,
 			   const struct drm_driver *driver,
 			   size_t size, size_t offset)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	void *container;
 	struct drm_device *drm;
 	int ret;
@@ -737,7 +718,6 @@ EXPORT_SYMBOL(__devm_drm_dev_alloc);
 struct drm_device *drm_dev_alloc(const struct drm_driver *driver,
 				 struct device *parent)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	struct drm_device *dev;
 	int ret;
 
@@ -759,7 +739,6 @@ EXPORT_SYMBOL(drm_dev_alloc);
 
 static void drm_dev_release(struct kref *ref)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	struct drm_device *dev = container_of(ref, struct drm_device, ref);
 
 	if (dev->driver->release)
@@ -784,7 +763,6 @@ static void drm_dev_release(struct kref *ref)
  */
 void drm_dev_get(struct drm_device *dev)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	if (dev)
 		kref_get(&dev->ref);
 }
@@ -799,7 +777,6 @@ EXPORT_SYMBOL(drm_dev_get);
  */
 void drm_dev_put(struct drm_device *dev)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	if (dev)
 		kref_put(&dev->ref, drm_dev_release);
 }
@@ -807,7 +784,6 @@ EXPORT_SYMBOL(drm_dev_put);
 
 static int create_compat_control_link(struct drm_device *dev)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	struct drm_minor *minor;
 	char *name;
 	int ret;
@@ -843,7 +819,6 @@ static int create_compat_control_link(struct drm_device *dev)
 
 static void remove_compat_control_link(struct drm_device *dev)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	struct drm_minor *minor;
 	char *name;
 
@@ -885,7 +860,6 @@ static void remove_compat_control_link(struct drm_device *dev)
  */
 int drm_dev_register(struct drm_device *dev, unsigned long flags)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	const struct drm_driver *driver = dev->driver;
 	int ret;
 
@@ -955,7 +929,6 @@ EXPORT_SYMBOL(drm_dev_register);
  */
 void drm_dev_unregister(struct drm_device *dev)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	if (drm_core_check_feature(dev, DRIVER_LEGACY))
 		drm_lastclose(dev);
 
@@ -991,7 +964,6 @@ EXPORT_SYMBOL(drm_dev_unregister);
  */
 int drm_dev_set_unique(struct drm_device *dev, const char *name)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	drmm_kfree(dev, dev->unique);
 	dev->unique = drmm_kstrdup(dev, name, GFP_KERNEL);
 
@@ -1021,7 +993,6 @@ EXPORT_SYMBOL(drm_dev_set_unique);
 
 static int drm_stub_open(struct inode *inode, struct file *filp)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	const struct file_operations *new_fops;
 	struct drm_minor *minor;
 	int err;
@@ -1058,7 +1029,6 @@ static const struct file_operations drm_stub_fops = {
 
 static void drm_core_exit(void)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	unregister_chrdev(DRM_MAJOR, "drm");
 	debugfs_remove(drm_debugfs_root);
 	drm_sysfs_destroy();
@@ -1068,7 +1038,6 @@ static void drm_core_exit(void)
 
 static int __init drm_core_init(void)
 {
-    pr_info("drm_drv: called %s\n", __func__);
 	int ret;
 
 	drm_connector_ida_init();

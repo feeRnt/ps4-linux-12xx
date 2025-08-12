@@ -44,7 +44,6 @@ static const struct drm_gem_object_funcs amdgpu_gem_object_funcs;
 
 static vm_fault_t amdgpu_gem_fault(struct vm_fault *vmf)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct ttm_buffer_object *bo = vmf->vma->vm_private_data;
 	struct drm_device *ddev = bo->base.dev;
 	vm_fault_t ret;
@@ -85,7 +84,6 @@ static const struct vm_operations_struct amdgpu_gem_vm_ops = {
 
 static void amdgpu_gem_object_free(struct drm_gem_object *gobj)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct amdgpu_bo *robj = gem_to_amdgpu_bo(gobj);
 
 	if (robj) {
@@ -100,7 +98,6 @@ int amdgpu_gem_object_create(struct amdgpu_device *adev, unsigned long size,
 			     struct dma_resv *resv,
 			     struct drm_gem_object **obj)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct amdgpu_bo *bo;
 	struct amdgpu_bo_user *ubo;
 	struct amdgpu_bo_param bp;
@@ -131,7 +128,6 @@ int amdgpu_gem_object_create(struct amdgpu_device *adev, unsigned long size,
 
 void amdgpu_gem_force_release(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct drm_device *ddev = adev_to_drm(adev);
 	struct drm_file *file;
 
@@ -161,7 +157,6 @@ void amdgpu_gem_force_release(struct amdgpu_device *adev)
 static int amdgpu_gem_object_open(struct drm_gem_object *obj,
 				  struct drm_file *file_priv)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct amdgpu_bo *abo = gem_to_amdgpu_bo(obj);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(abo->tbo.bdev);
 	struct amdgpu_fpriv *fpriv = file_priv->driver_priv;
@@ -195,7 +190,6 @@ static int amdgpu_gem_object_open(struct drm_gem_object *obj,
 static void amdgpu_gem_object_close(struct drm_gem_object *obj,
 				    struct drm_file *file_priv)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	struct amdgpu_fpriv *fpriv = file_priv->driver_priv;
@@ -254,7 +248,6 @@ out_unlock:
 
 static int amdgpu_gem_object_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct amdgpu_bo *bo = gem_to_amdgpu_bo(obj);
 
 	if (amdgpu_ttm_tt_get_usermm(bo->tbo.ttm))
@@ -291,7 +284,6 @@ static const struct drm_gem_object_funcs amdgpu_gem_object_funcs = {
 int amdgpu_gem_create_ioctl(struct drm_device *dev, void *data,
 			    struct drm_file *filp)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_fpriv *fpriv = filp->driver_priv;
 	struct amdgpu_vm *vm = &fpriv->vm;
@@ -388,7 +380,6 @@ retry:
 int amdgpu_gem_userptr_ioctl(struct drm_device *dev, void *data,
 			     struct drm_file *filp)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct ttm_operation_ctx ctx = { true, false };
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct drm_amdgpu_gem_userptr *args = data;
@@ -470,7 +461,6 @@ int amdgpu_mode_dumb_mmap(struct drm_file *filp,
 			  struct drm_device *dev,
 			  uint32_t handle, uint64_t *offset_p)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct drm_gem_object *gobj;
 	struct amdgpu_bo *robj;
 
@@ -492,7 +482,6 @@ int amdgpu_mode_dumb_mmap(struct drm_file *filp,
 int amdgpu_gem_mmap_ioctl(struct drm_device *dev, void *data,
 			  struct drm_file *filp)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	union drm_amdgpu_gem_mmap *args = data;
 	uint32_t handle = args->in.handle;
 	memset(args, 0, sizeof(*args));
@@ -508,7 +497,6 @@ int amdgpu_gem_mmap_ioctl(struct drm_device *dev, void *data,
  */
 unsigned long amdgpu_gem_timeout(uint64_t timeout_ns)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	unsigned long timeout_jiffies;
 	ktime_t timeout;
 
@@ -531,7 +519,6 @@ unsigned long amdgpu_gem_timeout(uint64_t timeout_ns)
 int amdgpu_gem_wait_idle_ioctl(struct drm_device *dev, void *data,
 			      struct drm_file *filp)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	union drm_amdgpu_gem_wait_idle *args = data;
 	struct drm_gem_object *gobj;
 	struct amdgpu_bo *robj;
@@ -564,7 +551,6 @@ int amdgpu_gem_wait_idle_ioctl(struct drm_device *dev, void *data,
 int amdgpu_gem_metadata_ioctl(struct drm_device *dev, void *data,
 				struct drm_file *filp)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct drm_amdgpu_gem_metadata *args = data;
 	struct drm_gem_object *gobj;
 	struct amdgpu_bo *robj;
@@ -621,7 +607,6 @@ static void amdgpu_gem_va_update_vm(struct amdgpu_device *adev,
 				    struct amdgpu_bo_va *bo_va,
 				    uint32_t operation)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	int r;
 
 	if (!amdgpu_vm_ready(vm))
@@ -655,7 +640,6 @@ error:
  */
 uint64_t amdgpu_gem_va_map_flags(struct amdgpu_device *adev, uint32_t flags)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	uint64_t pte_flag = 0;
 
 	if (flags & AMDGPU_VM_PAGE_EXECUTABLE)
@@ -677,7 +661,6 @@ uint64_t amdgpu_gem_va_map_flags(struct amdgpu_device *adev, uint32_t flags)
 int amdgpu_gem_va_ioctl(struct drm_device *dev, void *data,
 			  struct drm_file *filp)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	const uint32_t valid_flags = AMDGPU_VM_DELAY_UPDATE |
 		AMDGPU_VM_PAGE_READABLE | AMDGPU_VM_PAGE_WRITEABLE |
 		AMDGPU_VM_PAGE_EXECUTABLE | AMDGPU_VM_MTYPE_MASK;
@@ -820,7 +803,6 @@ error_unref:
 int amdgpu_gem_op_ioctl(struct drm_device *dev, void *data,
 			struct drm_file *filp)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct drm_amdgpu_gem_op *args = data;
 	struct drm_gem_object *gobj;
@@ -899,7 +881,6 @@ int amdgpu_mode_dumb_create(struct drm_file *file_priv,
 			    struct drm_device *dev,
 			    struct drm_mode_create_dumb *args)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct drm_gem_object *gobj;
 	uint32_t handle;
@@ -940,7 +921,6 @@ int amdgpu_mode_dumb_create(struct drm_file *file_priv,
 #if defined(CONFIG_DEBUG_FS)
 static int amdgpu_debugfs_gem_info_show(struct seq_file *m, void *unused)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)m->private;
 	struct drm_device *dev = adev_to_drm(adev);
 	struct drm_file *file;
@@ -986,7 +966,6 @@ DEFINE_SHOW_ATTRIBUTE(amdgpu_debugfs_gem_info);
 
 void amdgpu_debugfs_gem_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gem: called %s\n", __func__);
 #if defined(CONFIG_DEBUG_FS)
 	struct drm_minor *minor = adev_to_drm(adev)->primary;
 	struct dentry *root = minor->debugfs_root;

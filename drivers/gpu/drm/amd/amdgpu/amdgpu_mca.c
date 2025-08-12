@@ -31,7 +31,6 @@ void amdgpu_mca_query_correctable_error_count(struct amdgpu_device *adev,
 					      uint64_t mc_status_addr,
 					      unsigned long *error_count)
 {
-    pr_info("amdgpu_mca: called %s\n", __func__);
 	uint64_t mc_status = RREG64_PCIE(mc_status_addr * 4);
 
 	if (REG_GET_FIELD(mc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Val) == 1 &&
@@ -43,7 +42,6 @@ void amdgpu_mca_query_uncorrectable_error_count(struct amdgpu_device *adev,
 						uint64_t mc_status_addr,
 						unsigned long *error_count)
 {
-    pr_info("amdgpu_mca: called %s\n", __func__);
 	uint64_t mc_status = RREG64_PCIE(mc_status_addr * 4);
 
 	if ((REG_GET_FIELD(mc_status, MCA_UMC_UMC0_MCUMC_STATUST0, Val) == 1) &&
@@ -58,7 +56,6 @@ void amdgpu_mca_query_uncorrectable_error_count(struct amdgpu_device *adev,
 void amdgpu_mca_reset_error_count(struct amdgpu_device *adev,
 				  uint64_t mc_status_addr)
 {
-    pr_info("amdgpu_mca: called %s\n", __func__);
 	WREG64_PCIE(mc_status_addr * 4, 0x0ULL);
 }
 
@@ -66,7 +63,6 @@ void amdgpu_mca_query_ras_error_count(struct amdgpu_device *adev,
 				      uint64_t mc_status_addr,
 				      void *ras_error_status)
 {
-    pr_info("amdgpu_mca: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 
 	amdgpu_mca_query_correctable_error_count(adev, mc_status_addr, &(err_data->ce_count));
@@ -78,7 +74,6 @@ void amdgpu_mca_query_ras_error_count(struct amdgpu_device *adev,
 int amdgpu_mca_ras_late_init(struct amdgpu_device *adev,
 			     struct amdgpu_mca_ras *mca_dev)
 {
-    pr_info("amdgpu_mca: called %s\n", __func__);
 	int r;
 	struct ras_ih_if ih_info = {
 		.cb = NULL,
@@ -109,7 +104,6 @@ int amdgpu_mca_ras_late_init(struct amdgpu_device *adev,
 void amdgpu_mca_ras_fini(struct amdgpu_device *adev,
 			 struct amdgpu_mca_ras *mca_dev)
 {
-    pr_info("amdgpu_mca: called %s\n", __func__);
 	struct ras_ih_if ih_info = {
 		.cb = NULL,
 	};

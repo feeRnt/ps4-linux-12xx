@@ -351,7 +351,6 @@ static int gfx_v9_4_2_run_shader(struct amdgpu_device *adev,
 				 u32 compute_dim_x, u64 wb_gpu_addr, u32 pattern,
 				 struct dma_fence **fence_ptr)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	int r, i;
 	uint32_t total_size, shader_offset;
 	u64 gpu_addr;
@@ -420,7 +419,6 @@ static int gfx_v9_4_2_run_shader(struct amdgpu_device *adev,
 
 static void gfx_v9_4_2_log_wave_assignment(struct amdgpu_device *adev, uint32_t *wb_ptr)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t se, cu, simd, wave;
 	uint32_t offset = 0;
 	char *str;
@@ -455,7 +453,6 @@ static int gfx_v9_4_2_wait_for_waves_assigned(struct amdgpu_device *adev,
 					      uint32_t *wb_ptr, uint32_t mask,
 					      uint32_t pattern, uint32_t num_wave, bool wait)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t se, cu, simd, wave;
 	uint32_t loop = 0;
 	uint32_t wave_cnt;
@@ -492,7 +489,6 @@ static int gfx_v9_4_2_wait_for_waves_assigned(struct amdgpu_device *adev,
 
 static int gfx_v9_4_2_do_sgprs_init(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	int r;
 	int wb_size = adev->gfx.config.max_shader_engines *
 			 CU_ID_MAX * SIMD_ID_MAX * WAVE_ID_MAX;
@@ -636,7 +632,6 @@ pro_end:
 
 static int gfx_v9_4_2_do_vgprs_init(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	int r;
 	/* CU_ID: 0~15, SIMD_ID: 0~3, WAVE_ID: 0 ~ 9 */
 	int wb_size = adev->gfx.config.max_shader_engines *
@@ -707,7 +702,6 @@ pro_end:
 
 int gfx_v9_4_2_do_edc_gpr_workarounds(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	/* only support when RAS is enabled */
 	if (!amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__GFX))
 		return 0;
@@ -725,7 +719,6 @@ static void gfx_v9_4_2_reset_sq_timeout_status(struct amdgpu_device *adev);
 void gfx_v9_4_2_init_golden_registers(struct amdgpu_device *adev,
 				      uint32_t die_id)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	soc15_program_register_sequence(adev,
 					golden_settings_gc_9_4_2_alde,
 					ARRAY_SIZE(golden_settings_gc_9_4_2_alde));
@@ -756,7 +749,6 @@ void gfx_v9_4_2_debug_trap_config_init(struct amdgpu_device *adev,
 				uint32_t first_vmid,
 				uint32_t last_vmid)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t data;
 	int i;
 
@@ -778,7 +770,6 @@ void gfx_v9_4_2_debug_trap_config_init(struct amdgpu_device *adev,
 
 void gfx_v9_4_2_set_power_brake_sequence(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	u32 tmp;
 
 	gfx_v9_0_select_se_sh(adev, 0xffffffff, 0xffffffff, 0xffffffff);
@@ -850,7 +841,6 @@ static const struct soc15_reg_entry gfx_v9_4_2_edc_counter_regs[] = {
 static void gfx_v9_4_2_select_se_sh(struct amdgpu_device *adev, u32 se_num,
 				  u32 sh_num, u32 instance)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	u32 data;
 
 	if (instance == 0xffffffff)
@@ -1457,7 +1447,6 @@ static int gfx_v9_4_2_get_reg_error_count(struct amdgpu_device *adev,
 					  uint32_t value, uint32_t *sec_count,
 					  uint32_t *ded_count)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t i;
 	uint32_t sec_cnt, ded_cnt;
 
@@ -1494,7 +1483,6 @@ static int gfx_v9_4_2_get_reg_error_count(struct amdgpu_device *adev,
 static int gfx_v9_4_2_query_sram_edc_count(struct amdgpu_device *adev,
 				uint32_t *sec_count, uint32_t *ded_count)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t i, j, k, data;
 	uint32_t sec_cnt = 0, ded_cnt = 0;
 
@@ -1551,7 +1539,6 @@ static void gfx_v9_4_2_log_utc_edc_count(struct amdgpu_device *adev,
 					 uint32_t instance, uint32_t sec_cnt,
 					 uint32_t ded_cnt)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t bank, way, mem;
 	static const char *vml2_way_str[] = { "BIGK", "4K" };
 	static const char *utcl2_rounter_str[] = { "VMC", "APT" };
@@ -1602,7 +1589,6 @@ static int gfx_v9_4_2_query_utc_edc_count(struct amdgpu_device *adev,
 					  uint32_t *sec_count,
 					  uint32_t *ded_count)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t i, j, data;
 	uint32_t sec_cnt, ded_cnt;
 	uint32_t num_instances;
@@ -1653,7 +1639,6 @@ static int gfx_v9_4_2_query_utc_edc_count(struct amdgpu_device *adev,
 static int gfx_v9_4_2_query_ras_error_count(struct amdgpu_device *adev,
 					    void *ras_error_status)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 	uint32_t sec_count = 0, ded_count = 0;
 
@@ -1676,7 +1661,6 @@ static int gfx_v9_4_2_query_ras_error_count(struct amdgpu_device *adev,
 
 static void gfx_v9_4_2_reset_utc_err_status(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	WREG32_SOC15(GC, 0, regUTCL2_MEM_ECC_STATUS, 0x3);
 	WREG32_SOC15(GC, 0, regVML2_MEM_ECC_STATUS, 0x3);
 	WREG32_SOC15(GC, 0, regVML2_WALKER_MEM_ECC_STATUS, 0x3);
@@ -1684,7 +1668,6 @@ static void gfx_v9_4_2_reset_utc_err_status(struct amdgpu_device *adev)
 
 static void gfx_v9_4_2_reset_ea_err_status(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t i, j;
 	uint32_t value;
 
@@ -1705,7 +1688,6 @@ static void gfx_v9_4_2_reset_ea_err_status(struct amdgpu_device *adev)
 
 static void gfx_v9_4_2_reset_ras_error_count(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	if (!amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__GFX))
 		return;
 
@@ -1715,7 +1697,6 @@ static void gfx_v9_4_2_reset_ras_error_count(struct amdgpu_device *adev)
 
 static int gfx_v9_4_2_ras_error_inject(struct amdgpu_device *adev, void *inject_if)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	struct ras_inject_if *info = (struct ras_inject_if *)inject_if;
 	int ret;
 	struct ta_ras_trigger_error_input block_info = { 0 };
@@ -1738,7 +1719,6 @@ static int gfx_v9_4_2_ras_error_inject(struct amdgpu_device *adev, void *inject_
 
 static void gfx_v9_4_2_query_ea_err_status(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t i, j;
 	uint32_t reg_value;
 
@@ -1770,7 +1750,6 @@ static void gfx_v9_4_2_query_ea_err_status(struct amdgpu_device *adev)
 
 static void gfx_v9_4_2_query_utc_err_status(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t data;
 
 	data = RREG32_SOC15(GC, 0, regUTCL2_MEM_ECC_STATUS);
@@ -1794,7 +1773,6 @@ static void gfx_v9_4_2_query_utc_err_status(struct amdgpu_device *adev)
 
 static void gfx_v9_4_2_query_ras_error_status(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	if (!amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__GFX))
 		return;
 
@@ -1805,7 +1783,6 @@ static void gfx_v9_4_2_query_ras_error_status(struct amdgpu_device *adev)
 
 static void gfx_v9_4_2_reset_ras_error_status(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	if (!amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__GFX))
 		return;
 
@@ -1816,7 +1793,6 @@ static void gfx_v9_4_2_reset_ras_error_status(struct amdgpu_device *adev)
 
 static void gfx_v9_4_2_enable_watchdog_timer(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t i;
 	uint32_t data;
 
@@ -1844,7 +1820,6 @@ static void gfx_v9_4_2_enable_watchdog_timer(struct amdgpu_device *adev)
 
 static uint32_t wave_read_ind(struct amdgpu_device *adev, uint32_t simd, uint32_t wave, uint32_t address)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	WREG32_SOC15_RLC_EX(reg, GC, 0, regSQ_IND_INDEX,
 		(wave << SQ_IND_INDEX__WAVE_ID__SHIFT) |
 		(simd << SQ_IND_INDEX__SIMD_ID__SHIFT) |
@@ -1856,7 +1831,6 @@ static uint32_t wave_read_ind(struct amdgpu_device *adev, uint32_t simd, uint32_
 static void gfx_v9_4_2_log_cu_timeout_status(struct amdgpu_device *adev,
 					uint32_t status)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	struct amdgpu_cu_info *cu_info = &adev->gfx.cu_info;
 	uint32_t i, simd, wave;
 	uint32_t wave_status;
@@ -1898,7 +1872,6 @@ static void gfx_v9_4_2_log_cu_timeout_status(struct amdgpu_device *adev,
 
 static void gfx_v9_4_2_query_sq_timeout_status(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t se_idx, sh_idx, cu_idx;
 	uint32_t status;
 
@@ -1933,7 +1906,6 @@ static void gfx_v9_4_2_query_sq_timeout_status(struct amdgpu_device *adev)
 
 static void gfx_v9_4_2_reset_sq_timeout_status(struct amdgpu_device *adev)
 {
-    pr_info("gfx_v9_4_2: called %s\n", __func__);
 	uint32_t se_idx, sh_idx, cu_idx;
 
 	mutex_lock(&adev->grbm_idx_mutex);

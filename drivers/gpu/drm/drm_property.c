@@ -57,7 +57,6 @@
 
 static bool drm_property_flags_valid(u32 flags)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	u32 legacy_type = flags & DRM_MODE_PROP_LEGACY_TYPE;
 	u32 ext_type = flags & DRM_MODE_PROP_EXTENDED_TYPE;
 
@@ -98,7 +97,6 @@ struct drm_property *drm_property_create(struct drm_device *dev,
 					 u32 flags, const char *name,
 					 int num_values)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property *property = NULL;
 	int ret;
 
@@ -166,7 +164,6 @@ struct drm_property *drm_property_create_enum(struct drm_device *dev,
 					      const struct drm_prop_enum_list *props,
 					      int num_values)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property *property;
 	int i, ret;
 
@@ -216,7 +213,6 @@ struct drm_property *drm_property_create_bitmask(struct drm_device *dev,
 						 int num_props,
 						 uint64_t supported_bits)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property *property;
 	int i, ret;
 	int num_values = hweight64(supported_bits);
@@ -247,7 +243,6 @@ static struct drm_property *property_create_range(struct drm_device *dev,
 						  u32 flags, const char *name,
 						  uint64_t min, uint64_t max)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property *property;
 
 	property = drm_property_create(dev, flags, name, 2);
@@ -283,7 +278,6 @@ struct drm_property *drm_property_create_range(struct drm_device *dev,
 					       u32 flags, const char *name,
 					       uint64_t min, uint64_t max)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	return property_create_range(dev, DRM_MODE_PROP_RANGE | flags,
 			name, min, max);
 }
@@ -312,7 +306,6 @@ struct drm_property *drm_property_create_signed_range(struct drm_device *dev,
 						      u32 flags, const char *name,
 						      int64_t min, int64_t max)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	return property_create_range(dev, DRM_MODE_PROP_SIGNED_RANGE | flags,
 			name, I642U64(min), I642U64(max));
 }
@@ -340,7 +333,6 @@ struct drm_property *drm_property_create_object(struct drm_device *dev,
 						u32 flags, const char *name,
 						uint32_t type)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property *property;
 
 	flags |= DRM_MODE_PROP_OBJECT;
@@ -377,7 +369,6 @@ EXPORT_SYMBOL(drm_property_create_object);
 struct drm_property *drm_property_create_bool(struct drm_device *dev,
 					      u32 flags, const char *name)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	return drm_property_create_range(dev, flags, name, 0, 1);
 }
 EXPORT_SYMBOL(drm_property_create_bool);
@@ -399,7 +390,6 @@ EXPORT_SYMBOL(drm_property_create_bool);
 int drm_property_add_enum(struct drm_property *property,
 			  uint64_t value, const char *name)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property_enum *prop_enum;
 	int index = 0;
 
@@ -451,7 +441,6 @@ EXPORT_SYMBOL(drm_property_add_enum);
  */
 void drm_property_destroy(struct drm_device *dev, struct drm_property *property)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property_enum *prop_enum, *pt;
 
 	list_for_each_entry_safe(prop_enum, pt, &property->enum_list, head) {
@@ -470,7 +459,6 @@ EXPORT_SYMBOL(drm_property_destroy);
 int drm_mode_getproperty_ioctl(struct drm_device *dev,
 			       void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_mode_get_property *out_resp = data;
 	struct drm_property *property;
 	int enum_count = 0;
@@ -540,7 +528,6 @@ int drm_mode_getproperty_ioctl(struct drm_device *dev,
 
 static void drm_property_free_blob(struct kref *kref)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property_blob *blob =
 		container_of(kref, struct drm_property_blob, base.refcount);
 
@@ -571,7 +558,6 @@ struct drm_property_blob *
 drm_property_create_blob(struct drm_device *dev, size_t length,
 			 const void *data)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property_blob *blob;
 	int ret;
 
@@ -616,7 +602,6 @@ EXPORT_SYMBOL(drm_property_create_blob);
  */
 void drm_property_blob_put(struct drm_property_blob *blob)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	if (!blob)
 		return;
 
@@ -627,7 +612,6 @@ EXPORT_SYMBOL(drm_property_blob_put);
 void drm_property_destroy_user_blobs(struct drm_device *dev,
 				     struct drm_file *file_priv)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property_blob *blob, *bt;
 
 	/*
@@ -649,7 +633,6 @@ void drm_property_destroy_user_blobs(struct drm_device *dev,
  */
 struct drm_property_blob *drm_property_blob_get(struct drm_property_blob *blob)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	drm_mode_object_get(&blob->base);
 	return blob;
 }
@@ -670,7 +653,6 @@ EXPORT_SYMBOL(drm_property_blob_get);
 struct drm_property_blob *drm_property_lookup_blob(struct drm_device *dev,
 					           uint32_t id)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_mode_object *obj;
 	struct drm_property_blob *blob = NULL;
 
@@ -715,7 +697,6 @@ int drm_property_replace_global_blob(struct drm_device *dev,
 				     struct drm_mode_object *obj_holds_id,
 				     struct drm_property *prop_holds_id)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property_blob *new_blob = NULL;
 	struct drm_property_blob *old_blob = NULL;
 	int ret;
@@ -760,7 +741,6 @@ EXPORT_SYMBOL(drm_property_replace_global_blob);
 bool drm_property_replace_blob(struct drm_property_blob **blob,
 			       struct drm_property_blob *new_blob)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_property_blob *old_blob = *blob;
 
 	if (old_blob == new_blob)
@@ -777,7 +757,6 @@ EXPORT_SYMBOL(drm_property_replace_blob);
 int drm_mode_getblob_ioctl(struct drm_device *dev,
 			   void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_mode_get_blob *out_resp = data;
 	struct drm_property_blob *blob;
 	int ret = 0;
@@ -807,7 +786,6 @@ unref:
 int drm_mode_createblob_ioctl(struct drm_device *dev,
 			      void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_mode_create_blob *out_resp = data;
 	struct drm_property_blob *blob;
 	int ret = 0;
@@ -844,7 +822,6 @@ out_blob:
 int drm_mode_destroyblob_ioctl(struct drm_device *dev,
 			       void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	struct drm_mode_destroy_blob *out_resp = data;
 	struct drm_property_blob *blob = NULL, *bt;
 	bool found = false;
@@ -900,7 +877,6 @@ err:
 bool drm_property_change_valid_get(struct drm_property *property,
 				   uint64_t value, struct drm_mode_object **ref)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	int i;
 
 	if (property->flags & DRM_MODE_PROP_IMMUTABLE)
@@ -957,7 +933,6 @@ bool drm_property_change_valid_get(struct drm_property *property,
 void drm_property_change_valid_put(struct drm_property *property,
 		struct drm_mode_object *ref)
 {
-    pr_info("drm_property: called %s\n", __func__);
 	if (!ref)
 		return;
 

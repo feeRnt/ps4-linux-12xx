@@ -36,7 +36,6 @@ static void amdgpu_jpeg_idle_work_handler(struct work_struct *work);
 
 int amdgpu_jpeg_sw_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_jpeg: called %s\n", __func__);
 	INIT_DELAYED_WORK(&adev->jpeg.idle_work, amdgpu_jpeg_idle_work_handler);
 	mutex_init(&adev->jpeg.jpeg_pg_lock);
 	atomic_set(&adev->jpeg.total_submission_cnt, 0);
@@ -46,7 +45,6 @@ int amdgpu_jpeg_sw_init(struct amdgpu_device *adev)
 
 int amdgpu_jpeg_sw_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_jpeg: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->jpeg.num_jpeg_inst; ++i) {
@@ -63,7 +61,6 @@ int amdgpu_jpeg_sw_fini(struct amdgpu_device *adev)
 
 int amdgpu_jpeg_suspend(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_jpeg: called %s\n", __func__);
 	cancel_delayed_work_sync(&adev->jpeg.idle_work);
 
 	return 0;
@@ -71,13 +68,11 @@ int amdgpu_jpeg_suspend(struct amdgpu_device *adev)
 
 int amdgpu_jpeg_resume(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_jpeg: called %s\n", __func__);
 	return 0;
 }
 
 static void amdgpu_jpeg_idle_work_handler(struct work_struct *work)
 {
-    pr_info("amdgpu_jpeg: called %s\n", __func__);
 	struct amdgpu_device *adev =
 		container_of(work, struct amdgpu_device, jpeg.idle_work.work);
 	unsigned int fences = 0;
@@ -99,7 +94,6 @@ static void amdgpu_jpeg_idle_work_handler(struct work_struct *work)
 
 void amdgpu_jpeg_ring_begin_use(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_jpeg: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	atomic_inc(&adev->jpeg.total_submission_cnt);
@@ -113,14 +107,12 @@ void amdgpu_jpeg_ring_begin_use(struct amdgpu_ring *ring)
 
 void amdgpu_jpeg_ring_end_use(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_jpeg: called %s\n", __func__);
 	atomic_dec(&ring->adev->jpeg.total_submission_cnt);
 	schedule_delayed_work(&ring->adev->jpeg.idle_work, JPEG_IDLE_TIMEOUT);
 }
 
 int amdgpu_jpeg_dec_ring_test_ring(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_jpeg: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t tmp = 0;
 	unsigned i;
@@ -151,7 +143,6 @@ int amdgpu_jpeg_dec_ring_test_ring(struct amdgpu_ring *ring)
 static int amdgpu_jpeg_dec_set_reg(struct amdgpu_ring *ring, uint32_t handle,
 		struct dma_fence **fence)
 {
-    pr_info("amdgpu_jpeg: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct amdgpu_job *job;
 	struct amdgpu_ib *ib;
@@ -191,7 +182,6 @@ err:
 
 int amdgpu_jpeg_dec_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
-    pr_info("amdgpu_jpeg: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t tmp = 0;
 	unsigned i;

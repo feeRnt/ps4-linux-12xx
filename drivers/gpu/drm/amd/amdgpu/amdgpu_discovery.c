@@ -133,7 +133,6 @@ static int hw_id_map[MAX_HWIP] = {
 
 static int amdgpu_discovery_read_binary(struct amdgpu_device *adev, uint8_t *binary)
 {
-    pr_info("amdgpu_discovery: called %s\n", __func__);
 	uint64_t vram_size = (uint64_t)RREG32(mmRCC_CONFIG_MEMSIZE) << 20;
 	uint64_t pos = vram_size - DISCOVERY_TMR_OFFSET;
 
@@ -144,7 +143,6 @@ static int amdgpu_discovery_read_binary(struct amdgpu_device *adev, uint8_t *bin
 
 static uint16_t amdgpu_discovery_calculate_checksum(uint8_t *data, uint32_t size)
 {
-    pr_info("amdgpu_discovery: called %s\n", __func__);
 	uint16_t checksum = 0;
 	int i;
 
@@ -157,13 +155,11 @@ static uint16_t amdgpu_discovery_calculate_checksum(uint8_t *data, uint32_t size
 static inline bool amdgpu_discovery_verify_checksum(uint8_t *data, uint32_t size,
 						    uint16_t expected)
 {
-    pr_info("amdgpu_discovery: called %s\n", __func__);
 	return !!(amdgpu_discovery_calculate_checksum(data, size) == expected);
 }
 
 static int amdgpu_discovery_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_discovery: called %s\n", __func__);
 	struct table_info *info;
 	struct binary_header *bhdr;
 	struct ip_discovery_header *ihdr;
@@ -245,14 +241,12 @@ out:
 
 void amdgpu_discovery_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_discovery: called %s\n", __func__);
 	kfree(adev->mman.discovery_bin);
 	adev->mman.discovery_bin = NULL;
 }
 
 int amdgpu_discovery_reg_base_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_discovery: called %s\n", __func__);
 	struct binary_header *bhdr;
 	struct ip_discovery_header *ihdr;
 	struct die_header *dhdr;
@@ -337,7 +331,6 @@ int amdgpu_discovery_reg_base_init(struct amdgpu_device *adev)
 int amdgpu_discovery_get_ip_version(struct amdgpu_device *adev, int hw_id, int number_instance,
 				    int *major, int *minor, int *revision)
 {
-    pr_info("amdgpu_discovery: called %s\n", __func__);
 	struct binary_header *bhdr;
 	struct ip_discovery_header *ihdr;
 	struct die_header *dhdr;
@@ -387,14 +380,12 @@ int amdgpu_discovery_get_ip_version(struct amdgpu_device *adev, int hw_id, int n
 int amdgpu_discovery_get_vcn_version(struct amdgpu_device *adev, int vcn_instance,
 				     int *major, int *minor, int *revision)
 {
-    pr_info("amdgpu_discovery: called %s\n", __func__);
 	return amdgpu_discovery_get_ip_version(adev, VCN_HWID,
 					       vcn_instance, major, minor, revision);
 }
 
 void amdgpu_discovery_harvest_ip(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_discovery: called %s\n", __func__);
 	struct binary_header *bhdr;
 	struct harvest_table *harvest_info;
 	int i, vcn_harvest_count = 0;
@@ -431,7 +422,6 @@ union gc_info {
 
 int amdgpu_discovery_get_gfx_info(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_discovery: called %s\n", __func__);
 	struct binary_header *bhdr;
 	union gc_info *gc_info;
 

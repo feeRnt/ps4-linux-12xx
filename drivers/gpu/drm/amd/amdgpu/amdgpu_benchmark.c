@@ -31,7 +31,6 @@
 static int amdgpu_benchmark_do_move(struct amdgpu_device *adev, unsigned size,
 				    uint64_t saddr, uint64_t daddr, int n)
 {
-    pr_info("amdgpu_benchmark: called %s\n", __func__);
 	unsigned long start_jiffies;
 	unsigned long end_jiffies;
 	struct dma_fence *fence;
@@ -62,7 +61,6 @@ static void amdgpu_benchmark_log_results(int n, unsigned size,
 					 unsigned sdomain, unsigned ddomain,
 					 char *kind)
 {
-    pr_info("amdgpu_benchmark: called %s\n", __func__);
 	unsigned int throughput = (n * (size >> 10)) / time;
 	DRM_INFO("amdgpu: %s %u bo moves of %u kB from"
 		 " %d to %d in %u ms, throughput: %u Mb/s or %u MB/s\n",
@@ -73,7 +71,6 @@ static void amdgpu_benchmark_log_results(int n, unsigned size,
 static void amdgpu_benchmark_move(struct amdgpu_device *adev, unsigned size,
 				  unsigned sdomain, unsigned ddomain)
 {
-    pr_info("amdgpu_benchmark: called %s\n", __func__);
 	struct amdgpu_bo *dobj = NULL;
 	struct amdgpu_bo *sobj = NULL;
 	struct amdgpu_bo_param bp;
@@ -164,7 +161,6 @@ out_cleanup:
 
 void amdgpu_benchmark(struct amdgpu_device *adev, int test_number)
 {
-    pr_info("amdgpu_benchmark: called %s\n", __func__);
 	int i;
 	static const int common_modes[AMDGPU_BENCHMARK_COMMON_MODES_N] = {
 		640 * 480 * 4,

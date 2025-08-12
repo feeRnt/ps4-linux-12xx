@@ -43,7 +43,6 @@
 static ssize_t amdgpu_rap_debugfs_write(struct file *f, const char __user *buf,
 		size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_rap: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)file_inode(f)->i_private;
 	struct ta_rap_shared_memory *rap_shared_mem;
 	struct ta_rap_cmd_output_data *rap_cmd_output;
@@ -117,7 +116,6 @@ static const struct file_operations amdgpu_rap_debugfs_ops = {
 
 void amdgpu_rap_debugfs_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_rap: called %s\n", __func__);
 #if defined(CONFIG_DEBUG_FS)
 	struct drm_minor *minor = adev_to_drm(adev)->primary;
 

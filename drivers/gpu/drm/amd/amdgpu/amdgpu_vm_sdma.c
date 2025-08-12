@@ -35,7 +35,6 @@
  */
 static int amdgpu_vm_sdma_map_table(struct amdgpu_bo_vm *table)
 {
-    pr_info("amdgpu_vm_sdma: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_ttm_alloc_gart(&table->bo.tbo);
@@ -62,7 +61,6 @@ static int amdgpu_vm_sdma_prepare(struct amdgpu_vm_update_params *p,
 				  struct dma_resv *resv,
 				  enum amdgpu_sync_mode sync_mode)
 {
-    pr_info("amdgpu_vm_sdma: called %s\n", __func__);
 	enum amdgpu_ib_pool_type pool = p->immediate ? AMDGPU_IB_POOL_IMMEDIATE
 		: AMDGPU_IB_POOL_DELAYED;
 	unsigned int ndw = AMDGPU_VM_SDMA_MIN_NUM_DW;
@@ -92,7 +90,6 @@ static int amdgpu_vm_sdma_prepare(struct amdgpu_vm_update_params *p,
 static int amdgpu_vm_sdma_commit(struct amdgpu_vm_update_params *p,
 				 struct dma_fence **fence)
 {
-    pr_info("amdgpu_vm_sdma: called %s\n", __func__);
 	struct amdgpu_ib *ib = p->job->ibs;
 	struct drm_sched_entity *entity;
 	struct amdgpu_ring *ring;
@@ -142,7 +139,6 @@ static void amdgpu_vm_sdma_copy_ptes(struct amdgpu_vm_update_params *p,
 				     struct amdgpu_bo *bo, uint64_t pe,
 				     unsigned count)
 {
-    pr_info("amdgpu_vm_sdma: called %s\n", __func__);
 	struct amdgpu_ib *ib = p->job->ibs;
 	uint64_t src = ib->gpu_addr;
 
@@ -173,7 +169,6 @@ static void amdgpu_vm_sdma_set_ptes(struct amdgpu_vm_update_params *p,
 				    uint64_t addr, unsigned count,
 				    uint32_t incr, uint64_t flags)
 {
-    pr_info("amdgpu_vm_sdma: called %s\n", __func__);
 	struct amdgpu_ib *ib = p->job->ibs;
 
 	pe += amdgpu_gmc_sign_extend(amdgpu_bo_gpu_offset_no_check(bo));
@@ -206,7 +201,6 @@ static int amdgpu_vm_sdma_update(struct amdgpu_vm_update_params *p,
 				 uint64_t addr, unsigned count, uint32_t incr,
 				 uint64_t flags)
 {
-    pr_info("amdgpu_vm_sdma: called %s\n", __func__);
 	struct amdgpu_bo *bo = &vmbo->bo;
 	enum amdgpu_ib_pool_type pool = p->immediate ? AMDGPU_IB_POOL_IMMEDIATE
 		: AMDGPU_IB_POOL_DELAYED;

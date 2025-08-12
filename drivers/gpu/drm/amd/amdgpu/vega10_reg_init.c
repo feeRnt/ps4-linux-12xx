@@ -28,7 +28,6 @@
 
 int vega10_reg_base_init(struct amdgpu_device *adev)
 {
-    pr_info("vega10_reg_init: called %s\n", __func__);
 	/* HW has more IP blocks,  only initialized the blocke beend by our driver  */
 	uint32_t i;
 	for (i = 0 ; i < MAX_INSTANCE ; ++i) {
@@ -58,7 +57,6 @@ int vega10_reg_base_init(struct amdgpu_device *adev)
 
 void vega10_doorbell_index_init(struct amdgpu_device *adev)
 {
-    pr_info("vega10_reg_init: called %s\n", __func__);
 	adev->doorbell_index.kiq = AMDGPU_DOORBELL64_KIQ;
 	adev->doorbell_index.mec_ring0 = AMDGPU_DOORBELL64_MEC_RING0;
 	adev->doorbell_index.mec_ring1 = AMDGPU_DOORBELL64_MEC_RING1;

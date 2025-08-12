@@ -43,7 +43,6 @@ const uint32_t
 
 static void umc_v6_1_enable_umc_index_mode(struct amdgpu_device *adev)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	uint32_t rsmu_umc_addr, rsmu_umc_val;
 
 	rsmu_umc_addr = SOC15_REG_OFFSET(RSMU, 0,
@@ -59,7 +58,6 @@ static void umc_v6_1_enable_umc_index_mode(struct amdgpu_device *adev)
 
 static void umc_v6_1_disable_umc_index_mode(struct amdgpu_device *adev)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	uint32_t rsmu_umc_addr, rsmu_umc_val;
 
 	rsmu_umc_addr = SOC15_REG_OFFSET(RSMU, 0,
@@ -75,7 +73,6 @@ static void umc_v6_1_disable_umc_index_mode(struct amdgpu_device *adev)
 
 static uint32_t umc_v6_1_get_umc_index_mode_state(struct amdgpu_device *adev)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	uint32_t rsmu_umc_addr, rsmu_umc_val;
 
 	rsmu_umc_addr = SOC15_REG_OFFSET(RSMU, 0,
@@ -91,14 +88,12 @@ static inline uint32_t get_umc_6_reg_offset(struct amdgpu_device *adev,
 					    uint32_t umc_inst,
 					    uint32_t ch_inst)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	return adev->umc.channel_offs*ch_inst + UMC_6_INST_DIST*umc_inst;
 }
 
 static void umc_v6_1_clear_error_count_per_channel(struct amdgpu_device *adev,
 					uint32_t umc_reg_offset)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	uint32_t ecc_err_cnt_addr;
 	uint32_t ecc_err_cnt_sel, ecc_err_cnt_sel_addr;
 
@@ -149,7 +144,6 @@ static void umc_v6_1_clear_error_count_per_channel(struct amdgpu_device *adev,
 
 static void umc_v6_1_clear_error_count(struct amdgpu_device *adev)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	uint32_t umc_inst        = 0;
 	uint32_t ch_inst         = 0;
 	uint32_t umc_reg_offset  = 0;
@@ -176,7 +170,6 @@ static void umc_v6_1_query_correctable_error_count(struct amdgpu_device *adev,
 						   uint32_t umc_reg_offset,
 						   unsigned long *error_count)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	uint32_t ecc_err_cnt_sel, ecc_err_cnt_sel_addr;
 	uint32_t ecc_err_cnt, ecc_err_cnt_addr;
 	uint64_t mc_umc_status;
@@ -234,7 +227,6 @@ static void umc_v6_1_querry_uncorrectable_error_count(struct amdgpu_device *adev
 						      uint32_t umc_reg_offset,
 						      unsigned long *error_count)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	uint64_t mc_umc_status;
 	uint32_t mc_umc_status_addr;
 
@@ -262,7 +254,6 @@ static void umc_v6_1_querry_uncorrectable_error_count(struct amdgpu_device *adev
 static void umc_v6_1_query_ras_error_count(struct amdgpu_device *adev,
 					   void *ras_error_status)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 
 	uint32_t umc_inst        = 0;
@@ -307,7 +298,6 @@ static void umc_v6_1_query_error_address(struct amdgpu_device *adev,
 					 uint32_t ch_inst,
 					 uint32_t umc_inst)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	uint32_t lsb, mc_umc_status_addr;
 	uint64_t mc_umc_status, err_addr, retired_page, mc_umc_addrt0;
 	struct eeprom_table_record *err_rec;
@@ -379,7 +369,6 @@ static void umc_v6_1_query_error_address(struct amdgpu_device *adev,
 static void umc_v6_1_query_ras_error_address(struct amdgpu_device *adev,
 					     void *ras_error_status)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
 
 	uint32_t umc_inst        = 0;
@@ -418,7 +407,6 @@ static void umc_v6_1_query_ras_error_address(struct amdgpu_device *adev,
 static void umc_v6_1_err_cnt_init_per_channel(struct amdgpu_device *adev,
 					      uint32_t umc_reg_offset)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	uint32_t ecc_err_cnt_sel, ecc_err_cnt_sel_addr;
 	uint32_t ecc_err_cnt_addr;
 
@@ -456,7 +444,6 @@ static void umc_v6_1_err_cnt_init_per_channel(struct amdgpu_device *adev,
 
 static void umc_v6_1_err_cnt_init(struct amdgpu_device *adev)
 {
-    pr_info("umc_v6_1: called %s\n", __func__);
 	uint32_t umc_inst        = 0;
 	uint32_t ch_inst         = 0;
 	uint32_t umc_reg_offset  = 0;

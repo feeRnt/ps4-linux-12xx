@@ -47,7 +47,6 @@
 
 static void smu_v11_0_i2c_set_clock_gating(struct i2c_adapter *control, bool en)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	uint32_t reg = RREG32_SOC15(SMUIO, 0, mmSMUIO_PWRMGT);
 
@@ -76,7 +75,6 @@ static void smu_v11_0_i2c_set_clock_gating(struct i2c_adapter *control, bool en)
 
 static int smu_v11_0_i2c_enable(struct i2c_adapter *control, bool enable)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 
 	WREG32_SOC15(SMUIO, 0, mmCKSVII2C_IC_ENABLE, enable ? 1 : 0);
@@ -102,7 +100,6 @@ static int smu_v11_0_i2c_enable(struct i2c_adapter *control, bool enable)
 
 static void smu_v11_0_i2c_clear_status(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	/* do */
 	{
@@ -113,7 +110,6 @@ static void smu_v11_0_i2c_clear_status(struct i2c_adapter *control)
 
 static void smu_v11_0_i2c_configure(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	uint32_t reg = 0;
 
@@ -135,7 +131,6 @@ static void smu_v11_0_i2c_configure(struct i2c_adapter *control)
 
 static void smu_v11_0_i2c_set_clock(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 
 	/*
@@ -159,7 +154,6 @@ static void smu_v11_0_i2c_set_clock(struct i2c_adapter *control)
 
 static void smu_v11_0_i2c_set_address(struct i2c_adapter *control, u16 address)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 
 	/* The IC_TAR::IC_TAR field is 10-bits wide.
@@ -171,7 +165,6 @@ static void smu_v11_0_i2c_set_address(struct i2c_adapter *control, u16 address)
 
 static uint32_t smu_v11_0_i2c_poll_tx_status(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	uint32_t ret = I2C_OK;
 	uint32_t reg, reg_c_tx_abrt_source;
@@ -223,7 +216,6 @@ static uint32_t smu_v11_0_i2c_poll_tx_status(struct i2c_adapter *control)
 
 static uint32_t smu_v11_0_i2c_poll_rx_status(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	uint32_t ret = I2C_OK;
 	uint32_t reg_ic_status, reg_c_tx_abrt_source;
@@ -270,7 +262,6 @@ static uint32_t smu_v11_0_i2c_transmit(struct i2c_adapter *control,
 				       u16 address, u8 *data,
 				       u32 numbytes, u32 i2c_flag)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	u32 bytes_sent, reg, ret = I2C_OK;
 	unsigned long  timeout_counter;
@@ -369,7 +360,6 @@ static uint32_t smu_v11_0_i2c_receive(struct i2c_adapter *control,
 				      u16 address, u8 *data,
 				      u32 numbytes, u32 i2c_flag)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	uint32_t bytes_received, ret = I2C_OK;
 
@@ -441,7 +431,6 @@ static uint32_t smu_v11_0_i2c_receive(struct i2c_adapter *control,
 
 static void smu_v11_0_i2c_abort(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	uint32_t reg = 0;
 
@@ -458,7 +447,6 @@ static void smu_v11_0_i2c_abort(struct i2c_adapter *control)
 
 static bool smu_v11_0_i2c_activity_done(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 
 	const uint32_t IDLE_TIMEOUT = 1024;
@@ -497,7 +485,6 @@ static bool smu_v11_0_i2c_activity_done(struct i2c_adapter *control)
 
 static void smu_v11_0_i2c_init(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	int res;
 
 	/* Disable clock gating */
@@ -521,7 +508,6 @@ static void smu_v11_0_i2c_init(struct i2c_adapter *control)
 
 static void smu_v11_0_i2c_fini(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	u32 status, enable, en_stat;
 	int res;
@@ -557,7 +543,6 @@ static void smu_v11_0_i2c_fini(struct i2c_adapter *control)
 
 static bool smu_v11_0_i2c_bus_lock(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 
 	/* Send  PPSMC_MSG_RequestI2CBus */
@@ -569,7 +554,6 @@ static bool smu_v11_0_i2c_bus_lock(struct i2c_adapter *control)
 
 static bool smu_v11_0_i2c_bus_unlock(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 
 	/* Send  PPSMC_MSG_ReleaseI2CBus */
@@ -584,7 +568,6 @@ static bool smu_v11_0_i2c_bus_unlock(struct i2c_adapter *control)
 static uint32_t smu_v11_0_i2c_read_data(struct i2c_adapter *control,
 					struct i2c_msg *msg, uint32_t i2c_flag)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	uint32_t  ret;
 
 	ret = smu_v11_0_i2c_receive(control, msg->addr, msg->buf, msg->len, i2c_flag);
@@ -598,7 +581,6 @@ static uint32_t smu_v11_0_i2c_read_data(struct i2c_adapter *control,
 static uint32_t smu_v11_0_i2c_write_data(struct i2c_adapter *control,
 					struct i2c_msg *msg, uint32_t i2c_flag)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	uint32_t  ret;
 
 	ret = smu_v11_0_i2c_transmit(control, msg->addr, msg->buf, msg->len, i2c_flag);
@@ -612,7 +594,6 @@ static uint32_t smu_v11_0_i2c_write_data(struct i2c_adapter *control,
 
 static void lock_bus(struct i2c_adapter *i2c, unsigned int flags)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(i2c);
 
 	mutex_lock(&adev->pm.smu_i2c_mutex);
@@ -624,14 +605,12 @@ static void lock_bus(struct i2c_adapter *i2c, unsigned int flags)
 
 static int trylock_bus(struct i2c_adapter *i2c, unsigned int flags)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	WARN_ONCE(1, "This operation not supposed to run in atomic context!");
 	return false;
 }
 
 static void unlock_bus(struct i2c_adapter *i2c, unsigned int flags)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(i2c);
 
 	if (!smu_v11_0_i2c_bus_unlock(i2c))
@@ -650,7 +629,6 @@ static const struct i2c_lock_operations smu_v11_0_i2c_i2c_lock_ops = {
 static int smu_v11_0_i2c_xfer(struct i2c_adapter *i2c_adap,
 			      struct i2c_msg *msg, int num)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	int i, ret;
 	u16 addr, dir;
 
@@ -716,7 +694,6 @@ static int smu_v11_0_i2c_xfer(struct i2c_adapter *i2c_adap,
 
 static u32 smu_v11_0_i2c_func(struct i2c_adapter *adap)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	return I2C_FUNC_I2C | I2C_FUNC_SMBUS_EMUL;
 }
 
@@ -731,7 +708,6 @@ static const struct i2c_adapter_quirks smu_v11_0_i2c_control_quirks = {
 
 int smu_v11_0_i2c_control_init(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	int res;
 
@@ -753,7 +729,6 @@ int smu_v11_0_i2c_control_init(struct i2c_adapter *control)
 
 void smu_v11_0_i2c_control_fini(struct i2c_adapter *control)
 {
-    pr_info("smu_v11_0_i2c: called %s\n", __func__);
 	i2c_del_adapter(control);
 }
 

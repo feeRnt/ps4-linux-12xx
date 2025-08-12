@@ -27,7 +27,6 @@
 int amdgpu_reset_add_handler(struct amdgpu_reset_control *reset_ctl,
 			     struct amdgpu_reset_handler *handler)
 {
-    pr_info("amdgpu_reset: called %s\n", __func__);
 	/* TODO: Check if handler exists? */
 	list_add_tail(&handler->handler_list, &reset_ctl->reset_handlers);
 	return 0;
@@ -35,7 +34,6 @@ int amdgpu_reset_add_handler(struct amdgpu_reset_control *reset_ctl,
 
 int amdgpu_reset_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_reset: called %s\n", __func__);
 	int ret = 0;
 
 	switch (adev->asic_type) {
@@ -51,7 +49,6 @@ int amdgpu_reset_init(struct amdgpu_device *adev)
 
 int amdgpu_reset_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_reset: called %s\n", __func__);
 	int ret = 0;
 
 	switch (adev->asic_type) {
@@ -68,7 +65,6 @@ int amdgpu_reset_fini(struct amdgpu_device *adev)
 int amdgpu_reset_prepare_hwcontext(struct amdgpu_device *adev,
 				   struct amdgpu_reset_context *reset_context)
 {
-    pr_info("amdgpu_reset: called %s\n", __func__);
 	struct amdgpu_reset_handler *reset_handler = NULL;
 
 	if (adev->reset_cntl && adev->reset_cntl->get_reset_handler)
@@ -84,7 +80,6 @@ int amdgpu_reset_prepare_hwcontext(struct amdgpu_device *adev,
 int amdgpu_reset_perform_reset(struct amdgpu_device *adev,
 			       struct amdgpu_reset_context *reset_context)
 {
-    pr_info("amdgpu_reset: called %s\n", __func__);
 	int ret;
 	struct amdgpu_reset_handler *reset_handler = NULL;
 

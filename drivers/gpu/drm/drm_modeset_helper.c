@@ -48,7 +48,6 @@
  */
 void drm_helper_move_panel_connectors_to_head(struct drm_device *dev)
 {
-    pr_info("drm_modeset_helper: called %s\n", __func__);
 	struct drm_connector *connector, *tmp;
 	struct list_head panel_list;
 
@@ -81,7 +80,6 @@ void drm_helper_mode_fill_fb_struct(struct drm_device *dev,
 				    struct drm_framebuffer *fb,
 				    const struct drm_mode_fb_cmd2 *mode_cmd)
 {
-    pr_info("drm_modeset_helper: called %s\n", __func__);
 	int i;
 
 	fb->dev = dev;
@@ -111,7 +109,6 @@ static const uint32_t safe_modeset_formats[] = {
 
 static struct drm_plane *create_primary_plane(struct drm_device *dev)
 {
-    pr_info("drm_modeset_helper: called %s\n", __func__);
 	struct drm_plane *primary;
 	int ret;
 
@@ -172,7 +169,6 @@ static struct drm_plane *create_primary_plane(struct drm_device *dev)
 int drm_crtc_init(struct drm_device *dev, struct drm_crtc *crtc,
 		  const struct drm_crtc_funcs *funcs)
 {
-    pr_info("drm_modeset_helper: called %s\n", __func__);
 	struct drm_plane *primary;
 
 	primary = create_primary_plane(dev);
@@ -198,7 +194,6 @@ EXPORT_SYMBOL(drm_crtc_init);
  */
 int drm_mode_config_helper_suspend(struct drm_device *dev)
 {
-    pr_info("drm_modeset_helper: called %s\n", __func__);
 	struct drm_atomic_state *state;
 
 	if (!dev)
@@ -235,7 +230,6 @@ EXPORT_SYMBOL(drm_mode_config_helper_suspend);
  */
 int drm_mode_config_helper_resume(struct drm_device *dev)
 {
-    pr_info("drm_modeset_helper: called %s\n", __func__);
 	int ret;
 
 	if (!dev)

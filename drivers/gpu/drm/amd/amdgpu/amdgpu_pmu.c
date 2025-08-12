@@ -60,7 +60,6 @@ struct amdgpu_pmu_entry {
 static ssize_t amdgpu_pmu_event_show(struct device *dev,
 				struct device_attribute *attr, char *buf)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	struct amdgpu_pmu_event_attribute *amdgpu_pmu_attr;
 
 	amdgpu_pmu_attr = container_of(attr, struct amdgpu_pmu_event_attribute,
@@ -209,7 +208,6 @@ static struct amdgpu_pmu_config arcturus_config = {
 /* initialize perf counter */
 static int amdgpu_perf_event_init(struct perf_event *event)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	struct hw_perf_event *hwc = &event->hw;
 
 	/* test the event attr type check for PMU enumeration */
@@ -226,7 +224,6 @@ static int amdgpu_perf_event_init(struct perf_event *event)
 /* start perf counter */
 static void amdgpu_perf_start(struct perf_event *event, int flags)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	struct hw_perf_event *hwc = &event->hw;
 	struct amdgpu_pmu_entry *pe = container_of(event->pmu,
 						  struct amdgpu_pmu_entry,
@@ -265,7 +262,6 @@ static void amdgpu_perf_start(struct perf_event *event, int flags)
 /* read perf counter */
 static void amdgpu_perf_read(struct perf_event *event)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	struct hw_perf_event *hwc = &event->hw;
 	struct amdgpu_pmu_entry *pe = container_of(event->pmu,
 						  struct amdgpu_pmu_entry,
@@ -293,7 +289,6 @@ static void amdgpu_perf_read(struct perf_event *event)
 /* stop perf counter */
 static void amdgpu_perf_stop(struct perf_event *event, int flags)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	struct hw_perf_event *hwc = &event->hw;
 	struct amdgpu_pmu_entry *pe = container_of(event->pmu,
 						  struct amdgpu_pmu_entry,
@@ -325,7 +320,6 @@ static void amdgpu_perf_stop(struct perf_event *event, int flags)
 /* add perf counter */
 static int amdgpu_perf_add(struct perf_event *event, int flags)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	struct hw_perf_event *hwc = &event->hw;
 	int retval = 0, target_cntr;
 	struct amdgpu_pmu_entry *pe = container_of(event->pmu,
@@ -373,7 +367,6 @@ static int amdgpu_perf_add(struct perf_event *event, int flags)
 /* delete perf counter  */
 static void amdgpu_perf_del(struct perf_event *event, int flags)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	struct hw_perf_event *hwc = &event->hw;
 	struct amdgpu_pmu_entry *pe = container_of(event->pmu,
 						  struct amdgpu_pmu_entry,
@@ -402,7 +395,6 @@ static void amdgpu_pmu_create_event_attrs_by_type(
 				int e_offset,
 				unsigned int type)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	int i;
 
 	pmu_attr += s_offset;
@@ -424,7 +416,6 @@ static void amdgpu_pmu_create_attrs(struct attribute_group *attr_group,
 				struct amdgpu_pmu_attr events[],
 				int num_events)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	amdgpu_pmu_create_event_attrs_by_type(attr_group, pmu_attr, events, 0,
 				num_events, AMDGPU_PMU_EVENT_CONFIG_TYPE_NONE);
 }
@@ -437,7 +428,6 @@ static int amdgpu_pmu_alloc_pmu_attrs(
 				struct amdgpu_pmu_event_attribute **evt_attr,
 				struct amdgpu_pmu_config *config)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	*fmt_attr = kcalloc(config->num_formats, sizeof(**fmt_attr),
 								GFP_KERNEL);
 
@@ -475,7 +465,6 @@ err_fmt_attr_grp:
 static int init_pmu_entry_by_type_and_add(struct amdgpu_pmu_entry *pmu_entry,
 			struct amdgpu_pmu_config *config)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	const struct attribute_group *attr_groups[] = {
 		&pmu_entry->fmt_attr_group,
 		&pmu_entry->evt_attr_group,
@@ -569,7 +558,6 @@ err_out:
 /* destroy all pmu data associated with target device */
 void amdgpu_pmu_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	struct amdgpu_pmu_entry *pe, *temp;
 
 	list_for_each_entry_safe(pe, temp, &amdgpu_pmu_list, entry) {
@@ -591,7 +579,6 @@ static struct amdgpu_pmu_entry *create_pmu_entry(struct amdgpu_device *adev,
 						char *pmu_type_name,
 						char *pmu_file_prefix)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	struct amdgpu_pmu_entry *pmu_entry;
 
 	pmu_entry = kzalloc(sizeof(struct amdgpu_pmu_entry), GFP_KERNEL);
@@ -614,7 +601,6 @@ static struct amdgpu_pmu_entry *create_pmu_entry(struct amdgpu_device *adev,
 /* init amdgpu_pmu */
 int amdgpu_pmu_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_pmu: called %s\n", __func__);
 	int ret = 0;
 	struct amdgpu_pmu_entry *pmu_entry, *pmu_entry_df;
 

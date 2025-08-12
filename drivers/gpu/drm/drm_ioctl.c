@@ -116,7 +116,6 @@
 int drm_getunique(struct drm_device *dev, void *data,
 		  struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	struct drm_unique *u = data;
 	struct drm_master *master;
 
@@ -138,7 +137,6 @@ static void
 drm_unset_busid(struct drm_device *dev,
 		struct drm_master *master)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	kfree(master->unique);
 	master->unique = NULL;
 	master->unique_len = 0;
@@ -146,7 +144,6 @@ drm_unset_busid(struct drm_device *dev,
 
 static int drm_set_busid(struct drm_device *dev, struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	struct drm_master *master = file_priv->master;
 	int ret;
 
@@ -185,7 +182,6 @@ static int drm_set_busid(struct drm_device *dev, struct drm_file *file_priv)
 int drm_getclient(struct drm_device *dev, void *data,
 		  struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	struct drm_client *client = data;
 
 	/*
@@ -225,7 +221,6 @@ int drm_getclient(struct drm_device *dev, void *data,
 static int drm_getstats(struct drm_device *dev, void *data,
 		 struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	struct drm_stats *stats = data;
 
 	/* Clear stats to prevent userspace from eating its stack garbage. */
@@ -239,7 +234,6 @@ static int drm_getstats(struct drm_device *dev, void *data,
  */
 static int drm_getcap(struct drm_device *dev, void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	struct drm_get_cap *req = data;
 	struct drm_crtc *crtc;
 
@@ -320,7 +314,6 @@ static int drm_getcap(struct drm_device *dev, void *data, struct drm_file *file_
 static int
 drm_setclientcap(struct drm_device *dev, void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	struct drm_set_client_cap *req = data;
 
 	/* No render-only settable capabilities for now */
@@ -389,7 +382,6 @@ drm_setclientcap(struct drm_device *dev, void *data, struct drm_file *file_priv)
  */
 static int drm_setversion(struct drm_device *dev, void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	struct drm_set_version *sv = data;
 	int if_version, retcode = 0;
 
@@ -448,7 +440,6 @@ done:
 int drm_noop(struct drm_device *dev, void *data,
 	     struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	DRM_DEBUG("\n");
 	return 0;
 }
@@ -472,7 +463,6 @@ EXPORT_SYMBOL(drm_noop);
 int drm_invalid_op(struct drm_device *dev, void *data,
 		   struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	return -EINVAL;
 }
 EXPORT_SYMBOL(drm_invalid_op);
@@ -482,7 +472,6 @@ EXPORT_SYMBOL(drm_invalid_op);
  */
 static int drm_copy_field(char __user *buf, size_t *buf_len, const char *value)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	int len;
 
 	/* don't overflow userbuf */
@@ -515,7 +504,6 @@ static int drm_copy_field(char __user *buf, size_t *buf_len, const char *value)
 int drm_version(struct drm_device *dev, void *data,
 		       struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	struct drm_version *version = data;
 	int err;
 
@@ -548,7 +536,6 @@ int drm_version(struct drm_device *dev, void *data,
  */
 int drm_ioctl_permit(u32 flags, struct drm_file *file_priv)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	/* ROOT_ONLY is only for CAP_SYS_ADMIN */
 	if (unlikely((flags & DRM_ROOT_ONLY) && !capable(CAP_SYS_ADMIN)))
 		return -EACCES;
@@ -791,7 +778,6 @@ static const struct drm_ioctl_desc drm_ioctls[] = {
 long drm_ioctl_kernel(struct file *file, drm_ioctl_t *func, void *kdata,
 		      u32 flags)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	struct drm_file *file_priv = file->private_data;
 	struct drm_device *dev = file_priv->minor->dev;
 	int retcode;
@@ -832,7 +818,6 @@ EXPORT_SYMBOL(drm_ioctl_kernel);
 long drm_ioctl(struct file *filp,
 	      unsigned int cmd, unsigned long arg)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	struct drm_file *file_priv = filp->private_data;
 	struct drm_device *dev;
 	const struct drm_ioctl_desc *ioctl = NULL;
@@ -944,7 +929,6 @@ EXPORT_SYMBOL(drm_ioctl);
  */
 bool drm_ioctl_flags(unsigned int nr, unsigned int *flags)
 {
-    pr_info("drm_ioctl: called %s\n", __func__);
 	if (nr >= DRM_COMMAND_BASE && nr < DRM_COMMAND_END)
 		return false;
 

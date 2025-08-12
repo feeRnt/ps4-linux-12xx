@@ -34,14 +34,12 @@ struct amdgpu_gtt_node {
 static inline struct amdgpu_gtt_mgr *
 to_gtt_mgr(struct ttm_resource_manager *man)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	return container_of(man, struct amdgpu_gtt_mgr, manager);
 }
 
 static inline struct amdgpu_gtt_node *
 to_amdgpu_gtt_node(struct ttm_resource *res)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	return container_of(res, struct amdgpu_gtt_node, base.base);
 }
 
@@ -57,7 +55,6 @@ static ssize_t amdgpu_mem_info_gtt_total_show(struct device *dev,
 					      struct device_attribute *attr,
 					      char *buf)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	struct ttm_resource_manager *man;
@@ -78,7 +75,6 @@ static ssize_t amdgpu_mem_info_gtt_used_show(struct device *dev,
 					     struct device_attribute *attr,
 					     char *buf)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	struct ttm_resource_manager *man;
@@ -111,7 +107,6 @@ const struct attribute_group amdgpu_gtt_mgr_attr_group = {
  */
 bool amdgpu_gtt_mgr_has_gart_addr(struct ttm_resource *res)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	struct amdgpu_gtt_node *node = to_amdgpu_gtt_node(res);
 
 	return drm_mm_node_allocated(&node->base.mm_nodes[0]);
@@ -132,7 +127,6 @@ static int amdgpu_gtt_mgr_new(struct ttm_resource_manager *man,
 			      const struct ttm_place *place,
 			      struct ttm_resource **res)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	struct amdgpu_gtt_mgr *mgr = to_gtt_mgr(man);
 	uint32_t num_pages = PFN_UP(tbo->base.size);
 	struct amdgpu_gtt_node *node;
@@ -195,7 +189,6 @@ err_out:
 static void amdgpu_gtt_mgr_del(struct ttm_resource_manager *man,
 			       struct ttm_resource *res)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	struct amdgpu_gtt_node *node = to_amdgpu_gtt_node(res);
 	struct amdgpu_gtt_mgr *mgr = to_gtt_mgr(man);
 
@@ -219,7 +212,6 @@ static void amdgpu_gtt_mgr_del(struct ttm_resource_manager *man,
  */
 uint64_t amdgpu_gtt_mgr_usage(struct ttm_resource_manager *man)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	struct amdgpu_gtt_mgr *mgr = to_gtt_mgr(man);
 
 	return atomic64_read(&mgr->used) * PAGE_SIZE;
@@ -234,7 +226,6 @@ uint64_t amdgpu_gtt_mgr_usage(struct ttm_resource_manager *man)
  */
 int amdgpu_gtt_mgr_recover(struct ttm_resource_manager *man)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	struct amdgpu_gtt_mgr *mgr = to_gtt_mgr(man);
 	struct amdgpu_device *adev;
 	struct amdgpu_gtt_node *node;
@@ -267,7 +258,6 @@ int amdgpu_gtt_mgr_recover(struct ttm_resource_manager *man)
 static void amdgpu_gtt_mgr_debug(struct ttm_resource_manager *man,
 				 struct drm_printer *printer)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	struct amdgpu_gtt_mgr *mgr = to_gtt_mgr(man);
 
 	spin_lock(&mgr->lock);
@@ -294,7 +284,6 @@ static const struct ttm_resource_manager_func amdgpu_gtt_mgr_func = {
  */
 int amdgpu_gtt_mgr_init(struct amdgpu_device *adev, uint64_t gtt_size)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	struct amdgpu_gtt_mgr *mgr = &adev->mman.gtt_mgr;
 	struct ttm_resource_manager *man = &mgr->manager;
 	uint64_t start, size;
@@ -325,7 +314,6 @@ int amdgpu_gtt_mgr_init(struct amdgpu_device *adev, uint64_t gtt_size)
  */
 void amdgpu_gtt_mgr_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gtt_mgr: called %s\n", __func__);
 	struct amdgpu_gtt_mgr *mgr = &adev->mman.gtt_mgr;
 	struct ttm_resource_manager *man = &mgr->manager;
 	int ret;

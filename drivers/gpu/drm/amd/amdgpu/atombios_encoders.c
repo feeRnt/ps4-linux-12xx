@@ -40,7 +40,6 @@
 u8
 amdgpu_atombios_encoder_get_backlight_level_from_reg(struct amdgpu_device *adev)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	u8 backlight_level;
 	u32 bios_2_scratch;
 
@@ -56,7 +55,6 @@ void
 amdgpu_atombios_encoder_set_backlight_level_to_reg(struct amdgpu_device *adev,
 					    u8 backlight_level)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	u32 bios_2_scratch;
 
 	bios_2_scratch = RREG32(mmBIOS_SCRATCH_2);
@@ -71,7 +69,6 @@ amdgpu_atombios_encoder_set_backlight_level_to_reg(struct amdgpu_device *adev,
 u8
 amdgpu_atombios_encoder_get_backlight_level(struct amdgpu_encoder *amdgpu_encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = amdgpu_encoder->base.dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
@@ -85,7 +82,6 @@ void
 amdgpu_atombios_encoder_set_backlight_level(struct amdgpu_encoder *amdgpu_encoder,
 				     u8 level)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_encoder *encoder = &amdgpu_encoder->base;
 	struct drm_device *dev = amdgpu_encoder->base.dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -126,7 +122,6 @@ amdgpu_atombios_encoder_set_backlight_level(struct amdgpu_encoder *amdgpu_encode
 
 static u8 amdgpu_atombios_encoder_backlight_level(struct backlight_device *bd)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	u8 level;
 
 	/* Convert brightness to hardware level */
@@ -142,7 +137,6 @@ static u8 amdgpu_atombios_encoder_backlight_level(struct backlight_device *bd)
 
 static int amdgpu_atombios_encoder_update_backlight_status(struct backlight_device *bd)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct amdgpu_backlight_privdata *pdata = bl_get_data(bd);
 	struct amdgpu_encoder *amdgpu_encoder = pdata->encoder;
 
@@ -155,7 +149,6 @@ static int amdgpu_atombios_encoder_update_backlight_status(struct backlight_devi
 static int
 amdgpu_atombios_encoder_get_backlight_brightness(struct backlight_device *bd)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct amdgpu_backlight_privdata *pdata = bl_get_data(bd);
 	struct amdgpu_encoder *amdgpu_encoder = pdata->encoder;
 	struct drm_device *dev = amdgpu_encoder->base.dev;
@@ -172,7 +165,6 @@ static const struct backlight_ops amdgpu_atombios_encoder_backlight_ops = {
 void amdgpu_atombios_encoder_init_backlight(struct amdgpu_encoder *amdgpu_encoder,
 				     struct drm_connector *drm_connector)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = amdgpu_encoder->base.dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct backlight_device *bd;
@@ -233,7 +225,6 @@ error:
 void
 amdgpu_atombios_encoder_fini_backlight(struct amdgpu_encoder *amdgpu_encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = amdgpu_encoder->base.dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct backlight_device *bd = NULL;
@@ -264,19 +255,16 @@ amdgpu_atombios_encoder_fini_backlight(struct amdgpu_encoder *amdgpu_encoder)
 
 void amdgpu_atombios_encoder_init_backlight(struct amdgpu_encoder *encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 }
 
 void amdgpu_atombios_encoder_fini_backlight(struct amdgpu_encoder *encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 }
 
 #endif
 
 bool amdgpu_atombios_encoder_is_digital(struct drm_encoder *encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	switch (amdgpu_encoder->encoder_id) {
 	case ENCODER_OBJECT_ID_INTERNAL_KLDSCP_DVO1:
@@ -294,7 +282,6 @@ bool amdgpu_atombios_encoder_mode_fixup(struct drm_encoder *encoder,
 				 const struct drm_display_mode *mode,
 				 struct drm_display_mode *adjusted_mode)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 
 	/* set the active encoder to connector routing */
@@ -328,7 +315,6 @@ bool amdgpu_atombios_encoder_mode_fixup(struct drm_encoder *encoder,
 static void
 amdgpu_atombios_encoder_setup_dac(struct drm_encoder *encoder, int action)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -358,7 +344,6 @@ amdgpu_atombios_encoder_setup_dac(struct drm_encoder *encoder, int action)
 
 static u8 amdgpu_atombios_encoder_get_bpc(struct drm_encoder *encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	int bpc = 8;
 
 	if (encoder->crtc) {
@@ -393,7 +378,6 @@ union dvo_encoder_control {
 static void
 amdgpu_atombios_encoder_setup_dvo(struct drm_encoder *encoder, int action)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -456,7 +440,6 @@ amdgpu_atombios_encoder_setup_dvo(struct drm_encoder *encoder, int action)
 
 int amdgpu_atombios_encoder_get_encoder_mode(struct drm_encoder *encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct drm_connector *connector;
 	struct amdgpu_connector *amdgpu_connector;
@@ -584,7 +567,6 @@ void
 amdgpu_atombios_encoder_setup_dig_encoder(struct drm_encoder *encoder,
 				   int action, int panel_mode)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -774,7 +756,6 @@ void
 amdgpu_atombios_encoder_setup_dig_transmitter(struct drm_encoder *encoder, int action,
 					      uint8_t lane_num, uint8_t lane_set)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1190,7 +1171,6 @@ bool
 amdgpu_atombios_encoder_set_edp_panel_power(struct drm_connector *connector,
 				     int action)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct drm_device *dev = amdgpu_connector->base.dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
@@ -1239,7 +1219,6 @@ amdgpu_atombios_encoder_setup_external_encoder(struct drm_encoder *encoder,
 					struct drm_encoder *ext_encoder,
 					int action)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1343,7 +1322,6 @@ amdgpu_atombios_encoder_setup_external_encoder(struct drm_encoder *encoder,
 static void
 amdgpu_atombios_encoder_setup_dig(struct drm_encoder *encoder, int action)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 	struct drm_encoder *ext_encoder = amdgpu_get_external_encoder(encoder);
 	struct amdgpu_encoder_atom_dig *dig = amdgpu_encoder->enc_priv;
@@ -1423,7 +1401,6 @@ amdgpu_atombios_encoder_setup_dig(struct drm_encoder *encoder, int action)
 void
 amdgpu_atombios_encoder_dpms(struct drm_encoder *encoder, int mode)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
 
 	DRM_DEBUG_KMS("encoder dpms %d to mode %d, devices %08x, active_devices %08x\n",
@@ -1483,7 +1460,6 @@ union crtc_source_param {
 void
 amdgpu_atombios_encoder_set_crtc_source(struct drm_encoder *encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1692,7 +1668,6 @@ amdgpu_atombios_encoder_set_crtc_source(struct drm_encoder *encoder)
 void
 amdgpu_atombios_encoder_init_dig(struct amdgpu_device *adev)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = adev_to_drm(adev);
 	struct drm_encoder *encoder;
 
@@ -1720,7 +1695,6 @@ static bool
 amdgpu_atombios_encoder_dac_load_detect(struct drm_encoder *encoder,
 				 struct drm_connector *connector)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1771,7 +1745,6 @@ enum drm_connector_status
 amdgpu_atombios_encoder_dac_detect(struct drm_encoder *encoder,
 			    struct drm_connector *connector)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1811,7 +1784,6 @@ enum drm_connector_status
 amdgpu_atombios_encoder_dig_detect(struct drm_encoder *encoder,
 			    struct drm_connector *connector)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);
@@ -1856,7 +1828,6 @@ amdgpu_atombios_encoder_dig_detect(struct drm_encoder *encoder,
 void
 amdgpu_atombios_encoder_setup_ext_encoder_ddc(struct drm_encoder *encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_encoder *ext_encoder = amdgpu_get_external_encoder(encoder);
 
 	if (ext_encoder)
@@ -1871,7 +1842,6 @@ amdgpu_atombios_encoder_set_bios_scratch_regs(struct drm_connector *connector,
 				       struct drm_encoder *encoder,
 				       bool connected)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector =
@@ -2023,7 +1993,6 @@ union lvds_info {
 struct amdgpu_encoder_atom_dig *
 amdgpu_atombios_encoder_get_lcd_info(struct amdgpu_encoder *encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	struct drm_device *dev = encoder->base.dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_mode_info *mode_info = &adev->mode_info;
@@ -2164,7 +2133,6 @@ amdgpu_atombios_encoder_get_lcd_info(struct amdgpu_encoder *encoder)
 struct amdgpu_encoder_atom_dig *
 amdgpu_atombios_encoder_get_dig_info(struct amdgpu_encoder *amdgpu_encoder)
 {
-    pr_info("atombios_encoders: called %s\n", __func__);
 	int encoder_enum = (amdgpu_encoder->encoder_enum & ENUM_ID_MASK) >> ENUM_ID_SHIFT;
 	struct amdgpu_encoder_atom_dig *dig = kzalloc(sizeof(struct amdgpu_encoder_atom_dig), GFP_KERNEL);
 

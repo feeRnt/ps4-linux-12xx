@@ -98,7 +98,6 @@ static void nbio_v7_4_query_ras_error_count(struct amdgpu_device *adev,
 
 static void nbio_v7_4_remap_hdp_registers(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	WREG32_SOC15(NBIO, 0, mmREMAP_HDP_MEM_FLUSH_CNTL,
 		adev->rmmio_remap.reg_offset + KFD_MMIO_REMAP_HDP_MEM_FLUSH_CNTL);
 	WREG32_SOC15(NBIO, 0, mmREMAP_HDP_REG_FLUSH_CNTL,
@@ -107,7 +106,6 @@ static void nbio_v7_4_remap_hdp_registers(struct amdgpu_device *adev)
 
 static u32 nbio_v7_4_get_rev_id(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	u32 tmp;
 
 	if (adev->asic_type == CHIP_ALDEBARAN)
@@ -123,7 +121,6 @@ static u32 nbio_v7_4_get_rev_id(struct amdgpu_device *adev)
 
 static void nbio_v7_4_mc_access_enable(struct amdgpu_device *adev, bool enable)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	if (enable)
 		WREG32_SOC15(NBIO, 0, mmBIF_FB_EN,
 			BIF_FB_EN__FB_READ_EN_MASK | BIF_FB_EN__FB_WRITE_EN_MASK);
@@ -133,14 +130,12 @@ static void nbio_v7_4_mc_access_enable(struct amdgpu_device *adev, bool enable)
 
 static u32 nbio_v7_4_get_memsize(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	return RREG32_SOC15(NBIO, 0, mmRCC_CONFIG_MEMSIZE);
 }
 
 static void nbio_v7_4_sdma_doorbell_range(struct amdgpu_device *adev, int instance,
 			bool use_doorbell, int doorbell_index, int doorbell_size)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	u32 reg, doorbell_range;
 
 	if (instance < 2) {
@@ -182,7 +177,6 @@ static void nbio_v7_4_sdma_doorbell_range(struct amdgpu_device *adev, int instan
 static void nbio_v7_4_vcn_doorbell_range(struct amdgpu_device *adev, bool use_doorbell,
 					 int doorbell_index, int instance)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	u32 reg;
 	u32 doorbell_range;
 
@@ -212,14 +206,12 @@ static void nbio_v7_4_vcn_doorbell_range(struct amdgpu_device *adev, bool use_do
 static void nbio_v7_4_enable_doorbell_aperture(struct amdgpu_device *adev,
 					       bool enable)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	WREG32_FIELD15(NBIO, 0, RCC_DOORBELL_APER_EN, BIF_DOORBELL_APER_EN, enable ? 1 : 0);
 }
 
 static void nbio_v7_4_enable_doorbell_selfring_aperture(struct amdgpu_device *adev,
 							bool enable)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	u32 tmp = 0;
 
 	if (enable) {
@@ -239,7 +231,6 @@ static void nbio_v7_4_enable_doorbell_selfring_aperture(struct amdgpu_device *ad
 static void nbio_v7_4_ih_doorbell_range(struct amdgpu_device *adev,
 					bool use_doorbell, int doorbell_index)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	u32 ih_doorbell_range = RREG32_SOC15(NBIO, 0 , mmBIF_IH_DOORBELL_RANGE);
 
 	if (use_doorbell) {
@@ -255,14 +246,12 @@ static void nbio_v7_4_ih_doorbell_range(struct amdgpu_device *adev,
 static void nbio_v7_4_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 						       bool enable)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	//TODO: Add support for v7.4
 }
 
 static void nbio_v7_4_update_medium_grain_light_sleep(struct amdgpu_device *adev,
 						      bool enable)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	uint32_t def, data;
 
 	def = data = RREG32_PCIE(smnPCIE_CNTL2);
@@ -283,7 +272,6 @@ static void nbio_v7_4_update_medium_grain_light_sleep(struct amdgpu_device *adev
 static void nbio_v7_4_get_clockgating_state(struct amdgpu_device *adev,
 					    u32 *flags)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	int data;
 
 	/* AMD_CG_SUPPORT_BIF_MGCG */
@@ -299,7 +287,6 @@ static void nbio_v7_4_get_clockgating_state(struct amdgpu_device *adev,
 
 static void nbio_v7_4_ih_control(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	u32 interrupt_cntl;
 
 	/* setup interrupt control */
@@ -316,25 +303,21 @@ static void nbio_v7_4_ih_control(struct amdgpu_device *adev)
 
 static u32 nbio_v7_4_get_hdp_flush_req_offset(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	return SOC15_REG_OFFSET(NBIO, 0, mmGPU_HDP_FLUSH_REQ);
 }
 
 static u32 nbio_v7_4_get_hdp_flush_done_offset(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	return SOC15_REG_OFFSET(NBIO, 0, mmGPU_HDP_FLUSH_DONE);
 }
 
 static u32 nbio_v7_4_get_pcie_index_offset(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	return SOC15_REG_OFFSET(NBIO, 0, mmPCIE_INDEX2);
 }
 
 static u32 nbio_v7_4_get_pcie_data_offset(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	return SOC15_REG_OFFSET(NBIO, 0, mmPCIE_DATA2);
 }
 
@@ -361,13 +344,11 @@ const struct nbio_hdp_flush_reg nbio_v7_4_hdp_flush_reg = {
 
 static void nbio_v7_4_init_registers(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 
 }
 
 static void nbio_v7_4_handle_ras_controller_intr_no_bifring(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	uint32_t bif_doorbell_intr_cntl;
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, adev->nbio.ras_if);
 	struct ras_err_data err_data = {0, 0, 0, NULL};
@@ -427,7 +408,6 @@ static void nbio_v7_4_handle_ras_controller_intr_no_bifring(struct amdgpu_device
 
 static void nbio_v7_4_handle_ras_err_event_athub_intr_no_bifring(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	uint32_t bif_doorbell_intr_cntl;
 
 	if (adev->asic_type == CHIP_ALDEBARAN)
@@ -457,7 +437,6 @@ static int nbio_v7_4_set_ras_controller_irq_state(struct amdgpu_device *adev,
 						  unsigned type,
 						  enum amdgpu_interrupt_state state)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	/* The ras_controller_irq enablement should be done in psp bl when it
 	 * tries to enable ras feature. Driver only need to set the correct interrupt
 	 * vector for bare-metal and sriov use case respectively
@@ -490,7 +469,6 @@ static int nbio_v7_4_process_ras_controller_irq(struct amdgpu_device *adev,
 						struct amdgpu_irq_src *source,
 						struct amdgpu_iv_entry *entry)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	/* By design, the ih cookie for ras_controller_irq should be written
 	 * to BIFring instead of general iv ring. However, due to known bif ring
 	 * hw bug, it has to be disabled. There is no chance the process function
@@ -504,7 +482,6 @@ static int nbio_v7_4_set_ras_err_event_athub_irq_state(struct amdgpu_device *ade
 						       unsigned type,
 						       enum amdgpu_interrupt_state state)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	/* The ras_controller_irq enablement should be done in psp bl when it
 	 * tries to enable ras feature. Driver only need to set the correct interrupt
 	 * vector for bare-metal and sriov use case respectively
@@ -536,7 +513,6 @@ static int nbio_v7_4_process_err_event_athub_irq(struct amdgpu_device *adev,
 						 struct amdgpu_irq_src *source,
 						 struct amdgpu_iv_entry *entry)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	/* By design, the ih cookie for err_event_athub_irq should be written
 	 * to BIFring instead of general iv ring. However, due to known bif ring
 	 * hw bug, it has to be disabled. There is no chance the process function
@@ -557,7 +533,6 @@ static const struct amdgpu_irq_src_funcs nbio_v7_4_ras_err_event_athub_irq_funcs
 
 static int nbio_v7_4_init_ras_controller_interrupt (struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	int r;
 
 	/* init the irq funcs */
@@ -575,7 +550,6 @@ static int nbio_v7_4_init_ras_controller_interrupt (struct amdgpu_device *adev)
 
 static int nbio_v7_4_init_ras_err_event_athub_interrupt (struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 
 	int r;
 
@@ -597,7 +571,6 @@ static int nbio_v7_4_init_ras_err_event_athub_interrupt (struct amdgpu_device *a
 static void nbio_v7_4_query_ras_error_count(struct amdgpu_device *adev,
 					void *ras_error_status)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	uint32_t global_sts, central_sts, int_eoi, parity_sts;
 	uint32_t corr, fatal, non_fatal;
 	struct ras_err_data *err_data = (struct ras_err_data *)ras_error_status;
@@ -639,7 +612,6 @@ static void nbio_v7_4_query_ras_error_count(struct amdgpu_device *adev,
 static void nbio_v7_4_enable_doorbell_interrupt(struct amdgpu_device *adev,
 						bool enable)
 {
-        //pr_info("nbio_v7_4: called %s\n", __func__);
 	if (adev->asic_type == CHIP_ALDEBARAN)
 		WREG32_FIELD15(NBIO, 0, BIF_DOORBELL_INT_CNTL_ALDE,
 		       DOORBELL_INTERRUPT_DISABLE, enable ? 0 : 1);
@@ -660,7 +632,6 @@ const struct amdgpu_nbio_ras_funcs nbio_v7_4_ras_funcs = {
 
 static void nbio_v7_4_program_ltr(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	uint32_t def, data;
 
 	WREG32_PCIE(smnRCC_EP_DEV0_0_EP_PCIE_TX_LTR_CNTL, 0x75EB);
@@ -683,7 +654,6 @@ static void nbio_v7_4_program_ltr(struct amdgpu_device *adev)
 
 static void nbio_v7_4_program_aspm(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v7_4: called %s\n", __func__);
 	uint32_t def, data;
 
 	def = data = RREG32_PCIE(smnPCIE_LC_CNTL);

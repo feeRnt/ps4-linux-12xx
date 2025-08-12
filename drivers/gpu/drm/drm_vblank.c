@@ -170,7 +170,6 @@ static void store_vblank(struct drm_device *dev, unsigned int pipe,
 			 u32 vblank_count_inc,
 			 ktime_t t_vblank, u32 last)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 
 	assert_spin_locked(&dev->vblank_time_lock);
@@ -185,7 +184,6 @@ static void store_vblank(struct drm_device *dev, unsigned int pipe,
 
 static u32 drm_max_vblank_count(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 
 	return vblank->max_vblank_count ?: dev->max_vblank_count;
@@ -197,14 +195,12 @@ static u32 drm_max_vblank_count(struct drm_device *dev, unsigned int pipe)
  */
 static u32 drm_vblank_no_hw_counter(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	drm_WARN_ON_ONCE(dev, drm_max_vblank_count(dev, pipe) != 0);
 	return 0;
 }
 
 static u32 __get_vblank_counter(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	if (drm_core_check_feature(dev, DRIVER_MODESET)) {
 		struct drm_crtc *crtc = drm_crtc_from_index(dev, pipe);
 
@@ -234,7 +230,6 @@ static u32 __get_vblank_counter(struct drm_device *dev, unsigned int pipe)
  */
 static void drm_reset_vblank_timestamp(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	u32 cur_vblank;
 	bool rc;
 	ktime_t t_vblank;
@@ -283,7 +278,6 @@ static void drm_reset_vblank_timestamp(struct drm_device *dev, unsigned int pipe
 static void drm_update_vblank_count(struct drm_device *dev, unsigned int pipe,
 				    bool in_vblank_irq)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 	u32 cur_vblank, diff;
 	bool rc;
@@ -375,7 +369,6 @@ static void drm_update_vblank_count(struct drm_device *dev, unsigned int pipe,
 
 u64 drm_vblank_count(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 	u64 count;
 
@@ -409,7 +402,6 @@ u64 drm_vblank_count(struct drm_device *dev, unsigned int pipe)
  */
 u64 drm_crtc_accurate_vblank_count(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = drm_crtc_index(crtc);
 	u64 vblank;
@@ -432,7 +424,6 @@ EXPORT_SYMBOL(drm_crtc_accurate_vblank_count);
 
 static void __disable_vblank(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	if (drm_core_check_feature(dev, DRIVER_MODESET)) {
 		struct drm_crtc *crtc = drm_crtc_from_index(dev, pipe);
 
@@ -457,7 +448,6 @@ static void __disable_vblank(struct drm_device *dev, unsigned int pipe)
  */
 void drm_vblank_disable_and_save(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 	unsigned long irqflags;
 
@@ -494,7 +484,6 @@ out:
 
 static void vblank_disable_fn(struct timer_list *t)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = from_timer(vblank, t, disable_timer);
 	struct drm_device *dev = vblank->dev;
 	unsigned int pipe = vblank->pipe;
@@ -510,7 +499,6 @@ static void vblank_disable_fn(struct timer_list *t)
 
 static void drm_vblank_init_release(struct drm_device *dev, void *ptr)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = ptr;
 
 	drm_WARN_ON(dev, READ_ONCE(vblank->enabled) &&
@@ -534,7 +522,6 @@ static void drm_vblank_init_release(struct drm_device *dev, void *ptr)
  */
 int drm_vblank_init(struct drm_device *dev, unsigned int num_crtcs)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	int ret;
 	unsigned int i;
 
@@ -588,7 +575,6 @@ EXPORT_SYMBOL(drm_vblank_init);
  */
 bool drm_dev_has_vblank(const struct drm_device *dev)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	return dev->num_crtcs != 0;
 }
 EXPORT_SYMBOL(drm_dev_has_vblank);
@@ -603,7 +589,6 @@ EXPORT_SYMBOL(drm_dev_has_vblank);
  */
 wait_queue_head_t *drm_crtc_vblank_waitqueue(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	return &crtc->dev->vblank[drm_crtc_index(crtc)].queue;
 }
 EXPORT_SYMBOL(drm_crtc_vblank_waitqueue);
@@ -623,7 +608,6 @@ EXPORT_SYMBOL(drm_crtc_vblank_waitqueue);
 void drm_calc_timestamping_constants(struct drm_crtc *crtc,
 				     const struct drm_display_mode *mode)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = drm_crtc_index(crtc);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
@@ -709,7 +693,6 @@ drm_crtc_vblank_helper_get_vblank_timestamp_internal(
 	bool in_vblank_irq,
 	drm_vblank_get_scanout_position_func get_scanout_position)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = crtc->index;
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
@@ -854,7 +837,6 @@ bool drm_crtc_vblank_helper_get_vblank_timestamp(struct drm_crtc *crtc,
 						 ktime_t *vblank_time,
 						 bool in_vblank_irq)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	return drm_crtc_vblank_helper_get_vblank_timestamp_internal(
 		crtc, max_error, vblank_time, in_vblank_irq,
 		crtc->helper_private->get_scanout_position);
@@ -886,7 +868,6 @@ static bool
 drm_get_last_vbltimestamp(struct drm_device *dev, unsigned int pipe,
 			  ktime_t *tvblank, bool in_vblank_irq)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_crtc *crtc = drm_crtc_from_index(dev, pipe);
 	bool ret = false;
 
@@ -933,7 +914,6 @@ drm_get_last_vbltimestamp(struct drm_device *dev, unsigned int pipe,
  */
 u64 drm_crtc_vblank_count(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	return drm_vblank_count(crtc->dev, drm_crtc_index(crtc));
 }
 EXPORT_SYMBOL(drm_crtc_vblank_count);
@@ -955,7 +935,6 @@ EXPORT_SYMBOL(drm_crtc_vblank_count);
 static u64 drm_vblank_count_and_time(struct drm_device *dev, unsigned int pipe,
 				     ktime_t *vblanktime)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 	u64 vblank_count;
 	unsigned int seq;
@@ -996,7 +975,6 @@ static u64 drm_vblank_count_and_time(struct drm_device *dev, unsigned int pipe,
 u64 drm_crtc_vblank_count_and_time(struct drm_crtc *crtc,
 				   ktime_t *vblanktime)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	return drm_vblank_count_and_time(crtc->dev, drm_crtc_index(crtc),
 					 vblanktime);
 }
@@ -1006,7 +984,6 @@ static void send_vblank_event(struct drm_device *dev,
 		struct drm_pending_vblank_event *e,
 		u64 seq, ktime_t now)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct timespec64 tv;
 
 	switch (e->event.base.type) {
@@ -1080,7 +1057,6 @@ static void send_vblank_event(struct drm_device *dev,
 void drm_crtc_arm_vblank_event(struct drm_crtc *crtc,
 			       struct drm_pending_vblank_event *e)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = drm_crtc_index(crtc);
 
@@ -1106,7 +1082,6 @@ EXPORT_SYMBOL(drm_crtc_arm_vblank_event);
 void drm_crtc_send_vblank_event(struct drm_crtc *crtc,
 				struct drm_pending_vblank_event *e)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	u64 seq;
 	unsigned int pipe = drm_crtc_index(crtc);
@@ -1126,7 +1101,6 @@ EXPORT_SYMBOL(drm_crtc_send_vblank_event);
 
 static int __enable_vblank(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	if (drm_core_check_feature(dev, DRIVER_MODESET)) {
 		struct drm_crtc *crtc = drm_crtc_from_index(dev, pipe);
 
@@ -1147,7 +1121,6 @@ static int __enable_vblank(struct drm_device *dev, unsigned int pipe)
 
 static int drm_vblank_enable(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 	int ret = 0;
 
@@ -1186,7 +1159,6 @@ static int drm_vblank_enable(struct drm_device *dev, unsigned int pipe)
 
 int drm_vblank_get(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 	unsigned long irqflags;
 	int ret = 0;
@@ -1224,14 +1196,12 @@ int drm_vblank_get(struct drm_device *dev, unsigned int pipe)
  */
 int drm_crtc_vblank_get(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	return drm_vblank_get(crtc->dev, drm_crtc_index(crtc));
 }
 EXPORT_SYMBOL(drm_crtc_vblank_get);
 
 void drm_vblank_put(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 
 	if (drm_WARN_ON(dev, pipe >= dev->num_crtcs))
@@ -1261,7 +1231,6 @@ void drm_vblank_put(struct drm_device *dev, unsigned int pipe)
  */
 void drm_crtc_vblank_put(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	drm_vblank_put(crtc->dev, drm_crtc_index(crtc));
 }
 EXPORT_SYMBOL(drm_crtc_vblank_put);
@@ -1279,7 +1248,6 @@ EXPORT_SYMBOL(drm_crtc_vblank_put);
  */
 void drm_wait_one_vblank(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 	int ret;
 	u64 last;
@@ -1314,7 +1282,6 @@ EXPORT_SYMBOL(drm_wait_one_vblank);
  */
 void drm_crtc_wait_one_vblank(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	drm_wait_one_vblank(crtc->dev, drm_crtc_index(crtc));
 }
 EXPORT_SYMBOL(drm_crtc_wait_one_vblank);
@@ -1332,7 +1299,6 @@ EXPORT_SYMBOL(drm_crtc_wait_one_vblank);
  */
 void drm_crtc_vblank_off(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = drm_crtc_index(crtc);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
@@ -1412,7 +1378,6 @@ EXPORT_SYMBOL(drm_crtc_vblank_off);
  */
 void drm_crtc_vblank_reset(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = drm_crtc_index(crtc);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
@@ -1453,7 +1418,6 @@ EXPORT_SYMBOL(drm_crtc_vblank_reset);
 void drm_crtc_set_max_vblank_count(struct drm_crtc *crtc,
 				   u32 max_vblank_count)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = drm_crtc_index(crtc);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
@@ -1477,7 +1441,6 @@ EXPORT_SYMBOL(drm_crtc_set_max_vblank_count);
  */
 void drm_crtc_vblank_on(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	unsigned int pipe = drm_crtc_index(crtc);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
@@ -1509,7 +1472,6 @@ EXPORT_SYMBOL(drm_crtc_vblank_on);
 
 static void drm_vblank_restore(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	ktime_t t_vblank;
 	struct drm_vblank_crtc *vblank;
 	int framedur_ns;
@@ -1564,7 +1526,6 @@ static void drm_vblank_restore(struct drm_device *dev, unsigned int pipe)
  */
 void drm_crtc_vblank_restore(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	WARN_ON_ONCE(!crtc->funcs->get_vblank_timestamp);
 	WARN_ON_ONCE(!crtc->dev->vblank_disable_immediate);
 
@@ -1575,7 +1536,6 @@ EXPORT_SYMBOL(drm_crtc_vblank_restore);
 static void drm_legacy_vblank_pre_modeset(struct drm_device *dev,
 					  unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 
 	/* vblank is not initialized (IRQ not installed ?), or has been freed */
@@ -1602,7 +1562,6 @@ static void drm_legacy_vblank_pre_modeset(struct drm_device *dev,
 static void drm_legacy_vblank_post_modeset(struct drm_device *dev,
 					   unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 
 	/* vblank is not initialized (IRQ not installed ?), or has been freed */
@@ -1627,7 +1586,6 @@ static void drm_legacy_vblank_post_modeset(struct drm_device *dev,
 int drm_legacy_modeset_ctl_ioctl(struct drm_device *dev, void *data,
 				 struct drm_file *file_priv)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_modeset_ctl *modeset = data;
 	unsigned int pipe;
 
@@ -1662,7 +1620,6 @@ static int drm_queue_vblank_event(struct drm_device *dev, unsigned int pipe,
 				  union drm_wait_vblank *vblwait,
 				  struct drm_file *file_priv)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 	struct drm_pending_vblank_event *e;
 	ktime_t now;
@@ -1738,7 +1695,6 @@ err_put:
 
 static bool drm_wait_vblank_is_query(union drm_wait_vblank *vblwait)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	if (vblwait->request.sequence)
 		return false;
 
@@ -1761,14 +1717,12 @@ static bool drm_wait_vblank_is_query(union drm_wait_vblank *vblwait)
 
 static u64 widen_32_to_64(u32 narrow, u64 near)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	return near + (s32) (narrow - near);
 }
 
 static void drm_wait_vblank_reply(struct drm_device *dev, unsigned int pipe,
 				  struct drm_wait_vblank_reply *reply)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	ktime_t now;
 	struct timespec64 ts;
 
@@ -1785,7 +1739,6 @@ static void drm_wait_vblank_reply(struct drm_device *dev, unsigned int pipe,
 
 static bool drm_wait_vblank_supported(struct drm_device *dev)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 #if IS_ENABLED(CONFIG_DRM_LEGACY)
 	if (unlikely(drm_core_check_feature(dev, DRIVER_LEGACY)))
 		return dev->irq_enabled;
@@ -1796,7 +1749,6 @@ static bool drm_wait_vblank_supported(struct drm_device *dev)
 int drm_wait_vblank_ioctl(struct drm_device *dev, void *data,
 			  struct drm_file *file_priv)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_vblank_crtc *vblank;
 	union drm_wait_vblank *vblwait = data;
@@ -1938,7 +1890,6 @@ done:
 
 static void drm_handle_vblank_events(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_crtc *crtc = drm_crtc_from_index(dev, pipe);
 	bool high_prec = false;
 	struct drm_pending_vblank_event *e, *t;
@@ -1981,7 +1932,6 @@ static void drm_handle_vblank_events(struct drm_device *dev, unsigned int pipe)
  */
 bool drm_handle_vblank(struct drm_device *dev, unsigned int pipe)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_vblank_crtc *vblank = &dev->vblank[pipe];
 	unsigned long irqflags;
 	bool disable_irq;
@@ -2056,7 +2006,6 @@ EXPORT_SYMBOL(drm_handle_vblank);
  */
 bool drm_crtc_handle_vblank(struct drm_crtc *crtc)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	return drm_handle_vblank(crtc->dev, drm_crtc_index(crtc));
 }
 EXPORT_SYMBOL(drm_crtc_handle_vblank);
@@ -2072,7 +2021,6 @@ EXPORT_SYMBOL(drm_crtc_handle_vblank);
 int drm_crtc_get_sequence_ioctl(struct drm_device *dev, void *data,
 				struct drm_file *file_priv)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_vblank_crtc *vblank;
 	int pipe;
@@ -2129,7 +2077,6 @@ int drm_crtc_get_sequence_ioctl(struct drm_device *dev, void *data,
 int drm_crtc_queue_sequence_ioctl(struct drm_device *dev, void *data,
 				  struct drm_file *file_priv)
 {
-    pr_info("drm_vblank: called %s\n", __func__);
 	struct drm_crtc *crtc;
 	struct drm_vblank_crtc *vblank;
 	int pipe;

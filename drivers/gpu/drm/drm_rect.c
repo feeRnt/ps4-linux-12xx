@@ -43,7 +43,6 @@
  */
 bool drm_rect_intersect(struct drm_rect *r1, const struct drm_rect *r2)
 {
-    pr_info("drm_rect: called %s\n", __func__);
 	r1->x1 = max(r1->x1, r2->x1);
 	r1->y1 = max(r1->y1, r2->y1);
 	r1->x2 = min(r1->x2, r2->x2);
@@ -55,7 +54,6 @@ EXPORT_SYMBOL(drm_rect_intersect);
 
 static u32 clip_scaled(int src, int dst, int *clip)
 {
-    pr_info("drm_rect: called %s\n", __func__);
 	u64 tmp;
 
 	if (dst == 0)
@@ -94,7 +92,6 @@ static u32 clip_scaled(int src, int dst, int *clip)
 bool drm_rect_clip_scaled(struct drm_rect *src, struct drm_rect *dst,
 			  const struct drm_rect *clip)
 {
-    pr_info("drm_rect: called %s\n", __func__);
 	int diff;
 
 	diff = clip->x1 - dst->x1;
@@ -136,7 +133,6 @@ EXPORT_SYMBOL(drm_rect_clip_scaled);
 
 static int drm_calc_scale(int src, int dst)
 {
-    pr_info("drm_rect: called %s\n", __func__);
 	int scale = 0;
 
 	if (WARN_ON(src < 0 || dst < 0))
@@ -174,7 +170,6 @@ int drm_rect_calc_hscale(const struct drm_rect *src,
 			 const struct drm_rect *dst,
 			 int min_hscale, int max_hscale)
 {
-    pr_info("drm_rect: called %s\n", __func__);
 	int src_w = drm_rect_width(src);
 	int dst_w = drm_rect_width(dst);
 	int hscale = drm_calc_scale(src_w, dst_w);
@@ -210,7 +205,6 @@ int drm_rect_calc_vscale(const struct drm_rect *src,
 			 const struct drm_rect *dst,
 			 int min_vscale, int max_vscale)
 {
-    pr_info("drm_rect: called %s\n", __func__);
 	int src_h = drm_rect_height(src);
 	int dst_h = drm_rect_height(dst);
 	int vscale = drm_calc_scale(src_h, dst_h);
@@ -233,7 +227,6 @@ EXPORT_SYMBOL(drm_rect_calc_vscale);
  */
 void drm_rect_debug_print(const char *prefix, const struct drm_rect *r, bool fixed_point)
 {
-    pr_info("drm_rect: called %s\n", __func__);
 	if (fixed_point)
 		DRM_DEBUG_KMS("%s" DRM_RECT_FP_FMT "\n", prefix, DRM_RECT_FP_ARG(r));
 	else
@@ -261,7 +254,6 @@ void drm_rect_rotate(struct drm_rect *r,
 		     int width, int height,
 		     unsigned int rotation)
 {
-    pr_info("drm_rect: called %s\n", __func__);
 	struct drm_rect tmp;
 
 	if (rotation & (DRM_MODE_REFLECT_X | DRM_MODE_REFLECT_Y)) {
@@ -336,7 +328,6 @@ void drm_rect_rotate_inv(struct drm_rect *r,
 			 int width, int height,
 			 unsigned int rotation)
 {
-    pr_info("drm_rect: called %s\n", __func__);
 	struct drm_rect tmp;
 
 	switch (rotation & DRM_MODE_ROTATE_MASK) {

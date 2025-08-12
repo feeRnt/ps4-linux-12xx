@@ -77,7 +77,6 @@ int drm_framebuffer_check_src_coords(uint32_t src_x, uint32_t src_y,
 				     uint32_t src_w, uint32_t src_h,
 				     const struct drm_framebuffer *fb)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	unsigned int fb_width, fb_height;
 
 	fb_width = fb->width << 16;
@@ -118,7 +117,6 @@ int drm_framebuffer_check_src_coords(uint32_t src_x, uint32_t src_y,
 int drm_mode_addfb(struct drm_device *dev, struct drm_mode_fb_cmd *or,
 		   struct drm_file *file_priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_mode_fb_cmd2 r = {};
 	int ret;
 
@@ -150,14 +148,12 @@ int drm_mode_addfb(struct drm_device *dev, struct drm_mode_fb_cmd *or,
 int drm_mode_addfb_ioctl(struct drm_device *dev,
 			 void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	return drm_mode_addfb(dev, data, file_priv);
 }
 
 static int fb_plane_width(int width,
 			  const struct drm_format_info *format, int plane)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	if (plane == 0)
 		return width;
 
@@ -167,7 +163,6 @@ static int fb_plane_width(int width,
 static int fb_plane_height(int height,
 			   const struct drm_format_info *format, int plane)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	if (plane == 0)
 		return height;
 
@@ -177,7 +172,6 @@ static int fb_plane_height(int height,
 static int framebuffer_check(struct drm_device *dev,
 			     const struct drm_mode_fb_cmd2 *r)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	const struct drm_format_info *info;
 	int i;
 
@@ -294,7 +288,6 @@ drm_internal_framebuffer_create(struct drm_device *dev,
 				const struct drm_mode_fb_cmd2 *r,
 				struct drm_file *file_priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_mode_config *config = &dev->mode_config;
 	struct drm_framebuffer *fb;
 	int ret;
@@ -353,7 +346,6 @@ EXPORT_SYMBOL_FOR_TESTS_ONLY(drm_internal_framebuffer_create);
 int drm_mode_addfb2(struct drm_device *dev,
 		    void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_mode_fb_cmd2 *r = data;
 	struct drm_framebuffer *fb;
 
@@ -378,7 +370,6 @@ int drm_mode_addfb2(struct drm_device *dev,
 int drm_mode_addfb2_ioctl(struct drm_device *dev,
 			  void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 #ifdef __BIG_ENDIAN
 	if (!dev->mode_config.quirk_addfb_prefer_host_byte_order) {
 		/*
@@ -407,7 +398,6 @@ struct drm_mode_rmfb_work {
 
 static void drm_mode_rmfb_work_fn(struct work_struct *w)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_mode_rmfb_work *arg = container_of(w, typeof(*arg), work);
 
 	while (!list_empty(&arg->fbs)) {
@@ -438,7 +428,6 @@ static void drm_mode_rmfb_work_fn(struct work_struct *w)
 int drm_mode_rmfb(struct drm_device *dev, u32 fb_id,
 		  struct drm_file *file_priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_framebuffer *fb = NULL;
 	struct drm_framebuffer *fbl = NULL;
 	int found = 0;
@@ -495,7 +484,6 @@ fail_unref:
 int drm_mode_rmfb_ioctl(struct drm_device *dev,
 			void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	uint32_t *fb_id = data;
 
 	return drm_mode_rmfb(dev, *fb_id, file_priv);
@@ -517,7 +505,6 @@ int drm_mode_rmfb_ioctl(struct drm_device *dev,
 int drm_mode_getfb(struct drm_device *dev,
 		   void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_mode_fb_cmd *r = data;
 	struct drm_framebuffer *fb;
 	int ret;
@@ -580,7 +567,6 @@ out:
 int drm_mode_getfb2_ioctl(struct drm_device *dev,
 			  void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_mode_fb_cmd2 *r = data;
 	struct drm_framebuffer *fb;
 	unsigned int i;
@@ -709,7 +695,6 @@ out:
 int drm_mode_dirtyfb_ioctl(struct drm_device *dev,
 			   void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_clip_rect __user *clips_ptr;
 	struct drm_clip_rect *clips = NULL;
 	struct drm_mode_fb_dirty_cmd *r = data;
@@ -788,7 +773,6 @@ out_err1:
  */
 void drm_fb_release(struct drm_file *priv)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_framebuffer *fb, *tfb;
 	struct drm_mode_rmfb_work arg;
 
@@ -826,7 +810,6 @@ void drm_fb_release(struct drm_file *priv)
 
 void drm_framebuffer_free(struct kref *kref)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_framebuffer *fb =
 			container_of(kref, struct drm_framebuffer, base.refcount);
 	struct drm_device *dev = fb->dev;
@@ -861,7 +844,6 @@ void drm_framebuffer_free(struct kref *kref)
 int drm_framebuffer_init(struct drm_device *dev, struct drm_framebuffer *fb,
 			 const struct drm_framebuffer_funcs *funcs)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	int ret;
 
 	if (WARN_ON_ONCE(fb->dev != dev || !fb->format))
@@ -902,7 +884,6 @@ struct drm_framebuffer *drm_framebuffer_lookup(struct drm_device *dev,
 					       struct drm_file *file_priv,
 					       uint32_t id)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_mode_object *obj;
 	struct drm_framebuffer *fb = NULL;
 
@@ -929,7 +910,6 @@ EXPORT_SYMBOL(drm_framebuffer_lookup);
  */
 void drm_framebuffer_unregister_private(struct drm_framebuffer *fb)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_device *dev;
 
 	if (!fb)
@@ -961,7 +941,6 @@ EXPORT_SYMBOL(drm_framebuffer_unregister_private);
  */
 void drm_framebuffer_cleanup(struct drm_framebuffer *fb)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_device *dev = fb->dev;
 
 	mutex_lock(&dev->mode_config.fb_lock);
@@ -973,7 +952,6 @@ EXPORT_SYMBOL(drm_framebuffer_cleanup);
 
 static int atomic_remove_fb(struct drm_framebuffer *fb)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_modeset_acquire_ctx ctx;
 	struct drm_device *dev = fb->dev;
 	struct drm_atomic_state *state;
@@ -1078,7 +1056,6 @@ out:
 
 static void legacy_remove_fb(struct drm_framebuffer *fb)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_device *dev = fb->dev;
 	struct drm_crtc *crtc;
 	struct drm_plane *plane;
@@ -1122,7 +1099,6 @@ static void legacy_remove_fb(struct drm_framebuffer *fb)
  */
 void drm_framebuffer_remove(struct drm_framebuffer *fb)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_device *dev;
 
 	if (!fb)
@@ -1172,7 +1148,6 @@ EXPORT_SYMBOL(drm_framebuffer_remove);
 int drm_framebuffer_plane_width(int width,
 				const struct drm_framebuffer *fb, int plane)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	if (plane >= fb->format->num_planes)
 		return 0;
 
@@ -1192,7 +1167,6 @@ EXPORT_SYMBOL(drm_framebuffer_plane_width);
 int drm_framebuffer_plane_height(int height,
 				 const struct drm_framebuffer *fb, int plane)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	if (plane >= fb->format->num_planes)
 		return 0;
 
@@ -1203,7 +1177,6 @@ EXPORT_SYMBOL(drm_framebuffer_plane_height);
 void drm_framebuffer_print_info(struct drm_printer *p, unsigned int indent,
 				const struct drm_framebuffer *fb)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	unsigned int i;
 
 	drm_printf_indent(p, indent, "allocated by = %s\n", fb->comm);
@@ -1230,7 +1203,6 @@ void drm_framebuffer_print_info(struct drm_printer *p, unsigned int indent,
 #ifdef CONFIG_DEBUG_FS
 static int drm_framebuffer_info(struct seq_file *m, void *data)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	struct drm_info_node *node = m->private;
 	struct drm_device *dev = node->minor->dev;
 	struct drm_printer p = drm_seq_file_printer(m);
@@ -1252,7 +1224,6 @@ static const struct drm_info_list drm_framebuffer_debugfs_list[] = {
 
 void drm_framebuffer_debugfs_init(struct drm_minor *minor)
 {
-    pr_info("drm_framebuffer: called %s\n", __func__);
 	drm_debugfs_create_files(drm_framebuffer_debugfs_list,
 				 ARRAY_SIZE(drm_framebuffer_debugfs_list),
 				 minor->debugfs_root, minor);

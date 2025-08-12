@@ -40,7 +40,6 @@ MODULE_LICENSE("GPL and additional rights");
 /* Backward compatibility for drm_kms_helper.edid_firmware */
 static int edid_firmware_set(const char *val, const struct kernel_param *kp)
 {
-    pr_info("drm_kms_helper_common: called %s\n", __func__);
 	DRM_NOTE("drm_kms_helper.edid_firmware is deprecated, please use drm.edid_firmware instead.\n");
 
 	return __drm_set_edid_firmware_path(val);
@@ -48,7 +47,6 @@ static int edid_firmware_set(const char *val, const struct kernel_param *kp)
 
 static int edid_firmware_get(char *buffer, const struct kernel_param *kp)
 {
-    pr_info("drm_kms_helper_common: called %s\n", __func__);
 	return __drm_get_edid_firmware_path(buffer, PAGE_SIZE);
 }
 
@@ -66,7 +64,6 @@ MODULE_PARM_DESC(edid_firmware,
 
 static int __init drm_kms_helper_init(void)
 {
-    pr_info("drm_kms_helper_common: called %s\n", __func__);
 	/*
 	 * The Kconfig DRM_KMS_HELPER selects FRAMEBUFFER_CONSOLE (if !EXPERT)
 	 * but the module doesn't depend on any fb console symbols.  At least
@@ -83,7 +80,6 @@ static int __init drm_kms_helper_init(void)
 
 static void __exit drm_kms_helper_exit(void)
 {
-    pr_info("drm_kms_helper_common: called %s\n", __func__);
 	/* Call exit functions from specific kms helpers here */
 	drm_dp_aux_dev_exit();
 }

@@ -103,7 +103,6 @@ static bool drm_dp_mst_port_downstream_of_branch(struct drm_dp_mst_port *port,
 
 static const char *drm_dp_mst_req_type_str(u8 req_type)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	static const char * const req_type_str[] = {
 		DP_STR(GET_MSG_TRANSACTION_VERSION),
 		DP_STR(LINK_ADDRESS),
@@ -135,7 +134,6 @@ static const char *drm_dp_mst_req_type_str(u8 req_type)
 
 static const char *drm_dp_mst_nak_reason_str(u8 nak_reason)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	static const char * const nak_reason_str[] = {
 		DP_STR(WRITE_FAILURE),
 		DP_STR(INVALID_READ),
@@ -161,7 +159,6 @@ static const char *drm_dp_mst_nak_reason_str(u8 nak_reason)
 
 static const char *drm_dp_mst_sideband_tx_state_str(int state)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	static const char * const sideband_reason_str[] = {
 		DP_STR(QUEUED),
 		DP_STR(START_SEND),
@@ -180,7 +177,6 @@ static const char *drm_dp_mst_sideband_tx_state_str(int state)
 static int
 drm_dp_mst_rad_to_str(const u8 rad[8], u8 lct, char *out, size_t len)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int i;
 	u8 unpacked_rad[16];
 
@@ -200,7 +196,6 @@ drm_dp_mst_rad_to_str(const u8 rad[8], u8 lct, char *out, size_t len)
 /* sideband msg handling */
 static u8 drm_dp_msg_header_crc4(const uint8_t *data, size_t num_nibbles)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	u8 bitmask = 0x80;
 	u8 bitshift = 7;
 	u8 array_index = 0;
@@ -235,7 +230,6 @@ static u8 drm_dp_msg_header_crc4(const uint8_t *data, size_t num_nibbles)
 
 static u8 drm_dp_msg_data_crc4(const uint8_t *data, u8 number_of_bytes)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	u8 bitmask = 0x80;
 	u8 bitshift = 7;
 	u8 array_index = 0;
@@ -269,7 +263,6 @@ static u8 drm_dp_msg_data_crc4(const uint8_t *data, u8 number_of_bytes)
 }
 static inline u8 drm_dp_calc_sb_hdr_size(struct drm_dp_sideband_msg_hdr *hdr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	u8 size = 3;
 
 	size += (hdr->lct / 2);
@@ -279,7 +272,6 @@ static inline u8 drm_dp_calc_sb_hdr_size(struct drm_dp_sideband_msg_hdr *hdr)
 static void drm_dp_encode_sideband_msg_hdr(struct drm_dp_sideband_msg_hdr *hdr,
 					   u8 *buf, int *len)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 0;
 	int i;
 	u8 crc4;
@@ -301,7 +293,6 @@ static bool drm_dp_decode_sideband_msg_hdr(const struct drm_dp_mst_topology_mgr 
 					   struct drm_dp_sideband_msg_hdr *hdr,
 					   u8 *buf, int buflen, u8 *hdrlen)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	u8 crc4;
 	u8 len;
 	int i;
@@ -341,7 +332,6 @@ void
 drm_dp_encode_sideband_req(const struct drm_dp_sideband_msg_req_body *req,
 			   struct drm_dp_sideband_msg_tx *raw)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 0;
 	int i;
 	u8 *buf = raw->msg;
@@ -465,7 +455,6 @@ int
 drm_dp_decode_sideband_req(const struct drm_dp_sideband_msg_tx *raw,
 			   struct drm_dp_sideband_msg_req_body *req)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	const u8 *buf = raw->msg;
 	int i, idx = 0;
 
@@ -608,7 +597,6 @@ void
 drm_dp_dump_sideband_msg_req_body(const struct drm_dp_sideband_msg_req_body *req,
 				  int indent, struct drm_printer *printer)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int i;
 
 #define P(f, ...) drm_printf_indent(printer, indent, f, ##__VA_ARGS__)
@@ -699,7 +687,6 @@ static inline void
 drm_dp_mst_dump_sideband_msg_tx(struct drm_printer *p,
 				const struct drm_dp_sideband_msg_tx *txmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_req_body req;
 	char buf[64];
 	int ret;
@@ -735,7 +722,6 @@ drm_dp_mst_dump_sideband_msg_tx(struct drm_printer *p,
 
 static void drm_dp_crc_sideband_chunk_req(u8 *msg, u8 len)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	u8 crc4;
 
 	crc4 = drm_dp_msg_data_crc4(msg, len);
@@ -745,7 +731,6 @@ static void drm_dp_crc_sideband_chunk_req(u8 *msg, u8 len)
 static void drm_dp_encode_sideband_reply(struct drm_dp_sideband_msg_reply_body *rep,
 					 struct drm_dp_sideband_msg_tx *raw)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 0;
 	u8 *buf = raw->msg;
 
@@ -758,7 +743,6 @@ static int drm_dp_sideband_msg_set_header(struct drm_dp_sideband_msg_rx *msg,
 					  struct drm_dp_sideband_msg_hdr *hdr,
 					  u8 hdrlen)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	/*
 	 * ignore out-of-order messages or messages that are part of a
 	 * failed transaction
@@ -790,7 +774,6 @@ static int drm_dp_sideband_msg_set_header(struct drm_dp_sideband_msg_rx *msg,
 static bool drm_dp_sideband_append_payload(struct drm_dp_sideband_msg_rx *msg,
 					   u8 *replybuf, u8 replybuflen)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	u8 crc4;
 
 	memcpy(&msg->chunk[msg->curchunk_idx], replybuf, replybuflen);
@@ -814,7 +797,6 @@ static bool drm_dp_sideband_parse_link_address(const struct drm_dp_mst_topology_
 					       struct drm_dp_sideband_msg_rx *raw,
 					       struct drm_dp_sideband_msg_reply_body *repmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 1;
 	int i;
 
@@ -868,7 +850,6 @@ fail_len:
 static bool drm_dp_sideband_parse_remote_dpcd_read(struct drm_dp_sideband_msg_rx *raw,
 						   struct drm_dp_sideband_msg_reply_body *repmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 1;
 
 	repmsg->u.remote_dpcd_read_ack.port_number = raw->msg[idx] & 0xf;
@@ -890,7 +871,6 @@ fail_len:
 static bool drm_dp_sideband_parse_remote_dpcd_write(struct drm_dp_sideband_msg_rx *raw,
 						      struct drm_dp_sideband_msg_reply_body *repmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 1;
 
 	repmsg->u.remote_dpcd_write_ack.port_number = raw->msg[idx] & 0xf;
@@ -906,7 +886,6 @@ fail_len:
 static bool drm_dp_sideband_parse_remote_i2c_read_ack(struct drm_dp_sideband_msg_rx *raw,
 						      struct drm_dp_sideband_msg_reply_body *repmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 1;
 
 	repmsg->u.remote_i2c_read_ack.port_number = (raw->msg[idx] & 0xf);
@@ -926,7 +905,6 @@ fail_len:
 static bool drm_dp_sideband_parse_enum_path_resources_ack(struct drm_dp_sideband_msg_rx *raw,
 							  struct drm_dp_sideband_msg_reply_body *repmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 1;
 
 	repmsg->u.path_resources.port_number = (raw->msg[idx] >> 4) & 0xf;
@@ -951,7 +929,6 @@ fail_len:
 static bool drm_dp_sideband_parse_allocate_payload_ack(struct drm_dp_sideband_msg_rx *raw,
 							  struct drm_dp_sideband_msg_reply_body *repmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 1;
 
 	repmsg->u.allocate_payload.port_number = (raw->msg[idx] >> 4) & 0xf;
@@ -975,7 +952,6 @@ fail_len:
 static bool drm_dp_sideband_parse_query_payload_ack(struct drm_dp_sideband_msg_rx *raw,
 						    struct drm_dp_sideband_msg_reply_body *repmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 1;
 
 	repmsg->u.query_payload.port_number = (raw->msg[idx] >> 4) & 0xf;
@@ -995,7 +971,6 @@ fail_len:
 static bool drm_dp_sideband_parse_power_updown_phy_ack(struct drm_dp_sideband_msg_rx *raw,
 						       struct drm_dp_sideband_msg_reply_body *repmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 1;
 
 	repmsg->u.port_number.port_number = (raw->msg[idx] >> 4) & 0xf;
@@ -1013,7 +988,6 @@ drm_dp_sideband_parse_query_stream_enc_status(
 				struct drm_dp_sideband_msg_rx *raw,
 				struct drm_dp_sideband_msg_reply_body *repmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_query_stream_enc_status_ack_reply *reply;
 
 	reply = &repmsg->u.enc_status;
@@ -1049,7 +1023,6 @@ static bool drm_dp_sideband_parse_reply(const struct drm_dp_mst_topology_mgr *mg
 					struct drm_dp_sideband_msg_rx *raw,
 					struct drm_dp_sideband_msg_reply_body *msg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	memset(msg, 0, sizeof(*msg));
 	msg->reply_type = (raw->msg[0] & 0x80) >> 7;
 	msg->req_type = (raw->msg[0] & 0x7f);
@@ -1097,7 +1070,6 @@ drm_dp_sideband_parse_connection_status_notify(const struct drm_dp_mst_topology_
 					       struct drm_dp_sideband_msg_rx *raw,
 					       struct drm_dp_sideband_msg_req_body *msg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 1;
 
 	msg->u.conn_stat.port_number = (raw->msg[idx] & 0xf0) >> 4;
@@ -1127,7 +1099,6 @@ static bool drm_dp_sideband_parse_resource_status_notify(const struct drm_dp_mst
 							 struct drm_dp_sideband_msg_rx *raw,
 							 struct drm_dp_sideband_msg_req_body *msg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int idx = 1;
 
 	msg->u.resource_stat.port_number = (raw->msg[idx] & 0xf0) >> 4;
@@ -1152,7 +1123,6 @@ static bool drm_dp_sideband_parse_req(const struct drm_dp_mst_topology_mgr *mgr,
 				      struct drm_dp_sideband_msg_rx *raw,
 				      struct drm_dp_sideband_msg_req_body *msg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	memset(msg, 0, sizeof(*msg));
 	msg->req_type = (raw->msg[0] & 0x7f);
 
@@ -1171,7 +1141,6 @@ static bool drm_dp_sideband_parse_req(const struct drm_dp_mst_topology_mgr *mgr,
 static void build_dpcd_write(struct drm_dp_sideband_msg_tx *msg,
 			     u8 port_num, u32 offset, u8 num_bytes, u8 *bytes)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_req_body req;
 
 	req.req_type = DP_REMOTE_DPCD_WRITE;
@@ -1184,7 +1153,6 @@ static void build_dpcd_write(struct drm_dp_sideband_msg_tx *msg,
 
 static void build_link_address(struct drm_dp_sideband_msg_tx *msg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_req_body req;
 
 	req.req_type = DP_LINK_ADDRESS;
@@ -1193,7 +1161,6 @@ static void build_link_address(struct drm_dp_sideband_msg_tx *msg)
 
 static void build_clear_payload_id_table(struct drm_dp_sideband_msg_tx *msg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_req_body req;
 
 	req.req_type = DP_CLEAR_PAYLOAD_ID_TABLE;
@@ -1204,7 +1171,6 @@ static void build_clear_payload_id_table(struct drm_dp_sideband_msg_tx *msg)
 static int build_enum_path_resources(struct drm_dp_sideband_msg_tx *msg,
 				     int port_num)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_req_body req;
 
 	req.req_type = DP_ENUM_PATH_RESOURCES;
@@ -1220,7 +1186,6 @@ static void build_allocate_payload(struct drm_dp_sideband_msg_tx *msg,
 				   u8 number_sdp_streams,
 				   u8 *sdp_stream_sink)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_req_body req;
 
 	memset(&req, 0, sizeof(req));
@@ -1238,7 +1203,6 @@ static void build_allocate_payload(struct drm_dp_sideband_msg_tx *msg,
 static void build_power_updown_phy(struct drm_dp_sideband_msg_tx *msg,
 				   int port_num, bool power_up)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_req_body req;
 
 	if (power_up)
@@ -1255,7 +1219,6 @@ static int
 build_query_stream_enc_status(struct drm_dp_sideband_msg_tx *msg, u8 stream_id,
 			      u8 *q_id)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_req_body req;
 
 	req.req_type = DP_QUERY_STREAM_ENC_STATUS;
@@ -1274,7 +1237,6 @@ build_query_stream_enc_status(struct drm_dp_sideband_msg_tx *msg, u8 stream_id,
 static int drm_dp_mst_assign_payload_id(struct drm_dp_mst_topology_mgr *mgr,
 					struct drm_dp_vcpi *vcpi)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret, vcpi_ret;
 
 	mutex_lock(&mgr->payload_lock);
@@ -1304,7 +1266,6 @@ out_unlock:
 static void drm_dp_mst_put_payload_id(struct drm_dp_mst_topology_mgr *mgr,
 				      int vcpi)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int i;
 
 	if (vcpi == 0)
@@ -1327,7 +1288,6 @@ static void drm_dp_mst_put_payload_id(struct drm_dp_mst_topology_mgr *mgr,
 static bool check_txmsg_state(struct drm_dp_mst_topology_mgr *mgr,
 			      struct drm_dp_sideband_msg_tx *txmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	unsigned int state;
 
 	/*
@@ -1343,7 +1303,6 @@ static bool check_txmsg_state(struct drm_dp_mst_topology_mgr *mgr,
 static int drm_dp_mst_wait_tx_reply(struct drm_dp_mst_branch *mstb,
 				    struct drm_dp_sideband_msg_tx *txmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr = mstb->mgr;
 	unsigned long wait_timeout = msecs_to_jiffies(4000);
 	unsigned long wait_expires = jiffies + wait_timeout;
@@ -1409,7 +1368,6 @@ out:
 
 static struct drm_dp_mst_branch *drm_dp_add_mst_branch_device(u8 lct, u8 *rad)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_branch *mstb;
 
 	mstb = kzalloc(sizeof(*mstb), GFP_KERNEL);
@@ -1427,7 +1385,6 @@ static struct drm_dp_mst_branch *drm_dp_add_mst_branch_device(u8 lct, u8 *rad)
 
 static void drm_dp_free_mst_branch_device(struct kref *kref)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_branch *mstb =
 		container_of(kref, struct drm_dp_mst_branch, malloc_kref);
 
@@ -1539,7 +1496,6 @@ static void drm_dp_free_mst_branch_device(struct kref *kref)
 static void
 drm_dp_mst_get_mstb_malloc(struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	kref_get(&mstb->malloc_kref);
 	drm_dbg(mstb->mgr->dev, "mstb %p (%d)\n", mstb, kref_read(&mstb->malloc_kref));
 }
@@ -1558,14 +1514,12 @@ drm_dp_mst_get_mstb_malloc(struct drm_dp_mst_branch *mstb)
 static void
 drm_dp_mst_put_mstb_malloc(struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	drm_dbg(mstb->mgr->dev, "mstb %p (%d)\n", mstb, kref_read(&mstb->malloc_kref) - 1);
 	kref_put(&mstb->malloc_kref, drm_dp_free_mst_branch_device);
 }
 
 static void drm_dp_free_mst_port(struct kref *kref)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port =
 		container_of(kref, struct drm_dp_mst_port, malloc_kref);
 
@@ -1593,7 +1547,6 @@ static void drm_dp_free_mst_port(struct kref *kref)
 void
 drm_dp_mst_get_port_malloc(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	kref_get(&port->malloc_kref);
 	drm_dbg(port->mgr->dev, "port %p (%d)\n", port, kref_read(&port->malloc_kref));
 }
@@ -1612,7 +1565,6 @@ EXPORT_SYMBOL(drm_dp_mst_get_port_malloc);
 void
 drm_dp_mst_put_port_malloc(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	drm_dbg(port->mgr->dev, "port %p (%d)\n", port, kref_read(&port->malloc_kref) - 1);
 	kref_put(&port->malloc_kref, drm_dp_free_mst_port);
 }
@@ -1627,7 +1579,6 @@ __topology_ref_save(struct drm_dp_mst_topology_mgr *mgr,
 		    struct drm_dp_mst_topology_ref_history *history,
 		    enum drm_dp_mst_topology_ref_type type)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_ref_entry *entry = NULL;
 	depot_stack_handle_t backtrace;
 	ulong stack_entries[STACK_DEPTH];
@@ -1672,7 +1623,6 @@ __topology_ref_save(struct drm_dp_mst_topology_mgr *mgr,
 static int
 topology_ref_history_cmp(const void *a, const void *b)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	const struct drm_dp_mst_topology_ref_entry *entry_a = a, *entry_b = b;
 
 	if (entry_a->ts_nsec > entry_b->ts_nsec)
@@ -1686,7 +1636,6 @@ topology_ref_history_cmp(const void *a, const void *b)
 static inline const char *
 topology_ref_type_to_str(enum drm_dp_mst_topology_ref_type type)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	if (type == DRM_DP_MST_TOPOLOGY_REF_GET)
 		return "get";
 	else
@@ -1697,7 +1646,6 @@ static void
 __dump_topology_ref_history(struct drm_dp_mst_topology_ref_history *history,
 			    void *ptr, const char *type_str)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_printer p = drm_debug_printer(DBG_PREFIX);
 	char *buf = kzalloc(PAGE_SIZE, GFP_KERNEL);
 	int i;
@@ -1743,7 +1691,6 @@ out:
 static __always_inline void
 drm_dp_mst_dump_mstb_topology_history(struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	__dump_topology_ref_history(&mstb->topology_ref_history, mstb,
 				    "MSTB");
 }
@@ -1751,7 +1698,6 @@ drm_dp_mst_dump_mstb_topology_history(struct drm_dp_mst_branch *mstb)
 static __always_inline void
 drm_dp_mst_dump_port_topology_history(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	__dump_topology_ref_history(&port->topology_ref_history, port,
 				    "Port");
 }
@@ -1760,7 +1706,6 @@ static __always_inline void
 save_mstb_topology_ref(struct drm_dp_mst_branch *mstb,
 		       enum drm_dp_mst_topology_ref_type type)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	__topology_ref_save(mstb->mgr, &mstb->topology_ref_history, type);
 }
 
@@ -1768,21 +1713,18 @@ static __always_inline void
 save_port_topology_ref(struct drm_dp_mst_port *port,
 		       enum drm_dp_mst_topology_ref_type type)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	__topology_ref_save(port->mgr, &port->topology_ref_history, type);
 }
 
 static inline void
 topology_ref_history_lock(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	mutex_lock(&mgr->topology_ref_history_lock);
 }
 
 static inline void
 topology_ref_history_unlock(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	mutex_unlock(&mgr->topology_ref_history_lock);
 }
 #else
@@ -1800,7 +1742,6 @@ drm_dp_mst_dump_port_topology_history(struct drm_dp_mst_port *port) {}
 
 static void drm_dp_destroy_mst_branch_device(struct kref *kref)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_branch *mstb =
 		container_of(kref, struct drm_dp_mst_branch, topology_kref);
 	struct drm_dp_mst_topology_mgr *mgr = mstb->mgr;
@@ -1844,7 +1785,6 @@ static void drm_dp_destroy_mst_branch_device(struct kref *kref)
 static int __must_check
 drm_dp_mst_topology_try_get_mstb(struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 
 	topology_ref_history_lock(mstb->mgr);
@@ -1875,7 +1815,6 @@ drm_dp_mst_topology_try_get_mstb(struct drm_dp_mst_branch *mstb)
  */
 static void drm_dp_mst_topology_get_mstb(struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	topology_ref_history_lock(mstb->mgr);
 
 	save_mstb_topology_ref(mstb, DRM_DP_MST_TOPOLOGY_REF_GET);
@@ -1901,7 +1840,6 @@ static void drm_dp_mst_topology_get_mstb(struct drm_dp_mst_branch *mstb)
 static void
 drm_dp_mst_topology_put_mstb(struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	topology_ref_history_lock(mstb->mgr);
 
 	drm_dbg(mstb->mgr->dev, "mstb %p (%d)\n", mstb, kref_read(&mstb->topology_kref) - 1);
@@ -1913,7 +1851,6 @@ drm_dp_mst_topology_put_mstb(struct drm_dp_mst_branch *mstb)
 
 static void drm_dp_destroy_port(struct kref *kref)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port =
 		container_of(kref, struct drm_dp_mst_port, topology_kref);
 	struct drm_dp_mst_topology_mgr *mgr = port->mgr;
@@ -1963,7 +1900,6 @@ static void drm_dp_destroy_port(struct kref *kref)
 static int __must_check
 drm_dp_mst_topology_try_get_port(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 
 	topology_ref_history_lock(port->mgr);
@@ -1992,7 +1928,6 @@ drm_dp_mst_topology_try_get_port(struct drm_dp_mst_port *port)
  */
 static void drm_dp_mst_topology_get_port(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	topology_ref_history_lock(port->mgr);
 
 	WARN_ON(kref_read(&port->topology_kref) == 0);
@@ -2016,7 +1951,6 @@ static void drm_dp_mst_topology_get_port(struct drm_dp_mst_port *port)
  */
 static void drm_dp_mst_topology_put_port(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	topology_ref_history_lock(port->mgr);
 
 	drm_dbg(port->mgr->dev, "port %p (%d)\n", port, kref_read(&port->topology_kref) - 1);
@@ -2030,7 +1964,6 @@ static struct drm_dp_mst_branch *
 drm_dp_mst_topology_get_mstb_validated_locked(struct drm_dp_mst_branch *mstb,
 					      struct drm_dp_mst_branch *to_find)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port;
 	struct drm_dp_mst_branch *rmstb;
 
@@ -2052,7 +1985,6 @@ static struct drm_dp_mst_branch *
 drm_dp_mst_topology_get_mstb_validated(struct drm_dp_mst_topology_mgr *mgr,
 				       struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_branch *rmstb = NULL;
 
 	mutex_lock(&mgr->lock);
@@ -2071,7 +2003,6 @@ static struct drm_dp_mst_port *
 drm_dp_mst_topology_get_port_validated_locked(struct drm_dp_mst_branch *mstb,
 					      struct drm_dp_mst_port *to_find)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port, *mport;
 
 	list_for_each_entry(port, &mstb->ports, next) {
@@ -2092,7 +2023,6 @@ static struct drm_dp_mst_port *
 drm_dp_mst_topology_get_port_validated(struct drm_dp_mst_topology_mgr *mgr,
 				       struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *rport = NULL;
 
 	mutex_lock(&mgr->lock);
@@ -2109,7 +2039,6 @@ drm_dp_mst_topology_get_port_validated(struct drm_dp_mst_topology_mgr *mgr,
 
 static struct drm_dp_mst_port *drm_dp_get_port(struct drm_dp_mst_branch *mstb, u8 port_num)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port;
 	int ret;
 
@@ -2131,7 +2060,6 @@ static struct drm_dp_mst_port *drm_dp_get_port(struct drm_dp_mst_branch *mstb, u
 static u8 drm_dp_calculate_rad(struct drm_dp_mst_port *port,
 				 u8 *rad)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int parent_lct = port->parent->lct;
 	int shift = 4;
 	int idx = (parent_lct - 1) / 2;
@@ -2148,7 +2076,6 @@ static u8 drm_dp_calculate_rad(struct drm_dp_mst_port *port,
 
 static bool drm_dp_mst_is_end_device(u8 pdt, bool mcs)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	switch (pdt) {
 	case DP_PEER_DEVICE_DP_LEGACY_CONV:
 	case DP_PEER_DEVICE_SST_SINK:
@@ -2167,7 +2094,6 @@ static int
 drm_dp_port_set_pdt(struct drm_dp_mst_port *port, u8 new_pdt,
 		    bool new_mcs)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr = port->mgr;
 	struct drm_dp_mst_branch *mstb;
 	u8 rad[8], lct;
@@ -2255,7 +2181,6 @@ out:
 ssize_t drm_dp_mst_dpcd_read(struct drm_dp_aux *aux,
 			     unsigned int offset, void *buffer, size_t size)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port = container_of(aux, struct drm_dp_mst_port,
 						    aux);
 
@@ -2279,7 +2204,6 @@ ssize_t drm_dp_mst_dpcd_read(struct drm_dp_aux *aux,
 ssize_t drm_dp_mst_dpcd_write(struct drm_dp_aux *aux,
 			      unsigned int offset, void *buffer, size_t size)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port = container_of(aux, struct drm_dp_mst_port,
 						    aux);
 
@@ -2289,7 +2213,6 @@ ssize_t drm_dp_mst_dpcd_write(struct drm_dp_aux *aux,
 
 static int drm_dp_check_mstb_guid(struct drm_dp_mst_branch *mstb, u8 *guid)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret = 0;
 
 	memcpy(mstb->guid, guid, 16);
@@ -2316,7 +2239,6 @@ static void build_mst_prop_path(const struct drm_dp_mst_branch *mstb,
 				char *proppath,
 				size_t proppath_size)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int i;
 	char temp[8];
 
@@ -2346,7 +2268,6 @@ static void build_mst_prop_path(const struct drm_dp_mst_branch *mstb,
 int drm_dp_mst_connector_late_register(struct drm_connector *connector,
 				       struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	drm_dbg_kms(port->mgr->dev, "registering %s remote bus for %s\n",
 		    port->aux.name, connector->kdev->kobj.name);
 
@@ -2367,7 +2288,6 @@ EXPORT_SYMBOL(drm_dp_mst_connector_late_register);
 void drm_dp_mst_connector_early_unregister(struct drm_connector *connector,
 					   struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	drm_dbg_kms(port->mgr->dev, "unregistering %s remote bus for %s\n",
 		    port->aux.name, connector->kdev->kobj.name);
 	drm_dp_aux_unregister_devnode(&port->aux);
@@ -2378,7 +2298,6 @@ static void
 drm_dp_mst_port_add_connector(struct drm_dp_mst_branch *mstb,
 			      struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr = port->mgr;
 	char proppath[255];
 	int ret;
@@ -2411,7 +2330,6 @@ static void
 drm_dp_mst_topology_unlink_port(struct drm_dp_mst_topology_mgr *mgr,
 				struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	mutex_lock(&mgr->lock);
 	port->parent->num_ports--;
 	list_del(&port->next);
@@ -2424,7 +2342,6 @@ drm_dp_mst_add_port(struct drm_device *dev,
 		    struct drm_dp_mst_topology_mgr *mgr,
 		    struct drm_dp_mst_branch *mstb, u8 port_number)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port = kzalloc(sizeof(*port), GFP_KERNEL);
 
 	if (!port)
@@ -2457,7 +2374,6 @@ drm_dp_mst_handle_link_address_port(struct drm_dp_mst_branch *mstb,
 				    struct drm_device *dev,
 				    struct drm_dp_link_addr_reply_port *port_msg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr = mstb->mgr;
 	struct drm_dp_mst_port *port;
 	int old_ddps = 0, ret;
@@ -2586,7 +2502,6 @@ static void
 drm_dp_mst_handle_conn_stat(struct drm_dp_mst_branch *mstb,
 			    struct drm_dp_connection_status_notify *conn_stat)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr = mstb->mgr;
 	struct drm_dp_mst_port *port;
 	int old_ddps, ret;
@@ -2656,7 +2571,6 @@ out:
 static struct drm_dp_mst_branch *drm_dp_get_mst_branch_device(struct drm_dp_mst_topology_mgr *mgr,
 							       u8 lct, u8 *rad)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_branch *mstb;
 	struct drm_dp_mst_port *port;
 	int i, ret;
@@ -2698,7 +2612,6 @@ static struct drm_dp_mst_branch *get_mst_branch_device_by_guid_helper(
 	struct drm_dp_mst_branch *mstb,
 	const uint8_t *guid)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_branch *found_mstb;
 	struct drm_dp_mst_port *port;
 
@@ -2723,7 +2636,6 @@ static struct drm_dp_mst_branch *
 drm_dp_get_mst_branch_device_by_guid(struct drm_dp_mst_topology_mgr *mgr,
 				     const uint8_t *guid)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_branch *mstb;
 	int ret;
 
@@ -2744,7 +2656,6 @@ drm_dp_get_mst_branch_device_by_guid(struct drm_dp_mst_topology_mgr *mgr,
 static int drm_dp_check_and_send_link_address(struct drm_dp_mst_topology_mgr *mgr,
 					       struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port;
 	int ret;
 	bool changed = false;
@@ -2783,7 +2694,6 @@ static int drm_dp_check_and_send_link_address(struct drm_dp_mst_topology_mgr *mg
 
 static void drm_dp_mst_link_probe_work(struct work_struct *work)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr =
 		container_of(work, struct drm_dp_mst_topology_mgr, work);
 	struct drm_device *dev = mgr->dev;
@@ -2833,7 +2743,6 @@ static void drm_dp_mst_link_probe_work(struct work_struct *work)
 static bool drm_dp_validate_guid(struct drm_dp_mst_topology_mgr *mgr,
 				 u8 *guid)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	u64 salt;
 
 	if (memchr_inv(guid, 0, 16))
@@ -2850,7 +2759,6 @@ static bool drm_dp_validate_guid(struct drm_dp_mst_topology_mgr *mgr,
 static void build_dpcd_read(struct drm_dp_sideband_msg_tx *msg,
 			    u8 port_num, u32 offset, u8 num_bytes)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_req_body req;
 
 	req.req_type = DP_REMOTE_DPCD_READ;
@@ -2863,7 +2771,6 @@ static void build_dpcd_read(struct drm_dp_sideband_msg_tx *msg,
 static int drm_dp_send_sideband_msg(struct drm_dp_mst_topology_mgr *mgr,
 				    bool up, u8 *msg, int len)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 	int regbase = up ? DP_SIDEBAND_MSG_UP_REP_BASE : DP_SIDEBAND_MSG_DOWN_REQ_BASE;
 	int tosend, total, offset;
@@ -2896,7 +2803,6 @@ retry:
 static int set_hdr_from_dst_qlock(struct drm_dp_sideband_msg_hdr *hdr,
 				  struct drm_dp_sideband_msg_tx *txmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_branch *mstb = txmsg->dst;
 	u8 req_type;
 
@@ -2927,7 +2833,6 @@ static int process_single_tx_qlock(struct drm_dp_mst_topology_mgr *mgr,
 				   struct drm_dp_sideband_msg_tx *txmsg,
 				   bool up)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	u8 chunk[48];
 	struct drm_dp_sideband_msg_hdr hdr;
 	int len, space, idx, tosend;
@@ -2987,7 +2892,6 @@ static int process_single_tx_qlock(struct drm_dp_mst_topology_mgr *mgr,
 
 static void process_single_down_tx_qlock(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_tx *txmsg;
 	int ret;
 
@@ -3011,7 +2915,6 @@ static void process_single_down_tx_qlock(struct drm_dp_mst_topology_mgr *mgr)
 static void drm_dp_queue_down_tx(struct drm_dp_mst_topology_mgr *mgr,
 				 struct drm_dp_sideband_msg_tx *txmsg)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	mutex_lock(&mgr->qlock);
 	list_add_tail(&txmsg->next, &mgr->tx_msg_downq);
 
@@ -3030,7 +2933,6 @@ static void
 drm_dp_dump_link_address(const struct drm_dp_mst_topology_mgr *mgr,
 			 struct drm_dp_link_address_ack_reply *reply)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_link_addr_reply_port *port_reply;
 	int i;
 
@@ -3054,7 +2956,6 @@ drm_dp_dump_link_address(const struct drm_dp_mst_topology_mgr *mgr,
 static int drm_dp_send_link_address(struct drm_dp_mst_topology_mgr *mgr,
 				     struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_tx *txmsg;
 	struct drm_dp_link_address_ack_reply *reply;
 	struct drm_dp_mst_port *port, *tmp;
@@ -3135,7 +3036,6 @@ static void
 drm_dp_send_clear_payload_id_table(struct drm_dp_mst_topology_mgr *mgr,
 				   struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_tx *txmsg;
 	int ret;
 
@@ -3160,7 +3060,6 @@ drm_dp_send_enum_path_resources(struct drm_dp_mst_topology_mgr *mgr,
 				struct drm_dp_mst_branch *mstb,
 				struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_enum_path_resources_ack_reply *path_res;
 	struct drm_dp_sideband_msg_tx *txmsg;
 	int ret;
@@ -3209,7 +3108,6 @@ drm_dp_send_enum_path_resources(struct drm_dp_mst_topology_mgr *mgr,
 
 static struct drm_dp_mst_port *drm_dp_get_last_connected_port_to_mstb(struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	if (!mstb->port_parent)
 		return NULL;
 
@@ -3232,7 +3130,6 @@ drm_dp_get_last_connected_port_and_mstb(struct drm_dp_mst_topology_mgr *mgr,
 					struct drm_dp_mst_branch *mstb,
 					int *port_num)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_branch *rmstb = NULL;
 	struct drm_dp_mst_port *found_port;
 
@@ -3263,7 +3160,6 @@ static int drm_dp_payload_send_msg(struct drm_dp_mst_topology_mgr *mgr,
 				   int id,
 				   int pbn)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_tx *txmsg;
 	struct drm_dp_mst_branch *mstb;
 	int ret, port_num;
@@ -3321,7 +3217,6 @@ fail_put:
 int drm_dp_send_power_updown_phy(struct drm_dp_mst_topology_mgr *mgr,
 				 struct drm_dp_mst_port *port, bool power_up)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_tx *txmsg;
 	int ret;
 
@@ -3357,7 +3252,6 @@ int drm_dp_send_query_stream_enc_status(struct drm_dp_mst_topology_mgr *mgr,
 		struct drm_dp_mst_port *port,
 		struct drm_dp_query_stream_enc_status_ack_reply *status)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_tx *txmsg;
 	u8 nonce[7];
 	int ret;
@@ -3409,7 +3303,6 @@ static int drm_dp_create_payload_step1(struct drm_dp_mst_topology_mgr *mgr,
 				       int id,
 				       struct drm_dp_payload *payload)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 
 	ret = drm_dp_dpcd_write_payload(mgr, id, payload);
@@ -3426,7 +3319,6 @@ static int drm_dp_create_payload_step2(struct drm_dp_mst_topology_mgr *mgr,
 				       int id,
 				       struct drm_dp_payload *payload)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 
 	ret = drm_dp_payload_send_msg(mgr, port, id, port->vcpi.pbn);
@@ -3441,7 +3333,6 @@ static int drm_dp_destroy_payload_step1(struct drm_dp_mst_topology_mgr *mgr,
 					int id,
 					struct drm_dp_payload *payload)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	drm_dbg_kms(mgr->dev, "\n");
 	/* it's okay for these to fail */
 	if (port) {
@@ -3457,7 +3348,6 @@ static int drm_dp_destroy_payload_step2(struct drm_dp_mst_topology_mgr *mgr,
 					int id,
 					struct drm_dp_payload *payload)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	payload->payload_state = 0;
 	return 0;
 }
@@ -3477,7 +3367,6 @@ static int drm_dp_destroy_payload_step2(struct drm_dp_mst_topology_mgr *mgr,
  */
 int drm_dp_update_payload_part1(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_payload req_payload;
 	struct drm_dp_mst_port *port;
 	int i, j;
@@ -3604,7 +3493,6 @@ EXPORT_SYMBOL(drm_dp_update_payload_part1);
  */
 int drm_dp_update_payload_part2(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port;
 	int i;
 	int ret = 0;
@@ -3645,7 +3533,6 @@ static int drm_dp_send_dpcd_read(struct drm_dp_mst_topology_mgr *mgr,
 				 struct drm_dp_mst_port *port,
 				 int offset, int size, u8 *bytes)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret = 0;
 	struct drm_dp_sideband_msg_tx *txmsg;
 	struct drm_dp_mst_branch *mstb;
@@ -3698,7 +3585,6 @@ static int drm_dp_send_dpcd_write(struct drm_dp_mst_topology_mgr *mgr,
 				  struct drm_dp_mst_port *port,
 				  int offset, int size, u8 *bytes)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 	struct drm_dp_sideband_msg_tx *txmsg;
 	struct drm_dp_mst_branch *mstb;
@@ -3734,7 +3620,6 @@ fail_put:
 
 static int drm_dp_encode_up_ack_reply(struct drm_dp_sideband_msg_tx *msg, u8 req_type)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_reply_body reply;
 
 	reply.reply_type = DP_SIDEBAND_REPLY_ACK;
@@ -3747,7 +3632,6 @@ static int drm_dp_send_up_ack_reply(struct drm_dp_mst_topology_mgr *mgr,
 				    struct drm_dp_mst_branch *mstb,
 				    int req_type, bool broadcast)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_tx *txmsg;
 
 	txmsg = kzalloc(sizeof(*txmsg), GFP_KERNEL);
@@ -3780,7 +3664,6 @@ static int drm_dp_send_up_ack_reply(struct drm_dp_mst_topology_mgr *mgr,
 int drm_dp_get_vc_payload_bw(const struct drm_dp_mst_topology_mgr *mgr,
 			     int link_rate, int link_lane_count)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	if (link_rate == 0 || link_lane_count == 0)
 		drm_dbg_kms(mgr->dev, "invalid link rate/lane count: (%d / %d)\n",
 			    link_rate, link_lane_count);
@@ -3800,7 +3683,6 @@ EXPORT_SYMBOL(drm_dp_get_vc_payload_bw);
 bool drm_dp_read_mst_cap(struct drm_dp_aux *aux,
 			 const u8 dpcd[DP_RECEIVER_CAP_SIZE])
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	u8 mstm_cap;
 
 	if (dpcd[DP_DPCD_REV] < DP_DPCD_REV_12)
@@ -3823,7 +3705,6 @@ EXPORT_SYMBOL(drm_dp_read_mst_cap);
  */
 int drm_dp_mst_topology_mgr_set_mst(struct drm_dp_mst_topology_mgr *mgr, bool mst_state)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret = 0;
 	struct drm_dp_mst_branch *mstb = NULL;
 
@@ -3915,7 +3796,6 @@ EXPORT_SYMBOL(drm_dp_mst_topology_mgr_set_mst);
 static void
 drm_dp_mst_topology_mgr_invalidate_mstb(struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port;
 
 	/* The link address will need to be re-sent on resume */
@@ -3935,7 +3815,6 @@ drm_dp_mst_topology_mgr_invalidate_mstb(struct drm_dp_mst_branch *mstb)
  */
 void drm_dp_mst_topology_mgr_suspend(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	mutex_lock(&mgr->lock);
 	drm_dp_dpcd_writeb(mgr->aux, DP_MSTM_CTRL,
 			   DP_MST_EN | DP_UPSTREAM_IS_SRC);
@@ -3974,7 +3853,6 @@ EXPORT_SYMBOL(drm_dp_mst_topology_mgr_suspend);
 int drm_dp_mst_topology_mgr_resume(struct drm_dp_mst_topology_mgr *mgr,
 				   bool sync)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 	u8 guid[16];
 
@@ -4037,7 +3915,6 @@ static bool
 drm_dp_get_one_sb_msg(struct drm_dp_mst_topology_mgr *mgr, bool up,
 		      struct drm_dp_mst_branch **mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int len;
 	u8 replyblock[32];
 	int replylen, curreply;
@@ -4114,7 +3991,6 @@ drm_dp_get_one_sb_msg(struct drm_dp_mst_topology_mgr *mgr, bool up,
 
 static int drm_dp_mst_handle_down_rep(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_sideband_msg_tx *txmsg;
 	struct drm_dp_mst_branch *mstb = NULL;
 	struct drm_dp_sideband_msg_rx *msg = &mgr->down_rep_recv;
@@ -4179,7 +4055,6 @@ static inline bool
 drm_dp_mst_process_up_req(struct drm_dp_mst_topology_mgr *mgr,
 			  struct drm_dp_pending_up_req *up_req)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_branch *mstb = NULL;
 	struct drm_dp_sideband_msg_req_body *msg = &up_req->msg;
 	struct drm_dp_sideband_msg_hdr *hdr = &up_req->hdr;
@@ -4216,7 +4091,6 @@ drm_dp_mst_process_up_req(struct drm_dp_mst_topology_mgr *mgr,
 
 static void drm_dp_mst_up_req_work(struct work_struct *work)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr =
 		container_of(work, struct drm_dp_mst_topology_mgr,
 			     up_req_work);
@@ -4247,7 +4121,6 @@ static void drm_dp_mst_up_req_work(struct work_struct *work)
 
 static int drm_dp_mst_handle_up_req(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_pending_up_req *up_req;
 
 	if (!drm_dp_get_one_sb_msg(mgr, true, NULL))
@@ -4319,7 +4192,6 @@ out:
  */
 int drm_dp_mst_hpd_irq(struct drm_dp_mst_topology_mgr *mgr, u8 *esi, bool *handled)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret = 0;
 	int sc;
 	*handled = false;
@@ -4360,7 +4232,6 @@ drm_dp_mst_detect_port(struct drm_connector *connector,
 		       struct drm_dp_mst_topology_mgr *mgr,
 		       struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 
 	/* we need to search for the port in the mgr in case it's gone */
@@ -4414,7 +4285,6 @@ EXPORT_SYMBOL(drm_dp_mst_detect_port);
  */
 struct edid *drm_dp_mst_get_edid(struct drm_connector *connector, struct drm_dp_mst_topology_mgr *mgr, struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct edid *edid = NULL;
 
 	/* we need to search for the port in the mgr in case it's gone */
@@ -4448,7 +4318,6 @@ EXPORT_SYMBOL(drm_dp_mst_get_edid);
 int drm_dp_find_vcpi_slots(struct drm_dp_mst_topology_mgr *mgr,
 			   int pbn)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int num_slots;
 
 	num_slots = DIV_ROUND_UP(pbn, mgr->pbn_div);
@@ -4463,7 +4332,6 @@ EXPORT_SYMBOL(drm_dp_find_vcpi_slots);
 static int drm_dp_init_vcpi(struct drm_dp_mst_topology_mgr *mgr,
 			    struct drm_dp_vcpi *vcpi, int pbn, int slots)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 
 	/* max. time slots - one slot for MTP header */
@@ -4516,7 +4384,6 @@ int drm_dp_atomic_find_vcpi_slots(struct drm_atomic_state *state,
 				  struct drm_dp_mst_port *port, int pbn,
 				  int pbn_div)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_state *topology_state;
 	struct drm_dp_vcpi_allocation *pos, *vcpi = NULL;
 	int prev_slots, prev_bw, req_slots;
@@ -4611,7 +4478,6 @@ int drm_dp_atomic_release_vcpi_slots(struct drm_atomic_state *state,
 				     struct drm_dp_mst_topology_mgr *mgr,
 				     struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_state *topology_state;
 	struct drm_dp_vcpi_allocation *pos;
 	bool found = false;
@@ -4653,7 +4519,6 @@ EXPORT_SYMBOL(drm_dp_atomic_release_vcpi_slots);
 bool drm_dp_mst_allocate_vcpi(struct drm_dp_mst_topology_mgr *mgr,
 			      struct drm_dp_mst_port *port, int pbn, int slots)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 
 	if (slots < 0)
@@ -4693,7 +4558,6 @@ EXPORT_SYMBOL(drm_dp_mst_allocate_vcpi);
 
 int drm_dp_mst_get_vcpi_slots(struct drm_dp_mst_topology_mgr *mgr, struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int slots = 0;
 
 	port = drm_dp_mst_topology_get_port_validated(mgr, port);
@@ -4715,7 +4579,6 @@ EXPORT_SYMBOL(drm_dp_mst_get_vcpi_slots);
  */
 void drm_dp_mst_reset_vcpi_slots(struct drm_dp_mst_topology_mgr *mgr, struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	/*
 	 * A port with VCPI will remain allocated until its VCPI is
 	 * released, no verified ref needed
@@ -4736,7 +4599,6 @@ EXPORT_SYMBOL(drm_dp_mst_reset_vcpi_slots);
 void drm_dp_mst_deallocate_vcpi(struct drm_dp_mst_topology_mgr *mgr,
 				struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	bool skip;
 
 	if (!port->vcpi.vcpi)
@@ -4761,7 +4623,6 @@ EXPORT_SYMBOL(drm_dp_mst_deallocate_vcpi);
 static int drm_dp_dpcd_write_payload(struct drm_dp_mst_topology_mgr *mgr,
 				     int id, struct drm_dp_payload *payload)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	u8 payload_alloc[3], status;
 	int ret;
 	int retries = 0;
@@ -4804,7 +4665,6 @@ fail:
 
 static int do_get_act_status(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int ret;
 	u8 status;
 
@@ -4828,7 +4688,6 @@ static int do_get_act_status(struct drm_dp_aux *aux)
  */
 int drm_dp_check_act_status(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	/*
 	 * There doesn't seem to be any recommended retry count or timeout in
 	 * the MST specification. Since some hubs have been observed to take
@@ -4868,7 +4727,6 @@ EXPORT_SYMBOL(drm_dp_check_act_status);
  */
 int drm_dp_calc_pbn_mode(int clock, int bpp, bool dsc)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	/*
 	 * margin 5300ppm + 300ppm ~ 0.6% as per spec, factor is 1.006
 	 * The unit of 54/64Mbytes/sec is an arbitrary unit chosen based on
@@ -4896,7 +4754,6 @@ EXPORT_SYMBOL(drm_dp_calc_pbn_mode);
 /* we want to kick the TX after we've ack the up/down IRQs. */
 static void drm_dp_mst_kick_tx(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	queue_work(system_long_wq, &mgr->tx_work);
 }
 
@@ -4906,7 +4763,6 @@ static void drm_dp_mst_kick_tx(struct drm_dp_mst_topology_mgr *mgr)
  */
 static const char *pdt_to_string(u8 pdt)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	switch (pdt) {
 	case DP_PEER_DEVICE_NONE:
 		return "NONE";
@@ -4926,7 +4782,6 @@ static const char *pdt_to_string(u8 pdt)
 static void drm_dp_mst_dump_mstb(struct seq_file *m,
 				 struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *port;
 	int tabs = mstb->lct;
 	char prefix[10];
@@ -4960,7 +4815,6 @@ static void drm_dp_mst_dump_mstb(struct seq_file *m,
 static bool dump_dp_payload_table(struct drm_dp_mst_topology_mgr *mgr,
 				  char *buf)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < DP_PAYLOAD_TABLE_SIZE; i += 16) {
@@ -4976,7 +4830,6 @@ static void fetch_monitor_name(struct drm_dp_mst_topology_mgr *mgr,
 			       struct drm_dp_mst_port *port, char *name,
 			       int namelen)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct edid *mst_edid;
 
 	mst_edid = drm_dp_mst_get_edid(port->connector, mgr, port);
@@ -4993,7 +4846,6 @@ static void fetch_monitor_name(struct drm_dp_mst_topology_mgr *mgr,
 void drm_dp_mst_dump_topology(struct seq_file *m,
 			      struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int i;
 	struct drm_dp_mst_port *port;
 
@@ -5086,7 +4938,6 @@ EXPORT_SYMBOL(drm_dp_mst_dump_topology);
 
 static void drm_dp_tx_work(struct work_struct *work)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr = container_of(work, struct drm_dp_mst_topology_mgr, tx_work);
 
 	mutex_lock(&mgr->qlock);
@@ -5098,7 +4949,6 @@ static void drm_dp_tx_work(struct work_struct *work)
 static inline void
 drm_dp_delayed_destroy_port(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	drm_dp_port_set_pdt(port, DP_PEER_DEVICE_NONE, port->mcs);
 
 	if (port->connector) {
@@ -5112,7 +4962,6 @@ drm_dp_delayed_destroy_port(struct drm_dp_mst_port *port)
 static inline void
 drm_dp_delayed_destroy_mstb(struct drm_dp_mst_branch *mstb)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr = mstb->mgr;
 	struct drm_dp_mst_port *port, *port_tmp;
 	struct drm_dp_sideband_msg_tx *txmsg, *txmsg_tmp;
@@ -5145,7 +4994,6 @@ drm_dp_delayed_destroy_mstb(struct drm_dp_mst_branch *mstb)
 
 static void drm_dp_delayed_destroy_work(struct work_struct *work)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr =
 		container_of(work, struct drm_dp_mst_topology_mgr,
 			     delayed_destroy_work);
@@ -5204,7 +5052,6 @@ static void drm_dp_delayed_destroy_work(struct work_struct *work)
 static struct drm_private_state *
 drm_dp_mst_duplicate_state(struct drm_private_obj *obj)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_state *state, *old_state =
 		to_dp_mst_topology_state(obj->state);
 	struct drm_dp_vcpi_allocation *pos, *vcpi;
@@ -5245,7 +5092,6 @@ fail:
 static void drm_dp_mst_destroy_state(struct drm_private_obj *obj,
 				     struct drm_private_state *state)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_state *mst_state =
 		to_dp_mst_topology_state(state);
 	struct drm_dp_vcpi_allocation *pos, *tmp;
@@ -5263,7 +5109,6 @@ static void drm_dp_mst_destroy_state(struct drm_private_obj *obj,
 static bool drm_dp_mst_port_downstream_of_branch(struct drm_dp_mst_port *port,
 						 struct drm_dp_mst_branch *branch)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	while (port->parent) {
 		if (port->parent == branch)
 			return true;
@@ -5284,7 +5129,6 @@ static int
 drm_dp_mst_atomic_check_mstb_bw_limit(struct drm_dp_mst_branch *mstb,
 				      struct drm_dp_mst_topology_state *state)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_vcpi_allocation *vcpi;
 	struct drm_dp_mst_port *port;
 	int pbn_used = 0, ret;
@@ -5326,7 +5170,6 @@ static int
 drm_dp_mst_atomic_check_port_bw_limit(struct drm_dp_mst_port *port,
 				      struct drm_dp_mst_topology_state *state)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_vcpi_allocation *vcpi;
 	int pbn_used = 0;
 
@@ -5384,7 +5227,6 @@ static inline int
 drm_dp_mst_atomic_check_vcpi_alloc_limit(struct drm_dp_mst_topology_mgr *mgr,
 					 struct drm_dp_mst_topology_state *mst_state)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_vcpi_allocation *vcpi;
 	int avail_slots = 63, payload_count = 0;
 
@@ -5435,7 +5277,6 @@ drm_dp_mst_atomic_check_vcpi_alloc_limit(struct drm_dp_mst_topology_mgr *mgr,
  */
 int drm_dp_mst_add_affected_dsc_crtcs(struct drm_atomic_state *state, struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_state *mst_state;
 	struct drm_dp_vcpi_allocation *pos;
 	struct drm_connector *connector;
@@ -5501,7 +5342,6 @@ int drm_dp_mst_atomic_enable_dsc(struct drm_atomic_state *state,
 				 int pbn, int pbn_div,
 				 bool enable)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_state *mst_state;
 	struct drm_dp_vcpi_allocation *pos;
 	bool found = false;
@@ -5570,7 +5410,6 @@ EXPORT_SYMBOL(drm_dp_mst_atomic_enable_dsc);
  */
 int drm_dp_mst_atomic_check(struct drm_atomic_state *state)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr;
 	struct drm_dp_mst_topology_state *mst_state;
 	int i, ret = 0;
@@ -5621,7 +5460,6 @@ EXPORT_SYMBOL(drm_dp_mst_topology_state_funcs);
 struct drm_dp_mst_topology_state *drm_atomic_get_mst_topology_state(struct drm_atomic_state *state,
 								    struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	return to_dp_mst_topology_state(drm_atomic_get_private_obj_state(state, &mgr->base));
 }
 EXPORT_SYMBOL(drm_atomic_get_mst_topology_state);
@@ -5645,7 +5483,6 @@ int drm_dp_mst_topology_mgr_init(struct drm_dp_mst_topology_mgr *mgr,
 				 int max_lane_count, int max_link_rate,
 				 int conn_base_id)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_state *mst_state;
 
 	mutex_init(&mgr->lock);
@@ -5714,7 +5551,6 @@ EXPORT_SYMBOL(drm_dp_mst_topology_mgr_init);
  */
 void drm_dp_mst_topology_mgr_destroy(struct drm_dp_mst_topology_mgr *mgr)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	drm_dp_mst_topology_mgr_set_mst(mgr, false);
 	flush_work(&mgr->work);
 	/* The following will also drain any requeued work on the WQ. */
@@ -5747,7 +5583,6 @@ EXPORT_SYMBOL(drm_dp_mst_topology_mgr_destroy);
 
 static bool remote_i2c_read_ok(const struct i2c_msg msgs[], int num)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int i;
 
 	if (num - 1 > DP_REMOTE_I2C_READ_MAX_TRANSACTIONS)
@@ -5765,7 +5600,6 @@ static bool remote_i2c_read_ok(const struct i2c_msg msgs[], int num)
 
 static bool remote_i2c_write_ok(const struct i2c_msg msgs[], int num)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < num - 1; i++) {
@@ -5781,7 +5615,6 @@ static int drm_dp_mst_i2c_read(struct drm_dp_mst_branch *mstb,
 			       struct drm_dp_mst_port *port,
 			       struct i2c_msg *msgs, int num)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr = port->mgr;
 	unsigned int i;
 	struct drm_dp_sideband_msg_req_body msg;
@@ -5835,7 +5668,6 @@ static int drm_dp_mst_i2c_write(struct drm_dp_mst_branch *mstb,
 				struct drm_dp_mst_port *port,
 				struct i2c_msg *msgs, int num)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_topology_mgr *mgr = port->mgr;
 	unsigned int i;
 	struct drm_dp_sideband_msg_req_body msg;
@@ -5881,7 +5713,6 @@ out:
 static int drm_dp_mst_i2c_xfer(struct i2c_adapter *adapter,
 			       struct i2c_msg *msgs, int num)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_aux *aux = adapter->algo_data;
 	struct drm_dp_mst_port *port =
 		container_of(aux, struct drm_dp_mst_port, aux);
@@ -5908,7 +5739,6 @@ static int drm_dp_mst_i2c_xfer(struct i2c_adapter *adapter,
 
 static u32 drm_dp_mst_i2c_functionality(struct i2c_adapter *adapter)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	return I2C_FUNC_I2C | I2C_FUNC_SMBUS_EMUL |
 	       I2C_FUNC_SMBUS_READ_BLOCK_DATA |
 	       I2C_FUNC_SMBUS_BLOCK_PROC_CALL |
@@ -5928,7 +5758,6 @@ static const struct i2c_algorithm drm_dp_mst_i2c_algo = {
  */
 static int drm_dp_mst_register_i2c_bus(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_aux *aux = &port->aux;
 	struct device *parent_dev = port->mgr->dev->dev;
 
@@ -5954,7 +5783,6 @@ static int drm_dp_mst_register_i2c_bus(struct drm_dp_mst_port *port)
  */
 static void drm_dp_mst_unregister_i2c_bus(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	i2c_del_adapter(&port->aux.ddc);
 }
 
@@ -5976,7 +5804,6 @@ static void drm_dp_mst_unregister_i2c_bus(struct drm_dp_mst_port *port)
  */
 static bool drm_dp_mst_is_virtual_dpcd(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *downstream_port;
 
 	if (!port || port->dpcd_rev < DP_DPCD_REV_14)
@@ -6028,7 +5855,6 @@ static bool drm_dp_mst_is_virtual_dpcd(struct drm_dp_mst_port *port)
  */
 struct drm_dp_aux *drm_dp_mst_dsc_aux_for_port(struct drm_dp_mst_port *port)
 {
-    pr_info("drm_dp_mst_topology: called %s\n", __func__);
 	struct drm_dp_mst_port *immediate_upstream_port;
 	struct drm_dp_mst_port *fec_port;
 	struct drm_dp_desc desc = {};

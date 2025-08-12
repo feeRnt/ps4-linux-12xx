@@ -94,7 +94,6 @@ static DEFINE_WW_CLASS(crtc_ww_class);
  */
 void drm_modeset_lock_all(struct drm_device *dev)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	struct drm_mode_config *config = &dev->mode_config;
 	struct drm_modeset_acquire_ctx *ctx;
 	int ret;
@@ -149,7 +148,6 @@ EXPORT_SYMBOL(drm_modeset_lock_all);
  */
 void drm_modeset_unlock_all(struct drm_device *dev)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	struct drm_mode_config *config = &dev->mode_config;
 	struct drm_modeset_acquire_ctx *ctx = config->acquire_ctx;
 
@@ -174,7 +172,6 @@ EXPORT_SYMBOL(drm_modeset_unlock_all);
  */
 void drm_warn_on_modeset_not_all_locked(struct drm_device *dev)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	struct drm_crtc *crtc;
 
 	/* Locking is currently fubar in the panic handler. */
@@ -201,7 +198,6 @@ EXPORT_SYMBOL(drm_warn_on_modeset_not_all_locked);
 void drm_modeset_acquire_init(struct drm_modeset_acquire_ctx *ctx,
 		uint32_t flags)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	memset(ctx, 0, sizeof(*ctx));
 	ww_acquire_init(&ctx->ww_ctx, &crtc_ww_class);
 	INIT_LIST_HEAD(&ctx->locked);
@@ -217,7 +213,6 @@ EXPORT_SYMBOL(drm_modeset_acquire_init);
  */
 void drm_modeset_acquire_fini(struct drm_modeset_acquire_ctx *ctx)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	ww_acquire_fini(&ctx->ww_ctx);
 }
 EXPORT_SYMBOL(drm_modeset_acquire_fini);
@@ -230,7 +225,6 @@ EXPORT_SYMBOL(drm_modeset_acquire_fini);
  */
 void drm_modeset_drop_locks(struct drm_modeset_acquire_ctx *ctx)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	WARN_ON(ctx->contended);
 	while (!list_empty(&ctx->locked)) {
 		struct drm_modeset_lock *lock;
@@ -247,7 +241,6 @@ static inline int modeset_lock(struct drm_modeset_lock *lock,
 		struct drm_modeset_acquire_ctx *ctx,
 		bool interruptible, bool slow)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	int ret;
 
 	WARN_ON(ctx->contended);
@@ -300,7 +293,6 @@ static inline int modeset_lock(struct drm_modeset_lock *lock,
  */
 int drm_modeset_backoff(struct drm_modeset_acquire_ctx *ctx)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	struct drm_modeset_lock *contended = ctx->contended;
 
 	ctx->contended = NULL;
@@ -320,7 +312,6 @@ EXPORT_SYMBOL(drm_modeset_backoff);
  */
 void drm_modeset_lock_init(struct drm_modeset_lock *lock)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	ww_mutex_init(&lock->mutex, &crtc_ww_class);
 	INIT_LIST_HEAD(&lock->head);
 }
@@ -347,7 +338,6 @@ EXPORT_SYMBOL(drm_modeset_lock_init);
 int drm_modeset_lock(struct drm_modeset_lock *lock,
 		struct drm_modeset_acquire_ctx *ctx)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	if (ctx)
 		return modeset_lock(lock, ctx, ctx->interruptible, false);
 
@@ -367,7 +357,6 @@ EXPORT_SYMBOL(drm_modeset_lock);
  */
 int drm_modeset_lock_single_interruptible(struct drm_modeset_lock *lock)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	return ww_mutex_lock_interruptible(&lock->mutex, NULL);
 }
 EXPORT_SYMBOL(drm_modeset_lock_single_interruptible);
@@ -378,7 +367,6 @@ EXPORT_SYMBOL(drm_modeset_lock_single_interruptible);
  */
 void drm_modeset_unlock(struct drm_modeset_lock *lock)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	list_del_init(&lock->head);
 	ww_mutex_unlock(&lock->mutex);
 }
@@ -407,7 +395,6 @@ EXPORT_SYMBOL(drm_modeset_unlock);
 int drm_modeset_lock_all_ctx(struct drm_device *dev,
 			     struct drm_modeset_acquire_ctx *ctx)
 {
-    pr_info("drm_modeset_lock: called %s\n", __func__);
 	struct drm_private_obj *privobj;
 	struct drm_crtc *crtc;
 	struct drm_plane *plane;

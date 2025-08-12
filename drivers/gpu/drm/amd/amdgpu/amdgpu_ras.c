@@ -88,14 +88,12 @@ static bool amdgpu_ras_check_bad_page(struct amdgpu_device *adev,
 
 void amdgpu_ras_set_error_query_ready(struct amdgpu_device *adev, bool ready)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	if (adev && amdgpu_ras_get_context(adev))
 		amdgpu_ras_get_context(adev)->error_query_ready = ready;
 }
 
 static bool amdgpu_ras_get_error_query_ready(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	if (adev && amdgpu_ras_get_context(adev))
 		return amdgpu_ras_get_context(adev)->error_query_ready;
 
@@ -104,7 +102,6 @@ static bool amdgpu_ras_get_error_query_ready(struct amdgpu_device *adev)
 
 static int amdgpu_reserve_page_direct(struct amdgpu_device *adev, uint64_t address)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_err_data err_data = {0, 0, 0, NULL};
 	struct eeprom_table_record err_rec;
 
@@ -149,7 +146,6 @@ static int amdgpu_reserve_page_direct(struct amdgpu_device *adev, uint64_t addre
 static ssize_t amdgpu_ras_debugfs_read(struct file *f, char __user *buf,
 					size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_manager *obj = (struct ras_manager *)file_inode(f)->i_private;
 	struct ras_query_if info = {
 		.head = obj->head,
@@ -187,7 +183,6 @@ static const struct file_operations amdgpu_ras_debugfs_ops = {
 
 static int amdgpu_ras_find_block_id_by_name(const char *name, int *block_id)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(ras_block_string); i++) {
@@ -202,7 +197,6 @@ static int amdgpu_ras_debugfs_ctrl_parse_data(struct file *f,
 		const char __user *buf, size_t size,
 		loff_t *pos, struct ras_debug_if *data)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	ssize_t s = min_t(u64, 64, size);
 	char str[65];
 	char block_name[33];
@@ -364,7 +358,6 @@ static ssize_t amdgpu_ras_debugfs_ctrl_write(struct file *f,
 					     const char __user *buf,
 					     size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)file_inode(f)->i_private;
 	struct ras_debug_if data;
 	int ret = 0;
@@ -450,7 +443,6 @@ static ssize_t amdgpu_ras_debugfs_eeprom_write(struct file *f,
 					       const char __user *buf,
 					       size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_device *adev =
 		(struct amdgpu_device *)file_inode(f)->i_private;
 	int ret;
@@ -506,7 +498,6 @@ static const struct file_operations amdgpu_ras_debugfs_eeprom_ops = {
 static ssize_t amdgpu_ras_sysfs_read(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_manager *obj = container_of(attr, struct ras_manager, sysfs_attr);
 	struct ras_query_if info = {
 		.head = obj->head,
@@ -535,7 +526,6 @@ static ssize_t amdgpu_ras_sysfs_read(struct device *dev,
 
 static inline void put_obj(struct ras_manager *obj)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	if (obj && (--obj->use == 0))
 		list_del(&obj->node);
 	if (obj && (obj->use < 0))
@@ -546,7 +536,6 @@ static inline void put_obj(struct ras_manager *obj)
 static struct ras_manager *amdgpu_ras_create_obj(struct amdgpu_device *adev,
 		struct ras_common_if *head)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *obj;
 
@@ -573,7 +562,6 @@ static struct ras_manager *amdgpu_ras_create_obj(struct amdgpu_device *adev,
 struct ras_manager *amdgpu_ras_find_obj(struct amdgpu_device *adev,
 		struct ras_common_if *head)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *obj;
 	int i;
@@ -609,14 +597,12 @@ struct ras_manager *amdgpu_ras_find_obj(struct amdgpu_device *adev,
 static int amdgpu_ras_is_feature_allowed(struct amdgpu_device *adev,
 					 struct ras_common_if *head)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	return adev->ras_hw_enabled & BIT(head->block);
 }
 
 static int amdgpu_ras_is_feature_enabled(struct amdgpu_device *adev,
 		struct ras_common_if *head)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 
 	return con->features & BIT(head->block);
@@ -629,7 +615,6 @@ static int amdgpu_ras_is_feature_enabled(struct amdgpu_device *adev,
 static int __amdgpu_ras_feature_enable(struct amdgpu_device *adev,
 		struct ras_common_if *head, int enable)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, head);
 
@@ -668,7 +653,6 @@ static int __amdgpu_ras_feature_enable(struct amdgpu_device *adev,
 int amdgpu_ras_feature_enable(struct amdgpu_device *adev,
 		struct ras_common_if *head, bool enable)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	union ta_ras_cmd_input *info;
 	int ret;
@@ -723,7 +707,6 @@ out:
 int amdgpu_ras_feature_enable_on_boot(struct amdgpu_device *adev,
 		struct ras_common_if *head, bool enable)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	int ret;
 
@@ -775,7 +758,6 @@ int amdgpu_ras_feature_enable_on_boot(struct amdgpu_device *adev,
 static int amdgpu_ras_disable_all_features(struct amdgpu_device *adev,
 		bool bypass)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *obj, *tmp;
 
@@ -798,7 +780,6 @@ static int amdgpu_ras_disable_all_features(struct amdgpu_device *adev,
 static int amdgpu_ras_enable_all_features(struct amdgpu_device *adev,
 		bool bypass)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	int ras_block_count = AMDGPU_RAS_BLOCK_COUNT;
 	int i;
@@ -832,7 +813,6 @@ static int amdgpu_ras_enable_all_features(struct amdgpu_device *adev,
 int amdgpu_ras_query_error_status(struct amdgpu_device *adev,
 				  struct ras_query_if *info)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, &info->head);
 	struct ras_err_data err_data = {0, 0, 0, NULL};
 	int i;
@@ -947,7 +927,6 @@ int amdgpu_ras_query_error_status(struct amdgpu_device *adev,
 int amdgpu_ras_reset_error_status(struct amdgpu_device *adev,
 		enum amdgpu_ras_block block)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	if (!amdgpu_ras_is_supported(adev, block))
 		return -EINVAL;
 
@@ -990,7 +969,6 @@ int amdgpu_ras_reset_error_status(struct amdgpu_device *adev,
 static int amdgpu_ras_error_inject_xgmi(struct amdgpu_device *adev,
 				 struct ta_ras_trigger_error_input *block_info)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	int ret;
 
 	if (amdgpu_dpm_set_df_cstate(adev, DF_CSTATE_DISALLOW))
@@ -1017,7 +995,6 @@ static int amdgpu_ras_error_inject_xgmi(struct amdgpu_device *adev,
 int amdgpu_ras_error_inject(struct amdgpu_device *adev,
 		struct ras_inject_if *info)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, &info->head);
 	struct ta_ras_trigger_error_input block_info = {
 		.block_id =  amdgpu_ras_block_to_ta(info->head.block),
@@ -1083,7 +1060,6 @@ int amdgpu_ras_query_error_count(struct amdgpu_device *adev,
 				 unsigned long *ce_count,
 				 unsigned long *ue_count)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *obj;
 	unsigned long ce, ue;
@@ -1130,7 +1106,6 @@ static int amdgpu_ras_badpages_read(struct amdgpu_device *adev,
 
 static char *amdgpu_ras_badpage_flags_str(unsigned int flags)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	switch (flags) {
 	case AMDGPU_RAS_RETIRE_PAGE_RESERVED:
 		return "R";
@@ -1176,7 +1151,6 @@ static ssize_t amdgpu_ras_sysfs_badpages_read(struct file *f,
 		struct kobject *kobj, struct bin_attribute *attr,
 		char *buf, loff_t ppos, size_t count)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con =
 		container_of(attr, struct amdgpu_ras, badpages_attr);
 	struct amdgpu_device *adev = con->adev;
@@ -1208,7 +1182,6 @@ static ssize_t amdgpu_ras_sysfs_badpages_read(struct file *f,
 static ssize_t amdgpu_ras_sysfs_features_read(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con =
 		container_of(attr, struct amdgpu_ras, features_attr);
 
@@ -1217,7 +1190,6 @@ static ssize_t amdgpu_ras_sysfs_features_read(struct device *dev,
 
 static void amdgpu_ras_sysfs_remove_bad_page_node(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 
 	sysfs_remove_file_from_group(&adev->dev->kobj,
@@ -1227,7 +1199,6 @@ static void amdgpu_ras_sysfs_remove_bad_page_node(struct amdgpu_device *adev)
 
 static int amdgpu_ras_sysfs_remove_feature_node(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct attribute *attrs[] = {
 		&con->features_attr.attr,
@@ -1246,7 +1217,6 @@ static int amdgpu_ras_sysfs_remove_feature_node(struct amdgpu_device *adev)
 int amdgpu_ras_sysfs_create(struct amdgpu_device *adev,
 		struct ras_fs_if *head)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, &head->head);
 
 	if (!obj || obj->attr_inuse)
@@ -1282,7 +1252,6 @@ int amdgpu_ras_sysfs_create(struct amdgpu_device *adev,
 int amdgpu_ras_sysfs_remove(struct amdgpu_device *adev,
 		struct ras_common_if *head)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, head);
 
 	if (!obj || !obj->attr_inuse)
@@ -1299,7 +1268,6 @@ int amdgpu_ras_sysfs_remove(struct amdgpu_device *adev,
 
 static int amdgpu_ras_sysfs_remove_all(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *obj, *tmp;
 
@@ -1337,7 +1305,6 @@ static int amdgpu_ras_sysfs_remove_all(struct amdgpu_device *adev)
 /* debugfs begin */
 static struct dentry *amdgpu_ras_debugfs_create_ctrl_node(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct drm_minor  *minor = adev_to_drm(adev)->primary;
 	struct dentry     *dir;
@@ -1381,7 +1348,6 @@ static void amdgpu_ras_debugfs_create(struct amdgpu_device *adev,
 				      struct ras_fs_if *head,
 				      struct dentry *dir)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, &head->head);
 
 	if (!obj || !dir)
@@ -1399,7 +1365,6 @@ static void amdgpu_ras_debugfs_create(struct amdgpu_device *adev,
 
 void amdgpu_ras_debugfs_create_all(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct dentry *dir;
 	struct ras_manager *obj;
@@ -1434,7 +1399,6 @@ static DEVICE_ATTR(features, S_IRUGO,
 		amdgpu_ras_sysfs_features_read, NULL);
 static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct attribute_group group = {
 		.name = RAS_FS_NAME,
@@ -1472,7 +1436,6 @@ static int amdgpu_ras_fs_init(struct amdgpu_device *adev)
 
 static int amdgpu_ras_fs_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *con_obj, *ip_obj, *tmp;
 
@@ -1492,7 +1455,6 @@ static int amdgpu_ras_fs_fini(struct amdgpu_device *adev)
 /* ih begin */
 static void amdgpu_ras_interrupt_handler(struct ras_manager *obj)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_ih_data *data = &obj->ih_data;
 	struct amdgpu_iv_entry entry;
 	int ret;
@@ -1530,7 +1492,6 @@ static void amdgpu_ras_interrupt_handler(struct ras_manager *obj)
 
 static void amdgpu_ras_interrupt_process_handler(struct work_struct *work)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_ih_data *data =
 		container_of(work, struct ras_ih_data, ih_work);
 	struct ras_manager *obj =
@@ -1542,7 +1503,6 @@ static void amdgpu_ras_interrupt_process_handler(struct work_struct *work)
 int amdgpu_ras_interrupt_dispatch(struct amdgpu_device *adev,
 		struct ras_dispatch_if *info)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, &info->head);
 	struct ras_ih_data *data = &obj->ih_data;
 
@@ -1568,7 +1528,6 @@ int amdgpu_ras_interrupt_dispatch(struct amdgpu_device *adev,
 int amdgpu_ras_interrupt_remove_handler(struct amdgpu_device *adev,
 		struct ras_ih_if *info)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, &info->head);
 	struct ras_ih_data *data;
 
@@ -1591,7 +1550,6 @@ int amdgpu_ras_interrupt_remove_handler(struct amdgpu_device *adev,
 int amdgpu_ras_interrupt_add_handler(struct amdgpu_device *adev,
 		struct ras_ih_if *info)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_manager *obj = amdgpu_ras_find_obj(adev, &info->head);
 	struct ras_ih_data *data;
 
@@ -1632,7 +1590,6 @@ int amdgpu_ras_interrupt_add_handler(struct amdgpu_device *adev,
 
 static int amdgpu_ras_interrupt_remove_all(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *obj, *tmp;
 
@@ -1650,7 +1607,6 @@ static int amdgpu_ras_interrupt_remove_all(struct amdgpu_device *adev)
 /* traversal all IPs except NBIO to query error counter */
 static void amdgpu_ras_log_on_err_counter(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *obj;
 
@@ -1679,7 +1635,6 @@ static void amdgpu_ras_log_on_err_counter(struct amdgpu_device *adev)
 static void amdgpu_ras_error_status_query(struct amdgpu_device *adev,
 					  struct ras_query_if *info)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	/*
 	 * Only two block need to query read/write
 	 * RspStatus at current state
@@ -1702,7 +1657,6 @@ static void amdgpu_ras_error_status_query(struct amdgpu_device *adev,
 
 static void amdgpu_ras_query_err_status(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *obj;
 
@@ -1726,7 +1680,6 @@ static void amdgpu_ras_query_err_status(struct amdgpu_device *adev)
 static int amdgpu_ras_badpages_read(struct amdgpu_device *adev,
 		struct ras_badpage **bps, unsigned int *count)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_err_handler_data *data;
 	int i = 0;
@@ -1772,7 +1725,6 @@ out:
 
 static void amdgpu_ras_do_recovery(struct work_struct *work)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *ras =
 		container_of(work, struct amdgpu_ras, recovery_work);
 	struct amdgpu_device *remote_adev = NULL;
@@ -1809,7 +1761,6 @@ static void amdgpu_ras_do_recovery(struct work_struct *work)
 static int amdgpu_ras_realloc_eh_data_space(struct amdgpu_device *adev,
 		struct ras_err_handler_data *data, int pages)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	unsigned int old_space = data->count + data->space_left;
 	unsigned int new_space = old_space + pages;
 	unsigned int align_space = ALIGN(new_space, 512);
@@ -1835,7 +1786,6 @@ static int amdgpu_ras_realloc_eh_data_space(struct amdgpu_device *adev,
 int amdgpu_ras_add_bad_pages(struct amdgpu_device *adev,
 		struct eeprom_table_record *bps, int pages)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_err_handler_data *data;
 	int ret = 0;
@@ -1881,7 +1831,6 @@ out:
  */
 int amdgpu_ras_save_bad_pages(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_err_handler_data *data;
 	struct amdgpu_ras_eeprom_control *control;
@@ -1914,7 +1863,6 @@ int amdgpu_ras_save_bad_pages(struct amdgpu_device *adev)
  */
 static int amdgpu_ras_load_bad_pages(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras_eeprom_control *control =
 		&adev->psp.ras_context.ras->eeprom_control;
 	struct eeprom_table_record *bps;
@@ -1941,7 +1889,6 @@ static int amdgpu_ras_load_bad_pages(struct amdgpu_device *adev)
 static bool amdgpu_ras_check_bad_page_unlock(struct amdgpu_ras *con,
 				uint64_t addr)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_err_handler_data *data = con->eh_data;
 	int i;
 
@@ -1961,7 +1908,6 @@ static bool amdgpu_ras_check_bad_page_unlock(struct amdgpu_ras *con,
 static bool amdgpu_ras_check_bad_page(struct amdgpu_device *adev,
 				uint64_t addr)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	bool ret = false;
 
@@ -1977,7 +1923,6 @@ static bool amdgpu_ras_check_bad_page(struct amdgpu_device *adev,
 static void amdgpu_ras_validate_threshold(struct amdgpu_device *adev,
 					  uint32_t max_count)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 
 	/*
@@ -2013,7 +1958,6 @@ static void amdgpu_ras_validate_threshold(struct amdgpu_device *adev,
 
 int amdgpu_ras_recovery_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_err_handler_data **data;
 	u32  max_eeprom_records_count = 0;
@@ -2093,7 +2037,6 @@ out:
 
 static int amdgpu_ras_recovery_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_err_handler_data *data = con->eh_data;
 
@@ -2117,7 +2060,6 @@ static int amdgpu_ras_recovery_fini(struct amdgpu_device *adev)
 int amdgpu_ras_request_reset_on_boot(struct amdgpu_device *adev,
 		unsigned int block)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
 
 	if (!ras)
@@ -2129,7 +2071,6 @@ int amdgpu_ras_request_reset_on_boot(struct amdgpu_device *adev,
 
 static bool amdgpu_ras_asic_supported(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	return adev->asic_type == CHIP_VEGA10 ||
 		adev->asic_type == CHIP_VEGA20 ||
 		adev->asic_type == CHIP_ARCTURUS ||
@@ -2144,7 +2085,6 @@ static bool amdgpu_ras_asic_supported(struct amdgpu_device *adev)
  */
 static void amdgpu_ras_get_quirks(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct atom_context *ctx = adev->mode_info.atom_context;
 
 	if (!ctx)
@@ -2168,7 +2108,6 @@ static void amdgpu_ras_get_quirks(struct amdgpu_device *adev)
  */
 static void amdgpu_ras_check_supported(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	adev->ras_hw_enabled = adev->ras_enabled = 0;
 
 	if (amdgpu_sriov_vf(adev) || !adev->is_atom_fw ||
@@ -2210,7 +2149,6 @@ static void amdgpu_ras_check_supported(struct amdgpu_device *adev)
 
 static void amdgpu_ras_counte_dw(struct work_struct *work)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = container_of(work, struct amdgpu_ras,
 					      ras_counte_delay_work.work);
 	struct amdgpu_device *adev = con->adev;
@@ -2236,7 +2174,6 @@ Out:
 
 int amdgpu_ras_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	int r;
 
@@ -2327,7 +2264,6 @@ release_con:
 
 int amdgpu_persistent_edc_harvesting_supported(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	if (adev->gmc.xgmi.connected_to_cpu)
 		return 1;
 	return 0;
@@ -2336,7 +2272,6 @@ int amdgpu_persistent_edc_harvesting_supported(struct amdgpu_device *adev)
 static int amdgpu_persistent_edc_harvesting(struct amdgpu_device *adev,
 					struct ras_common_if *ras_block)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct ras_query_if info = {
 		.head = *ras_block,
 	};
@@ -2359,7 +2294,6 @@ int amdgpu_ras_late_init(struct amdgpu_device *adev,
 			 struct ras_fs_if *fs_info,
 			 struct ras_ih_if *ih_info)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	unsigned long ue_count, ce_count;
 	int r;
@@ -2425,7 +2359,6 @@ void amdgpu_ras_late_fini(struct amdgpu_device *adev,
 			  struct ras_common_if *ras_block,
 			  struct ras_ih_if *ih_info)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	if (!ras_block || !ih_info)
 		return;
 
@@ -2440,7 +2373,6 @@ void amdgpu_ras_late_fini(struct amdgpu_device *adev,
  */
 void amdgpu_ras_resume(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 	struct ras_manager *obj, *tmp;
 
@@ -2488,7 +2420,6 @@ void amdgpu_ras_resume(struct amdgpu_device *adev)
 
 void amdgpu_ras_suspend(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 
 	if (!adev->ras_enabled || !con)
@@ -2503,7 +2434,6 @@ void amdgpu_ras_suspend(struct amdgpu_device *adev)
 /* do some fini work before IP fini as dependence */
 int amdgpu_ras_pre_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 
 	if (!adev->ras_enabled || !con)
@@ -2518,7 +2448,6 @@ int amdgpu_ras_pre_fini(struct amdgpu_device *adev)
 
 int amdgpu_ras_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 
 	if (!adev->ras_enabled || !con)
@@ -2542,7 +2471,6 @@ int amdgpu_ras_fini(struct amdgpu_device *adev)
 
 void amdgpu_ras_global_ras_isr(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	amdgpu_ras_check_supported(adev);
 	if (!adev->ras_hw_enabled)
 		return;
@@ -2557,7 +2485,6 @@ void amdgpu_ras_global_ras_isr(struct amdgpu_device *adev)
 
 bool amdgpu_ras_need_emergency_restart(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	if (adev->asic_type == CHIP_VEGA20 &&
 	    adev->pm.fw_version <= 0x283400) {
 		return !(amdgpu_asic_reset_method(adev) == AMD_RESET_METHOD_BACO) &&
@@ -2569,7 +2496,6 @@ bool amdgpu_ras_need_emergency_restart(struct amdgpu_device *adev)
 
 void amdgpu_release_ras_context(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 
 	if (!con)

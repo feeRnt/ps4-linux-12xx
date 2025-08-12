@@ -91,7 +91,6 @@ typedef struct drm_version_32 {
 static int compat_drm_version(struct file *file, unsigned int cmd,
 			      unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_version32_t v32;
 	struct drm_version v;
 	int err;
@@ -133,7 +132,6 @@ typedef struct drm_unique32 {
 static int compat_drm_getunique(struct file *file, unsigned int cmd,
 				unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_unique32_t uq32;
 	struct drm_unique uq;
 	int err;
@@ -161,7 +159,6 @@ static int compat_drm_getunique(struct file *file, unsigned int cmd,
 static int compat_drm_setunique(struct file *file, unsigned int cmd,
 				unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	/* it's dead */
 	return -EINVAL;
 }
@@ -179,7 +176,6 @@ typedef struct drm_map32 {
 static int compat_drm_getmap(struct file *file, unsigned int cmd,
 			     unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_map32_t __user *argp = (void __user *)arg;
 	drm_map32_t m32;
 	struct drm_map map;
@@ -208,7 +204,6 @@ static int compat_drm_getmap(struct file *file, unsigned int cmd,
 static int compat_drm_addmap(struct file *file, unsigned int cmd,
 			     unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_map32_t __user *argp = (void __user *)arg;
 	drm_map32_t m32;
 	struct drm_map map;
@@ -243,7 +238,6 @@ static int compat_drm_addmap(struct file *file, unsigned int cmd,
 static int compat_drm_rmmap(struct file *file, unsigned int cmd,
 			    unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_map32_t __user *argp = (void __user *)arg;
 	struct drm_map map;
 	u32 handle;
@@ -267,7 +261,6 @@ typedef struct drm_client32 {
 static int compat_drm_getclient(struct file *file, unsigned int cmd,
 				unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_client32_t c32;
 	drm_client32_t __user *argp = (void __user *)arg;
 	struct drm_client client;
@@ -307,7 +300,6 @@ typedef struct drm_stats32 {
 static int compat_drm_getstats(struct file *file, unsigned int cmd,
 			       unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_stats32_t __user *argp = (void __user *)arg;
 
 	/* getstats is defunct, just clear */
@@ -329,7 +321,6 @@ typedef struct drm_buf_desc32 {
 static int compat_drm_addbufs(struct file *file, unsigned int cmd,
 			      unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_buf_desc32_t __user *argp = (void __user *)arg;
 	drm_buf_desc32_t desc32;
 	struct drm_buf_desc desc;
@@ -361,7 +352,6 @@ static int compat_drm_addbufs(struct file *file, unsigned int cmd,
 static int compat_drm_markbufs(struct file *file, unsigned int cmd,
 			       unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_buf_desc32_t b32;
 	drm_buf_desc32_t __user *argp = (void __user *)arg;
 	struct drm_buf_desc buf;
@@ -384,7 +374,6 @@ typedef struct drm_buf_info32 {
 
 static int copy_one_buf32(void *data, int count, struct drm_buf_entry *from)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_buf_info32_t *request = data;
 	drm_buf_desc32_t __user *to = compat_ptr(request->list);
 	drm_buf_desc32_t v = {.count = from->buf_count,
@@ -400,7 +389,6 @@ static int copy_one_buf32(void *data, int count, struct drm_buf_entry *from)
 static int drm_legacy_infobufs32(struct drm_device *dev, void *data,
 			struct drm_file *file_priv)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_buf_info32_t *request = data;
 
 	return __drm_legacy_infobufs(dev, data, &request->count, copy_one_buf32);
@@ -409,7 +397,6 @@ static int drm_legacy_infobufs32(struct drm_device *dev, void *data,
 static int compat_drm_infobufs(struct file *file, unsigned int cmd,
 			       unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_buf_info32_t req32;
 	drm_buf_info32_t __user *argp = (void __user *)arg;
 	int err;
@@ -446,7 +433,6 @@ typedef struct drm_buf_map32 {
 static int map_one_buf32(void *data, int idx, unsigned long virtual,
 			struct drm_buf *buf)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_buf_map32_t *request = data;
 	drm_buf_pub32_t __user *to = compat_ptr(request->list) + idx;
 	drm_buf_pub32_t v;
@@ -463,7 +449,6 @@ static int map_one_buf32(void *data, int idx, unsigned long virtual,
 static int drm_legacy_mapbufs32(struct drm_device *dev, void *data,
 		       struct drm_file *file_priv)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_buf_map32_t *request = data;
 	void __user *v;
 	int err = __drm_legacy_mapbufs(dev, data, &request->count,
@@ -476,7 +461,6 @@ static int drm_legacy_mapbufs32(struct drm_device *dev, void *data,
 static int compat_drm_mapbufs(struct file *file, unsigned int cmd,
 			      unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_buf_map32_t __user *argp = (void __user *)arg;
 	drm_buf_map32_t req32;
 	int err;
@@ -505,7 +489,6 @@ typedef struct drm_buf_free32 {
 static int compat_drm_freebufs(struct file *file, unsigned int cmd,
 			       unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_buf_free32_t req32;
 	struct drm_buf_free request;
 	drm_buf_free32_t __user *argp = (void __user *)arg;
@@ -526,7 +509,6 @@ typedef struct drm_ctx_priv_map32 {
 static int compat_drm_setsareactx(struct file *file, unsigned int cmd,
 				  unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_ctx_priv_map32_t req32;
 	struct drm_ctx_priv_map request;
 	drm_ctx_priv_map32_t __user *argp = (void __user *)arg;
@@ -543,7 +525,6 @@ static int compat_drm_setsareactx(struct file *file, unsigned int cmd,
 static int compat_drm_getsareactx(struct file *file, unsigned int cmd,
 				  unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	struct drm_ctx_priv_map req;
 	drm_ctx_priv_map32_t req32;
 	drm_ctx_priv_map32_t __user *argp = (void __user *)arg;
@@ -572,7 +553,6 @@ typedef struct drm_ctx_res32 {
 static int compat_drm_resctx(struct file *file, unsigned int cmd,
 			     unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_ctx_res32_t __user *argp = (void __user *)arg;
 	drm_ctx_res32_t res32;
 	struct drm_ctx_res res;
@@ -610,7 +590,6 @@ typedef struct drm_dma32 {
 static int compat_drm_dma(struct file *file, unsigned int cmd,
 			  unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_dma32_t d32;
 	drm_dma32_t __user *argp = (void __user *)arg;
 	struct drm_dma d;
@@ -648,7 +627,6 @@ typedef struct drm_agp_mode32 {
 static int compat_drm_agp_enable(struct file *file, unsigned int cmd,
 				 unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_agp_mode32_t __user *argp = (void __user *)arg;
 	struct drm_agp_mode mode;
 
@@ -676,7 +654,6 @@ typedef struct drm_agp_info32 {
 static int compat_drm_agp_info(struct file *file, unsigned int cmd,
 			       unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_agp_info32_t __user *argp = (void __user *)arg;
 	drm_agp_info32_t i32;
 	struct drm_agp_info info;
@@ -711,7 +688,6 @@ typedef struct drm_agp_buffer32 {
 static int compat_drm_agp_alloc(struct file *file, unsigned int cmd,
 				unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_agp_buffer32_t __user *argp = (void __user *)arg;
 	drm_agp_buffer32_t req32;
 	struct drm_agp_buffer request;
@@ -741,7 +717,6 @@ static int compat_drm_agp_alloc(struct file *file, unsigned int cmd,
 static int compat_drm_agp_free(struct file *file, unsigned int cmd,
 			       unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_agp_buffer32_t __user *argp = (void __user *)arg;
 	struct drm_agp_buffer request;
 
@@ -760,7 +735,6 @@ typedef struct drm_agp_binding32 {
 static int compat_drm_agp_bind(struct file *file, unsigned int cmd,
 			       unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_agp_binding32_t __user *argp = (void __user *)arg;
 	drm_agp_binding32_t req32;
 	struct drm_agp_binding request;
@@ -777,7 +751,6 @@ static int compat_drm_agp_bind(struct file *file, unsigned int cmd,
 static int compat_drm_agp_unbind(struct file *file, unsigned int cmd,
 				 unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_agp_binding32_t __user *argp = (void __user *)arg;
 	struct drm_agp_binding request;
 
@@ -797,7 +770,6 @@ typedef struct drm_scatter_gather32 {
 static int compat_drm_sg_alloc(struct file *file, unsigned int cmd,
 			       unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_scatter_gather32_t __user *argp = (void __user *)arg;
 	struct drm_scatter_gather request;
 	int err;
@@ -820,7 +792,6 @@ static int compat_drm_sg_alloc(struct file *file, unsigned int cmd,
 static int compat_drm_sg_free(struct file *file, unsigned int cmd,
 			      unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_scatter_gather32_t __user *argp = (void __user *)arg;
 	struct drm_scatter_gather request;
 	unsigned long x;
@@ -844,7 +815,6 @@ typedef struct drm_update_draw32 {
 static int compat_drm_update_draw(struct file *file, unsigned int cmd,
 				  unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	/* update_draw is defunct */
 	return 0;
 }
@@ -871,7 +841,6 @@ typedef union drm_wait_vblank32 {
 static int compat_drm_wait_vblank(struct file *file, unsigned int cmd,
 				  unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	drm_wait_vblank32_t __user *argp = (void __user *)arg;
 	drm_wait_vblank32_t req32;
 	union drm_wait_vblank req;
@@ -913,7 +882,6 @@ typedef struct drm_mode_fb_cmd232 {
 static int compat_drm_mode_addfb2(struct file *file, unsigned int cmd,
 				  unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	struct drm_mode_fb_cmd232 __user *argp = (void __user *)arg;
 	struct drm_mode_fb_cmd2 req64;
 	int err;
@@ -1002,7 +970,6 @@ static struct {
  */
 long drm_compat_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
 {
-    pr_info("drm_ioc32: called %s\n", __func__);
 	unsigned int nr = DRM_IOCTL_NR(cmd);
 	struct drm_file *file_priv = filp->private_data;
 	drm_ioctl_compat_t *fn;

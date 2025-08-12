@@ -33,7 +33,6 @@
 
 static u64 gfxhub_v1_0_get_mc_fb_offset(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	return (u64)RREG32_SOC15(GC, 0, mmMC_VM_FB_OFFSET) << 24;
 }
 
@@ -41,7 +40,6 @@ static void gfxhub_v1_0_setup_vm_pt_regs(struct amdgpu_device *adev,
 					 uint32_t vmid,
 					 uint64_t page_table_base)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB_0];
 
 	WREG32_SOC15_OFFSET(GC, 0, mmVM_CONTEXT0_PAGE_TABLE_BASE_ADDR_LO32,
@@ -55,7 +53,6 @@ static void gfxhub_v1_0_setup_vm_pt_regs(struct amdgpu_device *adev,
 
 static void gfxhub_v1_0_init_gart_aperture_regs(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	uint64_t pt_base;
 
 	if (adev->gmc.pdb0_bo)
@@ -93,7 +90,6 @@ static void gfxhub_v1_0_init_gart_aperture_regs(struct amdgpu_device *adev)
 
 static void gfxhub_v1_0_init_system_aperture_regs(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	uint64_t value;
 
 	/* Program the AGP BAR */
@@ -155,7 +151,6 @@ static void gfxhub_v1_0_init_system_aperture_regs(struct amdgpu_device *adev)
 
 static void gfxhub_v1_0_init_tlb_regs(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* Setup TLB control */
@@ -176,7 +171,6 @@ static void gfxhub_v1_0_init_tlb_regs(struct amdgpu_device *adev)
 
 static void gfxhub_v1_0_init_cache_regs(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* Setup L2 cache */
@@ -221,7 +215,6 @@ static void gfxhub_v1_0_init_cache_regs(struct amdgpu_device *adev)
 
 static void gfxhub_v1_0_enable_system_domain(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	uint32_t tmp;
 
 	tmp = RREG32_SOC15(GC, 0, mmVM_CONTEXT0_CNTL);
@@ -237,7 +230,6 @@ static void gfxhub_v1_0_enable_system_domain(struct amdgpu_device *adev)
 
 static void gfxhub_v1_0_disable_identity_aperture(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	WREG32_SOC15(GC, 0, mmVM_L2_CONTEXT1_IDENTITY_APERTURE_LOW_ADDR_LO32,
 		     0XFFFFFFFF);
 	WREG32_SOC15(GC, 0, mmVM_L2_CONTEXT1_IDENTITY_APERTURE_LOW_ADDR_HI32,
@@ -255,7 +247,6 @@ static void gfxhub_v1_0_disable_identity_aperture(struct amdgpu_device *adev)
 
 static void gfxhub_v1_0_setup_vmid_config(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB_0];
 	unsigned num_level, block_size;
 	uint32_t tmp;
@@ -316,7 +307,6 @@ static void gfxhub_v1_0_setup_vmid_config(struct amdgpu_device *adev)
 
 static void gfxhub_v1_0_program_invalidation(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB_0];
 	unsigned i;
 
@@ -330,7 +320,6 @@ static void gfxhub_v1_0_program_invalidation(struct amdgpu_device *adev)
 
 static int gfxhub_v1_0_gart_enable(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	/* GART Enable. */
 	gfxhub_v1_0_init_gart_aperture_regs(adev);
 	gfxhub_v1_0_init_system_aperture_regs(adev);
@@ -349,7 +338,6 @@ static int gfxhub_v1_0_gart_enable(struct amdgpu_device *adev)
 
 static void gfxhub_v1_0_gart_disable(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB_0];
 	u32 tmp;
 	u32 i;
@@ -382,7 +370,6 @@ static void gfxhub_v1_0_gart_disable(struct amdgpu_device *adev)
 static void gfxhub_v1_0_set_fault_enable_default(struct amdgpu_device *adev,
 						 bool value)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	u32 tmp;
 	tmp = RREG32_SOC15(GC, 0, mmVM_L2_PROTECTION_FAULT_CNTL);
 	tmp = REG_SET_FIELD(tmp, VM_L2_PROTECTION_FAULT_CNTL,
@@ -420,7 +407,6 @@ static void gfxhub_v1_0_set_fault_enable_default(struct amdgpu_device *adev,
 
 static void gfxhub_v1_0_init(struct amdgpu_device *adev)
 {
-    pr_info("gfxhub_v1_0: called %s\n", __func__);
 	struct amdgpu_vmhub *hub = &adev->vmhub[AMDGPU_GFXHUB_0];
 
 	hub->ctx0_ptb_addr_lo32 =

@@ -31,7 +31,6 @@ static u32 df_v1_7_channel_number[] = {1, 2, 0, 4, 0, 8, 0, 16, 2};
 
 static void df_v1_7_sw_init(struct amdgpu_device *adev)
 {
-    pr_info("df_v1_7: called %s\n", __func__);
 	adev->df.hash_status.hash_64k = false;
 	adev->df.hash_status.hash_2m = false;
 	adev->df.hash_status.hash_1g = false;
@@ -39,13 +38,11 @@ static void df_v1_7_sw_init(struct amdgpu_device *adev)
 
 static void df_v1_7_sw_fini(struct amdgpu_device *adev)
 {
-    pr_info("df_v1_7: called %s\n", __func__);
 }
 
 static void df_v1_7_enable_broadcast_mode(struct amdgpu_device *adev,
 					  bool enable)
 {
-    pr_info("df_v1_7: called %s\n", __func__);
 	u32 tmp;
 
 	if (enable) {
@@ -59,7 +56,6 @@ static void df_v1_7_enable_broadcast_mode(struct amdgpu_device *adev,
 
 static u32 df_v1_7_get_fb_channel_number(struct amdgpu_device *adev)
 {
-    pr_info("df_v1_7: called %s\n", __func__);
 	u32 tmp;
 
 	tmp = RREG32_SOC15(DF, 0, mmDF_CS_AON0_DramBaseAddress0);
@@ -71,7 +67,6 @@ static u32 df_v1_7_get_fb_channel_number(struct amdgpu_device *adev)
 
 static u32 df_v1_7_get_hbm_channel_number(struct amdgpu_device *adev)
 {
-    pr_info("df_v1_7: called %s\n", __func__);
 	int fb_channel_number;
 
 	fb_channel_number = adev->df.funcs->get_fb_channel_number(adev);
@@ -82,7 +77,6 @@ static u32 df_v1_7_get_hbm_channel_number(struct amdgpu_device *adev)
 static void df_v1_7_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 						     bool enable)
 {
-    pr_info("df_v1_7: called %s\n", __func__);
 	u32 tmp;
 
 	/* Put DF on broadcast mode */
@@ -107,7 +101,6 @@ static void df_v1_7_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 static void df_v1_7_get_clockgating_state(struct amdgpu_device *adev,
 					  u32 *flags)
 {
-    pr_info("df_v1_7: called %s\n", __func__);
 	u32 tmp;
 
 	/* AMD_CG_SUPPORT_DF_MGCG */
@@ -119,7 +112,6 @@ static void df_v1_7_get_clockgating_state(struct amdgpu_device *adev,
 static void df_v1_7_enable_ecc_force_par_wr_rmw(struct amdgpu_device *adev,
 						bool enable)
 {
-    pr_info("df_v1_7: called %s\n", __func__);
 	WREG32_FIELD15(DF, 0, DF_CS_AON0_CoherentSlaveModeCtrlA0,
 		       ForceParWrRMW, enable);
 }

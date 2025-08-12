@@ -49,7 +49,6 @@ static void vega20_ih_set_interrupt_funcs(struct amdgpu_device *adev);
  */
 static void vega20_ih_init_register_offset(struct amdgpu_device *adev)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_ih_regs *ih_regs;
 
 	if (adev->irq.ih.ring_size) {
@@ -101,7 +100,6 @@ static int vega20_ih_toggle_ring_interrupts(struct amdgpu_device *adev,
 					    struct amdgpu_ih_ring *ih,
 					    bool enable)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_ih_regs *ih_regs;
 	uint32_t tmp;
 
@@ -146,7 +144,6 @@ static int vega20_ih_toggle_ring_interrupts(struct amdgpu_device *adev,
  */
 static int vega20_ih_toggle_interrupts(struct amdgpu_device *adev, bool enable)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_ih_ring *ih[] = {&adev->irq.ih, &adev->irq.ih1, &adev->irq.ih2};
 	int i;
 	int r;
@@ -164,7 +161,6 @@ static int vega20_ih_toggle_interrupts(struct amdgpu_device *adev, bool enable)
 
 static uint32_t vega20_ih_rb_cntl(struct amdgpu_ih_ring *ih, uint32_t ih_rb_cntl)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	int rb_bufsz = order_base_2(ih->ring_size / 4);
 
 	ih_rb_cntl = REG_SET_FIELD(ih_rb_cntl, IH_RB_CNTL,
@@ -188,7 +184,6 @@ static uint32_t vega20_ih_rb_cntl(struct amdgpu_ih_ring *ih, uint32_t ih_rb_cntl
 
 static uint32_t vega20_ih_doorbell_rptr(struct amdgpu_ih_ring *ih)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	u32 ih_doorbell_rtpr = 0;
 
 	if (ih->use_doorbell) {
@@ -217,7 +212,6 @@ static uint32_t vega20_ih_doorbell_rptr(struct amdgpu_ih_ring *ih)
 static int vega20_ih_enable_ring(struct amdgpu_device *adev,
 				 struct amdgpu_ih_ring *ih)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_ih_regs *ih_regs;
 	uint32_t tmp;
 
@@ -268,7 +262,6 @@ static int vega20_ih_enable_ring(struct amdgpu_device *adev,
  */
 static void vega20_ih_reroute_ih(struct amdgpu_device *adev)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	uint32_t tmp;
 
 	/* vega20 ih reroute will go through psp this
@@ -303,7 +296,6 @@ static void vega20_ih_reroute_ih(struct amdgpu_device *adev)
  */
 static int vega20_ih_irq_init(struct amdgpu_device *adev)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_ih_ring *ih[] = {&adev->irq.ih, &adev->irq.ih1, &adev->irq.ih2};
 	u32 ih_chicken;
 	int ret;
@@ -370,7 +362,6 @@ static int vega20_ih_irq_init(struct amdgpu_device *adev)
  */
 static void vega20_ih_irq_disable(struct amdgpu_device *adev)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	vega20_ih_toggle_interrupts(adev, false);
 
 	/* Wait and acknowledge irq */
@@ -391,7 +382,6 @@ static void vega20_ih_irq_disable(struct amdgpu_device *adev)
 static u32 vega20_ih_get_wptr(struct amdgpu_device *adev,
 			      struct amdgpu_ih_ring *ih)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	u32 wptr, tmp;
 	struct amdgpu_ih_regs *ih_regs;
 
@@ -442,7 +432,6 @@ out:
 static void vega20_ih_irq_rearm(struct amdgpu_device *adev,
 			       struct amdgpu_ih_ring *ih)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	uint32_t v = 0;
 	uint32_t i = 0;
 	struct amdgpu_ih_regs *ih_regs;
@@ -470,7 +459,6 @@ static void vega20_ih_irq_rearm(struct amdgpu_device *adev,
 static void vega20_ih_set_rptr(struct amdgpu_device *adev,
 			       struct amdgpu_ih_ring *ih)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_ih_regs *ih_regs;
 
 	if (ih->use_doorbell) {
@@ -499,7 +487,6 @@ static int vega20_ih_self_irq(struct amdgpu_device *adev,
 			      struct amdgpu_irq_src *source,
 			      struct amdgpu_iv_entry *entry)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	switch (entry->ring_id) {
 	case 1:
 		schedule_work(&adev->irq.ih1_work);
@@ -518,14 +505,12 @@ static const struct amdgpu_irq_src_funcs vega20_ih_self_irq_funcs = {
 
 static void vega20_ih_set_self_irq_funcs(struct amdgpu_device *adev)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	adev->irq.self_irq.num_types = 0;
 	adev->irq.self_irq.funcs = &vega20_ih_self_irq_funcs;
 }
 
 static int vega20_ih_early_init(void *handle)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	vega20_ih_set_interrupt_funcs(adev);
@@ -535,7 +520,6 @@ static int vega20_ih_early_init(void *handle)
 
 static int vega20_ih_sw_init(void *handle)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int r;
 
@@ -579,7 +563,6 @@ static int vega20_ih_sw_init(void *handle)
 
 static int vega20_ih_sw_fini(void *handle)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	amdgpu_irq_fini_sw(adev);
@@ -589,7 +572,6 @@ static int vega20_ih_sw_fini(void *handle)
 
 static int vega20_ih_hw_init(void *handle)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -602,7 +584,6 @@ static int vega20_ih_hw_init(void *handle)
 
 static int vega20_ih_hw_fini(void *handle)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	vega20_ih_irq_disable(adev);
@@ -612,7 +593,6 @@ static int vega20_ih_hw_fini(void *handle)
 
 static int vega20_ih_suspend(void *handle)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return vega20_ih_hw_fini(adev);
@@ -620,7 +600,6 @@ static int vega20_ih_suspend(void *handle)
 
 static int vega20_ih_resume(void *handle)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return vega20_ih_hw_init(adev);
@@ -628,21 +607,18 @@ static int vega20_ih_resume(void *handle)
 
 static bool vega20_ih_is_idle(void *handle)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	/* todo */
 	return true;
 }
 
 static int vega20_ih_wait_for_idle(void *handle)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	/* todo */
 	return -ETIMEDOUT;
 }
 
 static int vega20_ih_soft_reset(void *handle)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	/* todo */
 
 	return 0;
@@ -651,7 +627,6 @@ static int vega20_ih_soft_reset(void *handle)
 static void vega20_ih_update_clockgating_state(struct amdgpu_device *adev,
 					       bool enable)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	uint32_t data, def, field_val;
 
 	if (adev->cg_flags & AMD_CG_SUPPORT_IH_CG) {
@@ -679,7 +654,6 @@ static void vega20_ih_update_clockgating_state(struct amdgpu_device *adev,
 static int vega20_ih_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	vega20_ih_update_clockgating_state(adev,
@@ -691,7 +665,6 @@ static int vega20_ih_set_clockgating_state(void *handle,
 static int vega20_ih_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	return 0;
 }
 
@@ -720,7 +693,6 @@ static const struct amdgpu_ih_funcs vega20_ih_funcs = {
 
 static void vega20_ih_set_interrupt_funcs(struct amdgpu_device *adev)
 {
-    pr_info("vega20_ih: called %s\n", __func__);
 	adev->irq.ih_funcs = &vega20_ih_funcs;
 }
 

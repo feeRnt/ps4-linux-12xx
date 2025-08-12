@@ -73,7 +73,6 @@ static const u32 iceland_mgcg_cgcg_init[] =
 
 static void gmc_v7_0_init_golden_registers(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_TOPAZ:
 		amdgpu_device_program_register_sequence(adev,
@@ -90,7 +89,6 @@ static void gmc_v7_0_init_golden_registers(struct amdgpu_device *adev)
 
 static void gmc_v7_0_mc_stop(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 blackout;
 
 	gmc_v7_0_wait_for_idle((void *)adev);
@@ -110,7 +108,6 @@ static void gmc_v7_0_mc_stop(struct amdgpu_device *adev)
 
 static void gmc_v7_0_mc_resume(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 tmp;
 
 	/* unblackout the MC */
@@ -134,7 +131,6 @@ static void gmc_v7_0_mc_resume(struct amdgpu_device *adev)
  */
 static int gmc_v7_0_init_microcode(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	const char *chip_name;
 	char fw_name[30];
 	int err;
@@ -186,7 +182,6 @@ out:
  */
 static int gmc_v7_0_mc_load_microcode(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	const struct mc_firmware_header_v1_0 *hdr;
 	const __le32 *fw_data = NULL;
 	const __le32 *io_mc_regs = NULL;
@@ -249,7 +244,6 @@ static int gmc_v7_0_mc_load_microcode(struct amdgpu_device *adev)
 static void gmc_v7_0_vram_gtt_location(struct amdgpu_device *adev,
 				       struct amdgpu_gmc *mc)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u64 base = RREG32(mmMC_VM_FB_LOCATION) & 0xFFFF;
 	base <<= 24;
 
@@ -267,7 +261,6 @@ static void gmc_v7_0_vram_gtt_location(struct amdgpu_device *adev,
  */
 static void gmc_v7_0_mc_program(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 tmp;
 	int i, j;
 
@@ -330,7 +323,6 @@ static void gmc_v7_0_mc_program(struct amdgpu_device *adev)
  */
 static int gmc_v7_0_mc_init(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	int r;
 
 	adev->gmc.vram_width = amdgpu_atombios_get_vram_width(adev);
@@ -448,7 +440,6 @@ static int gmc_v7_0_flush_gpu_tlb_pasid(struct amdgpu_device *adev,
 					uint16_t pasid, uint32_t flush_type,
 					bool all_hub)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	int vmid;
 	unsigned int tmp;
 
@@ -489,7 +480,6 @@ static int gmc_v7_0_flush_gpu_tlb_pasid(struct amdgpu_device *adev,
 static void gmc_v7_0_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 					uint32_t vmhub, uint32_t flush_type)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	/* bits 0-15 are the VM contexts0-15 */
 	WREG32(mmVM_INVALIDATE_REQUEST, 1 << vmid);
 }
@@ -497,7 +487,6 @@ static void gmc_v7_0_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 static uint64_t gmc_v7_0_emit_flush_gpu_tlb(struct amdgpu_ring *ring,
 					    unsigned vmid, uint64_t pd_addr)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	uint32_t reg;
 
 	if (vmid < 8)
@@ -515,14 +504,12 @@ static uint64_t gmc_v7_0_emit_flush_gpu_tlb(struct amdgpu_ring *ring,
 static void gmc_v7_0_emit_pasid_mapping(struct amdgpu_ring *ring, unsigned vmid,
 					unsigned pasid)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	amdgpu_ring_emit_wreg(ring, mmIH_VMID_0_LUT + vmid, pasid);
 }
 
 static void gmc_v7_0_get_vm_pde(struct amdgpu_device *adev, int level,
 				uint64_t *addr, uint64_t *flags)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	BUG_ON(*addr & 0xFFFFFF0000000FFFULL);
 }
 
@@ -530,7 +517,6 @@ static void gmc_v7_0_get_vm_pte(struct amdgpu_device *adev,
 				struct amdgpu_bo_va_mapping *mapping,
 				uint64_t *flags)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	*flags &= ~AMDGPU_PTE_EXECUTABLE;
 	*flags &= ~AMDGPU_PTE_PRT;
 }
@@ -544,7 +530,6 @@ static void gmc_v7_0_get_vm_pte(struct amdgpu_device *adev,
 static void gmc_v7_0_set_fault_enable_default(struct amdgpu_device *adev,
 					      bool value)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 tmp;
 
 	tmp = RREG32(mmVM_CONTEXT1_CNTL);
@@ -571,7 +556,6 @@ static void gmc_v7_0_set_fault_enable_default(struct amdgpu_device *adev,
  */
 static void gmc_v7_0_set_prt(struct amdgpu_device *adev, bool enable)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	uint32_t tmp;
 
 	if (enable && !adev->gmc.prt_warning) {
@@ -634,7 +618,6 @@ static void gmc_v7_0_set_prt(struct amdgpu_device *adev, bool enable)
  */
 static int gmc_v7_0_gart_enable(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	uint64_t table_addr;
 	int r, i;
 	u32 tmp, field;
@@ -754,7 +737,6 @@ static int gmc_v7_0_gart_enable(struct amdgpu_device *adev)
 
 static int gmc_v7_0_gart_init(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	int r;
 
 	if (adev->gart.bo) {
@@ -779,7 +761,6 @@ static int gmc_v7_0_gart_init(struct amdgpu_device *adev)
  */
 static void gmc_v7_0_gart_disable(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 tmp;
 
 	/* Disable all tables */
@@ -813,7 +794,6 @@ static void gmc_v7_0_gart_disable(struct amdgpu_device *adev)
 static void gmc_v7_0_vm_decode_fault(struct amdgpu_device *adev, u32 status,
 				     u32 addr, u32 mc_client, unsigned pasid)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 vmid = REG_GET_FIELD(status, VM_CONTEXT1_PROTECTION_FAULT_STATUS, VMID);
 	u32 protections = REG_GET_FIELD(status, VM_CONTEXT1_PROTECTION_FAULT_STATUS,
 					PROTECTIONS);
@@ -871,7 +851,6 @@ static const u32 mc_cg_en[] = {
 static void gmc_v7_0_enable_mc_ls(struct amdgpu_device *adev,
 				  bool enable)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	int i;
 	u32 orig, data;
 
@@ -889,7 +868,6 @@ static void gmc_v7_0_enable_mc_ls(struct amdgpu_device *adev,
 static void gmc_v7_0_enable_mc_mgcg(struct amdgpu_device *adev,
 				    bool enable)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	int i;
 	u32 orig, data;
 
@@ -907,7 +885,6 @@ static void gmc_v7_0_enable_mc_mgcg(struct amdgpu_device *adev,
 static void gmc_v7_0_enable_bif_mgls(struct amdgpu_device *adev,
 				     bool enable)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 orig, data;
 
 	orig = data = RREG32_PCIE(ixPCIE_CNTL2);
@@ -931,7 +908,6 @@ static void gmc_v7_0_enable_bif_mgls(struct amdgpu_device *adev,
 static void gmc_v7_0_enable_hdp_mgcg(struct amdgpu_device *adev,
 				     bool enable)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 orig, data;
 
 	orig = data = RREG32(mmHDP_HOST_PATH_CNTL);
@@ -948,7 +924,6 @@ static void gmc_v7_0_enable_hdp_mgcg(struct amdgpu_device *adev,
 static void gmc_v7_0_enable_hdp_ls(struct amdgpu_device *adev,
 				   bool enable)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 orig, data;
 
 	orig = data = RREG32(mmHDP_MEM_POWER_LS);
@@ -964,7 +939,6 @@ static void gmc_v7_0_enable_hdp_ls(struct amdgpu_device *adev,
 
 static int gmc_v7_0_convert_vram_type(int mc_seq_vram_type)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	switch (mc_seq_vram_type) {
 	case MC_SEQ_MISC0__MT__GDDR1:
 		return AMDGPU_VRAM_TYPE_GDDR1;
@@ -987,7 +961,6 @@ static int gmc_v7_0_convert_vram_type(int mc_seq_vram_type)
 
 static int gmc_v7_0_early_init(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	gmc_v7_0_set_gmc_funcs(adev);
@@ -1006,7 +979,6 @@ static int gmc_v7_0_early_init(void *handle)
 
 static int gmc_v7_0_late_init(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (amdgpu_vm_fault_stop != AMDGPU_VM_FAULT_STOP_ALWAYS)
@@ -1017,7 +989,6 @@ static int gmc_v7_0_late_init(void *handle)
 
 static unsigned gmc_v7_0_get_vbios_fb_size(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 d1vga_control = RREG32(mmD1VGA_CONTROL);
 	unsigned size;
 
@@ -1035,7 +1006,6 @@ static unsigned gmc_v7_0_get_vbios_fb_size(struct amdgpu_device *adev)
 
 static int gmc_v7_0_sw_init(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1133,7 +1103,6 @@ static int gmc_v7_0_sw_init(void *handle)
 
 static int gmc_v7_0_sw_fini(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	amdgpu_gem_force_release(adev);
@@ -1149,7 +1118,6 @@ static int gmc_v7_0_sw_fini(void *handle)
 
 static int gmc_v7_0_hw_init(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1174,7 +1142,6 @@ static int gmc_v7_0_hw_init(void *handle)
 
 static int gmc_v7_0_hw_fini(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	amdgpu_irq_put(adev, &adev->gmc.vm_fault, 0);
@@ -1185,7 +1152,6 @@ static int gmc_v7_0_hw_fini(void *handle)
 
 static int gmc_v7_0_suspend(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	gmc_v7_0_hw_fini(adev);
@@ -1195,7 +1161,6 @@ static int gmc_v7_0_suspend(void *handle)
 
 static int gmc_v7_0_resume(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1210,7 +1175,6 @@ static int gmc_v7_0_resume(void *handle)
 
 static bool gmc_v7_0_is_idle(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 tmp = RREG32(mmSRBM_STATUS);
 
@@ -1223,7 +1187,6 @@ static bool gmc_v7_0_is_idle(void *handle)
 
 static int gmc_v7_0_wait_for_idle(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	unsigned i;
 	u32 tmp;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -1245,7 +1208,6 @@ static int gmc_v7_0_wait_for_idle(void *handle)
 
 static int gmc_v7_0_soft_reset(void *handle)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 srbm_soft_reset = 0;
 	u32 tmp = RREG32(mmSRBM_STATUS);
@@ -1295,7 +1257,6 @@ static int gmc_v7_0_vm_fault_interrupt_state(struct amdgpu_device *adev,
 					     unsigned type,
 					     enum amdgpu_interrupt_state state)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	u32 tmp;
 	u32 bits = (VM_CONTEXT1_CNTL__RANGE_PROTECTION_FAULT_ENABLE_INTERRUPT_MASK |
 		    VM_CONTEXT1_CNTL__DUMMY_PAGE_PROTECTION_FAULT_ENABLE_INTERRUPT_MASK |
@@ -1336,8 +1297,6 @@ static int gmc_v7_0_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
-   	// pr_info("gmc_v7_0: called %s\n", __func__);
-	// excessive logs
 	u32 addr, status, mc_client, vmid;
 
 	addr = RREG32(mmVM_CONTEXT1_PROTECTION_FAULT_ADDR);
@@ -1392,7 +1351,6 @@ static int gmc_v7_0_process_interrupt(struct amdgpu_device *adev,
 static int gmc_v7_0_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	bool gate = false;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -1413,7 +1371,6 @@ static int gmc_v7_0_set_clockgating_state(void *handle,
 static int gmc_v7_0_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	return 0;
 }
 
@@ -1452,13 +1409,11 @@ static const struct amdgpu_irq_src_funcs gmc_v7_0_irq_funcs = {
 
 static void gmc_v7_0_set_gmc_funcs(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	adev->gmc.gmc_funcs = &gmc_v7_0_gmc_funcs;
 }
 
 static void gmc_v7_0_set_irq_funcs(struct amdgpu_device *adev)
 {
-    pr_info("gmc_v7_0: called %s\n", __func__);
 	adev->gmc.vm_fault.num_types = 1;
 	adev->gmc.vm_fault.funcs = &gmc_v7_0_irq_funcs;
 }

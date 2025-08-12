@@ -59,7 +59,6 @@ static void tonga_ih_set_interrupt_funcs(struct amdgpu_device *adev);
  */
 static void tonga_ih_enable_interrupts(struct amdgpu_device *adev)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	u32 ih_rb_cntl = RREG32(mmIH_RB_CNTL);
 
 	ih_rb_cntl = REG_SET_FIELD(ih_rb_cntl, IH_RB_CNTL, RB_ENABLE, 1);
@@ -77,7 +76,6 @@ static void tonga_ih_enable_interrupts(struct amdgpu_device *adev)
  */
 static void tonga_ih_disable_interrupts(struct amdgpu_device *adev)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	u32 ih_rb_cntl = RREG32(mmIH_RB_CNTL);
 
 	ih_rb_cntl = REG_SET_FIELD(ih_rb_cntl, IH_RB_CNTL, RB_ENABLE, 0);
@@ -103,7 +101,6 @@ static void tonga_ih_disable_interrupts(struct amdgpu_device *adev)
  */
 static int tonga_ih_irq_init(struct amdgpu_device *adev)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	u32 interrupt_cntl, ih_rb_cntl, ih_doorbell_rtpr;
 	struct amdgpu_ih_ring *ih = &adev->irq.ih;
 	int rb_bufsz;
@@ -174,7 +171,6 @@ static int tonga_ih_irq_init(struct amdgpu_device *adev)
  */
 static void tonga_ih_irq_disable(struct amdgpu_device *adev)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	tonga_ih_disable_interrupts(adev);
 
 	/* Wait and acknowledge irq */
@@ -196,7 +192,6 @@ static void tonga_ih_irq_disable(struct amdgpu_device *adev)
 static u32 tonga_ih_get_wptr(struct amdgpu_device *adev,
 			     struct amdgpu_ih_ring *ih)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	u32 wptr, tmp;
 
 	wptr = le32_to_cpu(*ih->wptr_cpu);
@@ -242,7 +237,6 @@ static void tonga_ih_decode_iv(struct amdgpu_device *adev,
 			       struct amdgpu_ih_ring *ih,
 			       struct amdgpu_iv_entry *entry)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	/* wptr/rptr are in bytes! */
 	u32 ring_index = ih->rptr >> 2;
 	uint32_t dw[4];
@@ -274,7 +268,6 @@ static void tonga_ih_decode_iv(struct amdgpu_device *adev,
 static void tonga_ih_set_rptr(struct amdgpu_device *adev,
 			      struct amdgpu_ih_ring *ih)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	if (ih->use_doorbell) {
 		/* XXX check if swapping is necessary on BE */
 		*ih->rptr_cpu = ih->rptr;
@@ -286,7 +279,6 @@ static void tonga_ih_set_rptr(struct amdgpu_device *adev,
 
 static int tonga_ih_early_init(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	int ret;
 
@@ -301,7 +293,6 @@ static int tonga_ih_early_init(void *handle)
 
 static int tonga_ih_sw_init(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -319,7 +310,6 @@ static int tonga_ih_sw_init(void *handle)
 
 static int tonga_ih_sw_fini(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	amdgpu_irq_fini_sw(adev);
@@ -330,7 +320,6 @@ static int tonga_ih_sw_fini(void *handle)
 
 static int tonga_ih_hw_init(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -343,7 +332,6 @@ static int tonga_ih_hw_init(void *handle)
 
 static int tonga_ih_hw_fini(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	tonga_ih_irq_disable(adev);
@@ -353,7 +341,6 @@ static int tonga_ih_hw_fini(void *handle)
 
 static int tonga_ih_suspend(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return tonga_ih_hw_fini(adev);
@@ -361,7 +348,6 @@ static int tonga_ih_suspend(void *handle)
 
 static int tonga_ih_resume(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return tonga_ih_hw_init(adev);
@@ -369,7 +355,6 @@ static int tonga_ih_resume(void *handle)
 
 static bool tonga_ih_is_idle(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 tmp = RREG32(mmSRBM_STATUS);
 
@@ -381,7 +366,6 @@ static bool tonga_ih_is_idle(void *handle)
 
 static int tonga_ih_wait_for_idle(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	unsigned i;
 	u32 tmp;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -398,7 +382,6 @@ static int tonga_ih_wait_for_idle(void *handle)
 
 static bool tonga_ih_check_soft_reset(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 srbm_soft_reset = 0;
 	u32 tmp = RREG32(mmSRBM_STATUS);
@@ -418,7 +401,6 @@ static bool tonga_ih_check_soft_reset(void *handle)
 
 static int tonga_ih_pre_soft_reset(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (!adev->irq.srbm_soft_reset)
@@ -429,7 +411,6 @@ static int tonga_ih_pre_soft_reset(void *handle)
 
 static int tonga_ih_post_soft_reset(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	if (!adev->irq.srbm_soft_reset)
@@ -440,7 +421,6 @@ static int tonga_ih_post_soft_reset(void *handle)
 
 static int tonga_ih_soft_reset(void *handle)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	u32 srbm_soft_reset;
 
@@ -473,14 +453,12 @@ static int tonga_ih_soft_reset(void *handle)
 static int tonga_ih_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	return 0;
 }
 
 static int tonga_ih_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	return 0;
 }
 
@@ -512,7 +490,6 @@ static const struct amdgpu_ih_funcs tonga_ih_funcs = {
 
 static void tonga_ih_set_interrupt_funcs(struct amdgpu_device *adev)
 {
-    pr_info("tonga_ih: called %s\n", __func__);
 	adev->irq.ih_funcs = &tonga_ih_funcs;
 }
 

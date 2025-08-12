@@ -61,7 +61,6 @@ int drm_mode_create_dumb(struct drm_device *dev,
 			 struct drm_mode_create_dumb *args,
 			 struct drm_file *file_priv)
 {
-    pr_info("drm_dumb_buffers: called %s\n", __func__);
 	u32 cpp, stride, size;
 
 	if (!dev->driver->dumb_create)
@@ -100,7 +99,6 @@ int drm_mode_create_dumb(struct drm_device *dev,
 int drm_mode_create_dumb_ioctl(struct drm_device *dev,
 			       void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_dumb_buffers: called %s\n", __func__);
 	return drm_mode_create_dumb(dev, data, file_priv);
 }
 
@@ -121,7 +119,6 @@ int drm_mode_create_dumb_ioctl(struct drm_device *dev,
 int drm_mode_mmap_dumb_ioctl(struct drm_device *dev,
 			     void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_dumb_buffers: called %s\n", __func__);
 	struct drm_mode_map_dumb *args = data;
 
 	if (!dev->driver->dumb_create)
@@ -139,7 +136,6 @@ int drm_mode_mmap_dumb_ioctl(struct drm_device *dev,
 int drm_mode_destroy_dumb(struct drm_device *dev, u32 handle,
 			  struct drm_file *file_priv)
 {
-    pr_info("drm_dumb_buffers: called %s\n", __func__);
 	if (!dev->driver->dumb_create)
 		return -ENOSYS;
 
@@ -152,7 +148,6 @@ int drm_mode_destroy_dumb(struct drm_device *dev, u32 handle,
 int drm_mode_destroy_dumb_ioctl(struct drm_device *dev,
 				void *data, struct drm_file *file_priv)
 {
-    pr_info("drm_dumb_buffers: called %s\n", __func__);
 	struct drm_mode_destroy_dumb *args = data;
 
 	return drm_mode_destroy_dumb(dev, args->handle, file_priv);

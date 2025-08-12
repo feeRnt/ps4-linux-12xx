@@ -82,7 +82,6 @@
 
 static int crc_control_show(struct seq_file *m, void *data)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	struct drm_crtc *crtc = m->private;
 
 	if (crtc->funcs->get_crc_sources) {
@@ -113,7 +112,6 @@ out:
 
 static int crc_control_open(struct inode *inode, struct file *file)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	struct drm_crtc *crtc = inode->i_private;
 
 	return single_open(file, crc_control_show, crtc);
@@ -122,7 +120,6 @@ static int crc_control_open(struct inode *inode, struct file *file)
 static ssize_t crc_control_write(struct file *file, const char __user *ubuf,
 				 size_t len, loff_t *offp)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	struct seq_file *m = file->private_data;
 	struct drm_crtc *crtc = m->private;
 	struct drm_crtc_crc *crc = &crtc->crc;
@@ -180,14 +177,12 @@ static const struct file_operations drm_crtc_crc_control_fops = {
 
 static int crtc_crc_data_count(struct drm_crtc_crc *crc)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	assert_spin_locked(&crc->lock);
 	return CIRC_CNT(crc->head, crc->tail, DRM_CRC_ENTRIES_NR);
 }
 
 static void crtc_crc_cleanup(struct drm_crtc_crc *crc)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	kfree(crc->entries);
 	crc->overflow = false;
 	crc->entries = NULL;
@@ -199,7 +194,6 @@ static void crtc_crc_cleanup(struct drm_crtc_crc *crc)
 
 static int crtc_crc_open(struct inode *inode, struct file *filep)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	struct drm_crtc *crtc = inode->i_private;
 	struct drm_crtc_crc *crc = &crtc->crc;
 	struct drm_crtc_crc_entry *entries = NULL;
@@ -263,7 +257,6 @@ err:
 
 static int crtc_crc_release(struct inode *inode, struct file *filep)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	struct drm_crtc *crtc = filep->f_inode->i_private;
 	struct drm_crtc_crc *crc = &crtc->crc;
 
@@ -291,7 +284,6 @@ static int crtc_crc_release(struct inode *inode, struct file *filep)
 static ssize_t crtc_crc_read(struct file *filep, char __user *user_buf,
 			     size_t count, loff_t *pos)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	struct drm_crtc *crtc = filep->f_inode->i_private;
 	struct drm_crtc_crc *crc = &crtc->crc;
 	struct drm_crtc_crc_entry *entry;
@@ -351,7 +343,6 @@ static ssize_t crtc_crc_read(struct file *filep, char __user *user_buf,
 
 static __poll_t crtc_crc_poll(struct file *file, poll_table *wait)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	struct drm_crtc *crtc = file->f_inode->i_private;
 	struct drm_crtc_crc *crc = &crtc->crc;
 	__poll_t ret = 0;
@@ -376,7 +367,6 @@ static const struct file_operations drm_crtc_crc_data_fops = {
 
 void drm_debugfs_crtc_crc_add(struct drm_crtc *crtc)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	struct dentry *crc_ent;
 
 	if (!crtc->funcs->set_crc_source || !crtc->funcs->verify_crc_source)
@@ -403,7 +393,6 @@ void drm_debugfs_crtc_crc_add(struct drm_crtc *crtc)
 int drm_crtc_add_crc_entry(struct drm_crtc *crtc, bool has_frame,
 			   uint32_t frame, uint32_t *crcs)
 {
-    pr_info("drm_debugfs_crc: called %s\n", __func__);
 	struct drm_crtc_crc *crc = &crtc->crc;
 	struct drm_crtc_crc_entry *entry;
 	int head, tail;

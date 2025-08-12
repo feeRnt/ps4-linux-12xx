@@ -38,7 +38,6 @@
 
 static void amdgpu_bo_list_free_rcu(struct rcu_head *rcu)
 {
-    pr_info("amdgpu_bo_list: called %s\n", __func__);
 	struct amdgpu_bo_list *list = container_of(rcu, struct amdgpu_bo_list,
 						   rhead);
 
@@ -47,7 +46,6 @@ static void amdgpu_bo_list_free_rcu(struct rcu_head *rcu)
 
 static void amdgpu_bo_list_free(struct kref *ref)
 {
-    pr_info("amdgpu_bo_list: called %s\n", __func__);
 	struct amdgpu_bo_list *list = container_of(ref, struct amdgpu_bo_list,
 						   refcount);
 	struct amdgpu_bo_list_entry *e;
@@ -65,7 +63,6 @@ int amdgpu_bo_list_create(struct amdgpu_device *adev, struct drm_file *filp,
 			  struct drm_amdgpu_bo_list_entry *info,
 			  size_t num_entries, struct amdgpu_bo_list **result)
 {
-    pr_info("amdgpu_bo_list: called %s\n", __func__);
 	unsigned last_entry = 0, first_userptr = num_entries;
 	struct amdgpu_bo_list_entry *array;
 	struct amdgpu_bo_list *list;
@@ -160,7 +157,6 @@ error_free:
 
 static void amdgpu_bo_list_destroy(struct amdgpu_fpriv *fpriv, int id)
 {
-    pr_info("amdgpu_bo_list: called %s\n", __func__);
 	struct amdgpu_bo_list *list;
 
 	mutex_lock(&fpriv->bo_list_lock);
@@ -173,7 +169,6 @@ static void amdgpu_bo_list_destroy(struct amdgpu_fpriv *fpriv, int id)
 int amdgpu_bo_list_get(struct amdgpu_fpriv *fpriv, int id,
 		       struct amdgpu_bo_list **result)
 {
-    pr_info("amdgpu_bo_list: called %s\n", __func__);
 	rcu_read_lock();
 	*result = idr_find(&fpriv->bo_list_handles, id);
 
@@ -189,7 +184,6 @@ int amdgpu_bo_list_get(struct amdgpu_fpriv *fpriv, int id,
 void amdgpu_bo_list_get_list(struct amdgpu_bo_list *list,
 			     struct list_head *validated)
 {
-    pr_info("amdgpu_bo_list: called %s\n", __func__);
 	/* This is based on the bucket sort with O(n) time complexity.
 	 * An item with priority "i" is added to bucket[i]. The lists are then
 	 * concatenated in descending order.
@@ -223,14 +217,12 @@ void amdgpu_bo_list_get_list(struct amdgpu_bo_list *list,
 
 void amdgpu_bo_list_put(struct amdgpu_bo_list *list)
 {
-    pr_info("amdgpu_bo_list: called %s\n", __func__);
 	kref_put(&list->refcount, amdgpu_bo_list_free);
 }
 
 int amdgpu_bo_create_list_entry_array(struct drm_amdgpu_bo_list_in *in,
 				      struct drm_amdgpu_bo_list_entry **info_param)
 {
-    pr_info("amdgpu_bo_list: called %s\n", __func__);
 	const void __user *uptr = u64_to_user_ptr(in->bo_info_ptr);
 	const uint32_t info_size = sizeof(struct drm_amdgpu_bo_list_entry);
 	struct drm_amdgpu_bo_list_entry *info;
@@ -273,7 +265,6 @@ error_free:
 int amdgpu_bo_list_ioctl(struct drm_device *dev, void *data,
 				struct drm_file *filp)
 {
-    pr_info("amdgpu_bo_list: called %s\n", __func__);
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_fpriv *fpriv = filp->driver_priv;
 	union drm_amdgpu_bo_list *args = data;

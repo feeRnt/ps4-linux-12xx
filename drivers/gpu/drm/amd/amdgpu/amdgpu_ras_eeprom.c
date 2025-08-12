@@ -87,7 +87,6 @@
 
 static bool __is_ras_eeprom_supported(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	return  adev->asic_type == CHIP_VEGA20 ||
 		adev->asic_type == CHIP_ARCTURUS ||
 		adev->asic_type == CHIP_SIENNA_CICHLID ||
@@ -97,7 +96,6 @@ static bool __is_ras_eeprom_supported(struct amdgpu_device *adev)
 static bool __get_eeprom_i2c_addr_arct(struct amdgpu_device *adev,
 				       struct amdgpu_ras_eeprom_control *control)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct atom_context *atom_ctx = adev->mode_info.atom_context;
 
 	if (!control || !atom_ctx)
@@ -116,7 +114,6 @@ static bool __get_eeprom_i2c_addr_arct(struct amdgpu_device *adev,
 static bool __get_eeprom_i2c_addr(struct amdgpu_device *adev,
 				  struct amdgpu_ras_eeprom_control *control)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	u8 i2c_addr;
 
 	if (!control)
@@ -164,7 +161,6 @@ static void
 __encode_table_header_to_buf(struct amdgpu_ras_eeprom_table_header *hdr,
 			     unsigned char *buf)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	u32 *pp = (uint32_t *)buf;
 
 	pp[0] = cpu_to_le32(hdr->header);
@@ -178,7 +174,6 @@ static void
 __decode_table_header_from_buf(struct amdgpu_ras_eeprom_table_header *hdr,
 			       unsigned char *buf)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	u32 *pp = (uint32_t *)buf;
 
 	hdr->header	      = le32_to_cpu(pp[0]);
@@ -190,7 +185,6 @@ __decode_table_header_from_buf(struct amdgpu_ras_eeprom_table_header *hdr,
 
 static int __write_table_header(struct amdgpu_ras_eeprom_control *control)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	u8 buf[RAS_TABLE_HEADER_SIZE];
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	int res;
@@ -221,7 +215,6 @@ static int __write_table_header(struct amdgpu_ras_eeprom_control *control)
 
 static u8 __calc_hdr_byte_sum(const struct amdgpu_ras_eeprom_control *control)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	int ii;
 	u8  *pp, csum;
 	size_t sz;
@@ -240,7 +233,6 @@ static int amdgpu_ras_eeprom_correct_header_tag(
 	struct amdgpu_ras_eeprom_control *control,
 	uint32_t header)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_ras_eeprom_table_header *hdr = &control->tbl_hdr;
 	u8 *hh;
 	int res;
@@ -271,7 +263,6 @@ static int amdgpu_ras_eeprom_correct_header_tag(
  */
 int amdgpu_ras_eeprom_reset_table(struct amdgpu_ras_eeprom_control *control)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_ras_eeprom_table_header *hdr = &control->tbl_hdr;
 	u8 csum;
 	int res;
@@ -303,7 +294,6 @@ __encode_table_record_to_buf(struct amdgpu_ras_eeprom_control *control,
 			     struct eeprom_table_record *record,
 			     unsigned char *buf)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	__le64 tmp = 0;
 	int i = 0;
 
@@ -332,7 +322,6 @@ __decode_table_record_from_buf(struct amdgpu_ras_eeprom_control *control,
 			       struct eeprom_table_record *record,
 			       unsigned char *buf)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	__le64 tmp = 0;
 	int i =  0;
 
@@ -358,7 +347,6 @@ __decode_table_record_from_buf(struct amdgpu_ras_eeprom_control *control,
 
 bool amdgpu_ras_eeprom_check_err_threshold(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_ras *con = amdgpu_ras_get_context(adev);
 
 	if (!__is_ras_eeprom_supported(adev))
@@ -394,7 +382,6 @@ bool amdgpu_ras_eeprom_check_err_threshold(struct amdgpu_device *adev)
 static int __amdgpu_ras_eeprom_write(struct amdgpu_ras_eeprom_control *control,
 				     u8 *buf, const u32 fri, const u32 num)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	u32 buf_size;
 	int res;
@@ -428,7 +415,6 @@ amdgpu_ras_eeprom_append_table(struct amdgpu_ras_eeprom_control *control,
 			       struct eeprom_table_record *record,
 			       const u32 num)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	u32 a, b, i;
 	u8 *buf, *pp;
 	int res;
@@ -531,7 +517,6 @@ Out:
 static int
 amdgpu_ras_eeprom_update_header(struct amdgpu_ras_eeprom_control *control)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
 	u8 *buf, *pp, csum;
@@ -612,7 +597,6 @@ int amdgpu_ras_eeprom_append(struct amdgpu_ras_eeprom_control *control,
 			     struct eeprom_table_record *record,
 			     const u32 num)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	int res;
 
@@ -653,7 +637,6 @@ int amdgpu_ras_eeprom_append(struct amdgpu_ras_eeprom_control *control,
 static int __amdgpu_ras_eeprom_read(struct amdgpu_ras_eeprom_control *control,
 				    u8 *buf, const u32 fri, const u32 num)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	u32 buf_size;
 	int res;
@@ -697,7 +680,6 @@ int amdgpu_ras_eeprom_read(struct amdgpu_ras_eeprom_control *control,
 			   struct eeprom_table_record *record,
 			   const u32 num)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	int i, res;
 	u8 *buf, *pp;
@@ -777,7 +759,6 @@ Out:
 
 uint32_t amdgpu_ras_eeprom_max_record_count(void)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	return RAS_MAX_RECORD_COUNT;
 }
 
@@ -785,7 +766,6 @@ static ssize_t
 amdgpu_ras_debugfs_eeprom_size_read(struct file *f, char __user *buf,
 				    size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)file_inode(f)->i_private;
 	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
 	struct amdgpu_ras_eeprom_control *control = ras ? &ras->eeprom_control : NULL;
@@ -838,14 +818,12 @@ static const char *record_err_type_str[AMDGPU_RAS_EEPROM_ERR_COUNT] = {
 
 static loff_t amdgpu_ras_debugfs_table_size(struct amdgpu_ras_eeprom_control *control)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	return strlen(tbl_hdr_str) + tbl_hdr_fmt_size +
 		strlen(rec_hdr_str) + rec_hdr_fmt_size * control->ras_num_recs;
 }
 
 void amdgpu_ras_debugfs_set_ret_size(struct amdgpu_ras_eeprom_control *control)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_ras *ras = container_of(control, struct amdgpu_ras,
 					      eeprom_control);
 	struct dentry *de = ras->de_ras_eeprom_table;
@@ -857,7 +835,6 @@ void amdgpu_ras_debugfs_set_ret_size(struct amdgpu_ras_eeprom_control *control)
 static ssize_t amdgpu_ras_debugfs_table_read(struct file *f, char __user *buf,
 					     size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)file_inode(f)->i_private;
 	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
 	struct amdgpu_ras_eeprom_control *control = &ras->eeprom_control;
@@ -973,7 +950,6 @@ static ssize_t
 amdgpu_ras_debugfs_eeprom_table_read(struct file *f, char __user *buf,
 				     size_t size, loff_t *pos)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)file_inode(f)->i_private;
 	struct amdgpu_ras *ras = amdgpu_ras_get_context(adev);
 	struct amdgpu_ras_eeprom_control *control = ras ? &ras->eeprom_control : NULL;
@@ -1021,7 +997,6 @@ const struct file_operations amdgpu_ras_debugfs_eeprom_table_ops = {
  */
 static int __verify_ras_table_checksum(struct amdgpu_ras_eeprom_control *control)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	int buf_size, res;
 	u8  csum, *buf, *pp;
@@ -1058,7 +1033,6 @@ Out:
 int amdgpu_ras_eeprom_init(struct amdgpu_ras_eeprom_control *control,
 			   bool *exceed_err_limit)
 {
-    pr_info("amdgpu_ras_eeprom: called %s\n", __func__);
 	struct amdgpu_device *adev = to_amdgpu_device(control);
 	unsigned char buf[RAS_TABLE_HEADER_SIZE] = { 0 };
 	struct amdgpu_ras_eeprom_table_header *hdr = &control->tbl_hdr;

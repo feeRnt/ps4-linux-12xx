@@ -134,7 +134,6 @@ static DEFINE_MUTEX(kernel_fb_helper_lock);
 
 static void drm_fb_helper_restore_lut_atomic(struct drm_crtc *crtc)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	uint16_t *r_base, *g_base, *b_base;
 
 	if (crtc->funcs->gamma_set == NULL)
@@ -154,7 +153,6 @@ static void drm_fb_helper_restore_lut_atomic(struct drm_crtc *crtc)
  */
 int drm_fb_helper_debug_enter(struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *helper = info->par;
 	const struct drm_crtc_helper_funcs *funcs;
 	struct drm_mode_set *mode_set;
@@ -191,7 +189,6 @@ EXPORT_SYMBOL(drm_fb_helper_debug_enter);
  */
 int drm_fb_helper_debug_leave(struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *helper = info->par;
 	struct drm_client_dev *client = &helper->client;
 	struct drm_device *dev = helper->dev;
@@ -234,7 +231,6 @@ static int
 __drm_fb_helper_restore_fbdev_mode_unlocked(struct drm_fb_helper *fb_helper,
 					    bool force)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	bool do_delayed;
 	int ret;
 
@@ -280,7 +276,6 @@ __drm_fb_helper_restore_fbdev_mode_unlocked(struct drm_fb_helper *fb_helper,
  */
 int drm_fb_helper_restore_fbdev_mode_unlocked(struct drm_fb_helper *fb_helper)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	return __drm_fb_helper_restore_fbdev_mode_unlocked(fb_helper, false);
 }
 EXPORT_SYMBOL(drm_fb_helper_restore_fbdev_mode_unlocked);
@@ -289,7 +284,6 @@ EXPORT_SYMBOL(drm_fb_helper_restore_fbdev_mode_unlocked);
 /* emergency restore, don't bother with error reporting */
 static void drm_fb_helper_restore_work_fn(struct work_struct *ignored)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *helper;
 
 	mutex_lock(&kernel_fb_helper_lock);
@@ -310,7 +304,6 @@ static DECLARE_WORK(drm_fb_helper_restore_work, drm_fb_helper_restore_work_fn);
 
 static void drm_fb_helper_sysrq(int dummy1)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	schedule_work(&drm_fb_helper_restore_work);
 }
 
@@ -325,7 +318,6 @@ static const struct sysrq_key_op sysrq_drm_fb_helper_restore_op = { };
 
 static void drm_fb_helper_dpms(struct fb_info *info, int dpms_mode)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 
 	mutex_lock(&fb_helper->lock);
@@ -340,7 +332,6 @@ static void drm_fb_helper_dpms(struct fb_info *info, int dpms_mode)
  */
 int drm_fb_helper_blank(int blank, struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	if (oops_in_progress)
 		return -EBUSY;
 
@@ -372,7 +363,6 @@ EXPORT_SYMBOL(drm_fb_helper_blank);
 
 static void drm_fb_helper_resume_worker(struct work_struct *work)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *helper = container_of(work, struct drm_fb_helper,
 						    resume_work);
 
@@ -385,7 +375,6 @@ static void drm_fb_helper_damage_blit_real(struct drm_fb_helper *fb_helper,
 					   struct drm_clip_rect *clip,
 					   struct dma_buf_map *dst)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_framebuffer *fb = fb_helper->fb;
 	unsigned int cpp = fb->format->cpp[0];
 	size_t offset = clip->y1 * fb->pitches[0] + clip->x1 * cpp;
@@ -405,7 +394,6 @@ static void drm_fb_helper_damage_blit_real(struct drm_fb_helper *fb_helper,
 static int drm_fb_helper_damage_blit(struct drm_fb_helper *fb_helper,
 				     struct drm_clip_rect *clip)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_client_buffer *buffer = fb_helper->buffer;
 	struct dma_buf_map map, dst;
 	int ret;
@@ -440,7 +428,6 @@ out:
 
 static void drm_fb_helper_damage_work(struct work_struct *work)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *helper = container_of(work, struct drm_fb_helper,
 						    damage_work);
 	struct drm_device *dev = helper->dev;
@@ -498,7 +485,6 @@ err:
 void drm_fb_helper_prepare(struct drm_device *dev, struct drm_fb_helper *helper,
 			   const struct drm_fb_helper_funcs *funcs)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	INIT_LIST_HEAD(&helper->kernel_fb_list);
 	spin_lock_init(&helper->damage_lock);
 	INIT_WORK(&helper->resume_work, drm_fb_helper_resume_worker);
@@ -528,7 +514,6 @@ EXPORT_SYMBOL(drm_fb_helper_prepare);
 int drm_fb_helper_init(struct drm_device *dev,
 		       struct drm_fb_helper *fb_helper)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	int ret;
 
 	if (!drm_fbdev_emulation) {
@@ -567,7 +552,6 @@ EXPORT_SYMBOL(drm_fb_helper_init);
  */
 struct fb_info *drm_fb_helper_alloc_fbi(struct drm_fb_helper *fb_helper)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct device *dev = fb_helper->dev->dev;
 	struct fb_info *info;
 	int ret;
@@ -617,7 +601,6 @@ EXPORT_SYMBOL(drm_fb_helper_alloc_fbi);
  */
 void drm_fb_helper_unregister_fbi(struct drm_fb_helper *fb_helper)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	if (fb_helper && fb_helper->fbdev)
 		unregister_framebuffer(fb_helper->fbdev);
 }
@@ -631,7 +614,6 @@ EXPORT_SYMBOL(drm_fb_helper_unregister_fbi);
  */
 void drm_fb_helper_fini(struct drm_fb_helper *fb_helper)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct fb_info *info;
 
 	if (!fb_helper)
@@ -670,7 +652,6 @@ EXPORT_SYMBOL(drm_fb_helper_fini);
 
 static bool drm_fbdev_use_shadow_fb(struct drm_fb_helper *fb_helper)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_device *dev = fb_helper->dev;
 	struct drm_framebuffer *fb = fb_helper->fb;
 
@@ -682,7 +663,6 @@ static bool drm_fbdev_use_shadow_fb(struct drm_fb_helper *fb_helper)
 static void drm_fb_helper_damage(struct fb_info *info, u32 x, u32 y,
 				 u32 width, u32 height)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *helper = info->par;
 	struct drm_clip_rect *clip = &helper->damage_clip;
 	unsigned long flags;
@@ -711,7 +691,6 @@ static void drm_fb_helper_damage(struct fb_info *info, u32 x, u32 y,
 void drm_fb_helper_deferred_io(struct fb_info *info,
 			       struct list_head *pagelist)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	unsigned long start, end, min, max;
 	struct page *page;
 	u32 y1, y2;
@@ -746,7 +725,6 @@ EXPORT_SYMBOL(drm_fb_helper_deferred_io);
 ssize_t drm_fb_helper_sys_read(struct fb_info *info, char __user *buf,
 			       size_t count, loff_t *ppos)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	return fb_sys_read(info, buf, count, ppos);
 }
 EXPORT_SYMBOL(drm_fb_helper_sys_read);
@@ -763,7 +741,6 @@ EXPORT_SYMBOL(drm_fb_helper_sys_read);
 ssize_t drm_fb_helper_sys_write(struct fb_info *info, const char __user *buf,
 				size_t count, loff_t *ppos)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	ssize_t ret;
 
 	ret = fb_sys_write(info, buf, count, ppos);
@@ -784,7 +761,6 @@ EXPORT_SYMBOL(drm_fb_helper_sys_write);
 void drm_fb_helper_sys_fillrect(struct fb_info *info,
 				const struct fb_fillrect *rect)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	sys_fillrect(info, rect);
 	drm_fb_helper_damage(info, rect->dx, rect->dy, rect->width, rect->height);
 }
@@ -800,7 +776,6 @@ EXPORT_SYMBOL(drm_fb_helper_sys_fillrect);
 void drm_fb_helper_sys_copyarea(struct fb_info *info,
 				const struct fb_copyarea *area)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	sys_copyarea(info, area);
 	drm_fb_helper_damage(info, area->dx, area->dy, area->width, area->height);
 }
@@ -816,7 +791,6 @@ EXPORT_SYMBOL(drm_fb_helper_sys_copyarea);
 void drm_fb_helper_sys_imageblit(struct fb_info *info,
 				 const struct fb_image *image)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	sys_imageblit(info, image);
 	drm_fb_helper_damage(info, image->dx, image->dy, image->width, image->height);
 }
@@ -832,7 +806,6 @@ EXPORT_SYMBOL(drm_fb_helper_sys_imageblit);
 void drm_fb_helper_cfb_fillrect(struct fb_info *info,
 				const struct fb_fillrect *rect)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	cfb_fillrect(info, rect);
 	drm_fb_helper_damage(info, rect->dx, rect->dy, rect->width, rect->height);
 }
@@ -848,7 +821,6 @@ EXPORT_SYMBOL(drm_fb_helper_cfb_fillrect);
 void drm_fb_helper_cfb_copyarea(struct fb_info *info,
 				const struct fb_copyarea *area)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	cfb_copyarea(info, area);
 	drm_fb_helper_damage(info, area->dx, area->dy, area->width, area->height);
 }
@@ -864,7 +836,6 @@ EXPORT_SYMBOL(drm_fb_helper_cfb_copyarea);
 void drm_fb_helper_cfb_imageblit(struct fb_info *info,
 				 const struct fb_image *image)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	cfb_imageblit(info, image);
 	drm_fb_helper_damage(info, image->dx, image->dy, image->width, image->height);
 }
@@ -881,7 +852,6 @@ EXPORT_SYMBOL(drm_fb_helper_cfb_imageblit);
  */
 void drm_fb_helper_set_suspend(struct drm_fb_helper *fb_helper, bool suspend)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	if (fb_helper && fb_helper->fbdev)
 		fb_set_suspend(fb_helper->fbdev, suspend);
 }
@@ -906,7 +876,6 @@ EXPORT_SYMBOL(drm_fb_helper_set_suspend);
 void drm_fb_helper_set_suspend_unlocked(struct drm_fb_helper *fb_helper,
 					bool suspend)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	if (!fb_helper || !fb_helper->fbdev)
 		return;
 
@@ -936,7 +905,6 @@ EXPORT_SYMBOL(drm_fb_helper_set_suspend_unlocked);
 
 static int setcmap_pseudo_palette(struct fb_cmap *cmap, struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	u32 *palette = (u32 *)info->pseudo_palette;
 	int i;
 
@@ -969,7 +937,6 @@ static int setcmap_pseudo_palette(struct fb_cmap *cmap, struct fb_info *info)
 
 static int setcmap_legacy(struct fb_cmap *cmap, struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	struct drm_mode_set *modeset;
 	struct drm_crtc *crtc;
@@ -1011,7 +978,6 @@ out:
 static struct drm_property_blob *setcmap_new_gamma_lut(struct drm_crtc *crtc,
 						       struct fb_cmap *cmap)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_device *dev = crtc->dev;
 	struct drm_property_blob *gamma_lut;
 	struct drm_color_lut *lut;
@@ -1054,7 +1020,6 @@ static struct drm_property_blob *setcmap_new_gamma_lut(struct drm_crtc *crtc,
 
 static int setcmap_atomic(struct fb_cmap *cmap, struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	struct drm_device *dev = fb_helper->dev;
 	struct drm_property_blob *gamma_lut = NULL;
@@ -1148,7 +1113,6 @@ backoff:
  */
 int drm_fb_helper_setcmap(struct fb_cmap *cmap, struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	struct drm_device *dev = fb_helper->dev;
 	int ret;
@@ -1192,7 +1156,6 @@ EXPORT_SYMBOL(drm_fb_helper_setcmap);
 int drm_fb_helper_ioctl(struct fb_info *info, unsigned int cmd,
 			unsigned long arg)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	struct drm_device *dev = fb_helper->dev;
 	struct drm_crtc *crtc;
@@ -1251,7 +1214,6 @@ EXPORT_SYMBOL(drm_fb_helper_ioctl);
 static bool drm_fb_pixel_format_equal(const struct fb_var_screeninfo *var_1,
 				      const struct fb_var_screeninfo *var_2)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	return var_1->bits_per_pixel == var_2->bits_per_pixel &&
 	       var_1->grayscale == var_2->grayscale &&
 	       var_1->red.offset == var_2->red.offset &&
@@ -1271,7 +1233,6 @@ static bool drm_fb_pixel_format_equal(const struct fb_var_screeninfo *var_1,
 static void drm_fb_helper_fill_pixel_fmt(struct fb_var_screeninfo *var,
 					 u8 depth)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	switch (depth) {
 	case 8:
 		var->red.offset = 0;
@@ -1335,7 +1296,6 @@ static void drm_fb_helper_fill_pixel_fmt(struct fb_var_screeninfo *var,
 int drm_fb_helper_check_var(struct fb_var_screeninfo *var,
 			    struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	struct drm_framebuffer *fb = fb_helper->fb;
 	struct drm_device *dev = fb_helper->dev;
@@ -1409,7 +1369,6 @@ EXPORT_SYMBOL(drm_fb_helper_check_var);
  */
 int drm_fb_helper_set_par(struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	struct fb_var_screeninfo *var = &info->var;
 	bool force;
@@ -1448,7 +1407,6 @@ EXPORT_SYMBOL(drm_fb_helper_set_par);
 
 static void pan_set(struct drm_fb_helper *fb_helper, int x, int y)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_mode_set *mode_set;
 
 	mutex_lock(&fb_helper->client.modeset_mutex);
@@ -1462,7 +1420,6 @@ static void pan_set(struct drm_fb_helper *fb_helper, int x, int y)
 static int pan_display_atomic(struct fb_var_screeninfo *var,
 			      struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	int ret;
 
@@ -1481,7 +1438,6 @@ static int pan_display_atomic(struct fb_var_screeninfo *var,
 static int pan_display_legacy(struct fb_var_screeninfo *var,
 			      struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	struct drm_client_dev *client = &fb_helper->client;
 	struct drm_mode_set *modeset;
@@ -1515,7 +1471,6 @@ static int pan_display_legacy(struct fb_var_screeninfo *var,
 int drm_fb_helper_pan_display(struct fb_var_screeninfo *var,
 			      struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	struct drm_device *dev = fb_helper->dev;
 	int ret;
@@ -1549,7 +1504,6 @@ EXPORT_SYMBOL(drm_fb_helper_pan_display);
 static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 					 int preferred_bpp)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_client_dev *client = &fb_helper->client;
 	struct drm_device *dev = fb_helper->dev;
 	struct drm_mode_config *config = &dev->mode_config;
@@ -1728,7 +1682,6 @@ static int drm_fb_helper_single_fb_probe(struct drm_fb_helper *fb_helper,
 static void drm_fb_helper_fill_fix(struct fb_info *info, uint32_t pitch,
 				   uint32_t depth)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	info->fix.type = FB_TYPE_PACKED_PIXELS;
 	info->fix.visual = depth == 8 ? FB_VISUAL_PSEUDOCOLOR :
 		FB_VISUAL_TRUECOLOR;
@@ -1747,7 +1700,6 @@ static void drm_fb_helper_fill_var(struct fb_info *info,
 				   struct drm_fb_helper *fb_helper,
 				   uint32_t fb_width, uint32_t fb_height)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_framebuffer *fb = fb_helper->fb;
 
 	WARN_ON((drm_format_info_block_width(fb->format, 0) > 1) ||
@@ -1784,7 +1736,6 @@ void drm_fb_helper_fill_info(struct fb_info *info,
 			     struct drm_fb_helper *fb_helper,
 			     struct drm_fb_helper_surface_size *sizes)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_framebuffer *fb = fb_helper->fb;
 
 	drm_fb_helper_fill_fix(info, fb->pitches[0], fb->format->depth);
@@ -1813,7 +1764,6 @@ EXPORT_SYMBOL(drm_fb_helper_fill_info);
  */
 static void drm_setup_crtcs_fb(struct drm_fb_helper *fb_helper)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_client_dev *client = &fb_helper->client;
 	struct drm_connector_list_iter conn_iter;
 	struct fb_info *info = fb_helper->fbdev;
@@ -1876,7 +1826,6 @@ static int
 __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
 					  int bpp_sel)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_device *dev = fb_helper->dev;
 	struct fb_info *info;
 	unsigned int width, height;
@@ -1975,7 +1924,6 @@ __drm_fb_helper_initial_config_and_unlock(struct drm_fb_helper *fb_helper,
  */
 int drm_fb_helper_initial_config(struct drm_fb_helper *fb_helper, int bpp_sel)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	int ret;
 
 	if (!drm_fbdev_emulation)
@@ -2011,7 +1959,6 @@ EXPORT_SYMBOL(drm_fb_helper_initial_config);
  */
 int drm_fb_helper_hotplug_event(struct drm_fb_helper *fb_helper)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	int err = 0;
 
 	if (!drm_fbdev_emulation || !fb_helper)
@@ -2053,7 +2000,6 @@ EXPORT_SYMBOL(drm_fb_helper_hotplug_event);
  */
 void drm_fb_helper_lastclose(struct drm_device *dev)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	drm_fb_helper_restore_fbdev_mode_unlocked(dev->fb_helper);
 }
 EXPORT_SYMBOL(drm_fb_helper_lastclose);
@@ -2069,7 +2015,6 @@ EXPORT_SYMBOL(drm_fb_helper_lastclose);
  */
 void drm_fb_helper_output_poll_changed(struct drm_device *dev)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	drm_fb_helper_hotplug_event(dev->fb_helper);
 }
 EXPORT_SYMBOL(drm_fb_helper_output_poll_changed);
@@ -2077,7 +2022,6 @@ EXPORT_SYMBOL(drm_fb_helper_output_poll_changed);
 /* @user: 1=userspace, 0=fbcon */
 static int drm_fbdev_fb_open(struct fb_info *info, int user)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 
 	/* No need to take a ref for fbcon because it unbinds on unregister */
@@ -2089,7 +2033,6 @@ static int drm_fbdev_fb_open(struct fb_info *info, int user)
 
 static int drm_fbdev_fb_release(struct fb_info *info, int user)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 
 	if (user)
@@ -2100,7 +2043,6 @@ static int drm_fbdev_fb_release(struct fb_info *info, int user)
 
 static void drm_fbdev_cleanup(struct drm_fb_helper *fb_helper)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct fb_info *fbi = fb_helper->fbdev;
 	void *shadow = NULL;
 
@@ -2126,7 +2068,6 @@ static void drm_fbdev_cleanup(struct drm_fb_helper *fb_helper)
 
 static void drm_fbdev_release(struct drm_fb_helper *fb_helper)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	drm_fbdev_cleanup(fb_helper);
 	drm_client_release(&fb_helper->client);
 	kfree(fb_helper);
@@ -2138,13 +2079,11 @@ static void drm_fbdev_release(struct drm_fb_helper *fb_helper)
  */
 static void drm_fbdev_fb_destroy(struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	drm_fbdev_release(info->par);
 }
 
 static int drm_fbdev_fb_mmap(struct fb_info *info, struct vm_area_struct *vma)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 
 	if (fb_helper->dev->driver->gem_prime_mmap)
@@ -2155,7 +2094,6 @@ static int drm_fbdev_fb_mmap(struct fb_info *info, struct vm_area_struct *vma)
 
 static bool drm_fbdev_use_iomem(struct fb_info *info)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = info->par;
 	struct drm_client_buffer *buffer = fb_helper->buffer;
 
@@ -2165,7 +2103,6 @@ static bool drm_fbdev_use_iomem(struct fb_info *info)
 static ssize_t fb_read_screen_base(struct fb_info *info, char __user *buf, size_t count,
 				   loff_t pos)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	const char __iomem *src = info->screen_base + pos;
 	size_t alloc_size = min_t(size_t, count, PAGE_SIZE);
 	ssize_t ret = 0;
@@ -2199,7 +2136,6 @@ static ssize_t fb_read_screen_base(struct fb_info *info, char __user *buf, size_
 static ssize_t fb_read_screen_buffer(struct fb_info *info, char __user *buf, size_t count,
 				     loff_t pos)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	const char *src = info->screen_buffer + pos;
 
 	if (copy_to_user(buf, src, count))
@@ -2211,7 +2147,6 @@ static ssize_t fb_read_screen_buffer(struct fb_info *info, char __user *buf, siz
 static ssize_t drm_fbdev_fb_read(struct fb_info *info, char __user *buf,
 				 size_t count, loff_t *ppos)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	loff_t pos = *ppos;
 	size_t total_size;
 	ssize_t ret;
@@ -2242,7 +2177,6 @@ static ssize_t drm_fbdev_fb_read(struct fb_info *info, char __user *buf,
 static ssize_t fb_write_screen_base(struct fb_info *info, const char __user *buf, size_t count,
 				    loff_t pos)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	char __iomem *dst = info->screen_base + pos;
 	size_t alloc_size = min_t(size_t, count, PAGE_SIZE);
 	ssize_t ret = 0;
@@ -2276,7 +2210,6 @@ static ssize_t fb_write_screen_base(struct fb_info *info, const char __user *buf
 static ssize_t fb_write_screen_buffer(struct fb_info *info, const char __user *buf, size_t count,
 				      loff_t pos)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	char *dst = info->screen_buffer + pos;
 
 	if (copy_from_user(dst, buf, count))
@@ -2288,7 +2221,6 @@ static ssize_t fb_write_screen_buffer(struct fb_info *info, const char __user *b
 static ssize_t drm_fbdev_fb_write(struct fb_info *info, const char __user *buf,
 				  size_t count, loff_t *ppos)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	loff_t pos = *ppos;
 	size_t total_size;
 	ssize_t ret;
@@ -2332,7 +2264,6 @@ static ssize_t drm_fbdev_fb_write(struct fb_info *info, const char __user *buf,
 static void drm_fbdev_fb_fillrect(struct fb_info *info,
 				  const struct fb_fillrect *rect)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	if (drm_fbdev_use_iomem(info))
 		drm_fb_helper_cfb_fillrect(info, rect);
 	else
@@ -2342,7 +2273,6 @@ static void drm_fbdev_fb_fillrect(struct fb_info *info,
 static void drm_fbdev_fb_copyarea(struct fb_info *info,
 				  const struct fb_copyarea *area)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	if (drm_fbdev_use_iomem(info))
 		drm_fb_helper_cfb_copyarea(info, area);
 	else
@@ -2352,7 +2282,6 @@ static void drm_fbdev_fb_copyarea(struct fb_info *info,
 static void drm_fbdev_fb_imageblit(struct fb_info *info,
 				   const struct fb_image *image)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	if (drm_fbdev_use_iomem(info))
 		drm_fb_helper_cfb_imageblit(info, image);
 	else
@@ -2387,7 +2316,6 @@ static struct fb_deferred_io drm_fbdev_defio = {
 static int drm_fb_helper_generic_probe(struct drm_fb_helper *fb_helper,
 				       struct drm_fb_helper_surface_size *sizes)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_client_dev *client = &fb_helper->client;
 	struct drm_device *dev = fb_helper->dev;
 	struct drm_client_buffer *buffer;
@@ -2461,7 +2389,6 @@ static const struct drm_fb_helper_funcs drm_fb_helper_generic_funcs = {
 
 static void drm_fbdev_client_unregister(struct drm_client_dev *client)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = drm_fb_helper_from_client(client);
 
 	if (fb_helper->fbdev)
@@ -2473,7 +2400,6 @@ static void drm_fbdev_client_unregister(struct drm_client_dev *client)
 
 static int drm_fbdev_client_restore(struct drm_client_dev *client)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	drm_fb_helper_lastclose(client->dev);
 
 	return 0;
@@ -2481,7 +2407,6 @@ static int drm_fbdev_client_restore(struct drm_client_dev *client)
 
 static int drm_fbdev_client_hotplug(struct drm_client_dev *client)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper = drm_fb_helper_from_client(client);
 	struct drm_device *dev = client->dev;
 	int ret;
@@ -2561,7 +2486,6 @@ static const struct drm_client_funcs drm_fbdev_client_funcs = {
 void drm_fbdev_generic_setup(struct drm_device *dev,
 			     unsigned int preferred_bpp)
 {
-    pr_info("drm_fb_helper: called %s\n", __func__);
 	struct drm_fb_helper *fb_helper;
 	int ret;
 

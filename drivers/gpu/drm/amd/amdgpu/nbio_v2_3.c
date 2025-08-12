@@ -55,7 +55,6 @@
 
 static void nbio_v2_3_remap_hdp_registers(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	WREG32_SOC15(NBIO, 0, mmREMAP_HDP_MEM_FLUSH_CNTL,
 		adev->rmmio_remap.reg_offset + KFD_MMIO_REMAP_HDP_MEM_FLUSH_CNTL);
 	WREG32_SOC15(NBIO, 0, mmREMAP_HDP_REG_FLUSH_CNTL,
@@ -64,7 +63,6 @@ static void nbio_v2_3_remap_hdp_registers(struct amdgpu_device *adev)
 
 static u32 nbio_v2_3_get_rev_id(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	u32 tmp;
 
 	/*
@@ -84,7 +82,6 @@ static u32 nbio_v2_3_get_rev_id(struct amdgpu_device *adev)
 
 static void nbio_v2_3_mc_access_enable(struct amdgpu_device *adev, bool enable)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	if (enable)
 		WREG32_SOC15(NBIO, 0, mmBIF_FB_EN,
 			     BIF_FB_EN__FB_READ_EN_MASK |
@@ -95,7 +92,6 @@ static void nbio_v2_3_mc_access_enable(struct amdgpu_device *adev, bool enable)
 
 static u32 nbio_v2_3_get_memsize(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	return RREG32_SOC15(NBIO, 0, mmRCC_DEV0_EPF0_RCC_CONFIG_MEMSIZE);
 }
 
@@ -103,7 +99,6 @@ static void nbio_v2_3_sdma_doorbell_range(struct amdgpu_device *adev, int instan
 					  bool use_doorbell, int doorbell_index,
 					  int doorbell_size)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	u32 reg = instance == 0 ? SOC15_REG_OFFSET(NBIO, 0, mmBIF_SDMA0_DOORBELL_RANGE) :
 			instance == 1 ? SOC15_REG_OFFSET(NBIO, 0, mmBIF_SDMA1_DOORBELL_RANGE) :
 			instance == 2 ? SOC15_REG_OFFSET(NBIO, 0, mmBIF_SDMA2_DOORBELL_RANGE) :
@@ -129,7 +124,6 @@ static void nbio_v2_3_sdma_doorbell_range(struct amdgpu_device *adev, int instan
 static void nbio_v2_3_vcn_doorbell_range(struct amdgpu_device *adev, bool use_doorbell,
 					 int doorbell_index, int instance)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	u32 reg = instance ? SOC15_REG_OFFSET(NBIO, 0, mmBIF_MMSCH1_DOORBELL_RANGE) :
 		SOC15_REG_OFFSET(NBIO, 0, mmBIF_MMSCH0_DOORBELL_RANGE);
 
@@ -151,7 +145,6 @@ static void nbio_v2_3_vcn_doorbell_range(struct amdgpu_device *adev, bool use_do
 static void nbio_v2_3_enable_doorbell_aperture(struct amdgpu_device *adev,
 					       bool enable)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	WREG32_FIELD15(NBIO, 0, RCC_DEV0_EPF0_RCC_DOORBELL_APER_EN, BIF_DOORBELL_APER_EN,
 		       enable ? 1 : 0);
 }
@@ -159,7 +152,6 @@ static void nbio_v2_3_enable_doorbell_aperture(struct amdgpu_device *adev,
 static void nbio_v2_3_enable_doorbell_selfring_aperture(struct amdgpu_device *adev,
 							bool enable)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	u32 tmp = 0;
 
 	if (enable) {
@@ -184,7 +176,6 @@ static void nbio_v2_3_enable_doorbell_selfring_aperture(struct amdgpu_device *ad
 static void nbio_v2_3_ih_doorbell_range(struct amdgpu_device *adev,
 					bool use_doorbell, int doorbell_index)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	u32 ih_doorbell_range = RREG32_SOC15(NBIO, 0, mmBIF_IH_DOORBELL_RANGE);
 
 	if (use_doorbell) {
@@ -204,7 +195,6 @@ static void nbio_v2_3_ih_doorbell_range(struct amdgpu_device *adev,
 
 static void nbio_v2_3_ih_control(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	u32 interrupt_cntl;
 
 	/* setup interrupt control */
@@ -228,7 +218,6 @@ static void nbio_v2_3_ih_control(struct amdgpu_device *adev)
 static void nbio_v2_3_update_medium_grain_clock_gating(struct amdgpu_device *adev,
 						       bool enable)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	uint32_t def, data;
 
 	if (!(adev->cg_flags & AMD_CG_SUPPORT_BIF_MGCG))
@@ -258,7 +247,6 @@ static void nbio_v2_3_update_medium_grain_clock_gating(struct amdgpu_device *ade
 static void nbio_v2_3_update_medium_grain_light_sleep(struct amdgpu_device *adev,
 						      bool enable)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	uint32_t def, data;
 
 	if (!(adev->cg_flags & AMD_CG_SUPPORT_BIF_LS))
@@ -282,7 +270,6 @@ static void nbio_v2_3_update_medium_grain_light_sleep(struct amdgpu_device *adev
 static void nbio_v2_3_get_clockgating_state(struct amdgpu_device *adev,
 					    u32 *flags)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	int data;
 
 	/* AMD_CG_SUPPORT_BIF_MGCG */
@@ -298,25 +285,21 @@ static void nbio_v2_3_get_clockgating_state(struct amdgpu_device *adev,
 
 static u32 nbio_v2_3_get_hdp_flush_req_offset(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	return SOC15_REG_OFFSET(NBIO, 0, mmBIF_BX_PF_GPU_HDP_FLUSH_REQ);
 }
 
 static u32 nbio_v2_3_get_hdp_flush_done_offset(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	return SOC15_REG_OFFSET(NBIO, 0, mmBIF_BX_PF_GPU_HDP_FLUSH_DONE);
 }
 
 static u32 nbio_v2_3_get_pcie_index_offset(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	return SOC15_REG_OFFSET(NBIO, 0, mmPCIE_INDEX2);
 }
 
 static u32 nbio_v2_3_get_pcie_data_offset(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	return SOC15_REG_OFFSET(NBIO, 0, mmPCIE_DATA2);
 }
 
@@ -337,7 +320,6 @@ const struct nbio_hdp_flush_reg nbio_v2_3_hdp_flush_reg = {
 
 static void nbio_v2_3_init_registers(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	uint32_t def, data;
 
 	def = data = RREG32_PCIE(smnPCIE_CONFIG_CNTL);
@@ -355,7 +337,6 @@ static void nbio_v2_3_init_registers(struct amdgpu_device *adev)
 static void nbio_v2_3_enable_aspm(struct amdgpu_device *adev,
 				  bool enable)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	uint32_t def, data;
 
 	def = data = RREG32_PCIE(smnPCIE_LC_CNTL);
@@ -387,7 +368,6 @@ static void nbio_v2_3_enable_aspm(struct amdgpu_device *adev,
 
 static void nbio_v2_3_program_ltr(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	uint32_t def, data;
 
 	WREG32_PCIE(smnRCC_EP_DEV0_0_EP_PCIE_TX_LTR_CNTL, 0x75EB);
@@ -410,7 +390,6 @@ static void nbio_v2_3_program_ltr(struct amdgpu_device *adev)
 
 static void nbio_v2_3_program_aspm(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	uint32_t def, data;
 
 	def = data = RREG32_PCIE(smnPCIE_LC_CNTL);
@@ -494,7 +473,6 @@ static void nbio_v2_3_program_aspm(struct amdgpu_device *adev)
 
 static void nbio_v2_3_apply_lc_spc_mode_wa(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	uint32_t reg_data = 0;
 	uint32_t link_width = 0;
 
@@ -520,7 +498,6 @@ static void nbio_v2_3_apply_lc_spc_mode_wa(struct amdgpu_device *adev)
 
 static void nbio_v2_3_apply_l1_link_width_reconfig_wa(struct amdgpu_device *adev)
 {
-    pr_info("nbio_v2_3: called %s\n", __func__);
 	uint32_t reg_data = 0;
 
 	if (adev->asic_type != CHIP_NAVI10)
@@ -533,7 +510,6 @@ static void nbio_v2_3_apply_l1_link_width_reconfig_wa(struct amdgpu_device *adev
 
 static void nbio_v2_3_clear_doorbell_interrupt(struct amdgpu_device *adev)
 {
-        //pr_info("nbio_v2_3: called %s\n", __func__);
 	uint32_t reg, reg_data;
 
 	if (adev->asic_type != CHIP_SIENNA_CICHLID)

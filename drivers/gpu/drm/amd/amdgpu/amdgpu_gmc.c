@@ -43,7 +43,6 @@
  */
 int amdgpu_gmc_pdb0_alloc(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	int r;
 	struct amdgpu_bo_param bp;
 	u64 vram_size = adev->gmc.xgmi.node_segment_size * adev->gmc.xgmi.num_physical_nodes;
@@ -100,7 +99,6 @@ bo_reserve_failure:
 void amdgpu_gmc_get_pde_for_bo(struct amdgpu_bo *bo, int level,
 			       uint64_t *addr, uint64_t *flags)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 
 	switch (bo->tbo.resource->mem_type) {
@@ -123,7 +121,6 @@ void amdgpu_gmc_get_pde_for_bo(struct amdgpu_bo *bo, int level,
  */
 uint64_t amdgpu_gmc_pd_addr(struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->tbo.bdev);
 	uint64_t pd_addr;
 
@@ -154,7 +151,6 @@ int amdgpu_gmc_set_pte_pde(struct amdgpu_device *adev, void *cpu_pt_addr,
 				uint32_t gpu_page_idx, uint64_t addr,
 				uint64_t flags)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	void __iomem *ptr = (void *)cpu_pt_addr;
 	uint64_t value;
 	int idx;
@@ -184,7 +180,6 @@ int amdgpu_gmc_set_pte_pde(struct amdgpu_device *adev, void *cpu_pt_addr,
  */
 uint64_t amdgpu_gmc_agp_addr(struct ttm_buffer_object *bo)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	struct amdgpu_device *adev = amdgpu_ttm_adev(bo->bdev);
 
 	if (bo->ttm->num_pages != 1 || bo->ttm->caching == ttm_cached)
@@ -209,7 +204,6 @@ uint64_t amdgpu_gmc_agp_addr(struct ttm_buffer_object *bo)
 void amdgpu_gmc_vram_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc,
 			      u64 base)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	uint64_t limit = (uint64_t)amdgpu_vram_limit << 20;
 
 	mc->vram_start = base;
@@ -244,7 +238,6 @@ void amdgpu_gmc_vram_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc,
  */
 void amdgpu_gmc_sysvm_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	u64 hive_vram_start = 0;
 	u64 hive_vram_end = mc->xgmi.node_segment_size * mc->xgmi.num_physical_nodes - 1;
 	mc->vram_start = mc->xgmi.node_segment_size * mc->xgmi.physical_node_id;
@@ -272,7 +265,6 @@ void amdgpu_gmc_sysvm_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc
  */
 void amdgpu_gmc_gart_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	const uint64_t four_gb = 0x100000000ULL;
 	u64 size_af, size_bf;
 	/*To avoid the hole, limit the max mc address to AMDGPU_GMC_HOLE_START*/
@@ -314,7 +306,6 @@ void amdgpu_gmc_gart_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc)
  */
 void amdgpu_gmc_agp_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	const uint64_t sixteen_gb = 1ULL << 34;
 	const uint64_t sixteen_gb_mask = ~(sixteen_gb - 1);
 	u64 size_af, size_bf;
@@ -358,7 +349,6 @@ void amdgpu_gmc_agp_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc)
  */
 static inline uint64_t amdgpu_gmc_fault_key(uint64_t addr, uint16_t pasid)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	return addr << 4 | pasid;
 }
 
@@ -377,7 +367,6 @@ static inline uint64_t amdgpu_gmc_fault_key(uint64_t addr, uint16_t pasid)
 bool amdgpu_gmc_filter_faults(struct amdgpu_device *adev, uint64_t addr,
 			      uint16_t pasid, uint64_t timestamp)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	struct amdgpu_gmc *gmc = &adev->gmc;
 	uint64_t stamp, key = amdgpu_gmc_fault_key(addr, pasid);
 	struct amdgpu_gmc_fault *fault;
@@ -430,7 +419,6 @@ bool amdgpu_gmc_filter_faults(struct amdgpu_device *adev, uint64_t addr,
 void amdgpu_gmc_filter_faults_remove(struct amdgpu_device *adev, uint64_t addr,
 				     uint16_t pasid)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	struct amdgpu_gmc *gmc = &adev->gmc;
 	uint64_t key = amdgpu_gmc_fault_key(addr, pasid);
 	struct amdgpu_gmc_fault *fault;
@@ -450,7 +438,6 @@ void amdgpu_gmc_filter_faults_remove(struct amdgpu_device *adev, uint64_t addr,
 
 int amdgpu_gmc_ras_late_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	int r;
 
 	if (adev->umc.ras_funcs &&
@@ -510,7 +497,6 @@ int amdgpu_gmc_ras_late_init(struct amdgpu_device *adev)
 
 void amdgpu_gmc_ras_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	if (adev->umc.ras_funcs &&
 	    adev->umc.ras_funcs->ras_fini)
 		adev->umc.ras_funcs->ras_fini(adev);
@@ -540,7 +526,6 @@ void amdgpu_gmc_ras_fini(struct amdgpu_device *adev)
 
 int amdgpu_gmc_allocate_vm_inv_eng(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	unsigned vm_inv_engs[AMDGPU_MAX_VMHUBS] =
 		{GFXHUB_FREE_VM_INV_ENGS_BITMAP, MMHUB_FREE_VM_INV_ENGS_BITMAP,
@@ -581,7 +566,6 @@ int amdgpu_gmc_allocate_vm_inv_eng(struct amdgpu_device *adev)
  */
 void amdgpu_gmc_tmz_set(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	switch (adev->asic_type) {
 	case CHIP_RAVEN:
 	case CHIP_RENOIR:
@@ -629,7 +613,6 @@ void amdgpu_gmc_tmz_set(struct amdgpu_device *adev)
  */
 void amdgpu_gmc_noretry_set(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	struct amdgpu_gmc *gmc = &adev->gmc;
 
 	switch (adev->asic_type) {
@@ -670,7 +653,6 @@ void amdgpu_gmc_noretry_set(struct amdgpu_device *adev)
 void amdgpu_gmc_set_vm_fault_masks(struct amdgpu_device *adev, int hub_type,
 				   bool enable)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	struct amdgpu_vmhub *hub;
 	u32 tmp, reg, i;
 
@@ -695,7 +677,6 @@ void amdgpu_gmc_set_vm_fault_masks(struct amdgpu_device *adev, int hub_type,
 
 void amdgpu_gmc_get_vbios_allocations(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	unsigned size;
 
 	/*
@@ -758,7 +739,6 @@ void amdgpu_gmc_get_vbios_allocations(struct amdgpu_device *adev)
  */
 void amdgpu_gmc_init_pdb0(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	int i;
 	uint64_t flags = adev->gart.gart_pte_flags; //TODO it is UC. explore NC/RW?
 	/* Each PDE0 (used as PTE) covers (2^vmid0_page_table_block_size)*2M
@@ -801,7 +781,6 @@ void amdgpu_gmc_init_pdb0(struct amdgpu_device *adev)
  */
 uint64_t amdgpu_gmc_vram_mc2pa(struct amdgpu_device *adev, uint64_t mc_addr)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	return mc_addr - adev->gmc.vram_start + adev->vm_manager.vram_base_offset;
 }
 
@@ -814,7 +793,6 @@ uint64_t amdgpu_gmc_vram_mc2pa(struct amdgpu_device *adev, uint64_t mc_addr)
  */
 uint64_t amdgpu_gmc_vram_pa(struct amdgpu_device *adev, struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	return amdgpu_gmc_vram_mc2pa(adev, amdgpu_bo_gpu_offset(bo));
 }
 
@@ -827,13 +805,11 @@ uint64_t amdgpu_gmc_vram_pa(struct amdgpu_device *adev, struct amdgpu_bo *bo)
  */
 uint64_t amdgpu_gmc_vram_cpu_pa(struct amdgpu_device *adev, struct amdgpu_bo *bo)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	return amdgpu_bo_gpu_offset(bo) - adev->gmc.vram_start + adev->gmc.aper_base;
 }
 
 void amdgpu_gmc_get_reserved_allocation(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gmc: called %s\n", __func__);
 	/* Some ASICs need to reserve a region of video memory to avoid access
 	 * from driver */
 	adev->mman.stolen_reserved_offset = 0;

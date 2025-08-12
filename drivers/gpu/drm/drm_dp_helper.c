@@ -56,14 +56,12 @@ struct dp_aux_backlight {
 /* Helpers for DP link training */
 static u8 dp_link_status(const u8 link_status[DP_LINK_STATUS_SIZE], int r)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	return link_status[r - DP_LANE0_1_STATUS];
 }
 
 static u8 dp_get_lane_status(const u8 link_status[DP_LINK_STATUS_SIZE],
 			     int lane)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int i = DP_LANE0_1_STATUS + (lane >> 1);
 	int s = (lane & 1) * 4;
 	u8 l = dp_link_status(link_status, i);
@@ -74,7 +72,6 @@ static u8 dp_get_lane_status(const u8 link_status[DP_LINK_STATUS_SIZE],
 bool drm_dp_channel_eq_ok(const u8 link_status[DP_LINK_STATUS_SIZE],
 			  int lane_count)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 lane_align;
 	u8 lane_status;
 	int lane;
@@ -95,7 +92,6 @@ EXPORT_SYMBOL(drm_dp_channel_eq_ok);
 bool drm_dp_clock_recovery_ok(const u8 link_status[DP_LINK_STATUS_SIZE],
 			      int lane_count)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int lane;
 	u8 lane_status;
 
@@ -111,7 +107,6 @@ EXPORT_SYMBOL(drm_dp_clock_recovery_ok);
 u8 drm_dp_get_adjust_request_voltage(const u8 link_status[DP_LINK_STATUS_SIZE],
 				     int lane)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int i = DP_ADJUST_REQUEST_LANE0_1 + (lane >> 1);
 	int s = ((lane & 1) ?
 		 DP_ADJUST_VOLTAGE_SWING_LANE1_SHIFT :
@@ -125,7 +120,6 @@ EXPORT_SYMBOL(drm_dp_get_adjust_request_voltage);
 u8 drm_dp_get_adjust_request_pre_emphasis(const u8 link_status[DP_LINK_STATUS_SIZE],
 					  int lane)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int i = DP_ADJUST_REQUEST_LANE0_1 + (lane >> 1);
 	int s = ((lane & 1) ?
 		 DP_ADJUST_PRE_EMPHASIS_LANE1_SHIFT :
@@ -139,7 +133,6 @@ EXPORT_SYMBOL(drm_dp_get_adjust_request_pre_emphasis);
 u8 drm_dp_get_adjust_request_post_cursor(const u8 link_status[DP_LINK_STATUS_SIZE],
 					 unsigned int lane)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	unsigned int offset = DP_ADJUST_REQUEST_POST_CURSOR2;
 	u8 value = dp_link_status(link_status, offset);
 
@@ -150,7 +143,6 @@ EXPORT_SYMBOL(drm_dp_get_adjust_request_post_cursor);
 void drm_dp_link_train_clock_recovery_delay(const struct drm_dp_aux *aux,
 					    const u8 dpcd[DP_RECEIVER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	unsigned long rd_interval = dpcd[DP_TRAINING_AUX_RD_INTERVAL] &
 					 DP_TRAINING_AUX_RD_MASK;
 
@@ -172,7 +164,6 @@ EXPORT_SYMBOL(drm_dp_link_train_clock_recovery_delay);
 static void __drm_dp_link_train_channel_eq_delay(const struct drm_dp_aux *aux,
 						 unsigned long rd_interval)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (rd_interval > 4)
 		drm_dbg_kms(aux->drm_dev, "%s: AUX interval %lu, out of range (max 4)\n",
 			    aux->name, rd_interval);
@@ -188,7 +179,6 @@ static void __drm_dp_link_train_channel_eq_delay(const struct drm_dp_aux *aux,
 void drm_dp_link_train_channel_eq_delay(const struct drm_dp_aux *aux,
 					const u8 dpcd[DP_RECEIVER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	__drm_dp_link_train_channel_eq_delay(aux,
 					     dpcd[DP_TRAINING_AUX_RD_INTERVAL] &
 					     DP_TRAINING_AUX_RD_MASK);
@@ -197,21 +187,18 @@ EXPORT_SYMBOL(drm_dp_link_train_channel_eq_delay);
 
 void drm_dp_lttpr_link_train_clock_recovery_delay(void)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	usleep_range(100, 200);
 }
 EXPORT_SYMBOL(drm_dp_lttpr_link_train_clock_recovery_delay);
 
 static u8 dp_lttpr_phy_cap(const u8 phy_cap[DP_LTTPR_PHY_CAP_SIZE], int r)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	return phy_cap[r - DP_TRAINING_AUX_RD_INTERVAL_PHY_REPEATER1];
 }
 
 void drm_dp_lttpr_link_train_channel_eq_delay(const struct drm_dp_aux *aux,
 					      const u8 phy_cap[DP_LTTPR_PHY_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 interval = dp_lttpr_phy_cap(phy_cap,
 				       DP_TRAINING_AUX_RD_INTERVAL_PHY_REPEATER1) &
 		      DP_TRAINING_AUX_RD_MASK;
@@ -222,7 +209,6 @@ EXPORT_SYMBOL(drm_dp_lttpr_link_train_channel_eq_delay);
 
 u8 drm_dp_link_rate_to_bw_code(int link_rate)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	/* Spec says link_bw = link_rate / 0.27Gbps */
 	return link_rate / 27000;
 }
@@ -230,7 +216,6 @@ EXPORT_SYMBOL(drm_dp_link_rate_to_bw_code);
 
 int drm_dp_bw_code_to_link_rate(u8 link_bw)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	/* Spec says link_rate = link_bw * 0.27Gbps */
 	return link_bw * 27000;
 }
@@ -242,7 +227,6 @@ static inline void
 drm_dp_dump_access(const struct drm_dp_aux *aux,
 		   u8 request, uint offset, void *buffer, int ret)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	const char *arrow = request == DP_AUX_NATIVE_READ ? "->" : "<-";
 
 	if (ret > 0)
@@ -268,7 +252,6 @@ drm_dp_dump_access(const struct drm_dp_aux *aux,
 static int drm_dp_dpcd_access(struct drm_dp_aux *aux, u8 request,
 			      unsigned int offset, void *buffer, size_t size)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	struct drm_dp_aux_msg msg;
 	unsigned int retry, native_reply;
 	int err = 0, ret = 0;
@@ -340,7 +323,6 @@ unlock:
 ssize_t drm_dp_dpcd_read(struct drm_dp_aux *aux, unsigned int offset,
 			 void *buffer, size_t size)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	/*
@@ -391,7 +373,6 @@ EXPORT_SYMBOL(drm_dp_dpcd_read);
 ssize_t drm_dp_dpcd_write(struct drm_dp_aux *aux, unsigned int offset,
 			  void *buffer, size_t size)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	if (aux->is_remote)
@@ -416,7 +397,6 @@ EXPORT_SYMBOL(drm_dp_dpcd_write);
 int drm_dp_dpcd_read_link_status(struct drm_dp_aux *aux,
 				 u8 status[DP_LINK_STATUS_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	return drm_dp_dpcd_read(aux, DP_LANE0_1_STATUS, status,
 				DP_LINK_STATUS_SIZE);
 }
@@ -439,7 +419,6 @@ int drm_dp_dpcd_read_phy_link_status(struct drm_dp_aux *aux,
 				     enum drm_dp_phy dp_phy,
 				     u8 link_status[DP_LINK_STATUS_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	if (dp_phy == DP_PHY_DPRX) {
@@ -478,7 +457,6 @@ EXPORT_SYMBOL(drm_dp_dpcd_read_phy_link_status);
 
 static bool is_edid_digital_input_dp(const struct edid *edid)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	return edid && edid->revision >= 4 &&
 		edid->input & DRM_EDID_INPUT_DIGITAL &&
 		(edid->input & DRM_EDID_DIGITAL_TYPE_MASK) == DRM_EDID_DIGITAL_TYPE_DP;
@@ -500,7 +478,6 @@ static bool is_edid_digital_input_dp(const struct edid *edid)
 bool drm_dp_downstream_is_type(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 			       const u8 port_cap[4], u8 type)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	return drm_dp_is_branch(dpcd) &&
 		dpcd[DP_DPCD_REV] >= 0x11 &&
 		(port_cap[0] & DP_DS_PORT_TYPE_MASK) == type;
@@ -519,7 +496,6 @@ bool drm_dp_downstream_is_tmds(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 			       const u8 port_cap[4],
 			       const struct edid *edid)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (dpcd[DP_DPCD_REV] < 0x11) {
 		switch (dpcd[DP_DOWNSTREAMPORT_PRESENT] & DP_DWN_STRM_PORT_TYPE_MASK) {
 		case DP_DWN_STRM_PORT_TYPE_TMDS:
@@ -554,7 +530,6 @@ EXPORT_SYMBOL(drm_dp_downstream_is_tmds);
 bool drm_dp_send_real_edid_checksum(struct drm_dp_aux *aux,
 				    u8 real_edid_checksum)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 link_edid_read = 0, auto_test_req = 0, test_resp = 0;
 
 	if (drm_dp_dpcd_read(aux, DP_DEVICE_SERVICE_IRQ_VECTOR,
@@ -606,7 +581,6 @@ EXPORT_SYMBOL(drm_dp_send_real_edid_checksum);
 
 static u8 drm_dp_downstream_port_count(const u8 dpcd[DP_RECEIVER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 port_count = dpcd[DP_DOWN_STREAM_PORT_COUNT] & DP_PORT_COUNT_MASK;
 
 	if (dpcd[DP_DOWNSTREAMPORT_PRESENT] & DP_DETAILED_CAP_INFO_AVAILABLE && port_count > 4)
@@ -618,7 +592,6 @@ static u8 drm_dp_downstream_port_count(const u8 dpcd[DP_RECEIVER_CAP_SIZE])
 static int drm_dp_read_extended_dpcd_caps(struct drm_dp_aux *aux,
 					  u8 dpcd[DP_RECEIVER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 dpcd_ext[6];
 	int ret;
 
@@ -673,7 +646,6 @@ static int drm_dp_read_extended_dpcd_caps(struct drm_dp_aux *aux,
 int drm_dp_read_dpcd_caps(struct drm_dp_aux *aux,
 			  u8 dpcd[DP_RECEIVER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	ret = drm_dp_dpcd_read(aux, DP_DPCD_REV, dpcd, DP_RECEIVER_CAP_SIZE);
@@ -709,7 +681,6 @@ int drm_dp_read_downstream_info(struct drm_dp_aux *aux,
 				const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 				u8 downstream_ports[DP_MAX_DOWNSTREAM_PORTS])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 len;
 
@@ -753,7 +724,6 @@ EXPORT_SYMBOL(drm_dp_read_downstream_info);
 int drm_dp_downstream_max_dotclock(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 				   const u8 port_cap[4])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (!drm_dp_is_branch(dpcd))
 		return 0;
 
@@ -784,7 +754,6 @@ int drm_dp_downstream_max_tmds_clock(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 				     const u8 port_cap[4],
 				     const struct edid *edid)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (!drm_dp_is_branch(dpcd))
 		return 0;
 
@@ -850,7 +819,6 @@ int drm_dp_downstream_min_tmds_clock(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 				     const u8 port_cap[4],
 				     const struct edid *edid)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (!drm_dp_is_branch(dpcd))
 		return 0;
 
@@ -894,7 +862,6 @@ int drm_dp_downstream_max_bpc(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 			      const u8 port_cap[4],
 			      const struct edid *edid)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (!drm_dp_is_branch(dpcd))
 		return 0;
 
@@ -950,7 +917,6 @@ EXPORT_SYMBOL(drm_dp_downstream_max_bpc);
 bool drm_dp_downstream_420_passthrough(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 				       const u8 port_cap[4])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (!drm_dp_is_branch(dpcd))
 		return false;
 
@@ -982,7 +948,6 @@ EXPORT_SYMBOL(drm_dp_downstream_420_passthrough);
 bool drm_dp_downstream_444_to_420_conversion(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 					     const u8 port_cap[4])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (!drm_dp_is_branch(dpcd))
 		return false;
 
@@ -1015,7 +980,6 @@ bool drm_dp_downstream_rgb_to_ycbcr_conversion(const u8 dpcd[DP_RECEIVER_CAP_SIZ
 					       const u8 port_cap[4],
 					       u8 color_spc)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (!drm_dp_is_branch(dpcd))
 		return false;
 
@@ -1050,7 +1014,6 @@ drm_dp_downstream_mode(struct drm_device *dev,
 		       const u8 port_cap[4])
 
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 vic;
 
 	if (!drm_dp_is_branch(dpcd))
@@ -1099,7 +1062,6 @@ EXPORT_SYMBOL(drm_dp_downstream_mode);
  */
 int drm_dp_downstream_id(struct drm_dp_aux *aux, char id[6])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	return drm_dp_dpcd_read(aux, DP_BRANCH_ID, id, 6);
 }
 EXPORT_SYMBOL(drm_dp_downstream_id);
@@ -1119,7 +1081,6 @@ void drm_dp_downstream_debug(struct seq_file *m,
 			     const struct edid *edid,
 			     struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	bool detailed_cap_info = dpcd[DP_DOWNSTREAMPORT_PRESENT] &
 				 DP_DETAILED_CAP_INFO_AVAILABLE;
 	int clk;
@@ -1205,7 +1166,6 @@ enum drm_mode_subconnector
 drm_dp_subconnector_type(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 			 const u8 port_cap[4])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int type;
 	if (!drm_dp_is_branch(dpcd))
 		return DRM_MODE_SUBCONNECTOR_Native;
@@ -1263,7 +1223,6 @@ void drm_dp_set_subconnector_property(struct drm_connector *connector,
 				      const u8 *dpcd,
 				      const u8 port_cap[4])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	enum drm_mode_subconnector subconnector = DRM_MODE_SUBCONNECTOR_Unknown;
 
 	if (status == connector_status_connected)
@@ -1290,7 +1249,6 @@ bool drm_dp_read_sink_count_cap(struct drm_connector *connector,
 				const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 				const struct drm_dp_desc *desc)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	/* Some eDP panels don't set a valid value for the sink count */
 	return connector->connector_type != DRM_MODE_CONNECTOR_eDP &&
 		dpcd[DP_DPCD_REV] >= DP_DPCD_REV_11 &&
@@ -1310,7 +1268,6 @@ EXPORT_SYMBOL(drm_dp_read_sink_count_cap);
  */
 int drm_dp_read_sink_count(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 count;
 	int ret;
 
@@ -1330,7 +1287,6 @@ EXPORT_SYMBOL(drm_dp_read_sink_count);
 
 static u32 drm_dp_i2c_functionality(struct i2c_adapter *adapter)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	return I2C_FUNC_I2C | I2C_FUNC_SMBUS_EMUL |
 	       I2C_FUNC_SMBUS_READ_BLOCK_DATA |
 	       I2C_FUNC_SMBUS_BLOCK_PROC_CALL |
@@ -1339,7 +1295,6 @@ static u32 drm_dp_i2c_functionality(struct i2c_adapter *adapter)
 
 static void drm_dp_i2c_msg_write_status_update(struct drm_dp_aux_msg *msg)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	/*
 	 * In case of i2c defer or short i2c ack reply to a write,
 	 * we need to switch to WRITE_STATUS_UPDATE to drain the
@@ -1365,7 +1320,6 @@ static void drm_dp_i2c_msg_write_status_update(struct drm_dp_aux_msg *msg)
  */
 static int drm_dp_aux_req_duration(const struct drm_dp_aux_msg *msg)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int len = AUX_PRECHARGE_LEN + AUX_SYNC_LEN + AUX_STOP_LEN +
 		AUX_CMD_LEN + AUX_ADDRESS_LEN + AUX_LENGTH_LEN;
 
@@ -1377,7 +1331,6 @@ static int drm_dp_aux_req_duration(const struct drm_dp_aux_msg *msg)
 
 static int drm_dp_aux_reply_duration(const struct drm_dp_aux_msg *msg)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int len = AUX_PRECHARGE_LEN + AUX_SYNC_LEN + AUX_STOP_LEN +
 		AUX_CMD_LEN + AUX_REPLY_PAD_LEN;
 
@@ -1407,7 +1360,6 @@ static int drm_dp_aux_reply_duration(const struct drm_dp_aux_msg *msg)
 static int drm_dp_i2c_msg_duration(const struct drm_dp_aux_msg *msg,
 				   int i2c_speed_khz)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	/* AUX bitrate is 1MHz, i2c bitrate as specified */
 	return DIV_ROUND_UP((I2C_START_LEN + I2C_ADDR_LEN +
 			     msg->size * I2C_DATA_LEN +
@@ -1422,7 +1374,6 @@ static int drm_dp_i2c_msg_duration(const struct drm_dp_aux_msg *msg,
 static int drm_dp_i2c_retry_count(const struct drm_dp_aux_msg *msg,
 			      int i2c_speed_khz)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int aux_time_us = drm_dp_aux_req_duration(msg) +
 		drm_dp_aux_reply_duration(msg);
 	int i2c_time_us = drm_dp_i2c_msg_duration(msg, i2c_speed_khz);
@@ -1449,7 +1400,6 @@ MODULE_PARM_DESC(dp_aux_i2c_speed_khz,
  */
 static int drm_dp_i2c_do_msg(struct drm_dp_aux *aux, struct drm_dp_aux_msg *msg)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	unsigned int retry, defer_i2c;
 	int ret;
 	/*
@@ -1560,7 +1510,6 @@ static int drm_dp_i2c_do_msg(struct drm_dp_aux *aux, struct drm_dp_aux_msg *msg)
 static void drm_dp_i2c_msg_set_request(struct drm_dp_aux_msg *msg,
 				       const struct i2c_msg *i2c_msg)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	msg->request = (i2c_msg->flags & I2C_M_RD) ?
 		DP_AUX_I2C_READ : DP_AUX_I2C_WRITE;
 	if (!(i2c_msg->flags & I2C_M_STOP))
@@ -1574,7 +1523,6 @@ static void drm_dp_i2c_msg_set_request(struct drm_dp_aux_msg *msg,
  */
 static int drm_dp_i2c_drain_msg(struct drm_dp_aux *aux, struct drm_dp_aux_msg *orig_msg)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int err, ret = orig_msg->size;
 	struct drm_dp_aux_msg msg = *orig_msg;
 
@@ -1610,7 +1558,6 @@ MODULE_PARM_DESC(dp_aux_i2c_transfer_size,
 static int drm_dp_i2c_xfer(struct i2c_adapter *adapter, struct i2c_msg *msgs,
 			   int num)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	struct drm_dp_aux *aux = adapter->algo_data;
 	unsigned int i, j;
 	unsigned transfer_size;
@@ -1685,25 +1632,21 @@ static const struct i2c_algorithm drm_dp_i2c_algo = {
 
 static struct drm_dp_aux *i2c_to_aux(struct i2c_adapter *i2c)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	return container_of(i2c, struct drm_dp_aux, ddc);
 }
 
 static void lock_bus(struct i2c_adapter *i2c, unsigned int flags)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	mutex_lock(&i2c_to_aux(i2c)->hw_mutex);
 }
 
 static int trylock_bus(struct i2c_adapter *i2c, unsigned int flags)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	return mutex_trylock(&i2c_to_aux(i2c)->hw_mutex);
 }
 
 static void unlock_bus(struct i2c_adapter *i2c, unsigned int flags)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	mutex_unlock(&i2c_to_aux(i2c)->hw_mutex);
 }
 
@@ -1715,7 +1658,6 @@ static const struct i2c_lock_operations drm_dp_i2c_lock_ops = {
 
 static int drm_dp_aux_get_crc(struct drm_dp_aux *aux, u8 *crc)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 buf, count;
 	int ret;
 
@@ -1748,7 +1690,6 @@ static int drm_dp_aux_get_crc(struct drm_dp_aux *aux, u8 *crc)
 
 static void drm_dp_aux_crc_work(struct work_struct *work)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	struct drm_dp_aux *aux = container_of(work, struct drm_dp_aux,
 					      crc_work);
 	struct drm_crtc *crtc;
@@ -1796,7 +1737,6 @@ static void drm_dp_aux_crc_work(struct work_struct *work)
  */
 void drm_dp_remote_aux_init(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	INIT_WORK(&aux->crc_work, drm_dp_aux_crc_work);
 }
 EXPORT_SYMBOL(drm_dp_remote_aux_init);
@@ -1820,7 +1760,6 @@ EXPORT_SYMBOL(drm_dp_remote_aux_init);
  */
 void drm_dp_aux_init(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	mutex_init(&aux->hw_mutex);
 	mutex_init(&aux->cec.lock);
 	INIT_WORK(&aux->crc_work, drm_dp_aux_crc_work);
@@ -1862,7 +1801,6 @@ EXPORT_SYMBOL(drm_dp_aux_init);
  */
 int drm_dp_aux_register(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	WARN_ON_ONCE(!aux->drm_dev);
@@ -1897,7 +1835,6 @@ EXPORT_SYMBOL(drm_dp_aux_register);
  */
 void drm_dp_aux_unregister(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	drm_dp_aux_unregister_devnode(aux);
 	i2c_del_adapter(&aux->ddc);
 }
@@ -1915,7 +1852,6 @@ EXPORT_SYMBOL(drm_dp_aux_unregister);
  */
 int drm_dp_psr_setup_time(const u8 psr_cap[EDP_PSR_RECEIVER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	static const u16 psr_setup_time_us[] = {
 		PSR_SETUP_TIME(330),
 		PSR_SETUP_TIME(275),
@@ -1946,7 +1882,6 @@ EXPORT_SYMBOL(drm_dp_psr_setup_time);
  */
 int drm_dp_start_crc(struct drm_dp_aux *aux, struct drm_crtc *crtc)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 buf;
 	int ret;
 
@@ -1974,7 +1909,6 @@ EXPORT_SYMBOL(drm_dp_start_crc);
  */
 int drm_dp_stop_crc(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 buf;
 	int ret;
 
@@ -2034,7 +1968,6 @@ static const struct dpcd_quirk dpcd_quirk_list[] = {
 static u32
 drm_dp_get_quirks(const struct drm_dp_dpcd_ident *ident, bool is_branch)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	const struct dpcd_quirk *quirk;
 	u32 quirks = 0;
 	int i;
@@ -2076,7 +2009,6 @@ drm_dp_get_quirks(const struct drm_dp_dpcd_ident *ident, bool is_branch)
 int drm_dp_read_desc(struct drm_dp_aux *aux, struct drm_dp_desc *desc,
 		     bool is_branch)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	struct drm_dp_dpcd_ident *ident = &desc->ident;
 	unsigned int offset = is_branch ? DP_BRANCH_OUI : DP_SINK_OUI;
 	int ret, dev_id_len;
@@ -2119,7 +2051,6 @@ EXPORT_SYMBOL(drm_dp_read_desc);
 u8 drm_dp_dsc_sink_max_slice_count(const u8 dsc_dpcd[DP_DSC_RECEIVER_CAP_SIZE],
 				   bool is_edp)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 slice_cap1 = dsc_dpcd[DP_DSC_SLICE_CAP_1 - DP_DSC_SUPPORT];
 
 	if (is_edp) {
@@ -2177,7 +2108,6 @@ EXPORT_SYMBOL(drm_dp_dsc_sink_max_slice_count);
  */
 u8 drm_dp_dsc_sink_line_buf_depth(const u8 dsc_dpcd[DP_DSC_RECEIVER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 line_buf_depth = dsc_dpcd[DP_DSC_LINE_BUF_BIT_DEPTH - DP_DSC_SUPPORT];
 
 	switch (line_buf_depth & DP_DSC_LINE_BUF_BIT_DEPTH_MASK) {
@@ -2225,7 +2155,6 @@ EXPORT_SYMBOL(drm_dp_dsc_sink_line_buf_depth);
 int drm_dp_dsc_sink_supported_input_bpcs(const u8 dsc_dpcd[DP_DSC_RECEIVER_CAP_SIZE],
 					 u8 dsc_bpc[3])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int num_bpc = 0;
 	u8 color_depth = dsc_dpcd[DP_DSC_DEC_COLOR_DEPTH_CAP - DP_DSC_SUPPORT];
 
@@ -2252,7 +2181,6 @@ EXPORT_SYMBOL(drm_dp_dsc_sink_supported_input_bpcs);
 int drm_dp_read_lttpr_common_caps(struct drm_dp_aux *aux,
 				  u8 caps[DP_LTTPR_COMMON_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	ret = drm_dp_dpcd_read(aux,
@@ -2281,7 +2209,6 @@ int drm_dp_read_lttpr_phy_caps(struct drm_dp_aux *aux,
 			       enum drm_dp_phy dp_phy,
 			       u8 caps[DP_LTTPR_PHY_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	ret = drm_dp_dpcd_read(aux,
@@ -2298,7 +2225,6 @@ EXPORT_SYMBOL(drm_dp_read_lttpr_phy_caps);
 
 static u8 dp_lttpr_common_cap(const u8 caps[DP_LTTPR_COMMON_CAP_SIZE], int r)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	return caps[r - DP_LT_TUNABLE_PHY_REPEATER_FIELD_DATA_STRUCTURE_REV];
 }
 
@@ -2315,7 +2241,6 @@ static u8 dp_lttpr_common_cap(const u8 caps[DP_LTTPR_COMMON_CAP_SIZE], int r)
  */
 int drm_dp_lttpr_count(const u8 caps[DP_LTTPR_COMMON_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 count = dp_lttpr_common_cap(caps, DP_PHY_REPEATER_CNT);
 
 	switch (hweight8(count)) {
@@ -2339,7 +2264,6 @@ EXPORT_SYMBOL(drm_dp_lttpr_count);
  */
 int drm_dp_lttpr_max_link_rate(const u8 caps[DP_LTTPR_COMMON_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 rate = dp_lttpr_common_cap(caps, DP_MAX_LINK_RATE_PHY_REPEATER);
 
 	return drm_dp_bw_code_to_link_rate(rate);
@@ -2354,7 +2278,6 @@ EXPORT_SYMBOL(drm_dp_lttpr_max_link_rate);
  */
 int drm_dp_lttpr_max_lane_count(const u8 caps[DP_LTTPR_COMMON_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 max_lanes = dp_lttpr_common_cap(caps, DP_MAX_LANE_COUNT_PHY_REPEATER);
 
 	return max_lanes & DP_MAX_LANE_COUNT_MASK;
@@ -2371,7 +2294,6 @@ EXPORT_SYMBOL(drm_dp_lttpr_max_lane_count);
 bool
 drm_dp_lttpr_voltage_swing_level_3_supported(const u8 caps[DP_LTTPR_PHY_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 txcap = dp_lttpr_phy_cap(caps, DP_TRANSMITTER_CAPABILITY_PHY_REPEATER1);
 
 	return txcap & DP_VOLTAGE_SWING_LEVEL_3_SUPPORTED;
@@ -2388,7 +2310,6 @@ EXPORT_SYMBOL(drm_dp_lttpr_voltage_swing_level_3_supported);
 bool
 drm_dp_lttpr_pre_emphasis_level_3_supported(const u8 caps[DP_LTTPR_PHY_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 txcap = dp_lttpr_phy_cap(caps, DP_TRANSMITTER_CAPABILITY_PHY_REPEATER1);
 
 	return txcap & DP_PRE_EMPHASIS_LEVEL_3_SUPPORTED;
@@ -2405,7 +2326,6 @@ EXPORT_SYMBOL(drm_dp_lttpr_pre_emphasis_level_3_supported);
 int drm_dp_get_phy_test_pattern(struct drm_dp_aux *aux,
 				struct drm_dp_phy_test_params *data)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int err;
 	u8 rate, lanes;
 
@@ -2457,7 +2377,6 @@ EXPORT_SYMBOL(drm_dp_get_phy_test_pattern);
 int drm_dp_set_phy_test_pattern(struct drm_dp_aux *aux,
 				struct drm_dp_phy_test_params *data, u8 dp_rev)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int err, i;
 	u8 link_config[2];
 	u8 test_pattern;
@@ -2494,7 +2413,6 @@ EXPORT_SYMBOL(drm_dp_set_phy_test_pattern);
 
 static const char *dp_pixelformat_get_name(enum dp_pixelformat pixelformat)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (pixelformat < 0 || pixelformat > DP_PIXELFORMAT_RESERVED)
 		return "Invalid";
 
@@ -2519,7 +2437,6 @@ static const char *dp_pixelformat_get_name(enum dp_pixelformat pixelformat)
 static const char *dp_colorimetry_get_name(enum dp_pixelformat pixelformat,
 					   enum dp_colorimetry colorimetry)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	if (pixelformat < 0 || pixelformat > DP_PIXELFORMAT_RESERVED)
 		return "Invalid";
 
@@ -2621,7 +2538,6 @@ static const char *dp_colorimetry_get_name(enum dp_pixelformat pixelformat,
 
 static const char *dp_dynamic_range_get_name(enum dp_dynamic_range dynamic_range)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	switch (dynamic_range) {
 	case DP_DYNAMIC_RANGE_VESA:
 		return "VESA range";
@@ -2634,7 +2550,6 @@ static const char *dp_dynamic_range_get_name(enum dp_dynamic_range dynamic_range
 
 static const char *dp_content_type_get_name(enum dp_content_type content_type)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	switch (content_type) {
 	case DP_CONTENT_TYPE_NOT_DEFINED:
 		return "Not defined";
@@ -2654,7 +2569,6 @@ static const char *dp_content_type_get_name(enum dp_content_type content_type)
 void drm_dp_vsc_sdp_log(const char *level, struct device *dev,
 			const struct drm_dp_vsc_sdp *vsc)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 #define DP_SDP_LOG(fmt, ...) dev_printk(level, dev, fmt, ##__VA_ARGS__)
 	DP_SDP_LOG("DP SDP: %s, revision %u, length %u\n", "VSC",
 		   vsc->revision, vsc->length);
@@ -2682,7 +2596,6 @@ EXPORT_SYMBOL(drm_dp_vsc_sdp_log);
 int drm_dp_get_pcon_max_frl_bw(const u8 dpcd[DP_RECEIVER_CAP_SIZE],
 			       const u8 port_cap[4])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int bw;
 	u8 buf;
 
@@ -2720,7 +2633,6 @@ EXPORT_SYMBOL(drm_dp_get_pcon_max_frl_bw);
  */
 int drm_dp_pcon_frl_prepare(struct drm_dp_aux *aux, bool enable_frl_ready_hpd)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 buf = DP_PCON_ENABLE_SOURCE_CTL_MODE |
 		 DP_PCON_ENABLE_LINK_FRL_MODE;
@@ -2742,7 +2654,6 @@ EXPORT_SYMBOL(drm_dp_pcon_frl_prepare);
  */
 bool drm_dp_pcon_is_frl_ready(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 buf;
 
@@ -2772,7 +2683,6 @@ EXPORT_SYMBOL(drm_dp_pcon_is_frl_ready);
 int drm_dp_pcon_frl_configure_1(struct drm_dp_aux *aux, int max_frl_gbps,
 				u8 frl_mode)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 buf;
 
@@ -2833,7 +2743,6 @@ EXPORT_SYMBOL(drm_dp_pcon_frl_configure_1);
 int drm_dp_pcon_frl_configure_2(struct drm_dp_aux *aux, int max_frl_mask,
 				u8 frl_type)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 buf = max_frl_mask;
 
@@ -2858,7 +2767,6 @@ EXPORT_SYMBOL(drm_dp_pcon_frl_configure_2);
  */
 int drm_dp_pcon_reset_frl_config(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	ret = drm_dp_dpcd_writeb(aux, DP_PCON_HDMI_LINK_CONFIG_1, 0x0);
@@ -2877,7 +2785,6 @@ EXPORT_SYMBOL(drm_dp_pcon_reset_frl_config);
  */
 int drm_dp_pcon_frl_enable(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 buf = 0;
 
@@ -2906,7 +2813,6 @@ EXPORT_SYMBOL(drm_dp_pcon_frl_enable);
  */
 bool drm_dp_pcon_hdmi_link_active(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 buf;
 	int ret;
 
@@ -2931,7 +2837,6 @@ EXPORT_SYMBOL(drm_dp_pcon_hdmi_link_active);
  */
 int drm_dp_pcon_hdmi_link_mode(struct drm_dp_aux *aux, u8 *frl_trained_mask)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 buf;
 	int mode;
 	int ret;
@@ -2960,7 +2865,6 @@ EXPORT_SYMBOL(drm_dp_pcon_hdmi_link_mode);
 void drm_dp_pcon_hdmi_frl_link_error_count(struct drm_dp_aux *aux,
 					   struct drm_connector *connector)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 buf, error_count;
 	int i, num_error;
 	struct drm_hdmi_info *hdmi = &connector->display_info.hdmi;
@@ -2998,7 +2902,6 @@ EXPORT_SYMBOL(drm_dp_pcon_hdmi_frl_link_error_count);
  */
 bool drm_dp_pcon_enc_is_dsc_1_2(const u8 pcon_dsc_dpcd[DP_PCON_DSC_ENCODER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 buf;
 	u8 major_v, minor_v;
 
@@ -3021,7 +2924,6 @@ EXPORT_SYMBOL(drm_dp_pcon_enc_is_dsc_1_2);
  */
 int drm_dp_pcon_dsc_max_slices(const u8 pcon_dsc_dpcd[DP_PCON_DSC_ENCODER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 slice_cap1, slice_cap2;
 
 	slice_cap1 = pcon_dsc_dpcd[DP_PCON_DSC_SLICE_CAP_1 - DP_PCON_DSC_ENCODER];
@@ -3060,7 +2962,6 @@ EXPORT_SYMBOL(drm_dp_pcon_dsc_max_slices);
  */
 int drm_dp_pcon_dsc_max_slice_width(const u8 pcon_dsc_dpcd[DP_PCON_DSC_ENCODER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 buf;
 
 	buf = pcon_dsc_dpcd[DP_PCON_DSC_MAX_SLICE_WIDTH - DP_PCON_DSC_ENCODER];
@@ -3077,7 +2978,6 @@ EXPORT_SYMBOL(drm_dp_pcon_dsc_max_slice_width);
  */
 int drm_dp_pcon_dsc_bpp_incr(const u8 pcon_dsc_dpcd[DP_PCON_DSC_ENCODER_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 buf;
 
 	buf = pcon_dsc_dpcd[DP_PCON_DSC_BPP_INCR - DP_PCON_DSC_ENCODER];
@@ -3102,7 +3002,6 @@ EXPORT_SYMBOL(drm_dp_pcon_dsc_bpp_incr);
 static
 int drm_dp_pcon_configure_dsc_enc(struct drm_dp_aux *aux, u8 pps_buf_config)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	u8 buf;
 	int ret;
 
@@ -3133,7 +3032,6 @@ int drm_dp_pcon_configure_dsc_enc(struct drm_dp_aux *aux, u8 pps_buf_config)
  */
 int drm_dp_pcon_pps_default(struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	ret = drm_dp_pcon_configure_dsc_enc(aux, DP_PCON_ENC_PPS_OVERRIDE_DISABLED);
@@ -3154,7 +3052,6 @@ EXPORT_SYMBOL(drm_dp_pcon_pps_default);
  */
 int drm_dp_pcon_pps_override_buf(struct drm_dp_aux *aux, u8 pps_buf[128])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	ret = drm_dp_dpcd_write(aux, DP_PCON_HDMI_PPS_OVERRIDE_BASE, &pps_buf, 128);
@@ -3180,7 +3077,6 @@ EXPORT_SYMBOL(drm_dp_pcon_pps_override_buf);
  */
 int drm_dp_pcon_pps_override_param(struct drm_dp_aux *aux, u8 pps_param[6])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	ret = drm_dp_dpcd_write(aux, DP_PCON_HDMI_PPS_OVRD_SLICE_HEIGHT, &pps_param[0], 2);
@@ -3210,7 +3106,6 @@ EXPORT_SYMBOL(drm_dp_pcon_pps_override_param);
  */
 int drm_dp_pcon_convert_rgb_to_ycbcr(struct drm_dp_aux *aux, u8 color_spc)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 buf;
 
@@ -3245,7 +3140,6 @@ EXPORT_SYMBOL(drm_dp_pcon_convert_rgb_to_ycbcr);
 int drm_edp_backlight_set_level(struct drm_dp_aux *aux, const struct drm_edp_backlight_info *bl,
 				u16 level)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 buf[2] = { 0 };
 
@@ -3272,7 +3166,6 @@ static int
 drm_edp_backlight_set_enable(struct drm_dp_aux *aux, const struct drm_edp_backlight_info *bl,
 			     bool enable)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 buf;
 
@@ -3322,7 +3215,6 @@ drm_edp_backlight_set_enable(struct drm_dp_aux *aux, const struct drm_edp_backli
 int drm_edp_backlight_enable(struct drm_dp_aux *aux, const struct drm_edp_backlight_info *bl,
 			     const u16 level)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 dpcd_buf, new_dpcd_buf;
 
@@ -3393,7 +3285,6 @@ EXPORT_SYMBOL(drm_edp_backlight_enable);
  */
 int drm_edp_backlight_disable(struct drm_dp_aux *aux, const struct drm_edp_backlight_info *bl)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	ret = drm_edp_backlight_set_enable(aux, bl, false);
@@ -3408,7 +3299,6 @@ static inline int
 drm_edp_backlight_probe_max(struct drm_dp_aux *aux, struct drm_edp_backlight_info *bl,
 			    u16 driver_pwm_freq_hz, const u8 edp_dpcd[EDP_DISPLAY_CTL_CAP_SIZE])
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int fxp, fxp_min, fxp_max, fxp_actual, f = 1;
 	int ret;
 	u8 pn, pn_min, pn_max;
@@ -3501,7 +3391,6 @@ static inline int
 drm_edp_backlight_probe_level(struct drm_dp_aux *aux, struct drm_edp_backlight_info *bl,
 			      u8 *current_mode)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 	u8 buf[2];
 	u8 mode_reg;
@@ -3560,7 +3449,6 @@ drm_edp_backlight_init(struct drm_dp_aux *aux, struct drm_edp_backlight_info *bl
 		       u16 driver_pwm_freq_hz, const u8 edp_dpcd[EDP_DISPLAY_CTL_CAP_SIZE],
 		       u16 *current_level, u8 *current_mode)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	int ret;
 
 	if (edp_dpcd[1] & DP_EDP_BACKLIGHT_AUX_ENABLE_CAP)
@@ -3592,7 +3480,6 @@ EXPORT_SYMBOL(drm_edp_backlight_init);
 
 static int dp_aux_backlight_update_status(struct backlight_device *bd)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	struct dp_aux_backlight *bl = bl_get_data(bd);
 	u16 brightness = backlight_get_brightness(bd);
 	int ret = 0;
@@ -3644,7 +3531,6 @@ static const struct backlight_ops dp_aux_bl_ops = {
  */
 int drm_panel_dp_aux_backlight(struct drm_panel *panel, struct drm_dp_aux *aux)
 {
-    pr_info("drm_dp_helper: called %s\n", __func__);
 	struct dp_aux_backlight *bl;
 	struct backlight_properties props = { 0 };
 	u16 current_level;

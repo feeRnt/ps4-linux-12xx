@@ -137,7 +137,6 @@ static void amdgpu_uvd_idle_work_handler(struct work_struct *work);
 
 int amdgpu_uvd_sw_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	unsigned long bo_size;
 	const char *fw_name;
 	const struct common_firmware_header *hdr;
@@ -325,7 +324,6 @@ int amdgpu_uvd_sw_init(struct amdgpu_device *adev)
 
 int amdgpu_uvd_sw_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	int i, j;
 
 	drm_sched_entity_destroy(&adev->uvd.entity);
@@ -357,7 +355,6 @@ int amdgpu_uvd_sw_fini(struct amdgpu_device *adev)
  */
 int amdgpu_uvd_entity_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	struct drm_gpu_scheduler *sched;
 	int r;
@@ -376,7 +373,6 @@ int amdgpu_uvd_entity_init(struct amdgpu_device *adev)
 
 int amdgpu_uvd_suspend(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	unsigned size;
 	void *ptr;
 	int i, j, idx;
@@ -426,7 +422,6 @@ int amdgpu_uvd_suspend(struct amdgpu_device *adev)
 
 int amdgpu_uvd_resume(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	unsigned size;
 	void *ptr;
 	int i, idx;
@@ -472,7 +467,6 @@ int amdgpu_uvd_resume(struct amdgpu_device *adev)
 
 void amdgpu_uvd_free_handles(struct amdgpu_device *adev, struct drm_file *filp)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_ring *ring = &adev->uvd.inst[0].ring;
 	int i, r;
 
@@ -500,7 +494,6 @@ void amdgpu_uvd_free_handles(struct amdgpu_device *adev, struct drm_file *filp)
 
 static void amdgpu_uvd_force_into_uvd_segment(struct amdgpu_bo *abo)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	int i;
 	for (i = 0; i < abo->placement.num_placement; ++i) {
 		abo->placements[i].fpfn = 0 >> PAGE_SHIFT;
@@ -510,7 +503,6 @@ static void amdgpu_uvd_force_into_uvd_segment(struct amdgpu_bo *abo)
 
 static u64 amdgpu_uvd_get_addr_from_ctx(struct amdgpu_uvd_cs_ctx *ctx)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	uint32_t lo, hi;
 	uint64_t addr;
 
@@ -531,7 +523,6 @@ static u64 amdgpu_uvd_get_addr_from_ctx(struct amdgpu_uvd_cs_ctx *ctx)
  */
 static int amdgpu_uvd_cs_pass1(struct amdgpu_uvd_cs_ctx *ctx)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct ttm_operation_ctx tctx = { false, false };
 	struct amdgpu_bo_va_mapping *mapping;
 	struct amdgpu_bo *bo;
@@ -573,7 +564,6 @@ static int amdgpu_uvd_cs_pass1(struct amdgpu_uvd_cs_ctx *ctx)
 static int amdgpu_uvd_cs_msg_decode(struct amdgpu_device *adev, uint32_t *msg,
 	unsigned buf_sizes[])
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	unsigned stream_type = msg[4];
 	unsigned width = msg[6];
 	unsigned height = msg[7];
@@ -770,7 +760,6 @@ static int amdgpu_uvd_cs_msg_decode(struct amdgpu_device *adev, uint32_t *msg,
 static int amdgpu_uvd_cs_msg(struct amdgpu_uvd_cs_ctx *ctx,
 			     struct amdgpu_bo *bo, unsigned offset)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_device *adev = ctx->parser->adev;
 	int32_t *msg, msg_type, handle;
 	void *ptr;
@@ -864,7 +853,6 @@ static int amdgpu_uvd_cs_msg(struct amdgpu_uvd_cs_ctx *ctx,
  */
 static int amdgpu_uvd_cs_pass2(struct amdgpu_uvd_cs_ctx *ctx)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_bo_va_mapping *mapping;
 	struct amdgpu_bo *bo;
 	uint32_t cmd;
@@ -951,7 +939,6 @@ static int amdgpu_uvd_cs_pass2(struct amdgpu_uvd_cs_ctx *ctx)
 static int amdgpu_uvd_cs_reg(struct amdgpu_uvd_cs_ctx *ctx,
 			     int (*cb)(struct amdgpu_uvd_cs_ctx *ctx))
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_ib *ib = &ctx->parser->job->ibs[ctx->ib_idx];
 	int i, r;
 
@@ -999,7 +986,6 @@ static int amdgpu_uvd_cs_reg(struct amdgpu_uvd_cs_ctx *ctx,
 static int amdgpu_uvd_cs_packets(struct amdgpu_uvd_cs_ctx *ctx,
 				 int (*cb)(struct amdgpu_uvd_cs_ctx *ctx))
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_ib *ib = &ctx->parser->job->ibs[ctx->ib_idx];
 	int r;
 
@@ -1035,7 +1021,6 @@ static int amdgpu_uvd_cs_packets(struct amdgpu_uvd_cs_ctx *ctx,
  */
 int amdgpu_uvd_ring_parse_cs(struct amdgpu_cs_parser *parser, uint32_t ib_idx)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_uvd_cs_ctx ctx = {};
 	unsigned buf_sizes[] = {
 		[0x00000000]	=	2048,
@@ -1084,7 +1069,6 @@ int amdgpu_uvd_ring_parse_cs(struct amdgpu_cs_parser *parser, uint32_t ib_idx)
 static int amdgpu_uvd_send_msg(struct amdgpu_ring *ring, struct amdgpu_bo *bo,
 			       bool direct, struct dma_fence **fence)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct dma_fence *f = NULL;
 	struct amdgpu_job *job;
@@ -1188,7 +1172,6 @@ err:
 int amdgpu_uvd_get_create_msg(struct amdgpu_ring *ring, uint32_t handle,
 			      struct dma_fence **fence)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct amdgpu_bo *bo = NULL;
 	uint32_t *msg;
@@ -1221,7 +1204,6 @@ int amdgpu_uvd_get_create_msg(struct amdgpu_ring *ring, uint32_t handle,
 int amdgpu_uvd_get_destroy_msg(struct amdgpu_ring *ring, uint32_t handle,
 			       bool direct, struct dma_fence **fence)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	struct amdgpu_bo *bo = NULL;
 	uint32_t *msg;
@@ -1246,7 +1228,6 @@ int amdgpu_uvd_get_destroy_msg(struct amdgpu_ring *ring, uint32_t handle,
 
 static void amdgpu_uvd_idle_work_handler(struct work_struct *work)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_device *adev =
 		container_of(work, struct amdgpu_device, uvd.idle_work.work);
 	unsigned fences = 0, i, j;
@@ -1278,7 +1259,6 @@ static void amdgpu_uvd_idle_work_handler(struct work_struct *work)
 
 void amdgpu_uvd_ring_begin_use(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	bool set_clocks;
 
@@ -1301,7 +1281,6 @@ void amdgpu_uvd_ring_begin_use(struct amdgpu_ring *ring)
 
 void amdgpu_uvd_ring_end_use(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	if (!amdgpu_sriov_vf(ring->adev))
 		schedule_delayed_work(&ring->adev->uvd.idle_work, UVD_IDLE_TIMEOUT);
 }
@@ -1316,7 +1295,6 @@ void amdgpu_uvd_ring_end_use(struct amdgpu_ring *ring)
  */
 int amdgpu_uvd_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	struct dma_fence *fence;
 	long r;
 
@@ -1349,7 +1327,6 @@ error:
  */
 uint32_t amdgpu_uvd_used_handles(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_uvd: called %s\n", __func__);
 	unsigned i;
 	uint32_t used_handles = 0;
 

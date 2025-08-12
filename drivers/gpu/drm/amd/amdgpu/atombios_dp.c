@@ -59,7 +59,6 @@ static int amdgpu_atombios_dp_process_aux_ch(struct amdgpu_i2c_chan *chan,
 				      u8 *recv, int recv_size,
 				      u8 delay, u8 *ack)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct drm_device *dev = chan->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	union aux_channel_transaction args;
@@ -127,7 +126,6 @@ done:
 static ssize_t
 amdgpu_atombios_dp_aux_transfer(struct drm_dp_aux *aux, struct drm_dp_aux_msg *msg)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct amdgpu_i2c_chan *chan =
 		container_of(aux, struct amdgpu_i2c_chan, aux);
 	int ret;
@@ -188,7 +186,6 @@ amdgpu_atombios_dp_aux_transfer(struct drm_dp_aux *aux, struct drm_dp_aux_msg *m
 
 void amdgpu_atombios_dp_aux_init(struct amdgpu_connector *amdgpu_connector)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	amdgpu_connector->ddc_bus->rec.hpd = amdgpu_connector->hpd.hpd;
 	amdgpu_connector->ddc_bus->aux.transfer = amdgpu_atombios_dp_aux_transfer;
 	amdgpu_connector->ddc_bus->aux.drm_dev = amdgpu_connector->base.dev;
@@ -207,7 +204,6 @@ static void amdgpu_atombios_dp_get_adjust_train(const u8 link_status[DP_LINK_STA
 						int lane_count,
 						u8 train_set[4])
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	u8 v = 0;
 	u8 p = 0;
 	int lane;
@@ -246,7 +242,6 @@ static void amdgpu_atombios_dp_get_adjust_train(const u8 link_status[DP_LINK_STA
 /* get bpc from the EDID */
 static unsigned amdgpu_atombios_dp_convert_bpc_to_bpp(int bpc)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	if (bpc == 0)
 		return 24;
 	else
@@ -260,7 +255,6 @@ static int amdgpu_atombios_dp_get_dp_link_config(struct drm_connector *connector
 						 unsigned pix_clock,
 						 unsigned *dp_lanes, unsigned *dp_rate)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	unsigned bpp =
 		amdgpu_atombios_dp_convert_bpc_to_bpp(amdgpu_connector_get_monitor_bpc(connector));
 	static const unsigned link_rates[3] = { 162000, 270000, 540000 };
@@ -306,7 +300,6 @@ static u8 amdgpu_atombios_dp_encoder_service(struct amdgpu_device *adev,
 				      int action, int dp_clock,
 				      u8 ucconfig, u8 lane_num)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	DP_ENCODER_SERVICE_PARAMETERS args;
 	int index = GetIndexIntoMasterTable(COMMAND, DPEncoderService);
 
@@ -323,7 +316,6 @@ static u8 amdgpu_atombios_dp_encoder_service(struct amdgpu_device *adev,
 
 u8 amdgpu_atombios_dp_get_sinktype(struct amdgpu_connector *amdgpu_connector)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct drm_device *dev = amdgpu_connector->base.dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
@@ -333,7 +325,6 @@ u8 amdgpu_atombios_dp_get_sinktype(struct amdgpu_connector *amdgpu_connector)
 
 static void amdgpu_atombios_dp_probe_oui(struct amdgpu_connector *amdgpu_connector)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct amdgpu_connector_atom_dig *dig_connector = amdgpu_connector->con_priv;
 	u8 buf[3];
 
@@ -351,7 +342,6 @@ static void amdgpu_atombios_dp_probe_oui(struct amdgpu_connector *amdgpu_connect
 
 static void amdgpu_atombios_dp_ds_ports(struct amdgpu_connector *amdgpu_connector)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct amdgpu_connector_atom_dig *dig_connector = amdgpu_connector->con_priv;
 	int ret;
 
@@ -368,7 +358,6 @@ static void amdgpu_atombios_dp_ds_ports(struct amdgpu_connector *amdgpu_connecto
 
 int amdgpu_atombios_dp_get_dpcd(struct amdgpu_connector *amdgpu_connector)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct amdgpu_connector_atom_dig *dig_connector = amdgpu_connector->con_priv;
 	u8 msg[DP_DPCD_SIZE];
 	int ret;
@@ -393,7 +382,6 @@ int amdgpu_atombios_dp_get_dpcd(struct amdgpu_connector *amdgpu_connector)
 int amdgpu_atombios_dp_get_panel_mode(struct drm_encoder *encoder,
 			       struct drm_connector *connector)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	int panel_mode = DP_PANEL_MODE_EXTERNAL_DP_MODE;
 	u16 dp_bridge = amdgpu_connector_encoder_get_dp_bridge_encoder_id(connector);
@@ -429,7 +417,6 @@ int amdgpu_atombios_dp_get_panel_mode(struct drm_encoder *encoder,
 void amdgpu_atombios_dp_set_link_config(struct drm_connector *connector,
 				 const struct drm_display_mode *mode)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *dig_connector;
 	int ret;
@@ -454,7 +441,6 @@ void amdgpu_atombios_dp_set_link_config(struct drm_connector *connector,
 int amdgpu_atombios_dp_mode_valid_helper(struct drm_connector *connector,
 				  struct drm_display_mode *mode)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *dig_connector;
 	unsigned dp_lanes, dp_clock;
@@ -478,7 +464,6 @@ int amdgpu_atombios_dp_mode_valid_helper(struct drm_connector *connector,
 
 bool amdgpu_atombios_dp_needs_link_train(struct amdgpu_connector *amdgpu_connector)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	u8 link_status[DP_LINK_STATUS_SIZE];
 	struct amdgpu_connector_atom_dig *dig = amdgpu_connector->con_priv;
 
@@ -493,7 +478,6 @@ bool amdgpu_atombios_dp_needs_link_train(struct amdgpu_connector *amdgpu_connect
 void amdgpu_atombios_dp_set_rx_power_state(struct drm_connector *connector,
 				    u8 power_state)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *dig_connector;
 
@@ -527,7 +511,6 @@ struct amdgpu_atombios_dp_link_train_info {
 static void
 amdgpu_atombios_dp_update_vs_emph(struct amdgpu_atombios_dp_link_train_info *dp_info)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	/* set the initial vs/emph on the source */
 	amdgpu_atombios_encoder_setup_dig_transmitter(dp_info->encoder,
 					       ATOM_TRANSMITTER_ACTION_SETUP_VSEMPH,
@@ -541,7 +524,6 @@ amdgpu_atombios_dp_update_vs_emph(struct amdgpu_atombios_dp_link_train_info *dp_
 static void
 amdgpu_atombios_dp_set_tp(struct amdgpu_atombios_dp_link_train_info *dp_info, int tp)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	int rtp = 0;
 
 	/* set training pattern on the source */
@@ -565,7 +547,6 @@ amdgpu_atombios_dp_set_tp(struct amdgpu_atombios_dp_link_train_info *dp_info, in
 static int
 amdgpu_atombios_dp_link_train_init(struct amdgpu_atombios_dp_link_train_info *dp_info)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(dp_info->encoder);
 	struct amdgpu_encoder_atom_dig *dig = amdgpu_encoder->enc_priv;
 	u8 tmp;
@@ -609,7 +590,6 @@ amdgpu_atombios_dp_link_train_init(struct amdgpu_atombios_dp_link_train_info *dp
 static int
 amdgpu_atombios_dp_link_train_finish(struct amdgpu_atombios_dp_link_train_info *dp_info)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	udelay(400);
 
 	/* disable the training pattern on the sink */
@@ -627,7 +607,6 @@ amdgpu_atombios_dp_link_train_finish(struct amdgpu_atombios_dp_link_train_info *
 static int
 amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_info)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	bool clock_recovery;
 	u8 voltage;
 	int i;
@@ -750,7 +729,6 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 static int
 amdgpu_atombios_dp_link_train_ce(struct amdgpu_atombios_dp_link_train_info *dp_info)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	bool channel_eq;
 
 	if (dp_info->tp3_supported)
@@ -804,7 +782,6 @@ amdgpu_atombios_dp_link_train_ce(struct amdgpu_atombios_dp_link_train_info *dp_i
 void amdgpu_atombios_dp_link_train(struct drm_encoder *encoder,
 			    struct drm_connector *connector)
 {
-    pr_info("atombios_dp: called %s\n", __func__);
 	struct drm_device *dev = encoder->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_encoder *amdgpu_encoder = to_amdgpu_encoder(encoder);

@@ -28,7 +28,6 @@
 static inline struct amdgpu_preempt_mgr *
 to_preempt_mgr(struct ttm_resource_manager *man)
 {
-    pr_info("amdgpu_preempt_mgr: called %s\n", __func__);
 	return container_of(man, struct amdgpu_preempt_mgr, manager);
 }
 
@@ -44,7 +43,6 @@ static ssize_t mem_info_preempt_used_show(struct device *dev,
 					  struct device_attribute *attr,
 					  char *buf)
 {
-    pr_info("amdgpu_preempt_mgr: called %s\n", __func__);
 	struct drm_device *ddev = dev_get_drvdata(dev);
 	struct amdgpu_device *adev = drm_to_adev(ddev);
 	struct ttm_resource_manager *man;
@@ -70,7 +68,6 @@ static int amdgpu_preempt_mgr_new(struct ttm_resource_manager *man,
 				  const struct ttm_place *place,
 				  struct ttm_resource **res)
 {
-    pr_info("amdgpu_preempt_mgr: called %s\n", __func__);
 	struct amdgpu_preempt_mgr *mgr = to_preempt_mgr(man);
 
 	*res = kzalloc(sizeof(**res), GFP_KERNEL);
@@ -95,7 +92,6 @@ static int amdgpu_preempt_mgr_new(struct ttm_resource_manager *man,
 static void amdgpu_preempt_mgr_del(struct ttm_resource_manager *man,
 				   struct ttm_resource *res)
 {
-    pr_info("amdgpu_preempt_mgr: called %s\n", __func__);
 	struct amdgpu_preempt_mgr *mgr = to_preempt_mgr(man);
 
 	atomic64_sub(res->num_pages, &mgr->used);
@@ -111,7 +107,6 @@ static void amdgpu_preempt_mgr_del(struct ttm_resource_manager *man,
  */
 uint64_t amdgpu_preempt_mgr_usage(struct ttm_resource_manager *man)
 {
-    pr_info("amdgpu_preempt_mgr: called %s\n", __func__);
 	struct amdgpu_preempt_mgr *mgr = to_preempt_mgr(man);
 	s64 result = atomic64_read(&mgr->used);
 
@@ -129,7 +124,6 @@ uint64_t amdgpu_preempt_mgr_usage(struct ttm_resource_manager *man)
 static void amdgpu_preempt_mgr_debug(struct ttm_resource_manager *man,
 				     struct drm_printer *printer)
 {
-    pr_info("amdgpu_preempt_mgr: called %s\n", __func__);
 	struct amdgpu_preempt_mgr *mgr = to_preempt_mgr(man);
 
 	drm_printf(printer, "man size:%llu pages, preempt used:%lld pages\n",
@@ -151,7 +145,6 @@ static const struct ttm_resource_manager_func amdgpu_preempt_mgr_func = {
  */
 int amdgpu_preempt_mgr_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_preempt_mgr: called %s\n", __func__);
 	struct amdgpu_preempt_mgr *mgr = &adev->mman.preempt_mgr;
 	struct ttm_resource_manager *man = &mgr->manager;
 	int ret;
@@ -185,7 +178,6 @@ int amdgpu_preempt_mgr_init(struct amdgpu_device *adev)
  */
 void amdgpu_preempt_mgr_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_preempt_mgr: called %s\n", __func__);
 	struct amdgpu_preempt_mgr *mgr = &adev->mman.preempt_mgr;
 	struct ttm_resource_manager *man = &mgr->manager;
 	int ret;

@@ -41,7 +41,6 @@
 struct drm_gem_cma_object *drm_fb_cma_get_gem_obj(struct drm_framebuffer *fb,
 						  unsigned int plane)
 {
-    pr_info("drm_fb_cma_helper: called %s\n", __func__);
 	struct drm_gem_object *gem;
 
 	gem = drm_gem_fb_get_obj(fb, plane);
@@ -67,7 +66,6 @@ dma_addr_t drm_fb_cma_get_gem_addr(struct drm_framebuffer *fb,
 				   struct drm_plane_state *state,
 				   unsigned int plane)
 {
-    pr_info("drm_fb_cma_helper: called %s\n", __func__);
 	struct drm_gem_cma_object *obj;
 	dma_addr_t paddr;
 	u8 h_div = 1, v_div = 1;
@@ -118,7 +116,6 @@ void drm_fb_cma_sync_non_coherent(struct drm_device *drm,
 				  struct drm_plane_state *old_state,
 				  struct drm_plane_state *state)
 {
-    pr_info("drm_fb_cma_helper: called %s\n", __func__);
 	const struct drm_format_info *finfo = state->fb->format;
 	struct drm_atomic_helper_damage_iter iter;
 	const struct drm_gem_cma_object *cma_obj;

@@ -35,7 +35,6 @@ static struct amdgpu_reset_handler *
 aldebaran_get_reset_handler(struct amdgpu_reset_control *reset_ctl,
 			    struct amdgpu_reset_context *reset_context)
 {
-    pr_info("aldebaran: called %s\n", __func__);
 	struct amdgpu_reset_handler *handler;
 	struct amdgpu_device *adev = (struct amdgpu_device *)reset_ctl->handle;
 
@@ -66,7 +65,6 @@ aldebaran_get_reset_handler(struct amdgpu_reset_control *reset_ctl,
 
 static int aldebaran_mode2_suspend_ip(struct amdgpu_device *adev)
 {
-    pr_info("aldebaran: called %s\n", __func__);
 	int r, i;
 
 	amdgpu_device_set_pg_state(adev, AMD_PG_STATE_UNGATE);
@@ -98,7 +96,6 @@ static int
 aldebaran_mode2_prepare_hwcontext(struct amdgpu_reset_control *reset_ctl,
 				  struct amdgpu_reset_context *reset_context)
 {
-    pr_info("aldebaran: called %s\n", __func__);
 	int r = 0;
 	struct amdgpu_device *adev = (struct amdgpu_device *)reset_ctl->handle;
 
@@ -112,7 +109,6 @@ aldebaran_mode2_prepare_hwcontext(struct amdgpu_reset_control *reset_ctl,
 
 static void aldebaran_async_reset(struct work_struct *work)
 {
-    pr_info("aldebaran: called %s\n", __func__);
 	struct amdgpu_reset_handler *handler;
 	struct amdgpu_reset_control *reset_ctl =
 		container_of(work, struct amdgpu_reset_control, reset_work);
@@ -130,7 +126,6 @@ static void aldebaran_async_reset(struct work_struct *work)
 
 static int aldebaran_mode2_reset(struct amdgpu_device *adev)
 {
-    pr_info("aldebaran: called %s\n", __func__);
 	/* disable BM */
 	pci_clear_master(adev->pdev);
 	adev->asic_reset_res = amdgpu_dpm_mode2_reset(adev);
@@ -141,7 +136,6 @@ static int
 aldebaran_mode2_perform_reset(struct amdgpu_reset_control *reset_ctl,
 			      struct amdgpu_reset_context *reset_context)
 {
-    pr_info("aldebaran: called %s\n", __func__);
 	struct amdgpu_device *tmp_adev = NULL;
 	struct amdgpu_device *adev = (struct amdgpu_device *)reset_ctl->handle;
 	int r = 0;
@@ -203,7 +197,6 @@ aldebaran_mode2_perform_reset(struct amdgpu_reset_control *reset_ctl,
 
 static int aldebaran_mode2_restore_ip(struct amdgpu_device *adev)
 {
-    pr_info("aldebaran: called %s\n", __func__);
 	struct amdgpu_firmware_info *ucode_list[AMDGPU_UCODE_ID_MAXIMUM];
 	struct amdgpu_firmware_info *ucode;
 	struct amdgpu_ip_block *cmn_block;
@@ -324,7 +317,6 @@ static int
 aldebaran_mode2_restore_hwcontext(struct amdgpu_reset_control *reset_ctl,
 				  struct amdgpu_reset_context *reset_context)
 {
-    pr_info("aldebaran: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *tmp_adev = NULL;
 
@@ -386,7 +378,6 @@ static struct amdgpu_reset_handler aldebaran_mode2_handler = {
 
 int aldebaran_reset_init(struct amdgpu_device *adev)
 {
-    pr_info("aldebaran: called %s\n", __func__);
 	struct amdgpu_reset_control *reset_ctl;
 
 	reset_ctl = kzalloc(sizeof(*reset_ctl), GFP_KERNEL);
@@ -410,7 +401,6 @@ int aldebaran_reset_init(struct amdgpu_device *adev)
 
 int aldebaran_reset_fini(struct amdgpu_device *adev)
 {
-    pr_info("aldebaran: called %s\n", __func__);
 	kfree(adev->reset_cntl);
 	adev->reset_cntl = NULL;
 	return 0;

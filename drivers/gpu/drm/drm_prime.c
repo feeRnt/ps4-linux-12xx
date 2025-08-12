@@ -98,7 +98,6 @@ struct drm_prime_member {
 static int drm_prime_add_buf_handle(struct drm_prime_file_private *prime_fpriv,
 				    struct dma_buf *dma_buf, uint32_t handle)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_prime_member *member;
 	struct rb_node **p, *rb;
 
@@ -146,7 +145,6 @@ static int drm_prime_add_buf_handle(struct drm_prime_file_private *prime_fpriv,
 static struct dma_buf *drm_prime_lookup_buf_by_handle(struct drm_prime_file_private *prime_fpriv,
 						      uint32_t handle)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct rb_node *rb;
 
 	rb = prime_fpriv->handles.rb_node;
@@ -169,7 +167,6 @@ static int drm_prime_lookup_buf_handle(struct drm_prime_file_private *prime_fpri
 				       struct dma_buf *dma_buf,
 				       uint32_t *handle)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct rb_node *rb;
 
 	rb = prime_fpriv->dmabufs.rb_node;
@@ -193,7 +190,6 @@ static int drm_prime_lookup_buf_handle(struct drm_prime_file_private *prime_fpri
 void drm_prime_remove_buf_handle_locked(struct drm_prime_file_private *prime_fpriv,
 					struct dma_buf *dma_buf)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct rb_node *rb;
 
 	rb = prime_fpriv->dmabufs.rb_node;
@@ -218,7 +214,6 @@ void drm_prime_remove_buf_handle_locked(struct drm_prime_file_private *prime_fpr
 
 void drm_prime_init_file_private(struct drm_prime_file_private *prime_fpriv)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	mutex_init(&prime_fpriv->lock);
 	prime_fpriv->dmabufs = RB_ROOT;
 	prime_fpriv->handles = RB_ROOT;
@@ -226,7 +221,6 @@ void drm_prime_init_file_private(struct drm_prime_file_private *prime_fpriv)
 
 void drm_prime_destroy_file_private(struct drm_prime_file_private *prime_fpriv)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	/* by now drm_gem_release should've made sure the list is empty */
 	WARN_ON(!RB_EMPTY_ROOT(&prime_fpriv->dmabufs));
 }
@@ -246,7 +240,6 @@ void drm_prime_destroy_file_private(struct drm_prime_file_private *prime_fpriv)
 struct dma_buf *drm_gem_dmabuf_export(struct drm_device *dev,
 				      struct dma_buf_export_info *exp_info)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_gem_object *obj = exp_info->priv;
 	struct dma_buf *dma_buf;
 
@@ -273,7 +266,6 @@ EXPORT_SYMBOL(drm_gem_dmabuf_export);
  */
 void drm_gem_dmabuf_release(struct dma_buf *dma_buf)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_gem_object *obj = dma_buf->priv;
 	struct drm_device *dev = obj->dev;
 
@@ -302,7 +294,6 @@ int drm_gem_prime_fd_to_handle(struct drm_device *dev,
 			       struct drm_file *file_priv, int prime_fd,
 			       uint32_t *handle)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct dma_buf *dma_buf;
 	struct drm_gem_object *obj;
 	int ret;
@@ -372,7 +363,6 @@ EXPORT_SYMBOL(drm_gem_prime_fd_to_handle);
 int drm_prime_fd_to_handle_ioctl(struct drm_device *dev, void *data,
 				 struct drm_file *file_priv)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_prime_handle *args = data;
 
 	if (!dev->driver->prime_fd_to_handle)
@@ -386,7 +376,6 @@ static struct dma_buf *export_and_register_object(struct drm_device *dev,
 						  struct drm_gem_object *obj,
 						  uint32_t flags)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct dma_buf *dmabuf;
 
 	/* prevent races with concurrent gem_close. */
@@ -435,7 +424,6 @@ int drm_gem_prime_handle_to_fd(struct drm_device *dev,
 			       uint32_t flags,
 			       int *prime_fd)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_gem_object *obj;
 	int ret = 0;
 	struct dma_buf *dmabuf;
@@ -521,7 +509,6 @@ EXPORT_SYMBOL(drm_gem_prime_handle_to_fd);
 int drm_prime_handle_to_fd_ioctl(struct drm_device *dev, void *data,
 				 struct drm_file *file_priv)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_prime_handle *args = data;
 
 	if (!dev->driver->prime_handle_to_fd)
@@ -587,7 +574,6 @@ int drm_prime_handle_to_fd_ioctl(struct drm_device *dev, void *data,
 int drm_gem_map_attach(struct dma_buf *dma_buf,
 		       struct dma_buf_attachment *attach)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_gem_object *obj = dma_buf->priv;
 
 	return drm_gem_pin(obj);
@@ -606,7 +592,6 @@ EXPORT_SYMBOL(drm_gem_map_attach);
 void drm_gem_map_detach(struct dma_buf *dma_buf,
 			struct dma_buf_attachment *attach)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_gem_object *obj = dma_buf->priv;
 
 	drm_gem_unpin(obj);
@@ -628,7 +613,6 @@ EXPORT_SYMBOL(drm_gem_map_detach);
 struct sg_table *drm_gem_map_dma_buf(struct dma_buf_attachment *attach,
 				     enum dma_data_direction dir)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_gem_object *obj = attach->dmabuf->priv;
 	struct sg_table *sgt;
 	int ret;
@@ -667,7 +651,6 @@ void drm_gem_unmap_dma_buf(struct dma_buf_attachment *attach,
 			   struct sg_table *sgt,
 			   enum dma_data_direction dir)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	if (!sgt)
 		return;
 
@@ -690,7 +673,6 @@ EXPORT_SYMBOL(drm_gem_unmap_dma_buf);
  */
 int drm_gem_dmabuf_vmap(struct dma_buf *dma_buf, struct dma_buf_map *map)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_gem_object *obj = dma_buf->priv;
 
 	return drm_gem_vmap(obj, map);
@@ -707,7 +689,6 @@ EXPORT_SYMBOL(drm_gem_dmabuf_vmap);
  */
 void drm_gem_dmabuf_vunmap(struct dma_buf *dma_buf, struct dma_buf_map *map)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_gem_object *obj = dma_buf->priv;
 
 	drm_gem_vunmap(obj, map);
@@ -728,7 +709,6 @@ EXPORT_SYMBOL(drm_gem_dmabuf_vunmap);
  */
 int drm_gem_prime_mmap(struct drm_gem_object *obj, struct vm_area_struct *vma)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_file *priv;
 	struct file *fil;
 	int ret;
@@ -791,7 +771,6 @@ EXPORT_SYMBOL(drm_gem_prime_mmap);
  */
 int drm_gem_dmabuf_mmap(struct dma_buf *dma_buf, struct vm_area_struct *vma)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_gem_object *obj = dma_buf->priv;
 	struct drm_device *dev = obj->dev;
 
@@ -829,7 +808,6 @@ static const struct dma_buf_ops drm_gem_prime_dmabuf_ops =  {
 struct sg_table *drm_prime_pages_to_sg(struct drm_device *dev,
 				       struct page **pages, unsigned int nr_pages)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct sg_table *sg;
 	size_t max_segment = 0;
 	int err;
@@ -865,7 +843,6 @@ EXPORT_SYMBOL(drm_prime_pages_to_sg);
  */
 unsigned long drm_prime_get_contiguous_size(struct sg_table *sgt)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	dma_addr_t expected = sg_dma_address(sgt->sgl);
 	struct scatterlist *sg;
 	unsigned long size = 0;
@@ -897,7 +874,6 @@ EXPORT_SYMBOL(drm_prime_get_contiguous_size);
 struct dma_buf *drm_gem_prime_export(struct drm_gem_object *obj,
 				     int flags)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct drm_device *dev = obj->dev;
 	struct dma_buf_export_info exp_info = {
 		.exp_name = KBUILD_MODNAME, /* white lie for debug */
@@ -931,7 +907,6 @@ struct drm_gem_object *drm_gem_prime_import_dev(struct drm_device *dev,
 					    struct dma_buf *dma_buf,
 					    struct device *attach_dev)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct dma_buf_attachment *attach;
 	struct sg_table *sgt;
 	struct drm_gem_object *obj;
@@ -1001,7 +976,6 @@ EXPORT_SYMBOL(drm_gem_prime_import_dev);
 struct drm_gem_object *drm_gem_prime_import(struct drm_device *dev,
 					    struct dma_buf *dma_buf)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	return drm_gem_prime_import_dev(dev, dma_buf, dev->dev);
 }
 EXPORT_SYMBOL(drm_gem_prime_import);
@@ -1022,7 +996,6 @@ int __deprecated drm_prime_sg_to_page_array(struct sg_table *sgt,
 					    struct page **pages,
 					    int max_entries)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct sg_page_iter page_iter;
 	struct page **p = pages;
 
@@ -1049,7 +1022,6 @@ EXPORT_SYMBOL(drm_prime_sg_to_page_array);
 int drm_prime_sg_to_dma_addr_array(struct sg_table *sgt, dma_addr_t *addrs,
 				   int max_entries)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct sg_dma_page_iter dma_iter;
 	dma_addr_t *a = addrs;
 
@@ -1072,7 +1044,6 @@ EXPORT_SYMBOL(drm_prime_sg_to_dma_addr_array);
  */
 void drm_prime_gem_destroy(struct drm_gem_object *obj, struct sg_table *sg)
 {
-    pr_info("drm_prime: called %s\n", __func__);
 	struct dma_buf_attachment *attach;
 	struct dma_buf *dma_buf;
 

@@ -54,7 +54,6 @@ static void vce_v2_0_set_irq_funcs(struct amdgpu_device *adev);
  */
 static uint64_t vce_v2_0_ring_get_rptr(struct amdgpu_ring *ring)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring->me == 0)
@@ -72,7 +71,6 @@ static uint64_t vce_v2_0_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t vce_v2_0_ring_get_wptr(struct amdgpu_ring *ring)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring->me == 0)
@@ -90,7 +88,6 @@ static uint64_t vce_v2_0_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static void vce_v2_0_ring_set_wptr(struct amdgpu_ring *ring)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	if (ring->me == 0)
@@ -101,7 +98,6 @@ static void vce_v2_0_ring_set_wptr(struct amdgpu_ring *ring)
 
 static int vce_v2_0_lmi_clean(struct amdgpu_device *adev)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	int i, j;
 
 	for (i = 0; i < 10; ++i) {
@@ -119,7 +115,6 @@ static int vce_v2_0_lmi_clean(struct amdgpu_device *adev)
 
 static int vce_v2_0_firmware_loaded(struct amdgpu_device *adev)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	int i, j;
 
 	for (i = 0; i < 10; ++i) {
@@ -146,13 +141,11 @@ static int vce_v2_0_firmware_loaded(struct amdgpu_device *adev)
 
 static void vce_v2_0_disable_cg(struct amdgpu_device *adev)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	WREG32(mmVCE_CGTT_CLK_OVERRIDE, 7);
 }
 
 static void vce_v2_0_init_cg(struct amdgpu_device *adev)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	u32 tmp;
 
 	tmp = RREG32(mmVCE_CLOCK_GATING_A);
@@ -174,7 +167,6 @@ static void vce_v2_0_init_cg(struct amdgpu_device *adev)
 
 static void vce_v2_0_mc_resume(struct amdgpu_device *adev)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	uint32_t size, offset;
 
 	WREG32_P(mmVCE_CLOCK_GATING_A, 0, ~(1 << 16));
@@ -211,7 +203,6 @@ static void vce_v2_0_mc_resume(struct amdgpu_device *adev)
 
 static bool vce_v2_0_is_idle(void *handle)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	return !(RREG32(mmSRBM_STATUS2) & SRBM_STATUS2__VCE_BUSY_MASK);
@@ -219,7 +210,6 @@ static bool vce_v2_0_is_idle(void *handle)
 
 static int vce_v2_0_wait_for_idle(void *handle)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 	unsigned i;
 
@@ -239,7 +229,6 @@ static int vce_v2_0_wait_for_idle(void *handle)
  */
 static int vce_v2_0_start(struct amdgpu_device *adev)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	int r;
 
@@ -285,7 +274,6 @@ static int vce_v2_0_start(struct amdgpu_device *adev)
 
 static int vce_v2_0_stop(struct amdgpu_device *adev)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	int i;
 	int status;
 
@@ -321,7 +309,6 @@ static int vce_v2_0_stop(struct amdgpu_device *adev)
 
 static void vce_v2_0_set_sw_cg(struct amdgpu_device *adev, bool gated)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	u32 tmp;
 
 	if (gated) {
@@ -357,7 +344,6 @@ static void vce_v2_0_set_sw_cg(struct amdgpu_device *adev, bool gated)
 
 static void vce_v2_0_set_dyn_cg(struct amdgpu_device *adev, bool gated)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	u32 orig, tmp;
 
 /* LMI_MC/LMI_UMC always set in dynamic,
@@ -397,7 +383,6 @@ static void vce_v2_0_set_dyn_cg(struct amdgpu_device *adev, bool gated)
 static void vce_v2_0_enable_mgcg(struct amdgpu_device *adev, bool enable,
 								bool sw_cg)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	if (enable && (adev->cg_flags & AMD_CG_SUPPORT_VCE_MGCG)) {
 		if (sw_cg)
 			vce_v2_0_set_sw_cg(adev, true);
@@ -415,7 +400,6 @@ static void vce_v2_0_enable_mgcg(struct amdgpu_device *adev, bool enable,
 
 static int vce_v2_0_early_init(void *handle)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	adev->vce.num_rings = 2;
@@ -428,7 +412,6 @@ static int vce_v2_0_early_init(void *handle)
 
 static int vce_v2_0_sw_init(void *handle)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	int r, i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
@@ -463,7 +446,6 @@ static int vce_v2_0_sw_init(void *handle)
 
 static int vce_v2_0_sw_fini(void *handle)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -476,7 +458,6 @@ static int vce_v2_0_sw_fini(void *handle)
 
 static int vce_v2_0_hw_init(void *handle)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	int r, i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -496,7 +477,6 @@ static int vce_v2_0_hw_init(void *handle)
 
 static int vce_v2_0_hw_fini(void *handle)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	cancel_delayed_work_sync(&adev->vce.idle_work);
@@ -506,7 +486,6 @@ static int vce_v2_0_hw_fini(void *handle)
 
 static int vce_v2_0_suspend(void *handle)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -543,7 +522,6 @@ static int vce_v2_0_suspend(void *handle)
 
 static int vce_v2_0_resume(void *handle)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
@@ -556,7 +534,6 @@ static int vce_v2_0_resume(void *handle)
 
 static int vce_v2_0_soft_reset(void *handle)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
 	WREG32_FIELD(SRBM_SOFT_RESET, SOFT_RESET_VCE, 1);
@@ -570,7 +547,6 @@ static int vce_v2_0_set_interrupt_state(struct amdgpu_device *adev,
 					unsigned type,
 					enum amdgpu_interrupt_state state)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	uint32_t val = 0;
 
 	if (state == AMDGPU_IRQ_STATE_ENABLE)
@@ -584,7 +560,6 @@ static int vce_v2_0_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
-        //pr_info("vce_v2_0: called %s\n", __func__);
 	DRM_DEBUG("IH: VCE\n");
 	switch (entry->src_data[0]) {
 	case 0:
@@ -603,7 +578,6 @@ static int vce_v2_0_process_interrupt(struct amdgpu_device *adev,
 static int vce_v2_0_set_clockgating_state(void *handle,
 					  enum amd_clockgating_state state)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	bool gate = false;
 	bool sw_cg = false;
 
@@ -622,7 +596,6 @@ static int vce_v2_0_set_clockgating_state(void *handle,
 static int vce_v2_0_set_powergating_state(void *handle,
 					  enum amd_powergating_state state)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	/* This doesn't actually powergate the VCE block.
 	 * That's done in the dpm code via the SMC.  This
 	 * just re-inits the block as necessary.  The actual
@@ -679,7 +652,6 @@ static const struct amdgpu_ring_funcs vce_v2_0_ring_funcs = {
 
 static void vce_v2_0_set_ring_funcs(struct amdgpu_device *adev)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	int i;
 
 	for (i = 0; i < adev->vce.num_rings; i++) {
@@ -695,7 +667,6 @@ static const struct amdgpu_irq_src_funcs vce_v2_0_irq_funcs = {
 
 static void vce_v2_0_set_irq_funcs(struct amdgpu_device *adev)
 {
-    pr_info("vce_v2_0: called %s\n", __func__);
 	adev->vce.irq.num_types = 1;
 	adev->vce.irq.funcs = &vce_v2_0_irq_funcs;
 };

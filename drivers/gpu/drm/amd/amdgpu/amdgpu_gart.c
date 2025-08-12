@@ -71,7 +71,6 @@
  */
 static int amdgpu_gart_dummy_page_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	struct page *dummy_page = ttm_glob.dummy_read_page;
 
 	if (adev->dummy_page_addr)
@@ -95,7 +94,6 @@ static int amdgpu_gart_dummy_page_init(struct amdgpu_device *adev)
  */
 void amdgpu_gart_dummy_page_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	if (!adev->dummy_page_addr)
 		return;
 	dma_unmap_page(&adev->pdev->dev, adev->dummy_page_addr, PAGE_SIZE,
@@ -115,7 +113,6 @@ void amdgpu_gart_dummy_page_fini(struct amdgpu_device *adev)
  */
 int amdgpu_gart_table_vram_alloc(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	int r;
 
 	if (adev->gart.bo == NULL) {
@@ -151,7 +148,6 @@ int amdgpu_gart_table_vram_alloc(struct amdgpu_device *adev)
  */
 int amdgpu_gart_table_vram_pin(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_bo_reserve(adev->gart.bo, false);
@@ -179,7 +175,6 @@ int amdgpu_gart_table_vram_pin(struct amdgpu_device *adev)
  */
 void amdgpu_gart_table_vram_unpin(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	int r;
 
 	if (adev->gart.bo == NULL) {
@@ -205,7 +200,6 @@ void amdgpu_gart_table_vram_unpin(struct amdgpu_device *adev)
  */
 void amdgpu_gart_table_vram_free(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	if (adev->gart.bo == NULL) {
 		return;
 	}
@@ -230,7 +224,6 @@ void amdgpu_gart_table_vram_free(struct amdgpu_device *adev)
 int amdgpu_gart_unbind(struct amdgpu_device *adev, uint64_t offset,
 			int pages)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	unsigned t;
 	unsigned p;
 	int i, j;
@@ -281,7 +274,6 @@ int amdgpu_gart_map(struct amdgpu_device *adev, uint64_t offset,
 		    int pages, dma_addr_t *dma_addr, uint64_t flags,
 		    void *dst)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	uint64_t page_base;
 	unsigned i, j, t;
 
@@ -319,7 +311,6 @@ int amdgpu_gart_bind(struct amdgpu_device *adev, uint64_t offset,
 		     int pages, dma_addr_t *dma_addr,
 		     uint64_t flags)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	if (!adev->gart.ready) {
 		WARN(1, "trying to bind memory to uninitialized GART !\n");
 		return -EINVAL;
@@ -342,7 +333,6 @@ int amdgpu_gart_bind(struct amdgpu_device *adev, uint64_t offset,
  */
 void amdgpu_gart_invalidate_tlb(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	int i;
 
 	mb();
@@ -361,7 +351,6 @@ void amdgpu_gart_invalidate_tlb(struct amdgpu_device *adev)
  */
 int amdgpu_gart_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_gart: called %s\n", __func__);
 	int r;
 
 	if (adev->dummy_page_addr)

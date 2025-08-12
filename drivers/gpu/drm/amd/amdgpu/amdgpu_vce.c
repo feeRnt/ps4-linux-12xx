@@ -97,7 +97,6 @@ static int amdgpu_vce_get_destroy_msg(struct amdgpu_ring *ring, uint32_t handle,
  */
 int amdgpu_vce_sw_init(struct amdgpu_device *adev, unsigned long size)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	const char *fw_name;
 	const struct common_firmware_header *hdr;
 	unsigned ucode_version, version_major, version_minor, binary_id;
@@ -214,7 +213,6 @@ int amdgpu_vce_sw_init(struct amdgpu_device *adev, unsigned long size)
  */
 int amdgpu_vce_sw_fini(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	unsigned i;
 
 	if (adev->vce.vcpu_bo == NULL)
@@ -242,7 +240,6 @@ int amdgpu_vce_sw_fini(struct amdgpu_device *adev)
  */
 int amdgpu_vce_entity_init(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	struct drm_gpu_scheduler *sched;
 	int r;
@@ -267,7 +264,6 @@ int amdgpu_vce_entity_init(struct amdgpu_device *adev)
  */
 int amdgpu_vce_suspend(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	int i;
 
 	cancel_delayed_work_sync(&adev->vce.idle_work);
@@ -294,7 +290,6 @@ int amdgpu_vce_suspend(struct amdgpu_device *adev)
  */
 int amdgpu_vce_resume(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	void *cpu_addr;
 	const struct common_firmware_header *hdr;
 	unsigned offset;
@@ -341,7 +336,6 @@ int amdgpu_vce_resume(struct amdgpu_device *adev)
  */
 static void amdgpu_vce_idle_work_handler(struct work_struct *work)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	struct amdgpu_device *adev =
 		container_of(work, struct amdgpu_device, vce.idle_work.work);
 	unsigned i, count = 0;
@@ -373,7 +367,6 @@ static void amdgpu_vce_idle_work_handler(struct work_struct *work)
  */
 void amdgpu_vce_ring_begin_use(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	bool set_clocks;
 
@@ -406,7 +399,6 @@ void amdgpu_vce_ring_begin_use(struct amdgpu_ring *ring)
  */
 void amdgpu_vce_ring_end_use(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	if (!amdgpu_sriov_vf(ring->adev))
 		schedule_delayed_work(&ring->adev->vce.idle_work, VCE_IDLE_TIMEOUT);
 }
@@ -421,7 +413,6 @@ void amdgpu_vce_ring_end_use(struct amdgpu_ring *ring)
  */
 void amdgpu_vce_free_handles(struct amdgpu_device *adev, struct drm_file *filp)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	struct amdgpu_ring *ring = &adev->vce.ring[0];
 	int i, r;
 	for (i = 0; i < AMDGPU_MAX_VCE_HANDLES; ++i) {
@@ -453,7 +444,6 @@ static int amdgpu_vce_get_create_msg(struct amdgpu_ring *ring, uint32_t handle,
 				     struct amdgpu_bo *bo,
 				     struct dma_fence **fence)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	const unsigned ib_size_dw = 1024;
 	struct amdgpu_job *job;
 	struct amdgpu_ib *ib;
@@ -534,7 +524,6 @@ err:
 static int amdgpu_vce_get_destroy_msg(struct amdgpu_ring *ring, uint32_t handle,
 				      bool direct, struct dma_fence **fence)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	const unsigned ib_size_dw = 1024;
 	struct amdgpu_job *job;
 	struct amdgpu_ib *ib;
@@ -603,7 +592,6 @@ err:
 static int amdgpu_vce_validate_bo(struct amdgpu_cs_parser *p, uint32_t ib_idx,
 				  int lo, int hi, unsigned size, int32_t index)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	int64_t offset = ((uint64_t)size) * ((int64_t)index);
 	struct ttm_operation_ctx ctx = { false, false };
 	struct amdgpu_bo_va_mapping *mapping;
@@ -654,7 +642,6 @@ static int amdgpu_vce_validate_bo(struct amdgpu_cs_parser *p, uint32_t ib_idx,
 static int amdgpu_vce_cs_reloc(struct amdgpu_cs_parser *p, uint32_t ib_idx,
 			       int lo, int hi, unsigned size, uint32_t index)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	struct amdgpu_bo_va_mapping *mapping;
 	struct amdgpu_bo *bo;
 	uint64_t addr;
@@ -704,7 +691,6 @@ static int amdgpu_vce_cs_reloc(struct amdgpu_cs_parser *p, uint32_t ib_idx,
 static int amdgpu_vce_validate_handle(struct amdgpu_cs_parser *p,
 				      uint32_t handle, uint32_t *allocated)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	unsigned i;
 
 	/* validate the handle */
@@ -740,7 +726,6 @@ static int amdgpu_vce_validate_handle(struct amdgpu_cs_parser *p,
  */
 int amdgpu_vce_ring_parse_cs(struct amdgpu_cs_parser *p, uint32_t ib_idx)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	struct amdgpu_ib *ib = &p->job->ibs[ib_idx];
 	unsigned fb_idx = 0, bs_idx = 0;
 	int session_idx = -1;
@@ -977,7 +962,6 @@ out:
  */
 int amdgpu_vce_ring_parse_cs_vm(struct amdgpu_cs_parser *p, uint32_t ib_idx)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	struct amdgpu_ib *ib = &p->job->ibs[ib_idx];
 	int session_idx = -1;
 	uint32_t destroyed = 0;
@@ -1074,7 +1058,6 @@ void amdgpu_vce_ring_emit_ib(struct amdgpu_ring *ring,
 				struct amdgpu_ib *ib,
 				uint32_t flags)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	amdgpu_ring_write(ring, VCE_CMD_IB);
 	amdgpu_ring_write(ring, lower_32_bits(ib->gpu_addr));
 	amdgpu_ring_write(ring, upper_32_bits(ib->gpu_addr));
@@ -1093,7 +1076,6 @@ void amdgpu_vce_ring_emit_ib(struct amdgpu_ring *ring,
 void amdgpu_vce_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				unsigned flags)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	WARN_ON(flags & AMDGPU_FENCE_FLAG_64BIT);
 
 	amdgpu_ring_write(ring, VCE_CMD_FENCE);
@@ -1112,7 +1094,6 @@ void amdgpu_vce_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
  */
 int amdgpu_vce_ring_test_ring(struct amdgpu_ring *ring)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 	uint32_t rptr;
 	unsigned i;
@@ -1152,7 +1133,6 @@ int amdgpu_vce_ring_test_ring(struct amdgpu_ring *ring)
  */
 int amdgpu_vce_ring_test_ib(struct amdgpu_ring *ring, long timeout)
 {
-    pr_info("amdgpu_vce: called %s\n", __func__);
 	struct dma_fence *fence = NULL;
 	struct amdgpu_bo *bo = NULL;
 	long r;

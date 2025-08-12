@@ -71,7 +71,6 @@ void
 __drm_atomic_helper_crtc_state_reset(struct drm_crtc_state *crtc_state,
 				     struct drm_crtc *crtc)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	crtc_state->crtc = crtc;
 }
 EXPORT_SYMBOL(__drm_atomic_helper_crtc_state_reset);
@@ -92,7 +91,6 @@ void
 __drm_atomic_helper_crtc_reset(struct drm_crtc *crtc,
 			       struct drm_crtc_state *crtc_state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	if (crtc_state)
 		__drm_atomic_helper_crtc_state_reset(crtc_state, crtc);
 
@@ -112,7 +110,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_crtc_reset);
  */
 void drm_atomic_helper_crtc_reset(struct drm_crtc *crtc)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	struct drm_crtc_state *crtc_state =
 		kzalloc(sizeof(*crtc->state), GFP_KERNEL);
 
@@ -134,7 +131,6 @@ EXPORT_SYMBOL(drm_atomic_helper_crtc_reset);
 void __drm_atomic_helper_crtc_duplicate_state(struct drm_crtc *crtc,
 					      struct drm_crtc_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	memcpy(state, crtc->state, sizeof(*state));
 
 	if (state->mode_blob)
@@ -171,7 +167,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_crtc_duplicate_state);
 struct drm_crtc_state *
 drm_atomic_helper_crtc_duplicate_state(struct drm_crtc *crtc)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	struct drm_crtc_state *state;
 
 	if (WARN_ON(!crtc->state))
@@ -195,7 +190,6 @@ EXPORT_SYMBOL(drm_atomic_helper_crtc_duplicate_state);
  */
 void __drm_atomic_helper_crtc_destroy_state(struct drm_crtc_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	if (state->commit) {
 		/*
 		 * In the event that a non-blocking commit returns
@@ -233,7 +227,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_crtc_destroy_state);
 void drm_atomic_helper_crtc_destroy_state(struct drm_crtc *crtc,
 					  struct drm_crtc_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	__drm_atomic_helper_crtc_destroy_state(state);
 	kfree(state);
 }
@@ -250,7 +243,6 @@ EXPORT_SYMBOL(drm_atomic_helper_crtc_destroy_state);
 void __drm_atomic_helper_plane_state_reset(struct drm_plane_state *plane_state,
 					   struct drm_plane *plane)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	plane_state->plane = plane;
 	plane_state->rotation = DRM_MODE_ROTATE_0;
 
@@ -274,7 +266,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_plane_state_reset);
 void __drm_atomic_helper_plane_reset(struct drm_plane *plane,
 				     struct drm_plane_state *plane_state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	if (plane_state)
 		__drm_atomic_helper_plane_state_reset(plane_state, plane);
 
@@ -291,7 +282,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_plane_reset);
  */
 void drm_atomic_helper_plane_reset(struct drm_plane *plane)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	if (plane->state)
 		__drm_atomic_helper_plane_destroy_state(plane->state);
 
@@ -313,7 +303,6 @@ EXPORT_SYMBOL(drm_atomic_helper_plane_reset);
 void __drm_atomic_helper_plane_duplicate_state(struct drm_plane *plane,
 					       struct drm_plane_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	memcpy(state, plane->state, sizeof(*state));
 
 	if (state->fb)
@@ -335,7 +324,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_plane_duplicate_state);
 struct drm_plane_state *
 drm_atomic_helper_plane_duplicate_state(struct drm_plane *plane)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	struct drm_plane_state *state;
 
 	if (WARN_ON(!plane->state))
@@ -359,7 +347,6 @@ EXPORT_SYMBOL(drm_atomic_helper_plane_duplicate_state);
  */
 void __drm_atomic_helper_plane_destroy_state(struct drm_plane_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	if (state->fb)
 		drm_framebuffer_put(state->fb);
 
@@ -384,7 +371,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_plane_destroy_state);
 void drm_atomic_helper_plane_destroy_state(struct drm_plane *plane,
 					   struct drm_plane_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	__drm_atomic_helper_plane_destroy_state(state);
 	kfree(state);
 }
@@ -402,7 +388,6 @@ void
 __drm_atomic_helper_connector_state_reset(struct drm_connector_state *conn_state,
 					  struct drm_connector *connector)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	conn_state->connector = connector;
 }
 EXPORT_SYMBOL(__drm_atomic_helper_connector_state_reset);
@@ -423,7 +408,6 @@ void
 __drm_atomic_helper_connector_reset(struct drm_connector *connector,
 				    struct drm_connector_state *conn_state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	if (conn_state)
 		__drm_atomic_helper_connector_state_reset(conn_state, connector);
 
@@ -441,7 +425,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_connector_reset);
  */
 void drm_atomic_helper_connector_reset(struct drm_connector *connector)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	struct drm_connector_state *conn_state =
 		kzalloc(sizeof(*conn_state), GFP_KERNEL);
 
@@ -461,7 +444,6 @@ EXPORT_SYMBOL(drm_atomic_helper_connector_reset);
  */
 void drm_atomic_helper_connector_tv_reset(struct drm_connector *connector)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	struct drm_cmdline_mode *cmdline = &connector->cmdline_mode;
 	struct drm_connector_state *state = connector->state;
 
@@ -484,7 +466,6 @@ void
 __drm_atomic_helper_connector_duplicate_state(struct drm_connector *connector,
 					    struct drm_connector_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	memcpy(state, connector->state, sizeof(*state));
 	if (state->crtc)
 		drm_connector_get(connector);
@@ -508,7 +489,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_connector_duplicate_state);
 struct drm_connector_state *
 drm_atomic_helper_connector_duplicate_state(struct drm_connector *connector)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	struct drm_connector_state *state;
 
 	if (WARN_ON(!connector->state))
@@ -533,7 +513,6 @@ EXPORT_SYMBOL(drm_atomic_helper_connector_duplicate_state);
 void
 __drm_atomic_helper_connector_destroy_state(struct drm_connector_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	if (state->crtc)
 		drm_connector_put(state->connector);
 
@@ -558,7 +537,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_connector_destroy_state);
 void drm_atomic_helper_connector_destroy_state(struct drm_connector *connector,
 					  struct drm_connector_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	__drm_atomic_helper_connector_destroy_state(state);
 	kfree(state);
 }
@@ -575,7 +553,6 @@ EXPORT_SYMBOL(drm_atomic_helper_connector_destroy_state);
 void __drm_atomic_helper_private_obj_duplicate_state(struct drm_private_obj *obj,
 						     struct drm_private_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	memcpy(state, obj->state, sizeof(*state));
 }
 EXPORT_SYMBOL(__drm_atomic_helper_private_obj_duplicate_state);
@@ -591,7 +568,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_private_obj_duplicate_state);
 void __drm_atomic_helper_bridge_duplicate_state(struct drm_bridge *bridge,
 						struct drm_bridge_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	__drm_atomic_helper_private_obj_duplicate_state(&bridge->base,
 							&state->base);
 	state->bridge = bridge;
@@ -610,7 +586,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_bridge_duplicate_state);
 struct drm_bridge_state *
 drm_atomic_helper_bridge_duplicate_state(struct drm_bridge *bridge)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	struct drm_bridge_state *new;
 
 	if (WARN_ON(!bridge->base.state))
@@ -638,7 +613,6 @@ EXPORT_SYMBOL(drm_atomic_helper_bridge_duplicate_state);
 void drm_atomic_helper_bridge_destroy_state(struct drm_bridge *bridge,
 					    struct drm_bridge_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	kfree(state);
 }
 EXPORT_SYMBOL(drm_atomic_helper_bridge_destroy_state);
@@ -656,7 +630,6 @@ EXPORT_SYMBOL(drm_atomic_helper_bridge_destroy_state);
 void __drm_atomic_helper_bridge_reset(struct drm_bridge *bridge,
 				      struct drm_bridge_state *state)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	memset(state, 0, sizeof(*state));
 	state->bridge = bridge;
 }
@@ -674,7 +647,6 @@ EXPORT_SYMBOL(__drm_atomic_helper_bridge_reset);
 struct drm_bridge_state *
 drm_atomic_helper_bridge_reset(struct drm_bridge *bridge)
 {
-    pr_info("drm_atomic_state_helper: called %s\n", __func__);
 	struct drm_bridge_state *bridge_state;
 
 	bridge_state = kzalloc(sizeof(*bridge_state), GFP_KERNEL);

@@ -31,7 +31,6 @@
  */
 static int amdgpu_vm_cpu_map_table(struct amdgpu_bo_vm *table)
 {
-    pr_info("amdgpu_vm_cpu: called %s\n", __func__);
 	return amdgpu_bo_kmap(&table->bo, NULL);
 }
 
@@ -49,7 +48,6 @@ static int amdgpu_vm_cpu_prepare(struct amdgpu_vm_update_params *p,
 				 struct dma_resv *resv,
 				 enum amdgpu_sync_mode sync_mode)
 {
-    pr_info("amdgpu_vm_cpu: called %s\n", __func__);
 	if (!resv)
 		return 0;
 
@@ -74,7 +72,6 @@ static int amdgpu_vm_cpu_update(struct amdgpu_vm_update_params *p,
 				uint64_t addr, unsigned count, uint32_t incr,
 				uint64_t flags)
 {
-    pr_info("amdgpu_vm_cpu: called %s\n", __func__);
 	unsigned int i;
 	uint64_t value;
 	int r;
@@ -111,7 +108,6 @@ static int amdgpu_vm_cpu_update(struct amdgpu_vm_update_params *p,
 static int amdgpu_vm_cpu_commit(struct amdgpu_vm_update_params *p,
 				struct dma_fence **fence)
 {
-    pr_info("amdgpu_vm_cpu: called %s\n", __func__);
 	/* Flush HDP */
 	mb();
 	amdgpu_device_flush_hdp(p->adev, NULL);
