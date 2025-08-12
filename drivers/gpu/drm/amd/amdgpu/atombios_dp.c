@@ -467,11 +467,16 @@ bool amdgpu_atombios_dp_needs_link_train(struct amdgpu_connector *amdgpu_connect
 	u8 link_status[DP_LINK_STATUS_SIZE];
 	struct amdgpu_connector_atom_dig *dig = amdgpu_connector->con_priv;
 
+	pr_info("atombios_dp: called %s\n", __func__);
 	if (drm_dp_dpcd_read_link_status(&amdgpu_connector->ddc_bus->aux, link_status)
-	    <= 0)
+	    <= 0) {
+		pr_info("atombios_dp: Returning false in %s\n", __func__);
 		return false;
-	if (drm_dp_channel_eq_ok(link_status, dig->dp_lane_count))
+	}
+	if (drm_dp_channel_eq_ok(link_status, dig->dp_lane_count)) {
+		pr_info("atombios_dp: Retruning false 2 in %s\n", __func__);
 		return false;
+	}
 	return true;
 }
 

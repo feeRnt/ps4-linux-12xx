@@ -725,6 +725,7 @@ out:
  */
 bool drm_kms_helper_is_poll_worker(void)
 {
+	pr_info("drm_probe_helper: called %s\n", __func__);
 	struct work_struct *work = current_work();
 
 	return work && work->func == output_poll_execute;
@@ -747,6 +748,7 @@ EXPORT_SYMBOL(drm_kms_helper_is_poll_worker);
  */
 void drm_kms_helper_poll_disable(struct drm_device *dev)
 {
+	pr_info("drm_probe_helper: called %s\n", __func__);
 	if (!dev->mode_config.poll_enabled)
 		return;
 	cancel_delayed_work_sync(&dev->mode_config.output_poll_work);

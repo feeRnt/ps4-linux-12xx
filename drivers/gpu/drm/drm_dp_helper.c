@@ -1225,6 +1225,7 @@ void drm_dp_set_subconnector_property(struct drm_connector *connector,
 {
 	enum drm_mode_subconnector subconnector = DRM_MODE_SUBCONNECTOR_Unknown;
 
+	pr_info("drm_dp_helper: called %s\n", __func__);
 	if (status == connector_status_connected)
 		subconnector = drm_dp_subconnector_type(dpcd, port_cap);
 	drm_object_property_set_value(&connector->base,
