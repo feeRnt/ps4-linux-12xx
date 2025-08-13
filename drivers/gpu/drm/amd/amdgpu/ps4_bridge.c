@@ -310,7 +310,7 @@ void ps4_bridge_mode_set(struct drm_bridge *bridge,
 			 const struct drm_display_mode *adjusted_mode)
 {
     pr_info("ps4_bridge: called %s\n", __func__);
-    	dump_stack();
+    	//dump_stack(); //this probably breaks the kernel video init; blackscreen with no fix
 	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 
 	/* This gets called before pre_enable/enable, so we just stash
