@@ -3319,7 +3319,7 @@ static u8 cea_num_vics(void)
 
 static u8 cea_next_vic(u8 vic)
 {
-	if (++vic == 1 + ARRAY_SIZE(edid_cea_modes_1)) 
+	if (++vic == 1 + ARRAY_SIZE(edid_cea_modes_1))
 		vic = 193;
 	// if next vic == beyond end of first vic array, then jump to the next array (193)
 	// otherwise return the next vic
@@ -3439,7 +3439,7 @@ u8 drm_match_cea_mode(const struct drm_display_mode *to_match)
 	// We are to match it with predefined and supported modes in this function.
 	u8 vic;
 
-	pr_info("drm_edid: called %s\n");
+	pr_info("drm_edid: called %s\n", __func__);
 
 	if (!to_match->clock) {
 		pr_info("drm_edid: !to_match->clock in %s, returning 0 -- vic absent\n", __func__);
@@ -3447,7 +3447,7 @@ u8 drm_match_cea_mode(const struct drm_display_mode *to_match)
 	}
 
 	if (to_match->picture_aspect_ratio) {
-		pr_info("drm_edid: picture_aspect_ration match in %s\n");
+		//pr_info("drm_edid: picture_aspect_ratio match in %s\n", __func__);
 		match_flags |= DRM_MODE_MATCH_ASPECT_RATIO;
 		// Matched Timings + Flags + Aspect Ratio
 	}

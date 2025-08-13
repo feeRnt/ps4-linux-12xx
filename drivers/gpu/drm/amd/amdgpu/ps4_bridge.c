@@ -829,15 +829,14 @@ int ps4_bridge_mode_valid(struct drm_connector *connector,
 	pr_info("ps4_bridge: Current vic from matched CEA = %d.\n"
         	"If vic == 0, or vic != 16 and vic != 4, then we will fail.\n", vic);
 
-
 	/* Allow anything that we can match up to a VIC (CEA modes) */
-	if (!vic || (vic != 16 && vic != 4)) { 
+	if (!vic || (vic != 16 && vic != 4)) {
 		// vic doesn't exist; or vic != 16 and also not equal 4
-		pr_info("ps4_bridge: Returning MODE_BAD.\n"); 
+		pr_info("ps4_bridge: Returning MODE_BAD.\n");
 		/* This always returns BAD now... Test drm_match_cea_mode*/
 		return MODE_BAD;
 	}
-	pr_info("ps4_bridge: Returning MODE_OK.\n"); 
+	pr_info("ps4_bridge: Returning MODE_OK.\n");
 	return MODE_OK;
 }
 
