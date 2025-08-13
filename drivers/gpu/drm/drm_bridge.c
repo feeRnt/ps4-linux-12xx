@@ -1087,9 +1087,11 @@ EXPORT_SYMBOL_GPL(drm_bridge_detect);
 int drm_bridge_get_modes(struct drm_bridge *bridge,
 			 struct drm_connector *connector)
 {
+	pr_info("drm_bridge: called %s\n", __func__);
 	if (!(bridge->ops & DRM_BRIDGE_OP_MODES))
 		return 0;
-
+	
+	pr_info("drm_bridge: will get and then return valid modes.\n");
 	return bridge->funcs->get_modes(bridge, connector);
 }
 EXPORT_SYMBOL_GPL(drm_bridge_get_modes);
@@ -1109,9 +1111,13 @@ EXPORT_SYMBOL_GPL(drm_bridge_get_modes);
 struct edid *drm_bridge_get_edid(struct drm_bridge *bridge,
 				 struct drm_connector *connector)
 {
-	if (!(bridge->ops & DRM_BRIDGE_OP_EDID))
+	pr_info("drm_bridge: called %s\n", __func__);
+	if (!(bridge->ops & DRM_BRIDGE_OP_EDID)) {
+		pr_info("drm_bridge: returning NULL, no EDID retrieval support\n");
 		return NULL;
+	}
 
+	pr_info("drm_bridge: will get and return valid EDIDs\n");
 	return bridge->funcs->get_edid(bridge, connector);
 }
 EXPORT_SYMBOL_GPL(drm_bridge_get_edid);
@@ -1139,6 +1145,7 @@ void drm_bridge_hpd_enable(struct drm_bridge *bridge,
 				      enum drm_connector_status status),
 			   void *data)
 {
+	pr_info("drm_bridge: called %s\n", __func__);
 	if (!(bridge->ops & DRM_BRIDGE_OP_HPD))
 		return;
 

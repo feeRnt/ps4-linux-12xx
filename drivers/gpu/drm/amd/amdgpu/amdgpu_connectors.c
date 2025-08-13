@@ -1024,7 +1024,7 @@ amdgpu_connector_check_hpd_status_unchanged(struct drm_connector *connector)
 static enum drm_connector_status
 amdgpu_connector_dvi_detect(struct drm_connector *connector, bool force)
 {
-    pr_info("amdgpu_connectors: called %s\n", __func__);
+    pr_info("amdgpu_connectors: called %s\n", __func__); //important function
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
@@ -1385,7 +1385,7 @@ bool amdgpu_connector_is_dp12_capable(struct drm_connector *connector)
 static enum drm_connector_status
 amdgpu_connector_dp_detect(struct drm_connector *connector, bool force)
 {
-    pr_info("amdgpu_connectors: called %s\n", __func__);
+    pr_info("amdgpu_connectors: called %s\n", __func__); /////most important function
 	struct drm_device *dev = connector->dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);

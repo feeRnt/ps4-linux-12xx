@@ -236,6 +236,7 @@ static int drm_bridge_connector_get_modes_edid(struct drm_connector *connector,
 	struct edid *edid;
 	int n;
 
+	pr_info("drm_bridge_connector: called %s\n", __func__);
 	status = drm_bridge_connector_detect(connector, false);
 	if (status != connector_status_connected)
 		goto no_edid;
@@ -263,27 +264,31 @@ static int drm_bridge_connector_get_modes(struct drm_connector *connector)
 		to_drm_bridge_connector(connector);
 	struct drm_bridge *bridge;
 
+	pr_info("drm_bridge_connector: called %s\n", __func__);
 	/*
 	 * If display exposes EDID, then we parse that in the normal way to
 	 * build table of supported modes.
 	 */
 	bridge = bridge_connector->bridge_edid;
-	if (bridge)
+	if (bridge) {
+		pr_info("drm_bridge_connector: edid bridge. will get edid modes in %s\n", __func__);
 		return drm_bridge_connector_get_modes_edid(connector, bridge);
-
+	}
 	/*
 	 * Otherwise if the display pipeline reports modes (e.g. with a fixed
 	 * resolution panel or an analog TV output), query it.
 	 */
 	bridge = bridge_connector->bridge_modes;
-	if (bridge)
+	if (bridge) {
+		pr_info("drm_bridge_connector: preset modes bridge. will get get modes in %s\n", __func__);
 		return bridge->funcs->get_modes(bridge, connector);
-
+	}
 	/*
 	 * We can't retrieve modes, which can happen for instance for a DVI or
 	 * VGA output with the DDC bus unconnected. The KMS core will add the
 	 * default modes.
 	 */
+	pr_info("drm_bridge_connector: Can't get modes. Will use KMS modes %s\n", __func__);
 	return 0;
 }
 
