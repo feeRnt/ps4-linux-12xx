@@ -302,6 +302,7 @@ static inline struct ps4_bridge *
 {
     pr_info("ps4_bridge: called %s\n", __func__);
 	return container_of(bridge, struct ps4_bridge, bridge);
+	//returns container of ps4 bridge
 }
 
 void ps4_bridge_mode_set(struct drm_bridge *bridge,
@@ -309,12 +310,17 @@ void ps4_bridge_mode_set(struct drm_bridge *bridge,
 			 const struct drm_display_mode *adjusted_mode)
 {
     pr_info("ps4_bridge: called %s\n", __func__);
+    	dump_stack();
 	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 
 	/* This gets called before pre_enable/enable, so we just stash
 	 * the vic ID for later */
+	//MN = Panasonic MN****, for the PlayStation 4
 	mn_bridge->mode = drm_match_cea_mode(adjusted_mode);
 	pr_info("vic mode: %d\n", mn_bridge->mode);
+	// ps4/mn bridge is now the mother bridge
+	// adjusted mode returns 16... what does the main mode return?
+
 	if (!mn_bridge->mode) {
 		pr_info("attempted to set non-CEA mode\n");
 	}
@@ -695,7 +701,7 @@ static const struct drm_display_mode mode_720p = {
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
-/* 16 - 1920x1080@60Hz */
+/* 16 - 1920x1080@60Hz */ 
 static const struct drm_display_mode mode_1080p = {
 	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
 		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
@@ -820,13 +826,18 @@ int ps4_bridge_mode_valid(struct drm_connector *connector,
 {
     pr_info("ps4_bridge: called %s\n", __func__);
 	int vic = drm_match_cea_mode(mode);
+	pr_info("ps4_bridge: Current vic from matched CEA = %d.\n"
+        	"If vic == 0, or vic != 16 and vic != 4, then we will fail.\n", vic);
+
 
 	/* Allow anything that we can match up to a VIC (CEA modes) */
-	if (!vic || (vic != 16 && vic != 4)) {
-		pr_info("ps4_bridge: Returning MODE_BAD.\n");
+	if (!vic || (vic != 16 && vic != 4)) { 
+		// vic doesn't exist; or vic != 16 and also not equal 4
+		pr_info("ps4_bridge: Returning MODE_BAD.\n"); 
+		/* This always returns BAD now... Test drm_match_cea_mode*/
 		return MODE_BAD;
 	}
-
+	pr_info("ps4_bridge: Returning MODE_OK.\n"); 
 	return MODE_OK;
 }
 

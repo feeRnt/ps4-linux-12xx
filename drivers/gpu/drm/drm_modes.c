@@ -775,6 +775,7 @@ int drm_mode_vrefresh(const struct drm_display_mode *mode)
 		den *= mode->vscan;
 
 	return DIV_ROUND_CLOSEST_ULL(mul_u32_u32(num, 1000), den);
+	//Just does some math	
 }
 EXPORT_SYMBOL(drm_mode_vrefresh);
 
@@ -988,6 +989,7 @@ bool drm_mode_match(const struct drm_display_mode *mode1,
 {
 	if (!mode1 && !mode2)
 		return true;
+	//match if both of them don't exist?????
 
 	if (!mode1 || !mode2)
 		return false;

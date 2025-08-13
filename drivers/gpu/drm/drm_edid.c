@@ -3309,6 +3309,7 @@ static __always_inline const struct drm_display_mode *cea_mode_for_vic(u8 vic)
 	if (vic >= 193 && vic < 193 + ARRAY_SIZE(edid_cea_modes_193))
 		return &edid_cea_modes_193[vic - 193];
 	return NULL;
+	// The function returns an edid based CEA mode from a VIC mode
 }
 
 static u8 cea_num_vics(void)
@@ -3318,8 +3319,11 @@ static u8 cea_num_vics(void)
 
 static u8 cea_next_vic(u8 vic)
 {
-	if (++vic == 1 + ARRAY_SIZE(edid_cea_modes_1))
+	if (++vic == 1 + ARRAY_SIZE(edid_cea_modes_1)) 
 		vic = 193;
+	// if next vic == beyond end of first vic array, then jump to the next array (193)
+	// otherwise return the next vic
+	// This is because there is still room room for more VICs in the first vic array
 	return vic;
 }
 
@@ -3332,7 +3336,7 @@ cea_mode_alternate_clock(const struct drm_display_mode *cea_mode)
 {
 	unsigned int clock = cea_mode->clock;
 
-	if (drm_mode_vrefresh(cea_mode) % 6 != 0)
+	if (drm_mode_vrefresh(cea_mode) % 6 != 0) // in drm_modes.c, rounds up the refresh rate
 		return clock;
 
 	/*
@@ -3346,6 +3350,7 @@ cea_mode_alternate_clock(const struct drm_display_mode *cea_mode)
 		clock = DIV_ROUND_CLOSEST(clock * 1000, 1001);
 
 	return clock;
+	// I think it's unnecessary to log
 }
 
 static bool
@@ -3422,20 +3427,36 @@ static u8 drm_match_cea_mode_clock_tolerance(const struct drm_display_mode *to_m
  *
  * Return: The CEA Video ID (VIC) of the mode or 0 if it isn't a CEA-861
  * mode.
- */
+ *
+ * CEA = Consumer Electronics Association; the alternative is the 
+ * DMT = Display Monitor Timings; used more commonly on monitors, than TVs
+ **/
+
 u8 drm_match_cea_mode(const struct drm_display_mode *to_match)
 {
-	unsigned int match_flags = DRM_MODE_MATCH_TIMINGS | DRM_MODE_MATCH_FLAGS;
+	unsigned int match_flags = DRM_MODE_MATCH_TIMINGS | DRM_MODE_MATCH_FLAGS; //Timings + Flags
+	// *to_match is the mode provided by the bridge / connector. 
+	// We are to match it with predefined and supported modes in this function.
 	u8 vic;
 
-	if (!to_match->clock)
-		return 0;
+	pr_info("drm_edid: called %s\n");
 
-	if (to_match->picture_aspect_ratio)
+	if (!to_match->clock) {
+		pr_info("drm_edid: !to_match->clock in %s, returning 0 -- vic absent\n", __func__);
+		return 0;
+	}
+
+	if (to_match->picture_aspect_ratio) {
+		pr_info("drm_edid: picture_aspect_ration match in %s\n");
 		match_flags |= DRM_MODE_MATCH_ASPECT_RATIO;
+		// Matched Timings + Flags + Aspect Ratio
+	}
 
 	for (vic = 1; vic < cea_num_vics(); vic = cea_next_vic(vic)) {
+		//          193 + 27 = 220, total number of CEA VICs, besides the 4k ones
+		//                                Basically vic+1, with minor adjustments
 		struct drm_display_mode cea_mode = *cea_mode_for_vic(vic);
+						  //returns the edid CEA mode from a VIC mode
 		unsigned int clock1, clock2;
 
 		/* Check both 60Hz and 59.94Hz */
@@ -3445,6 +3466,8 @@ u8 drm_match_cea_mode(const struct drm_display_mode *to_match)
 		if (KHZ2PICOS(to_match->clock) != KHZ2PICOS(clock1) &&
 		    KHZ2PICOS(to_match->clock) != KHZ2PICOS(clock2))
 			continue;
+		//kHz to Picosecond matches clock with basic or alt clock,
+		//and drm_mode_match returns with the selected values
 
 		do {
 			if (drm_mode_match(to_match, &cea_mode, match_flags))
