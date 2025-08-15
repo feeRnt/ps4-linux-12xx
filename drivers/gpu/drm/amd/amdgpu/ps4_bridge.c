@@ -179,7 +179,7 @@ static void cq_init(struct i2c_cmdqueue *q, u8 code)
 
 static void cq_cmd(struct i2c_cmdqueue *q, u8 major, u8 minor)
 {
-    pr_info("ps4_bridge: called %s\n", __func__);
+//    pr_info("ps4_bridge: called %s\n", __func__);
 	if (!q->cmd || q->cmd->major != major || q->cmd->minor != minor) {
 		if (q->cmd)
 			q->cmd->length = q->p - (u8 *)q->cmd;
@@ -197,7 +197,7 @@ static void cq_cmd(struct i2c_cmdqueue *q, u8 major, u8 minor)
 
 static int cq_exec(struct i2c_cmdqueue *q)
 {
-    pr_info("ps4_bridge: called %s\n", __func__);
+//    pr_info("ps4_bridge: called %s\n", __func__);
 	int res;
 
 	if (!q->cmd)
@@ -224,7 +224,7 @@ static int cq_exec(struct i2c_cmdqueue *q)
 
 static void cq_read(struct i2c_cmdqueue *q, u16 addr, u8 count)
 {
-    pr_info("ps4_bridge: called %s\n", __func__);
+//    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_READ);
 	*q->p++ = count;
 	*q->p++ = addr >> 8;
@@ -234,7 +234,7 @@ static void cq_read(struct i2c_cmdqueue *q, u16 addr, u8 count)
 
 static void cq_writereg(struct i2c_cmdqueue *q, u16 addr, u8 data)
 {
-    pr_info("ps4_bridge: called %s\n", __func__);
+//    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_WRITE);
 	*q->p++ = 1;
 	*q->p++ = addr >> 8;
@@ -256,7 +256,7 @@ static void cq_write(struct i2c_cmdqueue *q, u16 addr, u8 *data, u8 count)
 
 static void cq_mask(struct i2c_cmdqueue *q, u16 addr, u8 value, u8 mask)
 {
-    pr_info("ps4_bridge: called %s\n", __func__);
+//    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_MASK);
 	*q->p++ = 1;
 	*q->p++ = addr >> 8;
@@ -268,7 +268,7 @@ static void cq_mask(struct i2c_cmdqueue *q, u16 addr, u8 value, u8 mask)
 #if 1
 static void cq_delay(struct i2c_cmdqueue *q, u16 time)
 {
-    pr_info("ps4_bridge: called %s\n", __func__);
+//    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_DELAY);
 	*q->p++ = 0;
 	*q->p++ = time & 0xff;
@@ -279,7 +279,7 @@ static void cq_delay(struct i2c_cmdqueue *q, u16 time)
 
 static void cq_wait_set(struct i2c_cmdqueue *q, u16 addr, u8 mask)
 {
-    pr_info("ps4_bridge: called %s\n", __func__);
+//    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_WAIT_SET);
 	*q->p++ = 0;
 	*q->p++ = addr >> 8;
@@ -289,7 +289,7 @@ static void cq_wait_set(struct i2c_cmdqueue *q, u16 addr, u8 mask)
 
 static void cq_wait_clear(struct i2c_cmdqueue *q, u16 addr, u8 mask)
 {
-    pr_info("ps4_bridge: called %s\n", __func__);
+//    pr_info("ps4_bridge: called %s\n", __func__);
 	cq_cmd(q, CMD_WAIT_CLEAR);
 	*q->p++ = 0;
 	*q->p++ = addr >> 8;
@@ -310,7 +310,7 @@ void ps4_bridge_mode_set(struct drm_bridge *bridge,
 			 const struct drm_display_mode *adjusted_mode)
 {
     pr_info("ps4_bridge: called %s\n", __func__);
-    	//dump_stack(); //this probably breaks the kernel video init; blackscreen with no fix
+	//dump_stack(); //this probably breaks the kernel video init; blackscreen with no fix
 	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 
 	/* This gets called before pre_enable/enable, so we just stash
@@ -689,6 +689,7 @@ static void ps4_bridge_post_disable(struct drm_bridge *bridge)
 
 /* 1 - 640x480@60Hz */
 static const struct drm_display_mode mode_480p = {
+/* 1 - 640x480@60Hz 4:3 */
 	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 		 752, 800, 0, 480, 490, 492, 525, 0,
 		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
@@ -701,13 +702,24 @@ static const struct drm_display_mode mode_720p = {
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
-/* 16 - 1920x1080@60Hz */ 
+/* 16 - 1920x1080@60Hz */
+/* This is the CEA Mode */
 static const struct drm_display_mode mode_1080p = {
 	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
 		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
+
+/* 0x52 - 1920x1080@60Hz */
+/* This is the DMT Mode */
+/*
+static const struct drm_display_mode mode_1080p = {
+	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
+		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
+		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC)
+}
+*/
 
 int ps4_bridge_get_modes(struct drm_connector *connector)
 {
@@ -793,6 +805,7 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 	*/
 }
 
+/*
 static bool
 amdgpu_connector_check_hpd_status_unchanged(struct drm_connector *connector) // added
 {
@@ -820,6 +833,7 @@ amdgpu_connector_check_hpd_status_unchanged(struct drm_connector *connector) // 
 	return false;
 }
 
+*/
 
 int ps4_bridge_mode_valid(struct drm_connector *connector,
 				  struct drm_display_mode *mode)

@@ -96,10 +96,13 @@ drm_mode_validate_pipeline(struct drm_display_mode *mode,
 	struct drm_encoder *encoder;
 	int ret;
 
+	pr_info("drm_probe_helper: called %s.\n", __func__);
 	/* Step 1: Validate against connector */
 	ret = drm_connector_mode_valid(connector, mode, ctx, status);
-	if (ret || *status != MODE_OK)
+	if (ret || *status != MODE_OK) {
+		pr_info("drm_probe_helper: mode not ok from drm_connector_mode_valid. Returning.\n");
 		return ret;
+	}
 
 	/* Step 2: Validate against encoders and crtcs */
 	drm_connector_for_each_possible_encoder(connector, encoder) {
@@ -112,6 +115,7 @@ drm_mode_validate_pipeline(struct drm_display_mode *mode,
 			 * will not accept the mode anyway. If all encoders
 			 * reject the mode then, at exit, ret will not be
 			 * MODE_OK. */
+			pr_info("drm_probe_helper: Current mode not ok from drm_connector_for_each_possible_encoder. Trying next one.\n");
 			continue;
 		}
 
@@ -119,21 +123,25 @@ drm_mode_validate_pipeline(struct drm_display_mode *mode,
 		*status = drm_bridge_chain_mode_valid(bridge,
 						      &connector->display_info,
 						      mode);
-		if (*status != MODE_OK) {
+		if (*status != MODE_OK) {	
 			/* There is also no point in continuing for crtc check
 			 * here. */
+			pr_info("drm_probe_helper: Current mode not ok from drm_status_chain_mode_valid. Trying next one.\n");
 			continue;
 		}
 
 		drm_for_each_crtc(crtc, dev) {
-			if (!drm_encoder_crtc_ok(encoder, crtc))
+			if (!drm_encoder_crtc_ok(encoder, crtc)) {
+				pr_info("drm_probe_helper: Current encoder crtc not ok from drm_encoder_crtc_ok. Trying next one.\n");
 				continue;
+			}
 
 			*status = drm_crtc_mode_valid(crtc, mode);
 			if (*status == MODE_OK) {
 				/* If we get to this point there is at least
 				 * one combination of encoder+crtc that works
 				 * for this mode. Lets return now. */
+				pr_info("drm_probe_helper: Current mode is ok from drm_crtc_mode_valid. Returning 0.\n");
 				return 0;
 			}
 		}

@@ -53,7 +53,7 @@
  */
 void drm_mode_debug_printmodeline(const struct drm_display_mode *mode)
 {
-	DRM_DEBUG_KMS("Modeline " DRM_MODE_FMT "\n", DRM_MODE_ARG(mode));
+	pr_info("Modeline " DRM_MODE_FMT "\n", DRM_MODE_ARG(mode));
 }
 EXPORT_SYMBOL(drm_mode_debug_printmodeline);
 
@@ -89,6 +89,7 @@ EXPORT_SYMBOL(drm_mode_create);
  */
 void drm_mode_destroy(struct drm_device *dev, struct drm_display_mode *mode)
 {
+	pr_info("drm_modes: called %s\n", __func__);
 	if (!mode)
 		return;
 
@@ -104,6 +105,7 @@ EXPORT_SYMBOL(drm_mode_destroy);
  * Add @mode to @connector's probed_mode list for later use. This list should
  * then in a second step get filtered and all the modes actually supported by
  * the hardware moved to the @connector's modes list.
+ * (Using mode_validate functions)
  */
 void drm_mode_probed_add(struct drm_connector *connector,
 			 struct drm_display_mode *mode)
@@ -794,6 +796,8 @@ void drm_mode_get_hv_timing(const struct drm_display_mode *mode,
 	struct drm_display_mode adjusted = *mode;
 
 	drm_mode_set_crtcinfo(&adjusted, CRTC_STEREO_DOUBLE_ONLY);
+	// does some math
+
 	*hdisplay = adjusted.crtc_hdisplay;
 	*vdisplay = adjusted.crtc_vdisplay;
 }
@@ -875,6 +879,7 @@ void drm_mode_set_crtcinfo(struct drm_display_mode *p, int adjust_flags)
 	p->crtc_vblank_end = max(p->crtc_vsync_end, p->crtc_vtotal);
 	p->crtc_hblank_start = min(p->crtc_hsync_start, p->crtc_hdisplay);
 	p->crtc_hblank_end = max(p->crtc_hsync_end, p->crtc_htotal);
+	//does some math
 }
 EXPORT_SYMBOL(drm_mode_set_crtcinfo);
 
@@ -1128,15 +1133,23 @@ drm_mode_validate_driver(struct drm_device *dev,
 			const struct drm_display_mode *mode)
 {
 	enum drm_mode_status status;
+	//important
 
+	pr_info("drm_modes: called %s. Going to drm_mode_validate_basic.\n", __func__);
 	status = drm_mode_validate_basic(mode);
-	if (status != MODE_OK)
+	if (status != MODE_OK) {
+		pr_info("drm_modes: status not ok from validate_basic in %s.\n", __func__);
 		return status;
+	}
 
-	if (dev->mode_config.funcs->mode_valid)
+	if (dev->mode_config.funcs->mode_valid) {
+		pr_info("drm_modes: status not ok from driver validate in %s.\n", __func__);
 		return dev->mode_config.funcs->mode_valid(dev, mode);
-	else
+	}
+	else {
+		pr_info("drm_modes: Returning MODE_OK.\n");
 		return MODE_OK;
+	}
 }
 EXPORT_SYMBOL(drm_mode_validate_driver);
 
@@ -1164,6 +1177,7 @@ drm_mode_validate_size(const struct drm_display_mode *mode,
 	if (maxY > 0 && mode->vdisplay > maxY)
 		return MODE_VIRTUAL_Y;
 
+	//math
 	return MODE_OK;
 }
 EXPORT_SYMBOL(drm_mode_validate_size);
@@ -1262,14 +1276,17 @@ const char *drm_get_mode_status_name(enum drm_mode_status status)
 void drm_mode_prune_invalid(struct drm_device *dev,
 			    struct list_head *mode_list, bool verbose)
 {
+	verbose = true;
 	struct drm_display_mode *mode, *t;
+
+	pr_info("drm_modes: called %s\n", __func__);
 
 	list_for_each_entry_safe(mode, t, mode_list, head) {
 		if (mode->status != MODE_OK) {
 			list_del(&mode->head);
 			if (verbose) {
 				drm_mode_debug_printmodeline(mode);
-				DRM_DEBUG_KMS("Not using %s mode: %s\n",
+				pr_info("Not using %s mode: %s\n",
 					      mode->name,
 					      drm_get_mode_status_name(mode->status));
 			}
@@ -1367,6 +1384,9 @@ void drm_connector_list_update(struct drm_connector *connector)
 			 * multiple or zero preferred modes are present, favor
 			 * the mode added to the probed_modes list first.
 			 */
+
+			/* Imporant. Check logic? Prefer the old mode
+			 * first?*/
 			if (mode->status == MODE_STALE) {
 				drm_mode_copy(mode, pmode);
 			} else if ((mode->type & DRM_MODE_TYPE_PREFERRED) == 0 &&
@@ -1865,6 +1885,8 @@ struct drm_display_mode *
 drm_mode_create_from_cmdline_mode(struct drm_device *dev,
 				  struct drm_cmdline_mode *cmd)
 {
+
+	/* Imporant. Can we mark a mode as preferred here, then use it? */
 	struct drm_display_mode *mode;
 
 	if (cmd->xres == 0 || cmd->yres == 0)

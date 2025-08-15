@@ -223,6 +223,7 @@ static const struct edid_quirk {
  * This table is copied from xfree86/modes/xf86EdidModes.c.
  */
 static const struct drm_display_mode drm_dmt_modes[] = {
+	// IMPORTANT: DMT Modes
 	/* 0x01 - 640x350@85Hz */
 	{ DRM_MODE("640x350", DRM_MODE_TYPE_DRIVER, 31500, 640, 672,
 		   736, 832, 0, 350, 382, 385, 445, 0,
@@ -508,7 +509,8 @@ static const struct drm_display_mode drm_dmt_modes[] = {
 	{ DRM_MODE("1856x1392", DRM_MODE_TYPE_DRIVER, 356500, 1856, 1904,
 		   1936, 2016, 0, 1392, 1395, 1399, 1474, 0,
 		   DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_NVSYNC) },
-	/* 0x52 - 1920x1080@60Hz */ /* match this with PS4 Linux Loader, or force it in kernel/Xorg setup? */
+	/* 0x52 - 1920x1080@60Hz */ /* match this with PS4 Linux Loader, or force it in kernel/Xorg setup? */  
+	/* --- Does not match with ps4_bridge.c mode... --- The last NVSYNC is missing  */
 	{ DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
 		   2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
 		   DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC) },
@@ -717,6 +719,7 @@ static const struct minimode extra_modes[] = {
  * Do not access directly, instead always use cea_mode_for_vic().
  */
 static const struct drm_display_mode edid_cea_modes_1[] = {
+	// IMPORTANT: CEA MODES
 	/* 1 - 640x480@60Hz 4:3 */
 	{ DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 		   752, 800, 0, 480, 490, 492, 525, 0,
@@ -1385,6 +1388,7 @@ static const struct drm_display_mode edid_cea_modes_1[] = {
  * Do not access directly, instead always use cea_mode_for_vic().
  */
 static const struct drm_display_mode edid_cea_modes_193[] = {
+	// IMPORTANT: CEA Modes Part 2
 	/* 193 - 5120x2160@120Hz 64:27 */
 	{ DRM_MODE("5120x2160", DRM_MODE_TYPE_DRIVER, 1485000, 5120, 5284,
 		   5372, 5500, 0, 2160, 2168, 2178, 2250, 0,

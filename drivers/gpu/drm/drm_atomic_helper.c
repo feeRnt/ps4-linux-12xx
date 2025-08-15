@@ -500,9 +500,10 @@ static enum drm_mode_status mode_valid_path(struct drm_connector *connector,
 	struct drm_bridge *bridge;
 	enum drm_mode_status ret;
 
+	pr_info("drm_atomic_helper: called %s. Going to drm_encoder_mode_valid.\n", __func__);
 	ret = drm_encoder_mode_valid(encoder, mode);
 	if (ret != MODE_OK) {
-		DRM_DEBUG_ATOMIC("[ENCODER:%d:%s] mode_valid() failed\n",
+		pr_info("[ENCODER:%d:%s] mode_valid() failed\n",
 				encoder->base.id, encoder->name);
 		return ret;
 	}
@@ -511,13 +512,13 @@ static enum drm_mode_status mode_valid_path(struct drm_connector *connector,
 	ret = drm_bridge_chain_mode_valid(bridge, &connector->display_info,
 					  mode);
 	if (ret != MODE_OK) {
-		DRM_DEBUG_ATOMIC("[BRIDGE] mode_valid() failed\n");
+		pr_info("[BRIDGE] mode_valid() failed\n");
 		return ret;
 	}
 
 	ret = drm_crtc_mode_valid(crtc, mode);
 	if (ret != MODE_OK) {
-		DRM_DEBUG_ATOMIC("[CRTC:%d:%s] mode_valid() failed\n",
+		pr_info("[CRTC:%d:%s] mode_valid() failed\n",
 				crtc->base.id, crtc->name);
 		return ret;
 	}
