@@ -4830,7 +4830,7 @@ static void fetch_monitor_name(struct drm_dp_mst_topology_mgr *mgr,
 			       struct drm_dp_mst_port *port, char *name,
 			       int namelen)
 {
-	struct edid *mst_edid;
+	struct edid *mst_edid; // monitor name
 
 	mst_edid = drm_dp_mst_get_edid(port->connector, mgr, port);
 	drm_edid_get_monitor_name(mst_edid, name, namelen);

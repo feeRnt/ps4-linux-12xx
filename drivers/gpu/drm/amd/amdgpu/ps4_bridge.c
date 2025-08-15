@@ -27,9 +27,9 @@
 
 #include <linux/i2c.h>
 #include <linux/i2c-algo-bit.h>
-
 //#include <linux/pm_runtime.h> //added
 #include <drm/drm_dp_helper.h> //added
+#include <drm/drm_edid.h> //added
 
 #include "amdgpu.h"
 #include "amdgpu_mode.h"
@@ -721,8 +721,32 @@ static const struct drm_display_mode mode_1080p = {
 }
 */
 
+/* Taken from drm/drm_edid_load.c */
+static const u8 edid_array_1080p[128] = {
+	0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00,
+	0x31, 0xd8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	0x05, 0x16, 0x01, 0x03, 0x6d, 0x32, 0x1c, 0x78,
+	0xea, 0x5e, 0xc0, 0xa4, 0x59, 0x4a, 0x98, 0x25,
+	0x20, 0x50, 0x54, 0x00, 0x00, 0x00, 0xd1, 0xc0,
+	0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01,
+	0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x02, 0x3a,
+	0x80, 0x18, 0x71, 0x38, 0x2d, 0x40, 0x58, 0x2c,
+	0x45, 0x00, 0xf4, 0x19, 0x11, 0x00, 0x00, 0x1e,
+	0x00, 0x00, 0x00, 0xff, 0x00, 0x4c, 0x69, 0x6e,
+	0x75, 0x78, 0x20, 0x23, 0x30, 0x0a, 0x20, 0x20,
+	0x20, 0x20, 0x00, 0x00, 0x00, 0xfd, 0x00, 0x3b,
+	0x3d, 0x42, 0x44, 0x0f, 0x00, 0x0a, 0x20, 0x20,
+	0x20, 0x20, 0x20, 0x20, 0x00, 0x00, 0x00, 0xfc,
+	0x00, 0x4c, 0x69, 0x6e, 0x75, 0x78, 0x20, 0x46,
+	0x48, 0x44, 0x0a, 0x20, 0x20, 0x20, 0x00, 0x05,
+};
+
+
 int ps4_bridge_get_modes(struct drm_connector *connector)
 {
+    struct edid *edid_struct_1080p = (struct edid *)edid_array_1080p;
+    //cast the standard 1080p edid array to a struct
+
     pr_info("ps4_bridge: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *newmode;
@@ -739,13 +763,15 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	//newmode = drm_mode_duplicate(dev, &mode_480p);
 	//drm_mode_probed_add(connector, newmode);
 
-	drm_connector_update_edid_property(connector, NULL);
-	//defined in drivers/gpu/drm/drm_connector.c
-	//updates edid (and display info) for connector,
-	//but uses a NULL edid
-	
+	//drm_connector_update_edid_property(connector, NULL);
+
+	/* defined in drivers/gpu/drm/drm_connector.c
+	 * updates edid (and display info) for connector,
+	 * but uses a NULL edid
+	*/
+
 	//Predefined standard edids can be found in drm/drm_edid_load.c
-	
+
 	/* Check:
 	 * drm/drm_bridge_connector.c
 	 * drm/drm_connector.c (defined and explained)
@@ -754,6 +780,12 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	 * drm/drm_probe_helper.c
 	 * For tips and implementations
 	 */
+
+	 /* Since we're using 1080p only, provide a real 1080p standard edid,
+	  * and use it to update drm_connector_update_edid_property .
+	 */
+
+	drm_connector_update_edid_property(connector, edid_struct_1080p);
 
 	return 0;
 }

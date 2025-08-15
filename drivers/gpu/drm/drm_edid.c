@@ -1666,6 +1666,9 @@ bool drm_edid_block_valid(u8 *raw_edid, int block, bool print_bad_edid,
 {
 	u8 csum;
 	struct edid *edid = (struct edid *)raw_edid;
+	// use this "cast" logic to transfer raw bytes to edid struct
+
+	pr_info("drm_edid: called %s\n", __func__);
 
 	if (WARN_ON(!raw_edid))
 		return false;
@@ -1703,11 +1706,11 @@ bool drm_edid_block_valid(u8 *raw_edid, int block, bool print_bad_edid,
 
 		/* allow CEA to slide through, switches mangle this */
 		if (raw_edid[0] == CEA_EXT) {
-			DRM_DEBUG("EDID checksum is invalid, remainder is %d\n", csum);
-			DRM_DEBUG("Assuming a KVM switch modified the CEA block but left the original checksum\n");
+			pr_info("EDID checksum is invalid, remainder is %d\n", csum);
+			pr_info("Assuming a KVM switch modified the CEA block but left the original checksum\n");
 		} else {
 			if (print_bad_edid)
-				DRM_NOTE("EDID checksum is invalid, remainder is %d\n", csum);
+				pr_info("EDID checksum is invalid, remainder is %d\n", csum);
 
 			goto bad;
 		}
@@ -1972,7 +1975,7 @@ struct edid *drm_do_get_edid(struct drm_connector *connector,
 	/* if there's no extensions, we're done */
 	valid_extensions = edid[0x7e];
 	if (valid_extensions == 0)
-		return (struct edid *)edid;
+		return (struct edid *)edid; // edid is returned as struct
 
 	new = krealloc(edid, (valid_extensions + 1) * EDID_LENGTH, GFP_KERNEL);
 	if (!new)

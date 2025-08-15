@@ -371,6 +371,7 @@ void drm_connector_attach_edid_property(struct drm_connector *connector)
 {
 	struct drm_mode_config *config = &connector->dev->mode_config;
 
+	pr_info("drm_connector: called %s\n", __func__);
 	drm_object_attach_property(&connector->base,
 				   config->edid_property,
 				   0);
