@@ -2040,9 +2040,10 @@ int drm_connector_update_edid_property(struct drm_connector *connector,
 	if (connector->override_edid)
 		return 0; //test this?
 
-	if (edid)
+	if (edid) {
+		pr_info("drm_connector: edid detected. setting size.\n");
 		size = EDID_LENGTH * (1 + edid->extensions);
-
+	}
 	/* Set the display info, using edid if available, otherwise
 	 * resetting the values to defaults. This duplicates the work
 	 * done in drm_add_edid_modes, but that function is not
@@ -2051,10 +2052,14 @@ int drm_connector_update_edid_property(struct drm_connector *connector,
 	 * duplicate it rather than attempt to ensure some arbitrary
 	 * ordering of calls.
 	 */
-	if (edid)
+	if (edid) {
+		pr_info("drm_connector: edid detected. calling drm_add_display_info with edid.\n");
 		drm_add_display_info(connector, edid);
-	else
+	}
+	else {
+		pr_info("drm_connector: no edid detected. calling drm_reset_display_info.\n");
 		drm_reset_display_info(connector);
+	}		
 
 	drm_update_tile_info(connector, edid);
 
@@ -2062,13 +2067,16 @@ int drm_connector_update_edid_property(struct drm_connector *connector,
 		old_edid = (const struct edid *)connector->edid_blob_ptr->data;
 		if (old_edid) {
 			if (!drm_edid_are_equal(edid, old_edid)) {
-				DRM_DEBUG_KMS("[CONNECTOR:%d:%s] Edid was changed.\n",
+				pr_info("[CONNECTOR:%d:%s] Edid was changed.\n",
 					      connector->base.id, connector->name);
 
 				connector->epoch_counter += 1;
-				DRM_DEBUG_KMS("Updating change counter to %llu\n",
+				pr_info("Updating change counter to %llu\n",
 					      connector->epoch_counter);
 			}
+			else 
+				pr_info("[CONNECTOR:%d:%s] Keeping the old edid.\n",
+					      connector->base.id, connector->name);
 		}
 	}
 
@@ -2082,8 +2090,10 @@ int drm_connector_update_edid_property(struct drm_connector *connector,
 					       edid,
 					       &connector->base,
 					       dev->mode_config.edid_property);
-	if (ret)
+	if (ret) {
+		pr_info("drm_connector: ret in %s, returning it.\n", __func__);
 		return ret;
+	}
 	return drm_connector_set_tile_property(connector);
 }
 EXPORT_SYMBOL(drm_connector_update_edid_property);

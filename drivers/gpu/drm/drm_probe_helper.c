@@ -102,6 +102,8 @@ drm_mode_validate_pipeline(struct drm_display_mode *mode,
 	if (ret || *status != MODE_OK) {
 		pr_info("drm_probe_helper: mode not ok from drm_connector_mode_valid. Returning.\n");
 		return ret;
+		//this can fail. if vic != predefined value.
+		//This calls ps4_bridge.c's mode_valid
 	}
 
 	/* Step 2: Validate against encoders and crtcs */
@@ -117,6 +119,7 @@ drm_mode_validate_pipeline(struct drm_display_mode *mode,
 			 * MODE_OK. */
 			pr_info("drm_probe_helper: Current mode not ok from drm_connector_for_each_possible_encoder. Trying next one.\n");
 			continue;
+			//this never fails
 		}
 
 		bridge = drm_bridge_chain_get_first_bridge(encoder);
@@ -128,12 +131,14 @@ drm_mode_validate_pipeline(struct drm_display_mode *mode,
 			 * here. */
 			pr_info("drm_probe_helper: Current mode not ok from drm_status_chain_mode_valid. Trying next one.\n");
 			continue;
+			//this never fails
 		}
 
 		drm_for_each_crtc(crtc, dev) {
 			if (!drm_encoder_crtc_ok(encoder, crtc)) {
 				pr_info("drm_probe_helper: Current encoder crtc not ok from drm_encoder_crtc_ok. Trying next one.\n");
 				continue;
+				//this never fails
 			}
 
 			*status = drm_crtc_mode_valid(crtc, mode);

@@ -276,19 +276,26 @@ struct edid *amdgpu_connector_edid(struct drm_connector *connector)
 	struct drm_property_blob *edid_blob = connector->edid_blob_ptr;
 
 	if (amdgpu_connector->edid) {
+		pr_info("amdgpu_connectors: edid in <- amdgpu_connector. Returning it.\n");
 		return amdgpu_connector->edid;
 	} else if (edid_blob) {
+		pr_info("amdgpu_connectors: edid_blob in connector.\n");
 		struct edid *edid = kmemdup(edid_blob->data, edid_blob->length, GFP_KERNEL);
-		if (edid)
+		if (edid) {
+			pr_info("amdgpu_connectors: edid from edid_blob. Assigning amdgpu_connector's edid.\n");
 			amdgpu_connector->edid = edid;
+		}
 	}
+
+	pr_info("amdgpu_connectors: Returning edid. Empty if checks were not met.\n");
 	return amdgpu_connector->edid;
 }
 
 static struct edid *
 amdgpu_connector_get_hardcoded_edid(struct amdgpu_device *adev)
 {
-    pr_info("amdgpu_connectors: called %s\n", __func__);
+	//BIOS edid
+	pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct edid *edid;
 
 	if (adev->mode_info.bios_hardcoded_edid) {
@@ -310,8 +317,10 @@ static void amdgpu_connector_get_edid(struct drm_connector *connector)
 	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 
-	if (amdgpu_connector->edid)
+	if (amdgpu_connector->edid) {
+		pr_info("amdgpu_connectors: amdgpu_connector->edid detected. Returning.\n");
 		return;
+	}
 
 	/* on hw with routers, select right port */
 	if (amdgpu_connector->router.ddc_valid)

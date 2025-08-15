@@ -1559,7 +1559,7 @@ static const struct drm_display_mode edid_4k_modes[] = {
 };
 
 /*** DDC fetch and block validation ***/
-
+// At the start of every edid block //
 static const u8 edid_header[] = {
 	0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00
 };
@@ -1587,7 +1587,7 @@ EXPORT_SYMBOL(drm_edid_header_is_valid);
 static int edid_fixup __read_mostly = 6;
 module_param_named(edid_fixup, edid_fixup, int, 0400);
 MODULE_PARM_DESC(edid_fixup,
-		 "Minimum number of valid EDID header bytes (0-8, default 6)");
+		 "Minimum number of valid EDID header bytes (0-8, default 6)"); //interesting
 
 static int drm_edid_block_checksum(const u8 *raw_edid)
 {
@@ -1910,7 +1910,7 @@ int drm_add_override_edid_modes(struct drm_connector *connector)
 		num_modes = drm_add_edid_modes(connector, override);
 		kfree(override);
 
-		DRM_DEBUG_KMS("[CONNECTOR:%d:%s] adding %d modes via fallback override/firmware EDID\n",
+		pr_info("[CONNECTOR:%d:%s] adding %d modes via fallback override/firmware EDID\n",
 			      connector->base.id, connector->name, num_modes);
 	}
 
@@ -2061,6 +2061,7 @@ struct edid *drm_get_edid(struct drm_connector *connector,
 {
 	struct edid *edid;
 
+	pr_info("drm_edid: called %s\n", __func__);
 	if (connector->force == DRM_FORCE_OFF)
 		return NULL;
 
@@ -2069,6 +2070,7 @@ struct edid *drm_get_edid(struct drm_connector *connector,
 
 	edid = drm_do_get_edid(connector, drm_do_probe_ddc_edid, adapter);
 	drm_connector_update_edid_property(connector, edid);
+	//proper implementation
 	return edid;
 }
 EXPORT_SYMBOL(drm_get_edid);
@@ -5184,7 +5186,7 @@ void drm_get_monitor_range(struct drm_connector *connector,
 		      info->monitor_range.max_vfreq);
 }
 
-/* A connector has no EDID information, so we've got no EDID to compute quirks from. Reset
+/* A connector has (did not present) no EDID information, so we've got no EDID to compute quirks from. Reset
  * all of the values which would have been set from EDID
  */
 void
@@ -5192,6 +5194,7 @@ drm_reset_display_info(struct drm_connector *connector)
 {
 	struct drm_display_info *info = &connector->display_info;
 
+	//this function resets everything to zero
 	info->width_mm = 0;
 	info->height_mm = 0;
 
@@ -6011,6 +6014,7 @@ void drm_update_tile_info(struct drm_connector *connector,
 	const struct displayid_block *block;
 	struct displayid_iter iter;
 
+	pr_info("drm_edid: called %s\n", __func__);
 	connector->has_tile = false;
 
 	displayid_iter_edid_begin(edid, &iter);

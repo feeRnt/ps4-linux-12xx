@@ -741,6 +741,17 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 
 	drm_connector_update_edid_property(connector, NULL);
 	//defined in drivers/gpu/drm/drm_connector.c
+	//updates edid (and display info) for connector,
+	//but uses a NULL edid
+	
+	/* Check:
+	 * drm/drm_bridge_connector.c
+	 * drm/drm_connector.c (defined and explained)
+	 * drm/drm_debugfs.c
+	 * drm/drm_edid.c
+	 * drm/drm_probe_helper.c
+	 * For tips and implementations
+	 */
 
 	return 0;
 }
@@ -753,7 +764,7 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 	pr_info("ps4_bridge: called %s\n", __func__);
 	struct ps4_bridge *mn_bridge = &g_bridge;
 	u8 reg;
-	enum drm_connector_status ret = connector_status_disconnected;
+	//enum drm_connector_status ret = connector_status_disconnected;
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *amdgpu_dig_connector = amdgpu_connector->con_priv;
 
@@ -847,8 +858,10 @@ int ps4_bridge_mode_valid(struct drm_connector *connector,
 	if (!vic || (vic != 16 && vic != 4)) {
 		// vic doesn't exist; or vic != 16 and also not equal 4
 		pr_info("ps4_bridge: Returning MODE_BAD.\n");
-		/* This always returns BAD now... Test drm_match_cea_mode*/
+		/* This returns BAD sometimes... Test drm_match_cea_mode*/
 		return MODE_BAD;
+		// we never get VIC 4, but: 16, 1, 0, 0, 0, 0
+		// So it's useless to have the != 4 check
 	}
 	pr_info("ps4_bridge: Returning MODE_OK.\n");
 	return MODE_OK;
