@@ -744,6 +744,8 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	//updates edid (and display info) for connector,
 	//but uses a NULL edid
 	
+	//Predefined standard edids can be found in drm/drm_edid_load.c
+	
 	/* Check:
 	 * drm/drm_bridge_connector.c
 	 * drm/drm_connector.c (defined and explained)

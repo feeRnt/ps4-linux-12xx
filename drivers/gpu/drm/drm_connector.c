@@ -968,6 +968,8 @@ static const struct drm_prop_enum_list dp_colorspaces[] = {
  * 	other KMS properties (because the kernel might apply limits, quirks or
  * 	fixups to the EDID). For instance, user-space should not try to parse
  * 	mode lists from the EDID.
+ *		// Important //
+ *
  * DPMS:
  * 	Legacy property for setting the power state of the connector. For atomic
  * 	drivers this is only provided for backwards compatibility with existing
@@ -2035,11 +2037,14 @@ int drm_connector_update_edid_property(struct drm_connector *connector,
 	size_t size = 0;
 	int ret;
 	const struct edid *old_edid;
+	// saved at this state for later use
 
+	pr_info("drm_connector: called %s\n", __func__);
 	/* ignore requests to set edid when overridden */
-	if (connector->override_edid)
+	if (connector->override_edid) {
+		pr_info("drm_connector: connector->override_edid seen. Returning 0.\n");
 		return 0; //test this?
-
+	}
 	if (edid) {
 		pr_info("drm_connector: edid detected. setting size.\n");
 		size = EDID_LENGTH * (1 + edid->extensions);
@@ -2064,6 +2069,7 @@ int drm_connector_update_edid_property(struct drm_connector *connector,
 	drm_update_tile_info(connector, edid);
 
 	if (connector->edid_blob_ptr) {
+		pr_info("drm_connector: connector->edid_blob_ptr seen. Assigning old_edid.\n");
 		old_edid = (const struct edid *)connector->edid_blob_ptr->data;
 		if (old_edid) {
 			if (!drm_edid_are_equal(edid, old_edid)) {

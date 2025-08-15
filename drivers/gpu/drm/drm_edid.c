@@ -5217,6 +5217,8 @@ u32 drm_add_display_info(struct drm_connector *connector, const struct edid *edi
 	struct drm_display_info *info = &connector->display_info;
 
 	u32 quirks = edid_get_quirks(edid);
+	
+	pr_info("drm_edid: called %s\n", __func__);
 
 	drm_reset_display_info(connector);
 
@@ -5227,7 +5229,7 @@ u32 drm_add_display_info(struct drm_connector *connector, const struct edid *edi
 
 	drm_get_monitor_range(connector, edid);
 
-	DRM_DEBUG_KMS("non_desktop set to %d\n", info->non_desktop);
+	pr_info("non_desktop set to %d\n", info->non_desktop);
 
 	if (edid->revision < 3)
 		return quirks;
@@ -5247,7 +5249,7 @@ u32 drm_add_display_info(struct drm_connector *connector, const struct edid *edi
 	if (info->bpc == 0 && edid->revision == 3 &&
 	    edid->input & DRM_EDID_DIGITAL_DFP_1_X) {
 		info->bpc = 8;
-		DRM_DEBUG("%s: Assigning DFP sink color depth as %d bpc.\n",
+		pr_info("%s: Assigning DFP sink color depth as %d bpc.\n",
 			  connector->name, info->bpc);
 	}
 
@@ -5280,7 +5282,7 @@ u32 drm_add_display_info(struct drm_connector *connector, const struct edid *edi
 		break;
 	}
 
-	DRM_DEBUG("%s: Assigning EDID-1.4 digital sink color depth as %d bpc.\n",
+	pr_info("%s: Assigning EDID-1.4 digital sink color depth as %d bpc.\n",
 			  connector->name, info->bpc);
 
 	info->color_formats |= DRM_COLOR_FORMAT_RGB444;
@@ -5395,13 +5397,15 @@ int drm_add_edid_modes(struct drm_connector *connector, struct edid *edid)
 	int num_modes = 0;
 	u32 quirks;
 
+	pr_info("drm_edid: called %s\n", __func__);
 	if (edid == NULL) {
+		pr_info("drm_edid: edid == NULL. doing clear_edid and returning 0.\n");
 		clear_eld(connector);
 		return 0;
 	}
 	if (!drm_edid_is_valid(edid)) {
 		clear_eld(connector);
-		drm_warn(connector->dev, "%s: EDID invalid.\n",
+		pr_info("%s: EDID invalid.\n",
 			 connector->name);
 		return 0;
 	}
@@ -5476,6 +5480,7 @@ int drm_add_modes_noedid(struct drm_connector *connector,
 	struct drm_display_mode *mode;
 	struct drm_device *dev = connector->dev;
 
+	pr_info("drm_edid: called %s\n", __func__); 
 	count = ARRAY_SIZE(drm_dmt_modes);
 	if (hdisplay < 0)
 		hdisplay = 0;
