@@ -163,7 +163,7 @@ int drm_panel_enable(struct drm_panel *panel)
 
 	ret = backlight_enable(panel->backlight);
 	if (ret < 0)
-		DRM_DEV_INFO(panel->dev, "failed to enable backlight: %d\n",
+		pr_info("drm_panel: failed to enable backlight; error: %d\n",
 			     ret);
 
 	return 0;
@@ -189,7 +189,7 @@ int drm_panel_disable(struct drm_panel *panel)
 
 	ret = backlight_disable(panel->backlight);
 	if (ret < 0)
-		DRM_DEV_INFO(panel->dev, "failed to disable backlight: %d\n",
+		pr_info("drm_panel: failed to disable backlight; error: %d\n",
 			     ret);
 
 	if (panel->funcs && panel->funcs->disable)

@@ -45,6 +45,8 @@
  * laptops, this should be the main panel. Use this function to sort all
  * (eDP/LVDS/DSI) panels to the front of the connector list, instead of
  * painstakingly trying to initialize them in the right order.
+ *
+ * We seem to have one display panel shown anyways
  */
 void drm_helper_move_panel_connectors_to_head(struct drm_device *dev)
 {
@@ -52,7 +54,8 @@ void drm_helper_move_panel_connectors_to_head(struct drm_device *dev)
 	struct list_head panel_list;
 
 	INIT_LIST_HEAD(&panel_list);
-
+	
+	pr_info("drm_modeset_helper: called %s\n", __func__);
 	spin_lock_irq(&dev->mode_config.connector_list_lock);
 	list_for_each_entry_safe(connector, tmp,
 				 &dev->mode_config.connector_list, head) {
@@ -101,6 +104,9 @@ EXPORT_SYMBOL(drm_helper_mode_fill_fb_struct);
  * formats than this and drivers may specify a more accurate list when
  * creating the primary plane.  However drivers that still call
  * drm_plane_init() will use this minimal format list as the default.
+ *
+ * Plane related code. The driver itself determines plane properties...
+ * Connector part of amdgpu, is just a small part
  */
 static const uint32_t safe_modeset_formats[] = {
 	DRM_FORMAT_XRGB8888,
@@ -114,7 +120,7 @@ static struct drm_plane *create_primary_plane(struct drm_device *dev)
 
 	primary = kzalloc(sizeof(*primary), GFP_KERNEL);
 	if (primary == NULL) {
-		DRM_DEBUG_KMS("Failed to allocate primary plane\n");
+		pr_info("Failed to allocate primary plane\n");
 		return NULL;
 	}
 
@@ -191,11 +197,14 @@ EXPORT_SYMBOL(drm_crtc_init);
  *
  * See also:
  * drm_kms_helper_poll_disable() and drm_fb_helper_set_suspend_unlocked().
+ *
+ * IMPORTANT
  */
 int drm_mode_config_helper_suspend(struct drm_device *dev)
 {
 	struct drm_atomic_state *state;
 
+	pr_info("drm_modeset_helper: called %s\n", __func__);
 	if (!dev)
 		return 0;
 
@@ -204,7 +213,8 @@ int drm_mode_config_helper_suspend(struct drm_device *dev)
 	state = drm_atomic_helper_suspend(dev);
 	if (IS_ERR(state)) {
 		drm_fb_helper_set_suspend_unlocked(dev->fb_helper, 0);
-		drm_kms_helper_poll_enable(dev);
+		drm_kms_helper_poll_enable(dev); 
+		pr_info("drm_modeset_helper: IS_ERR in %s. Enabled helper_poll_enable.\n", __func__);
 		return PTR_ERR(state);
 	}
 
@@ -227,23 +237,31 @@ EXPORT_SYMBOL(drm_mode_config_helper_suspend);
  *
  * See also:
  * drm_fb_helper_set_suspend_unlocked() and drm_kms_helper_poll_enable().
+ *
+ * IMPORTANT
  */
 int drm_mode_config_helper_resume(struct drm_device *dev)
 {
 	int ret;
 
+	pr_info("drm_modeset_helper: called %s\n", __func__);
 	if (!dev)
 		return 0;
 
-	if (WARN_ON(!dev->mode_config.suspend_state))
+	if (WARN_ON(!dev->mode_config.suspend_state)) {
+		pr_info("drm_modeset_helper: Returning EINVAL in %s\n", __func__);
 		return -EINVAL;
+	}
 
+	pr_info("drm_modeset_helper: Going to drm_atomic_helper_resume from %s\n", __func__);
 	ret = drm_atomic_helper_resume(dev, dev->mode_config.suspend_state);
 	if (ret)
-		DRM_ERROR("Failed to resume (%d)\n", ret);
+		pr_info("Failed to resume (%d), will set suspend_state to NULL\n", ret);
 	dev->mode_config.suspend_state = NULL;
 
 	drm_fb_helper_set_suspend_unlocked(dev->fb_helper, 0);
+	
+	pr_info("drm_modeset_helper: Going to drm_kms_helper_poll_enable.\n");
 	drm_kms_helper_poll_enable(dev);
 
 	return ret;

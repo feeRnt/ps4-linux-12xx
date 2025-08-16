@@ -2700,6 +2700,7 @@ static int dce_v8_0_sw_init(void *handle)
 	int r, i;
 	struct amdgpu_device *adev = (struct amdgpu_device *)handle;
 
+	pr_info("dce_v8_0: called %s\n", __func__);
 	for (i = 0; i < adev->mode_info.num_crtc; i++) {
 		r = amdgpu_irq_add_id(adev, AMDGPU_IRQ_CLIENTID_LEGACY, i + 1, &adev->crtc_irq);
 		if (r)
@@ -2745,18 +2746,27 @@ static int dce_v8_0_sw_init(void *handle)
 
 	if (amdgpu_atombios_get_connector_info_from_object_table(adev))
 		amdgpu_display_print_display_setup(adev_to_drm(adev));
-	else
+	else {
+		pr_info("drm_probe_helper: EINVAL in %s\n", __func__);
 		return -EINVAL;
+	}
 
 	/* setup afmt */
 	r = dce_v8_0_afmt_init(adev);
-	if (r)
+	if (r) {
+		pr_info("drm_probe_helper: afmt_init returned in %s. Returning its value\n",
+				__func__);
 		return r;
+	}
 
 	r = dce_v8_0_audio_init(adev);
-	if (r)
+	if (r) {
+		pr_info("drm_probe_helper: audio_init returned in %s. Returning its value\n",
+				__func__);
 		return r;
+	}
 
+	pr_info("drm_probe_helper: Going to drm_kms_helper_poll_init.\n");
 	drm_kms_helper_poll_init(adev_to_drm(adev));
 
 	adev->mode_info.mode_config_initialized = true;

@@ -71,6 +71,8 @@
  * struct &drm_encoder_helper_funcs and &struct drm_connector_helper_funcs. It
  * also shares the &struct drm_plane_helper_funcs function table with the plane
  * helpers.
+ *
+ * Commit and tail stuff
  */
 static void
 drm_atomic_helper_plane_changed(struct drm_atomic_state *state,
@@ -103,6 +105,7 @@ drm_atomic_helper_plane_changed(struct drm_atomic_state *state,
 static int handle_conflicting_encoders(struct drm_atomic_state *state,
 				       bool disable_conflicting_encoders)
 {
+	//encoders
 	struct drm_connector_state *new_conn_state;
 	struct drm_connector *connector;
 	struct drm_connector_list_iter conn_iter;
@@ -132,7 +135,7 @@ static int handle_conflicting_encoders(struct drm_atomic_state *state,
 
 		if (new_encoder) {
 			if (encoder_mask & drm_encoder_mask(new_encoder)) {
-				DRM_DEBUG_ATOMIC("[ENCODER:%d:%s] on [CONNECTOR:%d:%s] already assigned\n",
+				pr_info("[ENCODER:%d:%s] on [CONNECTOR:%d:%s] already assigned\n",
 					new_encoder->base.id, new_encoder->name,
 					connector->base.id, connector->name);
 
@@ -169,7 +172,7 @@ static int handle_conflicting_encoders(struct drm_atomic_state *state,
 			continue;
 
 		if (!disable_conflicting_encoders) {
-			DRM_DEBUG_ATOMIC("[ENCODER:%d:%s] in use on [CRTC:%d:%s] by [CONNECTOR:%d:%s]\n",
+			pr_info("[ENCODER:%d:%s] in use on [CRTC:%d:%s] by [CONNECTOR:%d:%s]\n",
 					 encoder->base.id, encoder->name,
 					 connector->state->crtc->base.id,
 					 connector->state->crtc->name,
@@ -184,7 +187,7 @@ static int handle_conflicting_encoders(struct drm_atomic_state *state,
 			goto out;
 		}
 
-		DRM_DEBUG_ATOMIC("[ENCODER:%d:%s] in use on [CRTC:%d:%s], disabling [CONNECTOR:%d:%s]\n",
+		pr_info("[ENCODER:%d:%s] in use on [CRTC:%d:%s], disabling [CONNECTOR:%d:%s]\n",
 				 encoder->base.id, encoder->name,
 				 new_conn_state->crtc->base.id, new_conn_state->crtc->name,
 				 connector->base.id, connector->name);
@@ -268,7 +271,7 @@ steal_encoder(struct drm_atomic_state *state,
 
 		encoder_crtc = old_connector_state->crtc;
 
-		DRM_DEBUG_ATOMIC("[ENCODER:%d:%s] in use on [CRTC:%d:%s], stealing it\n",
+		pr_info("[ENCODER:%d:%s] in use on [CRTC:%d:%s], stealing it\n",
 				 encoder->base.id, encoder->name,
 				 encoder_crtc->base.id, encoder_crtc->name);
 
@@ -291,7 +294,7 @@ update_connector_routing(struct drm_atomic_state *state,
 	struct drm_encoder *new_encoder;
 	struct drm_crtc_state *crtc_state;
 
-	DRM_DEBUG_ATOMIC("Updating routing for [CONNECTOR:%d:%s]\n",
+	pr_info("Updating routing for [CONNECTOR:%d:%s]\n",
 			 connector->base.id,
 			 connector->name);
 
@@ -308,7 +311,7 @@ update_connector_routing(struct drm_atomic_state *state,
 	}
 
 	if (!new_connector_state->crtc) {
-		DRM_DEBUG_ATOMIC("Disabling [CONNECTOR:%d:%s]\n",
+		pr_info("Disabling [CONNECTOR:%d:%s]\n",
 				connector->base.id,
 				connector->name);
 
@@ -339,7 +342,7 @@ update_connector_routing(struct drm_atomic_state *state,
 	 */
 	if (!state->duplicated && drm_connector_is_unregistered(connector) &&
 	    crtc_state->active) {
-		DRM_DEBUG_ATOMIC("[CONNECTOR:%d:%s] is not registered\n",
+		pr_info("[CONNECTOR:%d:%s] is not registered\n",
 				 connector->base.id, connector->name);
 		return -EINVAL;
 	}
@@ -354,14 +357,14 @@ update_connector_routing(struct drm_atomic_state *state,
 		new_encoder = drm_connector_get_single_encoder(connector);
 
 	if (!new_encoder) {
-		DRM_DEBUG_ATOMIC("No suitable encoder found for [CONNECTOR:%d:%s]\n",
+		pr_info("No suitable encoder found for [CONNECTOR:%d:%s]\n",
 				 connector->base.id,
 				 connector->name);
 		return -EINVAL;
 	}
 
 	if (!drm_encoder_crtc_ok(new_encoder, new_connector_state->crtc)) {
-		DRM_DEBUG_ATOMIC("[ENCODER:%d:%s] incompatible with [CRTC:%d:%s]\n",
+		pr_info("[ENCODER:%d:%s] incompatible with [CRTC:%d:%s]\n",
 				 new_encoder->base.id,
 				 new_encoder->name,
 				 new_connector_state->crtc->base.id,
@@ -372,7 +375,7 @@ update_connector_routing(struct drm_atomic_state *state,
 	if (new_encoder == new_connector_state->best_encoder) {
 		set_best_encoder(state, new_connector_state, new_encoder);
 
-		DRM_DEBUG_ATOMIC("[CONNECTOR:%d:%s] keeps [ENCODER:%d:%s], now on [CRTC:%d:%s]\n",
+		pr_info("[CONNECTOR:%d:%s] keeps [ENCODER:%d:%s], now on [CRTC:%d:%s]\n",
 				 connector->base.id,
 				 connector->name,
 				 new_encoder->base.id,
@@ -389,7 +392,7 @@ update_connector_routing(struct drm_atomic_state *state,
 
 	crtc_state->connectors_changed = true;
 
-	DRM_DEBUG_ATOMIC("[CONNECTOR:%d:%s] using [ENCODER:%d:%s] on [CRTC:%d:%s]\n",
+	pr_info("[CONNECTOR:%d:%s] using [ENCODER:%d:%s] on [CRTC:%d:%s]\n",
 			 connector->base.id,
 			 connector->name,
 			 new_encoder->base.id,
@@ -443,7 +446,7 @@ mode_fixup(struct drm_atomic_state *state)
 						    new_crtc_state,
 						    new_conn_state);
 		if (ret) {
-			DRM_DEBUG_ATOMIC("Bridge atomic check failed\n");
+			pr_err("Bridge atomic check failed\n");
 			return ret;
 		}
 
@@ -451,7 +454,7 @@ mode_fixup(struct drm_atomic_state *state)
 			ret = funcs->atomic_check(encoder, new_crtc_state,
 						  new_conn_state);
 			if (ret) {
-				DRM_DEBUG_ATOMIC("[ENCODER:%d:%s] check failed\n",
+				pr_err("[ENCODER:%d:%s] check failed\n",
 						 encoder->base.id, encoder->name);
 				return ret;
 			}
@@ -459,7 +462,7 @@ mode_fixup(struct drm_atomic_state *state)
 			ret = funcs->mode_fixup(encoder, &new_crtc_state->mode,
 						&new_crtc_state->adjusted_mode);
 			if (!ret) {
-				DRM_DEBUG_ATOMIC("[ENCODER:%d:%s] fixup failed\n",
+				pr_err("[ENCODER:%d:%s] fixup failed\n",
 						 encoder->base.id, encoder->name);
 				return -EINVAL;
 			}
@@ -483,7 +486,7 @@ mode_fixup(struct drm_atomic_state *state)
 		ret = funcs->mode_fixup(crtc, &new_crtc_state->mode,
 					&new_crtc_state->adjusted_mode);
 		if (!ret) {
-			DRM_DEBUG_ATOMIC("[CRTC:%d:%s] fixup failed\n",
+			pr_err("[CRTC:%d:%s] fixup failed\n",
 					 crtc->base.id, crtc->name);
 			return -EINVAL;
 		}
@@ -620,13 +623,13 @@ drm_atomic_helper_check_modeset(struct drm_device *dev,
 		WARN_ON(!drm_modeset_is_locked(&crtc->mutex));
 
 		if (!drm_mode_equal(&old_crtc_state->mode, &new_crtc_state->mode)) {
-			DRM_DEBUG_ATOMIC("[CRTC:%d:%s] mode changed\n",
+			pr_info("[CRTC:%d:%s] mode changed\n",
 					 crtc->base.id, crtc->name);
 			new_crtc_state->mode_changed = true;
 		}
 
 		if (old_crtc_state->enable != new_crtc_state->enable) {
-			DRM_DEBUG_ATOMIC("[CRTC:%d:%s] enable changed\n",
+			pr_info("[CRTC:%d:%s] enable changed\n",
 					 crtc->base.id, crtc->name);
 
 			/*
@@ -3338,6 +3341,7 @@ int drm_atomic_helper_resume(struct drm_device *dev,
 	struct drm_modeset_acquire_ctx ctx;
 	int err;
 
+	pr_info("drm_atomic_helper: called %s\n", __func__);
 	drm_mode_config_reset(dev);
 
 	DRM_MODESET_LOCK_ALL_BEGIN(dev, ctx, 0, err);
@@ -3346,6 +3350,8 @@ int drm_atomic_helper_resume(struct drm_device *dev,
 
 	DRM_MODESET_LOCK_ALL_END(dev, ctx, err);
 	drm_atomic_state_put(state);
+
+	pr_info("drm_atomic_helper: returning %d in %s\n", err, __func__);
 
 	return err;
 }

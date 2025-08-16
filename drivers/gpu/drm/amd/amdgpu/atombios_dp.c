@@ -230,7 +230,7 @@ static void amdgpu_atombios_dp_get_adjust_train(const u8 link_status[DP_LINK_STA
 	if (p >= DP_PRE_EMPHASIS_MAX)
 		p |= DP_TRAIN_MAX_PRE_EMPHASIS_REACHED;
 
-	DRM_DEBUG_KMS("using signal parameters: voltage %s pre_emph %s\n",
+	pr_info("using signal parameters: voltage %s pre_emph %s\n",
 		  voltage_names[(v & DP_TRAIN_VOLTAGE_SWING_MASK) >> DP_TRAIN_VOLTAGE_SWING_SHIFT],
 		  pre_emph_names[(p & DP_TRAIN_PRE_EMPHASIS_MASK) >> DP_TRAIN_PRE_EMPHASIS_SHIFT]);
 
@@ -242,6 +242,7 @@ static void amdgpu_atombios_dp_get_adjust_train(const u8 link_status[DP_LINK_STA
 /* get bpc from the EDID */
 static unsigned amdgpu_atombios_dp_convert_bpc_to_bpp(int bpc)
 {
+	pr_info("atombios_dp: called %s", __func__);
 	if (bpc == 0)
 		return 24;
 	else
@@ -266,6 +267,7 @@ static int amdgpu_atombios_dp_get_dp_link_config(struct drm_connector *connector
 	struct drm_device *dev = amdgpu_connector->base.dev;
 	struct amdgpu_device *adev = drm_to_adev(dev);
 
+	pr_debug("atombios_dp: called %s", __func__);
 	/* Liverpool is always connected to an encoder that needs 4 lanes */
 	if (adev->asic_type == CHIP_LIVERPOOL)
 		min_lane_num = 4;
@@ -367,7 +369,7 @@ int amdgpu_atombios_dp_get_dpcd(struct amdgpu_connector *amdgpu_connector)
 	if (ret == DP_DPCD_SIZE) {
 		memcpy(dig_connector->dpcd, msg, DP_DPCD_SIZE);
 
-		DRM_DEBUG_KMS("DPCD: %*ph\n", (int)sizeof(dig_connector->dpcd),
+		pr_debug("DPCD: %*ph\n", (int)sizeof(dig_connector->dpcd),
 			      dig_connector->dpcd);
 
 		amdgpu_atombios_dp_probe_oui(amdgpu_connector);

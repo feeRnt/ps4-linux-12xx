@@ -1907,6 +1907,7 @@ int drm_add_override_edid_modes(struct drm_connector *connector)
 	struct edid *override;
 	int num_modes = 0;
 
+	pr_info("drm_edid: called %s\n", __func__);
 	override = drm_get_override_edid(connector);
 	if (override) {
 		drm_connector_update_edid_property(connector, override);

@@ -404,9 +404,11 @@ int drm_connector_attach_encoder(struct drm_connector *connector,
 	 * majority of drivers ignores the return value, so add in a big WARN
 	 * to get people's attention.
 	 */
-	if (WARN_ON(connector->encoder))
+	pr_info("drm_connector: called %s\n", __func__);
+	if (WARN_ON(connector->encoder)) {
+		pr_info("drm_connector: EINVAL in %s\n", __func__);
 		return -EINVAL;
-
+	}
 	connector->possible_encoders |= drm_encoder_mask(encoder);
 
 	return 0;

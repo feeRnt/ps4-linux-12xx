@@ -324,6 +324,7 @@ struct drm_connector *drm_bridge_connector_init(struct drm_device *drm,
 	struct drm_bridge *bridge;
 	int connector_type;
 
+	pr_info("drm_bridge_connector: called %s\n", __func__);
 	bridge_connector = kzalloc(sizeof(*bridge_connector), GFP_KERNEL);
 	if (!bridge_connector)
 		return ERR_PTR(-ENOMEM);
@@ -374,12 +375,15 @@ struct drm_connector *drm_bridge_connector_init(struct drm_device *drm,
 				    connector_type, ddc);
 	drm_connector_helper_add(connector, &drm_bridge_connector_helper_funcs);
 
-	if (bridge_connector->bridge_hpd)
+	if (bridge_connector->bridge_hpd) {
+		pr_err("drm_bridge_connector: setting bridge connection poll to HPD\n");
 		connector->polled = DRM_CONNECTOR_POLL_HPD;
-	else if (bridge_connector->bridge_detect)
+	}
+	else if (bridge_connector->bridge_detect) {
+		pr_err("drm_bridge_connector: setting bridge connection poll to software poll\n");
 		connector->polled = DRM_CONNECTOR_POLL_CONNECT
 				  | DRM_CONNECTOR_POLL_DISCONNECT;
-
+	}
 	return connector;
 }
 EXPORT_SYMBOL_GPL(drm_bridge_connector_init);

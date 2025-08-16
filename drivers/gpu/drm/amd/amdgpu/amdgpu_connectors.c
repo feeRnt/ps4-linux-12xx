@@ -367,7 +367,8 @@ static void amdgpu_connector_free_edid(struct drm_connector *connector)
 
 static int amdgpu_connector_ddc_get_modes(struct drm_connector *connector)
 {
-    pr_info("amdgpu_connectors: called %s\n", __func__);
+	// Digital Data Connector
+    	pr_info("amdgpu_connectors: called %s\n", __func__);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	int ret;
 

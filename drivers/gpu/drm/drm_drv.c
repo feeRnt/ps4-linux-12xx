@@ -26,6 +26,11 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
+/*
+ * Seems like very base level, framebuffer, level stuff.
+ * except for drmm_mode_config_init(drm)
+ */
+
 #include <linux/debugfs.h>
 #include <linux/fs.h>
 #include <linux/module.h>
