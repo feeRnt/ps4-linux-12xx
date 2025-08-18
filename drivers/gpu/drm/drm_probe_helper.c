@@ -631,6 +631,7 @@ prune:
 			connector->name);
 	list_for_each_entry(mode, &connector->modes, head) {
 		drm_mode_set_crtcinfo(mode, CRTC_INTERLACE_HALVE_V);
+		pr_info("drm_probe_helper: pritnmodeline(mode) in %s\n", __func__);
 		drm_mode_debug_printmodeline(mode);
 	}
 

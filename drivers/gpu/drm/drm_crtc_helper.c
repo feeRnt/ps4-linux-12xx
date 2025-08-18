@@ -642,8 +642,10 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 		fb_changed = true;
 
 	if (!drm_mode_equal(set->mode, &set->crtc->mode)) {
-		DRM_DEBUG_KMS("modes are different, full mode set\n");
+		pr_info("drm_crtc_helper: modes are different, full mode set\n");
+		pr_info("drm_crtc_helper: printmodeline for &set->crtc=>mode:\n");
 		drm_mode_debug_printmodeline(&set->crtc->mode);
+		pr_info("drm_crtc_helper: printmodeline for set->mode:\n");
 		drm_mode_debug_printmodeline(set->mode);
 		mode_changed = true;
 	}
@@ -749,8 +751,8 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 
 	if (mode_changed) {
 		if (drm_helper_crtc_in_use(set->crtc)) {
-			DRM_DEBUG_KMS("attempting to set mode from"
-					" userspace\n");
+			pr_info("attempting to set mode from"
+					" userspace. printmodeline of set->mode:\n");
 			drm_mode_debug_printmodeline(set->mode);
 			set->crtc->primary->fb = set->fb;
 			if (!drm_crtc_helper_set_mode(set->crtc, set->mode,

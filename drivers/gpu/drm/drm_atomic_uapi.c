@@ -131,7 +131,7 @@ int drm_atomic_set_mode_prop_for_crtc(struct drm_crtc_state *state,
 		int ret;
 
 		if (blob->length != sizeof(struct drm_mode_modeinfo)) {
-			drm_dbg_atomic(crtc->dev,
+			pr_info("drm_atomic_uapi:"
 				       "[CRTC:%d:%s] bad mode blob length: %zu\n",
 				       crtc->base.id, crtc->name,
 				       blob->length);
@@ -141,8 +141,9 @@ int drm_atomic_set_mode_prop_for_crtc(struct drm_crtc_state *state,
 		ret = drm_mode_convert_umode(crtc->dev,
 					     &state->mode, blob->data);
 		if (ret) {
-			drm_dbg_atomic(crtc->dev,
-				       "[CRTC:%d:%s] invalid mode (ret=%d, status=%s):\n",
+			pr_info("drm_atomic_uapi:"
+				       "[CRTC:%d:%s] invalid mode (ret=%d, status=%s).\n"
+				       "Will call mode_debug_printline.\n",
 				       crtc->base.id, crtc->name,
 				       ret, drm_get_mode_status_name(state->mode.status));
 			drm_mode_debug_printmodeline(&state->mode);

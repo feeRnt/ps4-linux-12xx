@@ -724,7 +724,7 @@ int of_get_drm_display_mode(struct device_node *np,
 	if (bus_flags)
 		drm_bus_flags_from_videomode(&vm, bus_flags);
 
-	pr_debug("%pOF: got %dx%d display mode\n",
+	pr_info("%pOF: got %dx%d display mode. printmodeline of dmode:\n",
 		np, vm.hactive, vm.vactive);
 	drm_mode_debug_printmodeline(dmode);
 
@@ -1285,6 +1285,8 @@ void drm_mode_prune_invalid(struct drm_device *dev,
 		if (mode->status != MODE_OK) {
 			list_del(&mode->head);
 			if (verbose) {
+				pr_info("drm_modes: printmodeline(mode) in %s\n",
+						__func__);
 				drm_mode_debug_printmodeline(mode);
 				pr_info("Not using %s mode: %s\n",
 					      mode->name,
