@@ -762,9 +762,14 @@ EXPORT_SYMBOL(drm_mode_set_name);
 int drm_mode_vrefresh(const struct drm_display_mode *mode)
 {
 	unsigned int num, den;
+	int ret;
 
-	if (mode->htotal == 0 || mode->vtotal == 0)
+	pr_info("drm_modes: called %s\n", __func__);
+
+	if (mode->htotal == 0 || mode->vtotal == 0) {
+		pr_info("drm_modes: mode->htotal or vtotal == 0; returning 0.\n");
 		return 0;
+	}
 
 	num = mode->clock;
 	den = mode->htotal * mode->vtotal;
@@ -776,8 +781,17 @@ int drm_mode_vrefresh(const struct drm_display_mode *mode)
 	if (mode->vscan > 1)
 		den *= mode->vscan;
 
-	return DIV_ROUND_CLOSEST_ULL(mul_u32_u32(num, 1000), den);
-	//Just does some math	
+	ret = DIV_ROUND_CLOSEST_ULL(mul_u32_u32(num, 1000), den);
+	pr_info("drm_modes: vrefresh from %s is %d. Returning it!\n", __func__, ret);
+	return ret;
+	/* Just does some math
+	 * AND returns the vrefresh / vsync of your monitor from your modeline
+	 * If we can't figure out how to fix this return, then simply do
+	 * #ifdef CONFIG_X86_PS4
+	 * return PS4_DEFAULT_VREFRESH
+	 * #endif
+	 * and have the DEFAULT_VREFRESH stored in ps4_bridge.h
+	 */
 }
 EXPORT_SYMBOL(drm_mode_vrefresh);
 
@@ -1929,6 +1943,7 @@ EXPORT_SYMBOL(drm_mode_create_from_cmdline_mode);
 void drm_mode_convert_to_umode(struct drm_mode_modeinfo *out,
 			       const struct drm_display_mode *in)
 {
+	pr_info("drm_modes: called %s\n", __func__);
 	out->clock = in->clock;
 	out->hdisplay = in->hdisplay;
 	out->hsync_start = in->hsync_start;
@@ -1940,7 +1955,9 @@ void drm_mode_convert_to_umode(struct drm_mode_modeinfo *out,
 	out->vsync_end = in->vsync_end;
 	out->vtotal = in->vtotal;
 	out->vscan = in->vscan;
-	out->vrefresh = drm_mode_vrefresh(in);
+	out->vrefresh = drm_mode_vrefresh(in); // Can hardcode to return 60 if x86_PS4 defined...
+					       // problematic function
+	pr_info("drm_modes: Just set drm_mode_modeinfo.vrefresh to %d\n", out->vrefresh);
 	out->flags = in->flags;
 	out->type = in->type;
 

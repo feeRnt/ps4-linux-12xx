@@ -687,9 +687,34 @@ static void ps4_bridge_post_disable(struct drm_bridge *bridge)
 // TODO (ps4patches): Apparently the vrefresh option is calculated on the fly now
 // Check if this actually works.
 
+/* Note: It does not, fully. When the distro starts up a into a display manager, 
+ * we get a modeline with 0 Hz vsync. This causes blackscreen on the
+ * monitor until there is a HDMI unplug+replug sequence.
+ *
+ * The problematic function is: 
+ * drm_crtc_helper_set_config in drivers/gpu/drm/drm_crtc_helper.c ->
+ *
+ * [  362.443832] attempting to set mode from userspace. printmodeline of set->mode:
+ * [  362.443834] Modeline "": 60 148500 1920 2008 2052 2200 1080 1084 1089 1125 0x0 0x5
+
+ * The second to last 0x0 is the vsync. It should be 0x60 for 60 Hz. 
+ * Also note the empty modeline title.
+ * 
+ * We can't hardcode the vsync to be 60Hz using .vrefresh element like in
+ * the original fail0verlow patches; as it was removed from the struct:
+ * https://github.com/torvalds/linux/commit/0425662fdf05665235e768e2fbcb4ced12432b43
+ *
+ * The best fix is to figure out why userspace detects 0 Hz... 
+ * The vsync should be calculated from...->
+ * drm_mode_vrefresh in drivers/gpu/drm/drm_modes.c
+ *
+ * TODO: Test using DRM_MODE_TYPE_PREFERRED, DRM_MODE_TYPE_USERDEF
+ * as well...
+ * These flags and their possible values are defined in include/drm/drm_modes.h
+*/
+
 /* 1 - 640x480@60Hz */
 static const struct drm_display_mode mode_480p = {
-/* 1 - 640x480@60Hz 4:3 */
 	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 		 752, 800, 0, 480, 490, 492, 525, 0,
 		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
@@ -707,7 +732,7 @@ static const struct drm_display_mode mode_720p = {
 static const struct drm_display_mode mode_1080p = {
 	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
 		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
-		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
+		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC | DRM_MODE_TYPE_PREFERRED),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
 
@@ -719,6 +744,11 @@ static const struct drm_display_mode mode_1080p = {
 		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
 		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC)
 }
+*/
+
+/* DRM_MODE sets:
+ * .name, .type, .clock, .hdisplay, .hsync_start, 
+ * .hsync_end, .htotal, .hskew, .vdisplay, .vsync_start, .vsync_end, .vtotal, .vscan, .flags
 */
 
 /* Taken from drm/drm_edid_load.c */
