@@ -752,6 +752,7 @@ static const struct drm_display_mode mode_1080p = {
 */
 
 /* Taken from drm/drm_edid_load.c */
+/*
 static const u8 edid_array_1080p[128] = {
 	0x00, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0x00,
 	0x31, 0xd8, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -770,14 +771,14 @@ static const u8 edid_array_1080p[128] = {
 	0x00, 0x4c, 0x69, 0x6e, 0x75, 0x78, 0x20, 0x46,
 	0x48, 0x44, 0x0a, 0x20, 0x20, 0x20, 0x00, 0x05,
 };
-
+*/
 
 int ps4_bridge_get_modes(struct drm_connector *connector)
 {
-    struct edid *edid_struct_1080p = (struct edid *)edid_array_1080p;
-    //cast the standard 1080p edid array to a struct
+	//struct edid *edid_struct_1080p = (struct edid *)edid_array_1080p;
+	//cast the standard 1080p edid array to a struct
 
-    pr_info("ps4_bridge: called %s\n", __func__);
+	pr_info("ps4_bridge: called %s\n", __func__);
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *newmode;
 	pr_info("ps4_bridge_get_modes\n");
@@ -793,7 +794,7 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	//newmode = drm_mode_duplicate(dev, &mode_480p);
 	//drm_mode_probed_add(connector, newmode);
 
-	//drm_connector_update_edid_property(connector, NULL);
+	drm_connector_update_edid_property(connector, NULL);
 
 	/* defined in drivers/gpu/drm/drm_connector.c
 	 * updates edid (and display info) for connector,
@@ -815,7 +816,8 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	  * and use it to update drm_connector_update_edid_property .
 	 */
 
-	drm_connector_update_edid_property(connector, edid_struct_1080p);
+	//drm_connector_update_edid_property(connector, edid_struct_1080p);
+	/* Reverted for now. Seems unnecessary and/or doesn't have an effect */
 
 	return 0;
 }
