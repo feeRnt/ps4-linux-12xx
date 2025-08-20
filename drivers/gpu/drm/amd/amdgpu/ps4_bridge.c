@@ -608,7 +608,8 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_mask(&mn_bridge->cq, 0x1034, 0x02, 0x02);
 		cq_mask(&mn_bridge->cq, 0x1e00, 0x01, 0x01);
 		cq_writereg(&mn_bridge->cq, VMUTECNT, VMUTECNT_LINEWIDTH_90);
-		cq_writereg(&mn_bridge->cq, HDCPEN, 0x00);
+		//cq_writereg(&mn_bridge->cq, HDCPEN, 0x00);
+		//don't write 0 to HDCPENcoder(?) register after enable
 		if (cq_exec(&mn_bridge->cq) < 0) {
 			pr_info("Failed to configure ps4-bridge (MN864729) mode\n");
 		}
@@ -862,7 +863,7 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 	*/
 
 	amdgpu_dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
-	//amdgpu_atombios_dp_get_dpcd(amdgpu_connector); //this might do a probe of the device again?
+	amdgpu_atombios_dp_get_dpcd(amdgpu_connector); //this might do a probe of the device again?
 	// The old variant was radeon_dp_getdpcd (radeon displayport get display port configuration data)
 	// It doesn't exist anymore I think
 
@@ -986,8 +987,9 @@ int ps4_bridge_register(struct drm_connector *connector,
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
 
 	// TODO (ps4patches): This seems to be the new way of adding bridges
-	//drm_bridge_add(&mn_bridge->bridge);
-	/* test without this */
+	drm_bridge_add(&mn_bridge->bridge);
+	/* test without this:
+	 * causes blackscreen at kernel init */
 
 	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
 	if (ret) {
