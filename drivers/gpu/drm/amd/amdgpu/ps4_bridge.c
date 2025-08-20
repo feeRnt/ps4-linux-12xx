@@ -854,7 +854,7 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *amdgpu_dig_connector = amdgpu_connector->con_priv;
 
-	/* removed for now. tyr later
+	/* removed for now. try later
 	 * if (!force && amdgpu_connector_check_hpd_status_unchanged(connector)) {
 		ret = connector->status;
 		goto out;
@@ -862,7 +862,9 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 	*/
 
 	amdgpu_dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
-	amdgpu_atombios_dp_get_dpcd(amdgpu_connector); //this might do a probe of the device again?
+	//amdgpu_atombios_dp_get_dpcd(amdgpu_connector); //this might do a probe of the device again?
+	// The old variant was radeon_dp_getdpcd (radeon displayport get display port configuration data)
+	// It doesn't exist anymore I think
 
 	mutex_lock(&mn_bridge->mutex);
 	cq_init(&mn_bridge->cq, 4);
@@ -984,7 +986,8 @@ int ps4_bridge_register(struct drm_connector *connector,
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
 
 	// TODO (ps4patches): This seems to be the new way of adding bridges
-	drm_bridge_add(&mn_bridge->bridge);
+	//drm_bridge_add(&mn_bridge->bridge);
+	/* test without this */
 
 	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
 	if (ret) {

@@ -340,6 +340,7 @@ static void amdgpu_atombios_dp_probe_oui(struct amdgpu_connector *amdgpu_connect
 	if (drm_dp_dpcd_read(&amdgpu_connector->ddc_bus->aux, DP_BRANCH_OUI, buf, 3) == 3)
 		DRM_DEBUG_KMS("Branch OUI: %02hx%02hx%02hx\n",
 			      buf[0], buf[1], buf[2]);
+	//IMPORTANT
 }
 
 static void amdgpu_atombios_dp_ds_ports(struct amdgpu_connector *amdgpu_connector)
@@ -499,6 +500,7 @@ void amdgpu_atombios_dp_set_rx_power_state(struct drm_connector *connector,
 				   DP_SET_POWER, power_state);
 		usleep_range(1000, 2000);
 	}
+	//IMPORTANT
 }
 
 struct amdgpu_atombios_dp_link_train_info {
@@ -646,7 +648,7 @@ amdgpu_atombios_dp_link_train_cr(struct amdgpu_atombios_dp_link_train_info *dp_i
 
 		if (drm_dp_dpcd_read_link_status(dp_info->aux,
 						 dp_info->link_status) <= 0) {
-			DRM_ERROR("displayport link status failed\n"); //Status is never never 0 or less for aux? for us
+			pr_err("displayport link status failed\n"); //Status is never never 0 or less for aux? for us
 			break;
 		}
 	
@@ -751,7 +753,7 @@ amdgpu_atombios_dp_link_train_ce(struct amdgpu_atombios_dp_link_train_info *dp_i
 
 		if (drm_dp_dpcd_read_link_status(dp_info->aux,
 						 dp_info->link_status) <= 0) {
-			DRM_ERROR("displayport link status failed\n");
+			pr_err("displayport link status failed\n");
 			break;
 		}
 

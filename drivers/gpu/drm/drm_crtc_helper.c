@@ -559,7 +559,7 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 	struct drm_mode_set save_set;
 	int ret;
 	int i;
-	int ret_set_mode;
+	//int ret_set_mode;
 
 	DRM_DEBUG_KMS("\n");
 
@@ -793,7 +793,8 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 			
 			/* Combat the empty title modeline, to prevent a switchup..
 			 * Also make sure set->mode is initialized already */
-			if (set-> mode && strcmp(set->mode->name, "") != 0) {
+			/*
+			 if (set-> mode && strcmp(set->mode->name, "") != 0) {
 				ret_set_mode = !drm_crtc_helper_set_mode(set->crtc, set->mode,
 							      set->x, set->y,
 							      save_set.fb);
@@ -804,7 +805,13 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 			}
 			
 			if (ret_set_mode) {
-				pr_err("failed to set mode on [CRTC:%d:%s]\n",
+			*/
+			// This trivial modes witching doesn't seem to be the issue...
+			
+			if (!drm_crtc_helper_set_mode(set->crtc, set->mode,
+						set->x, set->y,
+						save_set.fb)) {
+			pr_err("failed to set mode on [CRTC:%d:%s]\n",
 					  set->crtc->base.id, set->crtc->name);
 				set->crtc->primary->fb = save_set.fb;
 				ret = -EINVAL;
