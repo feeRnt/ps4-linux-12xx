@@ -664,7 +664,12 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 		fb_changed = true;
 	}
 
-	if (!drm_mode_equal(set->mode, &set->crtc->mode)) {
+	// This detects different modes for some reason.. With a blank name, different aspect ratio
+	// Just use the old mode for now
+	// At kernel init, other matches , like the null fb; different (new) encoder, will trigger
+	// a mode_changed to true, so we can rely on those for setting the initial drm_mode_set
+	/*
+	 * if (!drm_mode_equal(set->mode, &set->crtc->mode)) {
 		pr_info("drm_crtc_helper: modes are different, full mode set\n");
 		pr_info("drm_crtc_helper: printmodeline for &set->crtc=>mode:\n");
 		drm_mode_debug_printmodeline(&set->crtc->mode);
@@ -672,6 +677,7 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 		drm_mode_debug_printmodeline(set->mode);
 		mode_changed = true;
 	}
+	*/
 
 	/* take a reference on all unbound connectors in set, reuse the
 	 * already taken reference for bound connectors

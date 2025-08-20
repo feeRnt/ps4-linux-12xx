@@ -156,7 +156,7 @@ static int drm_primary_helper_update(struct drm_plane *plane, struct drm_crtc *c
 	struct drm_mode_set set = {
 		.crtc = crtc,
 		.fb = fb,
-		.mode = &crtc->mode,
+		.mode = &crtc->mode, //IMPORTANT
 		.x = src_x >> 16,
 		.y = src_y >> 16,
 	};

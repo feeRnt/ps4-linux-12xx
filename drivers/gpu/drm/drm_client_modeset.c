@@ -817,7 +817,7 @@ int drm_client_modeset_probe(struct drm_client_dev *client, unsigned int width, 
 	for (i = 0; i < connector_count; i++)
 		total_modes_count += connectors[i]->funcs->fill_modes(connectors[i], width, height);
 	if (!total_modes_count)
-		DRM_DEBUG_KMS("No connectors reported connected with modes\n");
+		pr_info("No connectors reported connected with modes\n");
 	drm_client_connectors_enabled(connectors, connector_count, enabled);
 
 	if (!drm_client_firmware_config(client, connectors, connector_count, crtcs,
@@ -830,7 +830,7 @@ int drm_client_modeset_probe(struct drm_client_dev *client, unsigned int width, 
 					      offsets, enabled, width, height) &&
 		    !drm_client_target_preferred(connectors, connector_count, modes,
 						 offsets, enabled, width, height))
-			DRM_ERROR("Unable to find initial modes\n");
+			pr_err("Unable to find initial modes\n");
 
 		DRM_DEBUG_KMS("picking CRTCs for %dx%d config\n",
 			      width, height);
@@ -851,7 +851,7 @@ int drm_client_modeset_probe(struct drm_client_dev *client, unsigned int width, 
 			struct drm_mode_set *modeset = drm_client_find_modeset(client, crtc);
 			struct drm_connector *connector = connectors[i];
 
-			DRM_DEBUG_KMS("desired mode %s set on crtc %d (%d,%d)\n",
+			pr_info("desired mode %s set on crtc %d (%d,%d)\n",
 				      mode->name, crtc->base.id, offset->x, offset->y);
 
 			if (WARN_ON_ONCE(modeset->num_connectors == DRM_CLIENT_MAX_CLONED_CONNECTORS ||
@@ -860,6 +860,7 @@ int drm_client_modeset_probe(struct drm_client_dev *client, unsigned int width, 
 				break;
 			}
 
+			pr_info("drm_client_modeset: setting modeset->mode with = %s\n", mode->name);
 			modeset->mode = drm_mode_duplicate(dev, mode);
 			drm_connector_get(connector);
 			modeset->connectors[modeset->num_connectors++] = connector;
