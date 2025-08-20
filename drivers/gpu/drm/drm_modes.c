@@ -54,6 +54,8 @@
 void drm_mode_debug_printmodeline(const struct drm_display_mode *mode)
 {
 	pr_info("Modeline " DRM_MODE_FMT "\n", DRM_MODE_ARG(mode));
+	/* format:
+	/ "Name":, vrefresh, clock, hdisplay, hsync_start, . . . , type, flags */ 
 }
 EXPORT_SYMBOL(drm_mode_debug_printmodeline);
 
@@ -764,7 +766,7 @@ int drm_mode_vrefresh(const struct drm_display_mode *mode)
 	unsigned int num, den;
 	int ret;
 
-	pr_info("drm_modes: called %s\n", __func__);
+	//pr_info("drm_modes: called %s\n", __func__);
 
 	if (mode->htotal == 0 || mode->vtotal == 0) {
 		pr_info("drm_modes: mode->htotal or vtotal == 0; returning 0.\n");
@@ -782,7 +784,7 @@ int drm_mode_vrefresh(const struct drm_display_mode *mode)
 		den *= mode->vscan;
 
 	ret = DIV_ROUND_CLOSEST_ULL(mul_u32_u32(num, 1000), den);
-	pr_info("drm_modes: vrefresh from %s is %d. Returning it!\n", __func__, ret);
+	//pr_info("drm_modes: vrefresh from %s is %d. Returning it!\n", __func__, ret);
 	return ret;
 	/* Just does some math
 	 * AND returns the vrefresh / vsync of your monitor from your modeline
@@ -1006,33 +1008,54 @@ bool drm_mode_match(const struct drm_display_mode *mode1,
 		    const struct drm_display_mode *mode2,
 		    unsigned int match_flags)
 {
-	if (!mode1 && !mode2)
+	if (!mode1 && !mode2) {
+		pr_info("both mode1 AND 2 don't exist, returning true in %s.\n",
+				__func__);
 		return true;
+	}
 	//match if both of them don't exist?????
+	///Yes; because empty modes are equivalent
 
-	if (!mode1 || !mode2)
+	if (!mode1 || !mode2) {
+		pr_info("mode1 or 2 doesn't exist, returning false in %s.\n",
+				__func__);
 		return false;
+	}
 
 	if (match_flags & DRM_MODE_MATCH_TIMINGS &&
-	    !drm_mode_match_timings(mode1, mode2))
+	    !drm_mode_match_timings(mode1, mode2)) {
+		pr_info("just failed at matching the timings in %s.. returning false.\n",
+				__func__);
 		return false;
+	}
 
 	if (match_flags & DRM_MODE_MATCH_CLOCK &&
-	    !drm_mode_match_clock(mode1, mode2))
+	    !drm_mode_match_clock(mode1, mode2)) {
+		pr_info("just failed at matching the clock in %s.. returning false.\n",
+				__func__);
 		return false;
+	}
 
 	if (match_flags & DRM_MODE_MATCH_FLAGS &&
-	    !drm_mode_match_flags(mode1, mode2))
+	    !drm_mode_match_flags(mode1, mode2)) {
+		pr_info("just failed at matching the mode flags in %s.. returning false.\n",
+				__func__);
 		return false;
+	}
 
 	if (match_flags & DRM_MODE_MATCH_3D_FLAGS &&
-	    !drm_mode_match_3d_flags(mode1, mode2))
+	    !drm_mode_match_3d_flags(mode1, mode2)) {
+		pr_info("just failed at matching the 3d flags in %s.. returning false.\n",
+				__func__);	
 		return false;
+	}
 
 	if (match_flags & DRM_MODE_MATCH_ASPECT_RATIO &&
-	    !drm_mode_match_aspect_ratio(mode1, mode2))
+	    !drm_mode_match_aspect_ratio(mode1, mode2)) {
+		pr_info("just failed at matching the aspect ratio in %s.. returning false.\n",
+				__func__);
 		return false;
-
+	}
 	return true;
 }
 EXPORT_SYMBOL(drm_mode_match);
@@ -1053,7 +1076,7 @@ bool drm_mode_equal(const struct drm_display_mode *mode1,
 	return drm_mode_match(mode1, mode2,
 			      DRM_MODE_MATCH_TIMINGS |
 			      DRM_MODE_MATCH_CLOCK |
-			      DRM_MODE_MATCH_FLAGS |
+			      DRM_MODE_MATCH_FLAGS | //remove this flags check?? 
 			      DRM_MODE_MATCH_3D_FLAGS|
 			      DRM_MODE_MATCH_ASPECT_RATIO);
 }

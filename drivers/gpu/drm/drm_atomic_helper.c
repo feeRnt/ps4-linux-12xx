@@ -1142,6 +1142,7 @@ drm_atomic_helper_update_legacy_modeset_state(struct drm_device *dev,
 	struct drm_crtc_state *new_crtc_state;
 	int i;
 
+	pr_info("drm_atomic_helper: called %s\n", __func__);
 	/* clear out existing links and update dpms */
 	for_each_oldnew_connector_in_state(old_state, connector, old_conn_state, new_conn_state, i) {
 		if (connector->encoder) {
@@ -1180,6 +1181,7 @@ drm_atomic_helper_update_legacy_modeset_state(struct drm_device *dev,
 		struct drm_plane *primary = crtc->primary;
 		struct drm_plane_state *new_plane_state;
 
+		pr_info("drm_atomic_helper: just set crtc->mode in %s\n", __func__);
 		crtc->mode = new_crtc_state->mode;
 		crtc->enabled = new_crtc_state->enable;
 

@@ -687,26 +687,39 @@ static void ps4_bridge_post_disable(struct drm_bridge *bridge)
 // TODO (ps4patches): Apparently the vrefresh option is calculated on the fly now
 // Check if this actually works.
 
-/* Note: It does not, fully. When the distro starts up a into a display manager, 
- * we get a modeline with 0 Hz vsync. This causes blackscreen on the
- * monitor until there is a HDMI unplug+replug sequence.
+/* Note: Maybe it does not, fully. When the distro starts up a into a display manager, 
+ * We get a blackscreen on the monitor until there is a HDMI unplug+replug sequence.
  *
  * The problematic function is: 
  * drm_crtc_helper_set_config in drivers/gpu/drm/drm_crtc_helper.c ->
  *
+ *
  * [  362.443832] attempting to set mode from userspace. printmodeline of set->mode:
  * [  362.443834] Modeline "": 60 148500 1920 2008 2052 2200 1080 1084 1089 1125 0x0 0x5
-
- * The second to last 0x0 is the vsync. It should be 0x60 for 60 Hz. 
- * Also note the empty modeline title.
- * 
+ *
+ * Note the empty modeline title.
+ *
+ * A standard modeline is :
+ * [  168.214290] Modeline "1920x1080": 60 148500 1920 2008 2052 2200 1080 1084 1089 1125 0x60 0x5
+ *
+ * The second to last element here is the "type".
+ * "1920x1080": DRM_MODE_TYPE_USERDEF | DRM_MODE_TYPE_DRIVER
+ * DRM_MODE_TYPE_PREFERRED gets addede if you add it
+ * "": NULL
+ *
+ *
+ *[  169.192833] Modeline "800x600": 56 36000 800 824 896 1024 600 601 603 625 0x40 0x5
+ * "800x600": DRM_MODE_TYPE_DRIVER
+ *
  * We can't hardcode the vsync to be 60Hz using .vrefresh element like in
  * the original fail0verlow patches; as it was removed from the struct:
  * https://github.com/torvalds/linux/commit/0425662fdf05665235e768e2fbcb4ced12432b43
  *
- * The best fix is to figure out why userspace detects 0 Hz... 
+ * The best fix is to figure out why userspace detects type = 0
  * The vsync should be calculated from...->
  * drm_mode_vrefresh in drivers/gpu/drm/drm_modes.c
+ *
+ * Vsync is always 60... The first element in 'Modeline' printout is the vrefresh.
  *
  * TODO: Test using DRM_MODE_TYPE_PREFERRED, DRM_MODE_TYPE_USERDEF
  * as well...
