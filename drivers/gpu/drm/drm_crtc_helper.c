@@ -668,8 +668,10 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 	// Just use the old mode for now
 	// At kernel init, other matches , like the null fb; different (new) encoder, will trigger
 	// a mode_changed to true, so we can rely on those for setting the initial drm_mode_set
-	/*
-	 * if (!drm_mode_equal(set->mode, &set->crtc->mode)) {
+	// With this off, the login manager logs in properly without blackscreen
+	// but a source switchup on the monitor causes a blackscreen that couldn't be fixed
+
+	 if (!drm_mode_equal(set->mode, &set->crtc->mode)) {
 		pr_info("drm_crtc_helper: modes are different, full mode set\n");
 		pr_info("drm_crtc_helper: printmodeline for &set->crtc=>mode:\n");
 		drm_mode_debug_printmodeline(&set->crtc->mode);
@@ -677,7 +679,6 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 		drm_mode_debug_printmodeline(set->mode);
 		mode_changed = true;
 	}
-	*/
 
 	/* take a reference on all unbound connectors in set, reuse the
 	 * already taken reference for bound connectors
@@ -788,7 +789,11 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 					" userspace. printmodeline of set->mode:\n");
 			drm_mode_debug_printmodeline(set->mode);
 			set->crtc->primary->fb = set->fb;
-			if (!drm_crtc_helper_set_mode(set->crtc, set->mode,
+			/*if (!drm_crtc_helper_set_mode(set->crtc, set->mode,
+						      set->x, set->y,
+						      save_set.fb)) {
+			*/
+			if (!drm_crtc_helper_set_mode(set->crtc, &set->crtc->mode,
 						      set->x, set->y,
 						      save_set.fb)) {
 				pr_err("failed to set mode on [CRTC:%d:%s]\n",

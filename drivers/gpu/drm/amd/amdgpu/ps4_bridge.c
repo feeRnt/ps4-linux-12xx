@@ -727,19 +727,26 @@ static void ps4_bridge_post_disable(struct drm_bridge *bridge)
 */
 
 /* 1 - 640x480@60Hz */
+/*
 static const struct drm_display_mode mode_480p = {
 	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 		 752, 800, 0, 480, 490, 492, 525, 0,
 		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
 };
+*/
+
 /* 4 - 1280x720@60Hz */
-static const struct drm_display_mode mode_720p = {
+/*static const struct drm_display_mode mode_720p = {
 	DRM_MODE("1280x720", DRM_MODE_TYPE_DRIVER, 74250, 1280, 1390,
 		 1430, 1650, 0, 720, 725, 730, 750, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
+*/
+
+//Remove the unnecessary modes for now
+
 /* 16 - 1920x1080@60Hz */
 /* This is the CEA Mode */
 static const struct drm_display_mode mode_1080p = {

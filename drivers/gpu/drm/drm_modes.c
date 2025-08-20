@@ -55,7 +55,7 @@ void drm_mode_debug_printmodeline(const struct drm_display_mode *mode)
 {
 	pr_info("Modeline " DRM_MODE_FMT "\n", DRM_MODE_ARG(mode));
 	/* format:
-	/ "Name":, vrefresh, clock, hdisplay, hsync_start, . . . , type, flags */ 
+	 * "Name":, vrefresh, clock, hdisplay, hsync_start, . . . , type, flags */ 
 }
 EXPORT_SYMBOL(drm_mode_debug_printmodeline);
 
