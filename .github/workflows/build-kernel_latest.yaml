@@ -7,6 +7,7 @@ name: "Compile PS4-Linux Kernel-12xx; Unified Version: Latest"
 on:
   # Allows you to run this workflow manually from the Github Actions tab
   workflow_dispatch:
+  push:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
