@@ -220,7 +220,7 @@ static int ahci_init_one(struct pci_dev *pdev)
 		if (ctlr) {
 			ctlr->r_mem = r_mem;
 			ctlr->dev_id = 0x90DE104D;
-			ctlr->apcie_bpcie_buffer = 0x04;//for ahci 0x024
+			ctlr->apcie_bpcie_buffer = (void *)0x04;//for ahci 0x024
 			bpcie_sata_phy_init(&pdev->dev, ctlr);
 			kfree(ctlr);
 		}
