@@ -98,6 +98,10 @@ modules.order
 !.gitignore
 !.mailmap
 
+# Added
+!.github
+!.dockerignore
+!.Dockerfile*
 #
 # Generated include files
 #
