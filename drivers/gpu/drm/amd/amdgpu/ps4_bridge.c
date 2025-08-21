@@ -1,5 +1,5 @@
 /*
- * Panasonic MN86471A DP->HDMI bridge driver (via PS4 Aeolia ICC interface)
+ * Panasonic MN86471A / MN864729 DP->HDMI bridge driver (via PS4 Aeolia ICC interface)
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -15,6 +15,20 @@
 // TODO (ps4patches): Make functions atomic,
 //  https://lore.kernel.org/linux-arm-kernel/20211020181901.2114645-5-sam@ravnborg.org/
 
+/*
+ * Forward-ported patches from https://github.com/rancido,
+ * 		            in https://github.com/Ps3itaTeam/ps4-linux/
+ * Maybe the problem is no one is putting a "Copyright"
+ * in their files ... We don't know who introduced what change or where,
+ * since there is often no centralized repository.. Patches thrown around
+ * everywhere.
+ * But that goes against the whole nature of tinkery/RE work..?
+ * But does it really? No.
+ *
+ * 
+ * Copyright: .....
+ *
+*/
 #include <asm/ps4.h>
 
 #include <drm/drm_crtc.h>
@@ -254,7 +268,7 @@ static void cq_mask(struct i2c_cmdqueue *q, u16 addr, u8 value, u8 mask)
 	*q->p++ = mask;
 }
 
-#if 1
+#if 0
 static void cq_delay(struct i2c_cmdqueue *q, u16 time)
 {
 	cq_cmd(q, CMD_DELAY);
@@ -531,9 +545,12 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_mask(&mn_bridge->cq, 0x1e00, 0x00, 0x21);
 		cq_mask(&mn_bridge->cq, 0x1e02, 0x00, 0x70);
 		// 03 08 01 01 00  2c 01 00
-		cq_delay(&mn_bridge->cq, 0x012c);
+		//rancido has no delay here vvv
+		//cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x00);
-		cq_delay(&mn_bridge->cq, 0x0032);
+
+		//rancido has no delay here vvv
+		//cq_delay(&mn_bridge->cq, 0x0032);
 		cq_writereg(&mn_bridge->cq, 0x7402, 0x1c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x04);
 		cq_writereg(&mn_bridge->cq, TSYSCTRL, TSYSCTRL_HDMI);
@@ -576,7 +593,8 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_wait_set(&mn_bridge->cq, 0x10f6, 0x80);
 		cq_mask(&mn_bridge->cq, 0x7226, 0x00, 0x80);
 		cq_mask(&mn_bridge->cq, 0x7228, 0x00, 0xFF);
-		cq_delay(&mn_bridge->cq, 0x012c);
+		// rancido has no delay here vvv
+		//cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x7204, 0x40);
 		cq_wait_clear(&mn_bridge->cq, 0x7204, 0x40);
 		cq_writereg(&mn_bridge->cq, 0x7a8b, 0x05);
@@ -777,7 +795,10 @@ int ps4_bridge_register(struct drm_connector *connector,
 	// TODO (ps4patches): This seems to be the new way of adding bridges
 	drm_bridge_add(&mn_bridge->bridge);
 
-	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
+	//ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
+	
+	// Allow the bridge to create its own connectors with last parameter = 0.
+	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
 	if (ret) {
 		DRM_ERROR("Failed to initialize bridge with drm\n");
 		return -EINVAL;
