@@ -825,10 +825,11 @@ int drm_crtc_helper_set_config(struct drm_mode_set *set,
 				ret = -EINVAL;
 				goto fail;
 			}
-			pr_info("Setting connector DPMS state to on\n");
+			pr_info("Setting connector DPMS state to off then on\n");
 			for (i = 0; i < set->num_connectors; i++) {
 				pr_info("\t[CONNECTOR:%d:%s] set DPMS on\n", set->connectors[i]->base.id,
 					      set->connectors[i]->name);
+				set->connectors[i]->funcs->dpms(set->connectors[i], DRM_MODE_DPMS_OFF);
 				set->connectors[i]->funcs->dpms(set->connectors[i], DRM_MODE_DPMS_ON);
 			}
 		}
