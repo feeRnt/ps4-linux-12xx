@@ -314,6 +314,14 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 	/* Update crtc values up front so the driver can rely on them for mode
 	 * setting.
 	 */
+
+	/* When we get to display manager, we probably end up with a *new* mode, 
+	 * this requires a monitor replug.
+	 * The replug maybe makes it able to accept this new mode,
+	 * withuot having to replug it again later. As the subsequent modes are probably 
+	 * *similar* enough for the monior.
+	 */
+
 	pr_info("drm_crtc_helper: updated crtc->mode to drm_display_mode in %s\n", __func__);
 	crtc->mode = *mode;
 	crtc->x = x;
@@ -966,9 +974,12 @@ int drm_helper_connector_dpms(struct drm_connector *connector, int mode)
 
 	WARN_ON(drm_drv_uses_atomic_modeset(connector->dev));
 
-	if (mode == connector->dpms)
+	pr_info("drm_crtc_helper: called %s\n", __func__);
+	if (mode == connector->dpms) {
+		pr_info("drm_crtc_helper: requested state = %d = existing state." 
+				"returning 0. TEST THIS.\n", connector->dpms);
 		return 0;
-
+	}
 	old_dpms = connector->dpms;
 	connector->dpms = mode;
 
@@ -976,7 +987,9 @@ int drm_helper_connector_dpms(struct drm_connector *connector, int mode)
 		encoder_dpms = drm_helper_choose_encoder_dpms(encoder);
 
 	/* from off to on, do crtc then encoder */
+	// 0 = on, 1 = off
 	if (mode < old_dpms) {
+		pr_info("drm_crtc_helper: Going from off to on\n");
 		if (crtc) {
 			const struct drm_crtc_helper_funcs *crtc_funcs = crtc->helper_private;
 
@@ -990,6 +1003,7 @@ int drm_helper_connector_dpms(struct drm_connector *connector, int mode)
 
 	/* from on to off, do encoder then crtc */
 	if (mode > old_dpms) {
+		pr_info("drm_crtc_helper: Going from on to off\n");
 		if (encoder)
 			drm_helper_encoder_dpms(encoder, encoder_dpms);
 		if (crtc) {

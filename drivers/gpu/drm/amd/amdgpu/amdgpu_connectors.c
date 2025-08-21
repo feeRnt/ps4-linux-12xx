@@ -1596,7 +1596,7 @@ static const struct drm_connector_helper_funcs amdgpu_ps4_dp_connector_helper_fu
 };
 
 static const struct drm_connector_funcs amdgpu_ps4_dp_connector_funcs = {
-	.dpms = drm_helper_connector_dpms,
+	.dpms = drm_helper_connector_dpms, // Important
 	.detect = ps4_bridge_detect,
 	.fill_modes = drm_helper_probe_single_connector_modes,
 	//.set_property = amdgpu_connector_set_property,
