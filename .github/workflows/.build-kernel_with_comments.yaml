@@ -1,0 +1,539 @@
+## This is a basic workflow to help you get started with Actions 
+## Adapted from https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
+
+name: "Compile PS4-Linux Kernel-12xx 5.15"
+
+# Controls when the workflow will run
+on:
+  # Allows you to run this workflow manually from the Github Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest # Github action variant. But docker image is of ubuntu 22.04 
+    #env:
+      #cache-workspace-key: ${{ runner.os }}-workspace-${{ github.run_id }}    # workspace cache key, unique per run
+      #cache-workspace-restore-key: ${{ runner.os }}-workspace-                # workspace cache key, common. (We use this to restore)
+      #current-branch: ps4-linux-5.15.y-conservative2 (I don't use this yet, but I should..)
+      #current-branch: ${{ github.refs }} then grep out origin/refs/heads . I don't think uses a bash , so I can't pipe it here?
+      # I might be able to use a run block in jobs:build: directly to store the variable.
+    #to reference runner.os, you need to first have started the job that implements "runs-on". so put env inside steps.
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    #env:
+    #is not allowed at this stage. You need to put it in an individual step or export like::
+      
+      - name: Set up cache env vars
+        id: cache-workspace-vars
+        run: |
+          echo "CACHE_WORKSPACE_KEY=${{ runner.os }}-workspace-${{ github.run_id }}" >> $GITHUB_ENV
+          echo "CACHE_WORKSPACE_RESTORE_KEY=${{ runner.os }}-workspace-" >> $GITHUB_ENV
+          #Use $RESTORE_KEY in your other steps. 
+
+      #Based on:
+      #https://github.com/actions/toolkit/issues/946#issuecomment-1590016041
+      #https://github.com/actions/toolkit/issues/946#issuecomment-1726311681
+      - name: Set SUID to tar binary #Allows saving (and recovering)? cache of restricted files
+        run: sudo chown root /bin/tar && sudo chmod u+s /bin/tar
+        #SUID allows the bin to be ran as the user who owns the file, instead of the default: the uid of the caller
+      
+      # Check-out your repository to $github.workspace=github actions directory, 
+      # so your job can access it
+      # - uses: actions/checkout@v4
+      #   with:
+      #    ref: ${{ github.ref }}
+      # ${{ github.ref }} refers to the caller of the current github actions/job,
+      # for example the current branch or tag or commit.
+
+      # Meaning checkout (pull) the branch that is calling this github action, so we can
+      # work on it. (Inlcuding the dockerfile)
+      
+      
+
+      - name: Download Dockerfile
+        run: |
+         curl -fL https://raw.githubusercontent.com/feeRnt/ps4-linux-12xx/ps4-linux-5.15.y-conservative2/Dockerfile -o Dockerfile
+         curl -fL https://raw.githubusercontent.com/feeRnt/ps4-linux-12xx/ps4-linux-5.15.y-conservative2/.dockerignore -o .dockerignore
+         echo "Current github.workspace in curl stage = ${{ github.workspace }}"
+      # ~~-verbose~~, -fail if server error, -Links follow,
+
+      # Going to use Buildx which is newer and better
+      # OLD:::::
+      # Build docker image with tag "kernel-linux-ps4" in the present directory
+      #- name: build docker image
+      #   run: |
+      #     docker build -t kernel-linux-ps4 .
+
+      #- name: Build Docker image with cache (incomplete?)
+      #  run: |
+      #    docker build --build-arg BUILDKIT_INLINE_CACHE=1 -t kernel-linux-ps4:latest .
+ 
+      # Set up Docker Buildx for advanced build options and caching
+      
+      - name: Show username and group info
+        run: |
+          echo "Actions Runner Username: $(whoami)"
+          echo "Actions Runner User ID: $(id -u)"
+          echo "Actions Runner Group Name: $(id -gn)"
+          echo "Actions Runner Group ID: $(id -g)"
+          echo "Actions Runner OS: ${{ runner.os }}"
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+      # this needs to be done before using docker buildx.
+      # this doesn't to be done before the caching part, but doing it anyway. It initializes the
+      # component that can utilize the cache.
+      # Downloading the cache can either happen before or after.
+
+
+      # Retrieve Cache-d Docker layers, and Save cache after job completion
+      - name: Cache Docker Layers
+        uses: actions/cache@v3
+        with:
+          path: |
+            /tmp/.buildx-cache 
+          #The location where Docker will have cache layers (inside github.workspace root)
+          #Which is set in the buildx build launch parameters
+
+          key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}  # Cache key
+          restore-keys: |
+            ${{ runner.os }}-docker-
+      # The cache action needs to come before the Build Docker image, because this action is 
+      # needed for bringing the cache file into the workspace.
+
+      # The cache files (inside /tmp/.bulidx-cache) are used internally AFTER; by docker (from/to).
+      # The cache action makes sure the buildx-cache is actually available for Docker (inside
+      # the workspace).
+      
+      #- name: Cache Github Workspace
+      #  uses: actions/cache@v3
+      #  with:
+      #    path: ${{ github.workspace }}
+      #    #home/runner/work/ps4-linux-12xx/ps4-linux-12xx = github.workspace 
+      #    #key: ${{ runner.os }}-workspace-${{ hashFiles('peristence_test_$(date -I)*') }}  # Cache key
+      #    # similar to : https://github.com/actions/toolkit/issues/505#issuecomment-2894449519
+
+      #    key: ${{ runner.os }}-workspace-${{ github.run_id }} # Unique cache key each run
+      #    restore-keys: |
+      #      ${{ runner.os }}-workspace-
+      #      #not unique. Will restore, but then save a new (latest) cache.
+          
+
+          # Proper cache handling and overwriting; for build artifacts. Based on:
+          #1: https://github.com/actions/cache/issues/342#issuecomment-1363953531 (original. ulterzlw)
+          #2: https://github.com/actions/cache/issues/342#issuecomment-1711054115 (azu)
+          #3: https://github.com/actions/cache/issues/342#issuecomment-2773231159 (langston-barett, Apr '25)
+      - name: Restore Cache of Github Workspace
+        uses: actions/cache/restore@v4 #uses is actually a macro for a github repo that you will use.
+        id: cache-restore-workspace
+        #env:
+        #  cache-workspace-restore-key: $CACHE_WORKSPACE_RESTORE_KEY
+        # Doesn't work, takes $expr literally without expansion
+        with:
+          path: ${{ github.workspace }}
+          #key:  ${{ env.cache-workspace-restore-key }}
+          key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}
+
+      - name: Check if repo was previously cloned
+        id: check_repo
+        run: |
+          if [ -d .git ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo ".git directory exists"
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo ".git directory doesn't exist" 
+          fi
+
+        # the default pwd in github actions is /home/runner/work/repo/repo (even before checkout of
+        # your repo). SO mind the paths
+        # It's a variable, and it is your default shell path. But it is empty unless you check
+        # it out.
+        # The .github files don't exist there either. They are loaded into memory from the repo.
+        # Unless you checkout, then they are acquired obviously.
+
+      - name: Checkout ps4-linux-12xx repo
+        if: steps.check_repo.outputs.exists == 'false'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          #fetch-depth=--depth
+          #repository: feeRnt/ps4-linux-12xx
+          #path: ps4-linux-12xx
+          ref: ${{ github.ref }}
+          #repository: is optional. Default is the repo that triggered the event
+          #ref = default branch, for us (caller).
+
+      - name: Move config file
+        if: steps.check_repo.outputs.exists == 'false'
+        run: |
+          echo "Current PWD = $PWD"
+          ls -a
+          echo "cd'ing to github.workspace = ${{ github.workspace }}"
+          cd ${{ github.workspace }}
+          echo "Current PWD after moving to hub.workspace = $PWD"
+          ls -a
+          echo "Total commits in this repo = . . . "
+          git rev-list --all --count
+          echo "Branches in this repo"
+          git branch
+          echo "Git remote info:"
+          git remote -v
+          mv config .config
+          # config will exist if we clone. so no need to use -f check
+        #Cannot have run and action in the same step
+
+      - name: Update ps4-linux-12xx repo if it exists
+        if: steps.check_repo.outputs.exists == 'true'
+        run: |
+          cd ${{ github.workspace }}
+          echo "Total commits in this repo:"
+          git rev-list --all --count
+          echo "Branches in this repo:"
+          git branch
+          echo "github.ref is = ${{ github.ref }}."
+          echo "git remote information:"
+          git remote -v
+
+          #with workspace cache, we somehow get this
+          # fatal: could not read Username for 'https://github.com': No such device or address
+          # ....
+          # It is probably caused by caching ${{ github.workspace }}, as I assume it might generate the
+          # ~/.git* credential files based on the secrets.GITHUB_TOKEN each run.
+          # But since I cache ~, it probably uses old access tokens that have since expired...
+          #
+          # Logs for reference:
+          # 
+          #Run actions/checkout@v4
+          #Syncing repository: user/ps4-linux-12xx
+          # Getting Git version info
+          #Working directory is '/home/runner/work/ps4-linux-12xx/ps4-linux-12xx'
+          #/usr/bin/git version
+          #git version 2.50.1
+          #Temporarily overriding HOME='/home/runner/work/_temp/f40ae438-ce43-4277-9d66-41be451e6adf' before making global git config changes
+          #Adding repository directory to the temporary git global config as a safe directory
+          #/usr/bin/git config --global --add safe.directory /home/runner/work/ps4-linux-12xx/ps4-linux-12xx
+          #Deleting the contents of '/home/runner/work/ps4-linux-12xx/ps4-linux-12xx'
+          #Initializing the repository
+          #/usr/bin/git init /home/runner/work/ps4-linux-12xx/ps4-linux-12xx
+          
+          # Maybe we need to recreate whatever happens up above ^^^
+          # I'm sure there is an easier workaround with `git credential-cache` or `git credential`, `rm ~/.git-[]` , etc.
+          # But all that is messy, and it is smart to move the cache and compilation to another subdirectory.
+          # It is much safer and more predictable. I just wanted to test a proof of concept.
+          
+          # The new cache refactoring is put in the yaml with far fewer comments and code, but this is still useful for reference,
+          # and how I learned and got to that final stage. So I'll keep it as a hidden file.
+          # A similar thing is done for the /Dockerfile.
+          # Sayonara
+
+          #git pull --depth=1 origin ${{ github.ref }} --update-shallow --no-rebase -X theirs --allow-unrelated-histories
+          #pull with depth tries to commit???
+
+          #git fetch --depth=1 origin ${{ github.ref }} 
+          #git reset --hard origin/${{ github.ref }}
+          #reference not found (origin/refs/heads/ps4-linux-5.15.y-conservative2); with reset.
+
+          #git pull origin ps4-linux-5.15.y-conservative2 --update-shallow --no-rebase -X theirs --allow-unrelated-histories
+          #still slow...
+          
+          git fetch --depth=1 origin ps4-linux-5.15.y-conservative2
+          git reset --hard origin/ps4-linux-5.15.y-conservative2
+          if [ -f config ]; then
+            echo "Renaming config to .config"
+            mv config .config
+          else
+            echo ".config already exists. Continuing."
+          # for reruns without updating the repo
+          fi;
+
+        # Code:
+        # _DEFAULT_BRANCH=$(git remote show origin 2>/dev/null | awk '/HEAD branch/ {print $NF}')
+        # _DEFAULT_BRANCH=${DEFAULT_BRANCH:-ps4-linux-5.15.y-conservative2}
+        # git fetch --depth=1 origin ${{ github.ref }} 
+        # git reset origin/${{ github.ref }} --hard
+
+        # Assigns master branch, or uses one if unset. Used for fetch and reset. Nvm unnecessary.
+
+        #Nvm reset is unnecessary. The slow fetch was because of pulling another branch
+        #git pull origin --update-shallow --no-rebase -X theirs && mv config .config
+        #git pull origin --update-shallow --no-rebase --allow-unrelated-histories -X theirs && mv config .config
+        # git pull origin --rebase -X theirs && mv config .config
+        # Rebase version. unrelated-histories not possible. Best to merge if you don't frequently sync cache with repo.
+
+        # Since I used actions/checkout, and since my repo was forked using github webpage,
+        # it contains the entire linux history up to 5.15, unlike my local clone.
+        # Which makes --allow-unrelated-histories very slow.
+
+        # Using git fetch origin; git reset HEAD --hard is probably the best option..
+        # But in case some obj files are not excluded. . . Nvm. git reset doesn't touch
+        # untracked files lol.
+        # cd ../ (unnecessary since the path is not saved between steps)
+
+
+
+      # Build Docker image  
+      - name: Build Docker image with cache
+        run: |
+          echo "Current pwd = $PWD in docker image build"
+          mkdir -p /tmp/.buildx-cache
+          docker buildx build \
+            --cache-from type=local,src=/tmp/.buildx-cache \
+            --cache-to type=local,dest=/tmp/.buildx-cache,mode=max \
+            --build-arg BUILDKIT_INLINE_CACHE=1 \
+            --tag kernel-linux-ps4:latest \
+            --load \
+            .
+      # This /tmp is not gonna be made if the directory doesn't exist already
+      # --load loads the contents the image into the workspace OS, otherwise only in cache
+      # --cache-to type=local caches straight to the host machine, meaning github workspace
+      #
+      # build-context workspace=./ results in /home/runner/work/repo/repo by default
+   
+      #--build-context workspace=${{ github.workspace }} \
+      # Removed because we no longer compile in the docker build.
+
+      - name: Compile the linux kernel with docker run
+        id: compile-kernel-step
+        run: |
+          docker run -i --name kernel -d -v ${{ github.workspace }}:/container/workspace -w /container/workspace \
+          kernel-linux-ps4:latest tail -f /dev/null
+          # -v is volume, # -w is workdir (WORKDIR)
+          #
+          # -d is detached. Is useful for when you are starting the initial docker image and you don't need its output.
+          # -i is useful in most cases. -t is probably not needed in CI but keeping it anyway.
+          # Nvm got rid of it.
+
+          # without -it, you need to run some other command as well, otherwise it will fail.
+          # Not true. There was an empty space after "\" which broke the command continuation.
+
+          # Somehow it worked with both -it and -d before (after compiling kernel), 
+          # but not now. I will add a tail or bash command to keep the container running I guess. .
+          # Options:
+          # sleep 90000000000
+          # sleep infinity (GNU only) [seems this doesn't work and closes the container immediately]
+          # tail -f /dev/null
+          # Either that or specify CMD or ENTRYPOINT in Dockerfile.
+          # Maybe it is because previously, it would always (even if other steps were cached) 
+          # compile the kernel using
+          # RUN <<"EOF"
+          # set -e
+          # . . .
+          # It's possible that doing so created a default/running cmd in the dockerfile. 
+          # Using -d (detached) and -it is atypical. But it works 
+          # Just put it in one line instead of \ because I don't know what's wrong.
+          # Still didn't work. The problem was the command options and formatting. Chatgpt failed me.
+          # You don't need to specify the tail -f if the command syntax is right
+          
+          echo "Made it past running docker run -it. Will docker exec bash now."
+          #docker exec -it kernel bash <<"EOF"
+          #heredoc doesn't work directly with docker exec. you can't run a chain or quoted command. 
+          #https://docs.docker.com/reference/cli/docker/container/exec/
+          #with -t it says: input device is not a tty
+          #docker exec kernel bash -c "
+          #bash <<\"EOF\"
+
+
+
+          # groupadd -g $HOST_GID runner
+          # useradd -m -u $HOST_UID -g $HOST_GID runner
+          # exec su runner -c "$@"
+          # changing perms stuff. The problem is probably actions/cache key hits...
+      
+          #-i apparently allows stdin to the command... let's see. Yes
+          docker exec -i kernel bash <<'EOF' 
+          set -e
+          echo "Testing if host directory mounting was successful."
+          ls -a .
+          # chown -R $HOST_UID:$HOST_GID .
+          
+          # already cd'ed
+          if [ -f persistence_test* ]; then
+            echo "Files are persisting across runs! Congratulations."
+          else
+            echo "Files are not persisting across runs, OR, this is the first uncached action run."
+          fi;
+
+          echo "File perms of mounted directory:"
+          stat /container/workspace /container/workspace/*
+          #echo "Changing perms of the mounted directory"
+          #chmod 777 -R /container/workspace
+          
+          echo "Doing persistence tests!"
+          touch "write_test"
+          echo "persisting! $(date --iso=s)" > persistence_test_"$(date --iso=s)".txt: 
+          echo "files available..."
+          ls -a
+
+          export localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '"'`
+          # Using uppercase localversion will mess with your final kernel img version.
+          export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
+          export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
+          export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
+          export KERNEL_PKG=kernel-${localversion}.tar.gz
+          export MAKE_OPTS="-j`nproc` \
+                     INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
+                     INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
+                     HOSTCC=gcc-11 \
+                     CC=gcc-11"
+          mkdir -p ${GCE_BUILD_DIR}
+          mkdir -p ${GCE_INSTALL_DIR}/boot
+          mkdir -p ${GCE_PKG_DIR}
+          echo "Debugging gce directory."
+          find ${GCE_BUILD_DIR} ${GCE_INSTALL_DIR}/boot ${GCE_PKG_DIR}
+
+          make ${MAKE_OPTS} olddefconfig
+          make ${MAKE_OPTS} prepare
+          echo "Making kernel. . ."
+          make ${MAKE_OPTS}
+          echo "Making modules . . ."
+          make ${MAKE_OPTS} modules
+          echo "Installing kernel . . ."
+          make ${MAKE_OPTS} install
+          echo "Installing modules . . ."
+          make ${MAKE_OPTS} modules_install
+          echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
+          cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
+          cd ${GCE_INSTALL_DIR}
+          #tar -cvzf /kernel_"$localversion".tar.gz2 boot/* lib/modules/* --owner=0 --group=0
+          #Move directly to the workspace. Only keeping bzImage and modules
+          tar -cvzf /container/workspace/kernel_"$localversion".tar.gz boot/bzImage lib/modules/* --owner=0 --group=0
+          EOF
+          
+          # Now in runner.
+          echo "Available files in runner after docker compile..."
+          ls -la
+          echo "compile-kernel-complete=true" >> $GITHUB_OUTPUT
+          #This is set even if there are compile errors. 
+          #We just want to ensure that we reached the end of this stage before deleting the old cached rud run.
+
+          #upload works.. but why do the files not persist.
+          #Solution: It's because github doesn't update/overwrite old caches 
+
+      ### Run a docker instance, interactively, with the name "kernel", using previous image
+      ### kernel-linux-ps4's "latest" tag/state (the default tag name)
+      ##- name: retrieve artifact from docker image
+      ##  id: docker-run-step
+      ##  run: |
+      ##    docker run -it --name kernel -d kernel-linux-ps4:latest
+      ##    localversion=`cat /container/workspace/.config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'`
+      ##    echo "localversion is originally = $localversion"
+      ##    echo "localversion=$localversion" >> $GITHUB_OUTPUT
+      ##    docker cp kernel:/kernel_"$localversion".tar.gz2 ${{ github.workspace }} 
+      ##  # Copy kernel.tar.gz to the github workspace
+      ##  #localversion=`docker exec kernel sh -c "cat /container/workspace/.config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'"`
+      ##  # Unnecessary when files are on the workspace directly
+
+      ##  #- name: Cache the built kernel directory into workspace
+      ##  #run: |
+      ##  #  echo "Copying build directory to work space using r-sync"
+      ##  #  apt-get install -y rsync
+      ##  #  docker psu
+      ##  #  docker exec sh -c "rsync
+      ##  
+      ##  #  Using bind mount/volumes in docker build instead
+      ##  #  
+      ##- name: Use localversion env
+      ##  env:
+      ##    localversion: ${{ steps.docker-run-step.outputs.localversion }}
+      ##  run: |
+      ##    echo "Using localversion=$localversion"
+      ##    echo "Or actually... using localversion=${{ env.localversion }}"
+      ##
+
+      - name: Get kernel version name env
+        id: kernel-version-env
+        run: |
+          localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*=||p' | tr -d '\"'`
+          echo "localversion is originally = $localversion"
+          echo "localversion=$localversion" >> $GITHUB_OUTPUT
+
+      - name: Upload kernel image to github actions artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          #name: kernel
+          name: ${{ steps.kernel-version-env.outputs.localversion }}
+          #path: ${{ github.workspace }}/kernel_${{ env.localversion }}.tar.gz2 (doesn't work.
+          #env is not exported between "run"s)
+          #path: ${{ github.workspace }}/kernel_${{ steps.docker-run-step.outputs.localversion }}.tar.gz2
+          path: ${{ github.workspace }}/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
+          # This path is the github actiions root
+
+      # - name: Delete the kernel image artifact from workspace
+      #  run: |
+      #   #if [ -n $(grep 10 ./build_counter) ]; ... then
+      #    # for file in ... <<< ls --sort time; do
+      #    #rm ${{ github.workspace }}/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
+      #    #done
+      #    #fi
+
+      - name: Testing Cache Hit Bools
+        run: |
+          echo "Current steps.cache-restore-workspace.outputs.cache-hit = ${{ steps.cache-restore-workspace.outputs.cache-hit }}"
+          echo "and"
+          echo "Current steps.compile-kernel-step.outputs.compile-kernel-complete = ${{ steps.compile-kernel-step.outputs.compile-kernel-complete }}"
+
+      #3: https://github.com/actions/cache/issues/342#issuecomment-2773231159 (langston-barett, Apr '25)
+      - name: Delete Cache of Github Workspace
+        env:
+          GH_TOKEN: ${{ github.token }}
+        if: steps.cache-restore-workspace.outputs.cache-hit && steps.compile-kernel-step.outputs.compile-kernel-complete
+        # Using `--repo` makes it so that this step doesn't require checking out the
+        # repo first.
+        run: |
+          echo "There was a cache hit for github workspace, and we just completed the kernel compilation. Hence deleting the old cache."
+          gh cache delete --repo ${{ github.repository }} ${{ steps.cache.outputs.cache-primary-key }}     
+      
+      - name: Save Cache of Github Workspace
+        uses: actions/cache/save@v4
+        # Save the cache even if build steps fail.
+        #if: always()
+
+        # If we at least get to the end of compile step, then attempt to save.
+        # If the cache has not been deleted in delete cache step, then this won't save anyway, saying "Cache already in use,"
+        # but still keeping this if conditional.
+        if: steps.compile-kernel-step.outputs.compile-kernel-complete
+        with:
+          path: ${{ github.workspace }} #it will cache things in this dir. Not where it is storing the cache (they may be same though?).
+          key: ${{ steps.cache-restore-workspace.outputs.cache-primary-key }}
+          # Warning, this will also save the bulit artifacts themselves (the kernel.tar.gz)
+          # We can remove those tar.gzs by uncommenting the above run block, or by having a conditional delete every 10 compiles or so.
+          # Additionally by deleting the caches entirely from gh or web-interface.
+      
+
+# Some yaml facts.
+ # Even if your indentation or other errors are further down
+ # in the file, yaml will complain of missing "-" way up at the start.
+
+ # Minor indentation faults can break your yaml, so format properly.
+
+ # There is github.com/google/yamlfmt , which works decent
+ # At least it tells you what is broken and what isn't
+ # IMPORTANT: You CANNOT, put comments outside a run block, before the block is over; Unless it is aligned with the commands.
+ # Such as:
+ # run: |
+ #   echo this
+ #   echo that
+ # #comment
+ #   echo final
+ #
+ # This is invalid ! ^^^
+ #
+ # It needs to be ->
+ # run: |
+ #   echo this
+ #   echo that
+ # # Comment. On command 2. . . 
+ #
+ # Though 
+ # run: |
+ #   echo this
+ #   # comment
+ #   echo that
+ # Will work
+ 
+ # Vim highlighting can be misleading.
