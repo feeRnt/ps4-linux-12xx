@@ -1,5 +1,5 @@
 /*
- * Panasonic MN86471A DP->HDMI bridge driver (via PS4 Aeolia ICC interface)
+ * Panasonic MN86471A / MN864729 DP->HDMI bridge driver (via PS4 Aeolia ICC interface)
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -15,12 +15,26 @@
 // TODO (ps4patches): Make functions atomic,
 //  https://lore.kernel.org/linux-arm-kernel/20211020181901.2114645-5-sam@ravnborg.org/
 
+/* 
+ * Extra patches from https://github.com/rancido,
+ * 		   in https://github.com/Ps3itaTeam/ps4-linux/
+ * Maybe the problem is no one is putting a "Copyright"
+ * in their files ...
+ * BUt that goes against the whole nature of tinkery/RE work..?
+ * But does it really? No.
+ *
+ * 
+ * Copyright: .....
+ *
+*/
 #include <asm/ps4.h>
 
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_edid.h>
+
+//#include <drm/drmP.h>
 
 #include <drm/drm_bridge.h>
 #include <drm/drm_encoder.h>
@@ -38,6 +52,7 @@
 #include "amdgpu_connectors.h" //added
 #include "amdgpu_display.h"    //added
 
+//#include "radeon_mode.h"
 
 #define CMD_READ	1, 1
 #define CMD_WRITE	2, 2
@@ -265,7 +280,7 @@ static void cq_mask(struct i2c_cmdqueue *q, u16 addr, u8 value, u8 mask)
 	*q->p++ = mask;
 }
 
-#if 1
+#if 0
 static void cq_delay(struct i2c_cmdqueue *q, u16 time)
 {
 //    pr_info("ps4_bridge: called %s\n", __func__);
@@ -402,6 +417,7 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 	struct drm_connector *connector = mn_bridge->connector;
 	struct drm_device *dev = connector->dev;
+	//check this vvv
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	u8 dp[3];
 
@@ -431,7 +447,7 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		if (cq_exec(&mn_bridge->cq) < 11) {
 			mutex_unlock(&mn_bridge->mutex);
 			pr_info("could not read DP status");
-		return;
+			return;
 		}
 		memcpy(dp, &mn_bridge->cq.reply.databuf[3], 3);
 
@@ -555,9 +571,12 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_mask(&mn_bridge->cq, 0x1e00, 0x00, 0x21);
 		cq_mask(&mn_bridge->cq, 0x1e02, 0x00, 0x70);
 		// 03 08 01 01 00  2c 01 00
-		cq_delay(&mn_bridge->cq, 0x012c);
+		//rancido has no delay here vvv
+		//cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x00);
-		cq_delay(&mn_bridge->cq, 0x0032);
+
+		//rancido has no delay here vvv
+		//cq_delay(&mn_bridge->cq, 0x0032);
 		cq_writereg(&mn_bridge->cq, 0x7402, 0x1c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x04);
 		cq_writereg(&mn_bridge->cq, TSYSCTRL, TSYSCTRL_HDMI);
@@ -600,7 +619,8 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_wait_set(&mn_bridge->cq, 0x10f6, 0x80);
 		cq_mask(&mn_bridge->cq, 0x7226, 0x00, 0x80);
 		cq_mask(&mn_bridge->cq, 0x7228, 0x00, 0xFF);
-		cq_delay(&mn_bridge->cq, 0x012c);
+		// rancido has no delay here vvv
+		//cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x7204, 0x40);
 		cq_wait_clear(&mn_bridge->cq, 0x7204, 0x40);
 		cq_writereg(&mn_bridge->cq, 0x7a8b, 0x05);
