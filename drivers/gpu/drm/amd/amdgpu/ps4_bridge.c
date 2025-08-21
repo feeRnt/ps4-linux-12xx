@@ -1,5 +1,5 @@
 /*
- * Panasonic MN86471A DP->HDMI bridge driver (via PS4 Aeolia ICC interface)
+ * Panasonic MN86471A / MN864729 DP->HDMI bridge driver (via PS4 Aeolia ICC interface)
  *
  * This software is licensed under the terms of the GNU General Public
  * License version 2, as published by the Free Software Foundation, and
@@ -11,6 +11,25 @@
  * GNU General Public License for more details.
  */
 
+
+// TODO (ps4patches): Make functions atomic,
+//  https://lore.kernel.org/linux-arm-kernel/20211020181901.2114645-5-sam@ravnborg.org/
+//  from version 5.15.15 ^
+
+/*
+ * Forward-ported patches from https://github.com/rancido,
+ * 		            in https://github.com/Ps3itaTeam/ps4-linux/
+ * Maybe the problem is no one is putting a "Copyright"
+ * in their files ... We don't know who introduced what change or where,
+ * since there is often no centralized repository.. Patches thrown around
+ * everywhere.
+ * But that goes against the whole nature of tinkery/RE work..?
+ * But does it really? No.
+ *
+ *
+ * Copyright: .....
+ *
+*/
 #include <asm/ps4.h>
 
 #include <drm/drm_crtc.h>
@@ -153,6 +172,20 @@ static struct ps4_bridge g_bridge = {
 	.mutex = __MUTEX_INITIALIZER(g_bridge.mutex)
 };
 
+/* Function prototype declarations, to fix compilation warnings */
+void ps4_bridge_mode_set(struct drm_bridge *bridge,
+			 const struct drm_display_mode *mode,
+			 const struct drm_display_mode *adjusted_mode);
+
+int ps4_bridge_get_modes(struct drm_connector *connector);
+
+enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
+		bool force);
+
+int ps4_bridge_register(struct drm_connector *connector,
+			     struct drm_encoder *encoder);
+
+
 static void cq_init(struct i2c_cmdqueue *q, u8 code)
 {
 	q->req.code = code;
@@ -244,7 +277,7 @@ static void cq_mask(struct i2c_cmdqueue *q, u16 addr, u8 value, u8 mask)
 	*q->p++ = mask;
 }
 
-#if 1
+#if 0
 static void cq_delay(struct i2c_cmdqueue *q, u16 time)
 {
 	cq_cmd(q, CMD_DELAY);
@@ -520,9 +553,12 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_mask(&mn_bridge->cq, 0x1e00, 0x00, 0x21);
 		cq_mask(&mn_bridge->cq, 0x1e02, 0x00, 0x70);
 		// 03 08 01 01 00  2c 01 00
-		cq_delay(&mn_bridge->cq, 0x012c);
+		//rancido has no delay here vvv
+		//cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x00);
-		cq_delay(&mn_bridge->cq, 0x0032);
+
+		//rancido has no delay here vvv
+		//cq_delay(&mn_bridge->cq, 0x0032);
 		cq_writereg(&mn_bridge->cq, 0x7402, 0x1c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x04);
 		cq_writereg(&mn_bridge->cq, TSYSCTRL, TSYSCTRL_HDMI);
@@ -565,7 +601,8 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_wait_set(&mn_bridge->cq, 0x10f6, 0x80);
 		cq_mask(&mn_bridge->cq, 0x7226, 0x00, 0x80);
 		cq_mask(&mn_bridge->cq, 0x7228, 0x00, 0xFF);
-		cq_delay(&mn_bridge->cq, 0x012c);
+		// rancido has no delay here vvv
+		//cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x7204, 0x40);
 		cq_wait_clear(&mn_bridge->cq, 0x7204, 0x40);
 		cq_writereg(&mn_bridge->cq, 0x7a8b, 0x05);
@@ -648,14 +685,14 @@ static void ps4_bridge_post_disable(struct drm_bridge *bridge)
  * Other CEA modes *should* work (and are allowed if externally added) */
 
 /* 1 - 640x480@60Hz */
-static const struct drm_display_mode mode_480p = {
+static const struct drm_display_mode mode_480p __maybe_unused = {
 	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 		 752, 800, 0, 480, 490, 492, 525, 0,
 		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
 	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
 };
 /* 4 - 1280x720@60Hz */
-static const struct drm_display_mode mode_720p = {
+static const struct drm_display_mode mode_720p __maybe_unused = {
 	DRM_MODE("1280x720", DRM_MODE_TYPE_DRIVER, 74250, 1280, 1390,
 		 1430, 1650, 0, 720, 725, 730, 750, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
@@ -663,7 +700,7 @@ static const struct drm_display_mode mode_720p = {
 };
 /* 16 - 1920x1080@60Hz */
 static const struct drm_display_mode mode_1080p = {
-	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
+	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED, 148500, 1920, 2008,
 		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
 	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
@@ -673,7 +710,8 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 {
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *newmode;
-	DRM_DEBUG_KMS("ps4_bridge_get_modes\n");
+	/* This is usually excessive logging for most */
+	pr_debug("ps4_bridge_get_modes\n");
 
 	newmode = drm_mode_duplicate(dev, &mode_1080p);
 	drm_mode_probed_add(connector, newmode);
@@ -756,8 +794,24 @@ int ps4_bridge_register(struct drm_connector *connector,
 
 	mn_bridge->encoder = encoder;
 	mn_bridge->connector = connector;
+
+	//from codedwrench source:
+	mn_bridge->connector->connector_type = DRM_MODE_CONNECTOR_HDMIA;
+
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
+
+	// TODO (ps4patches): This seems to be the new way of adding bridges
+	//drm_bridge_add(&mn_bridge->bridge);
+	//Seems like no driver really implemented it in this version of the kernel
+	/* Edit: It is not needed for proper functionality */
+
 	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL);
+
+	// Allow the bridge to create its own connectors with last parameter = 0.
+	//ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
+	// Not yet introduced in this version of the kernel... This modification is from
+	// v5.15.15
+
 	if (ret) {
 		DRM_ERROR("Failed to initialize bridge with drm\n");
 		return -EINVAL;
