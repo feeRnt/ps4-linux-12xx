@@ -1015,7 +1015,10 @@ int ps4_bridge_register(struct drm_connector *connector,
 	 * Doesn't seem to do anything. 
 	 * Probably needed now */
 
-	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
+	//ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
+	
+	// Allow the bridge to create its own connectors with last parameter = 0.
+	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
 	if (ret) {
 		pr_info("Failed to initialize bridge with drm\n");
 		return -EINVAL;
