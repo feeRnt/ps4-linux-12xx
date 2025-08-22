@@ -280,7 +280,7 @@ static void cq_mask(struct i2c_cmdqueue *q, u16 addr, u8 value, u8 mask)
 	*q->p++ = mask;
 }
 
-#if 0
+#if 1
 static void cq_delay(struct i2c_cmdqueue *q, u16 time)
 {
 //    pr_info("ps4_bridge: called %s\n", __func__);
@@ -571,12 +571,16 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_mask(&mn_bridge->cq, 0x1e00, 0x00, 0x21);
 		cq_mask(&mn_bridge->cq, 0x1e02, 0x00, 0x70);
 		// 03 08 01 01 00  2c 01 00
-		//rancido has no delay here vvv
-		//cq_delay(&mn_bridge->cq, 0x012c);
+		
+		//rancido has no delay here
+		/* But the delays may be important.. 
+		 * Had a strange flickering screen at kernel init
+		 * without them 1 time. . . Not sure who introduced the patches */ 
+		cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x00);
 
 		//rancido has no delay here vvv
-		//cq_delay(&mn_bridge->cq, 0x0032);
+		cq_delay(&mn_bridge->cq, 0x0032);
 		cq_writereg(&mn_bridge->cq, 0x7402, 0x1c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x04);
 		cq_writereg(&mn_bridge->cq, TSYSCTRL, TSYSCTRL_HDMI);
@@ -620,7 +624,7 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_mask(&mn_bridge->cq, 0x7226, 0x00, 0x80);
 		cq_mask(&mn_bridge->cq, 0x7228, 0x00, 0xFF);
 		// rancido has no delay here vvv
-		//cq_delay(&mn_bridge->cq, 0x012c);
+		cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x7204, 0x40);
 		cq_wait_clear(&mn_bridge->cq, 0x7204, 0x40);
 		cq_writereg(&mn_bridge->cq, 0x7a8b, 0x05);
@@ -629,7 +633,8 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_mask(&mn_bridge->cq, 0x1e00, 0x01, 0x01);
 		cq_writereg(&mn_bridge->cq, VMUTECNT, VMUTECNT_LINEWIDTH_90);
 		cq_writereg(&mn_bridge->cq, HDCPEN, 0x00);
-		//TODO: don't write 0 to HDCPENcoder(?) register after enable
+		// Try: don't write 0 to HDCPENcoder(?) register after enable ^^^ :
+		// Doesn't seem to have an effect
 		if (cq_exec(&mn_bridge->cq) < 0) {
 			pr_info("Failed to configure ps4-bridge (MN864729) mode\n");
 		}
