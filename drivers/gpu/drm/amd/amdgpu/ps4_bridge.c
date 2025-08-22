@@ -1009,15 +1009,15 @@ int ps4_bridge_register(struct drm_connector *connector,
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
 
 	// TODO (ps4patches): This seems to be the new way of adding bridges
-	// drm_bridge_add(&mn_bridge->bridge);
+	drm_bridge_add(&mn_bridge->bridge);
 	/* test without this:
-	 * causes blackscreen at kernel init. NVM
 	 * Doesn't seem to do anything. 
-	 * Probably needed now */
+	 * But probably still needed now */
 
 	//ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
 	
 	// Allow the bridge to create its own connectors with last parameter = 0.
+	// drm_bridge_attach parameters: encoder, bridge, previous bridge, flags
 	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
 	if (ret) {
 		pr_info("Failed to initialize bridge with drm\n");
