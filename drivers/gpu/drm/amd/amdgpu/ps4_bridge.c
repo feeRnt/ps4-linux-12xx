@@ -576,7 +576,7 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		/* But the delays may be important.. 
 		 * Had a strange flickering screen at kernel init
 		 * without them 1 time. . . Not sure who introduced the patches */ 
-		//cq_delay(&mn_bridge->cq, 0x012c);
+		cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x00);
 
 		//rancido has no delay here vvv
