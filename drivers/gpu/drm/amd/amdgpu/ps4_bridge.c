@@ -1010,7 +1010,8 @@ int ps4_bridge_register(struct drm_connector *connector,
 	mn_bridge->connector = connector;
 	
 	//was added in codedwrench's source
-	//mn_bridge->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
+	mn_bridge->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
+
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
 
 	// TODO (ps4patches): This seems to be the new way of adding bridges
