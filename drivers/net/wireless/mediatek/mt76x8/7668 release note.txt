@@ -1,0 +1,351 @@
+7668 release note
+mt7668.mp1-1714-v1.2.0 
+cert: Add power cap ie in assoc/reassoc req 
+　　--认证：在关联/重新关联请求时添加功率上限
+　　说明：认证问题，暂时无方法验证。
+cert: Fix TGac 5.2.46 STBC Receive Test fail 
+　　--认证：修复TGac 5.2.46 STBC接收测试失败
+　　说明：认证问题，暂时无方法验证。
+cfg80211: Fix incorrect max_scan_ssids number
+　　--cfg80211：修复不正确的max_scan_ssids值
+　　说明：max_scan_ssids会影响扫描的性能，并且当同时扫描广播ssid和隐藏ssid时如果max_scan_ssids设置较小时，扫描会报扫描参数错误。旧驱动里面该值为1，新驱动已经改成了一个宏来控制，目前该宏为4。
+cfg80211: Fix compile errors for linux-4.1.y 
+　　--cfg80211：修复在linux-4.1.y版本内核上的编译错误
+　　说明：4.1新内核的编译问题，需合入。
+core: Fix PDMA setting and refine wifi power-on function 
+　　--core：修复PDMA设置并改善WiFi上电功能
+　　说明：Pdma是dma（内存直接存取），用于快速传递数据，减小CPU使用,wifi power-on应该是时时序优化。
+misc: Change noise info source of driver "stat" result
+　　--杂项：更改驱动程序“stat”结果的噪声信息源 
+　　说明：mtk在debug时需要的参考信息，建议合入
+misc: Fix random OID timeout in connected idle
+　　--杂项：修复在连接的空闲模式中的随机OID超时
+　　说明：在其他客户上面暴露的问题，建议合入。
+misc: add linux-4.9 support 
+　　--杂项：添加linux-4.9支持
+　　说明：对新内核的支持，建议合入。
+misc: Remove BOW (BT over WiFi) feature 
+　　--杂项：移除BOW（BT over WiFi）功能
+　　说明：移除过后已经经过了几轮QC,?目前沒有发现到异常影响, BT都可以正常使用沒問題
+misc: Fix kernel crash while suspend due to no MT7668 dongle inserted
+　　--杂项：修复由于没有插入mt7668 dongle 而造成的在suspend时的内核crash。
+　　说明：外接dongle时的问题，建议合入。
+misc: Fix compile error if IPV6 is enabled as module 
+　　--杂项：修复当IPV6作为模块时的编译错误
+　　说明：编译错误，建议合入。
+misc: Add build support for Linux backports-3.14-1 （mtk确认）
+　　--杂项：增加对Linux 3.14-1反向移植的编译支持
+　　说明：针对特殊内核的支持，可以合入。
+misc: Add more config items in Makefile.x86 
+　　--杂项：在Makefile.x86中增加更多配置项。
+　　说明：x86平台修改，可以合入。
+perf: Fix USB probe fail on some laptop PC 
+　　--perf：修复在一些笔记本电脑上的USB探测失败问题
+　　说明：usb dongle问题，可以合入。
+regd: Fix crash problem of TxPwrLimit when in single band 
+　　--regd：修复TxPwrLimit在单频段时的崩溃问题
+　　说明：TxPwrLimit.dat为新驱动新增文件，可以在不改代码的前提下修改某个频段的功率参数，虽然目前7668所用均为默认值，但是不排除今后定制的可能，建议合入。
+Sdio：fix command port Tx overflow issue 
+　　--sdio：修复命令端口Tx溢出问题
+　　说明：马镇解释说是发命令时的长度超限制，合入应该无影响。
+sdio: Add support MMC_PM_WAKE_SDIO_IRQ 
+　　--sdio：添加对MMC_PM_WAKE_SDIO_IRQ的支持
+　　说明：有客户会有MMC_PM_WAKE_SDIO_IRQ这个需求，我们没有用到，但是应该无影响。
+softap: apply cfg80211 setting for P2PGO 
+　　--softap：适用于P2PGO的cfg80211设置
+　　说明：softap模式下做P2PServer时对cfg80211的适配更好，建议合入。
+softap: add dfs shut down flow 
+　　--softap：添加dfs关闭流程
+　　说明：在softap模式下增加dfs（动态频率选择）的关闭功能。
+tx: refine WMM set CMD usage between drv and fw 
+　　--tx：改进在driver和FW之间WMM设置CMD的使用
+　　说明：WMM（无线多媒体）定义了四种连接内容，其中包括语音、视频、best effort以及background。并给四种内容进行分级，优先级高的优先保证传输。建议合入。
+mt7668.mp1-1714-v1.2.1 
+ate: Fix FFT cannot work on non-PC Linux platform 
+　　--ate：修复FFT不能在非PC Linux平台上运行的问题
+　　说明：ate校准相关，建议合入。
+cfg80211: Fix Android O CTS item 
+　　--cfg80211：修复Android O cts测试项
+　　说明：修复8.0的cts测试想建议合入。
+cfg80211：get_station will query wlan0 address also
+　　--cfg80211：get_station也会查询wlan0地址
+　　说明：同上
+misc: Fix coding style 
+　　--杂项：修复代码风格
+softap: add 802.11w PMF mandatory item for AP role
+　　--softap：为AP角色添加802.11w PMF强制项
+　　说明：softap模式下的问题，建议合入
+oftap: Fix cannot start hostapd with WPA
+　　--softap：修复无法使用WPA启动hostapd
+　　说明：之前softap无法启动问题的相关修改，已合入。
+softap: Fix WEP key assign bug
+　　--softap：修复WEP密钥分配错误
+　　说明：softap以WEP方式加密时的问题，建议合入。
+softap: Fix rekey and ping fail 
+ 	--softap：修复密钥和ping失败的问题
+　　说明：之前在4.4上碰到的问题，已合入。
+tdls: Fix skb memory overwrite issue
+　　--tdls： 修复skb内存覆盖问题
+　　说明：tdls模式下存在内存泄露问题，建议合入。
+tx: Fix TX handle too late issue
+　　--tx：修复TX handle太晚的问题
+　　说明：修复tx处理时间问题，能够提升tx吞吐率，需验证后合入。
+wowlan: Support EAPOL offload in active mode or wow mode  
+　　--wowlan：在活动模式或wow模式下支持EAPOL卸载
+　　说明：wifi唤醒模式的相关问题，建议合入
+wowlan: automatically enter power mode when suspend in wow state 
+　　--wowlan：在wow状态时待机自动进入电源模式
+　　说明：wifi唤醒模式的相关问题，建议合入
+　　
+　　　另外本次驱动更新我手动合入了国家码、p2p两个个修改，wifi待机时挂死的问题，mtk方面在新驱动已经做了修改，所以这部分修改没有合入。
+国家码：
+　　commit af22923502fd84d4bf2714dcfb9ade731d7e4330
+　　Author: 6407001065 <zhang.lei30@zte.com.cn>
+　　Date:   Fri Jul 21 11:20:00 2017 +0800
+　　
+　　    add country code for wifi
+　　    
+　　    【鞠静文】【故障】【android7.1】【通用市场】【是否需要合入其他主线：否】
+　　    【是否与中间件或者产品有依赖关系：无】
+　　    【详细描述：添加wifi国家码相关设置】
+　　    【接口及功能变更影响分析：无】
+　　    【测试方法：insmod时添加国家码参数】
+　　    【自测结论：ok】【走查信息：自查】
+　　
+　　diff --git a/MT6632_WIFI_DRV/7668_firmware/wifi.cfg b/MT6632_WIFI_DRV/7668_firmware/wifi.cfg
+　　index c43614d..4021123 100755
+　　--- a/MT6632_WIFI_DRV/7668_firmware/wifi.cfg
+　　+++ b/MT6632_WIFI_DRV/7668_firmware/wifi.cfg
+　　@@ -55,4 +55,3 @@ SetChip0 KeepFullPwr 0
+　　 TdlsBufferSTASleep 0
+　　 ChipResetRecover 0
+　　 CalTimingCtrl 1
+　　-Country IN
+　　diff --git a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/common/wlan_lib.c b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/common/wlan_lib.c
+　　old mode 100755
+　　new mode 100644
+　　index 3efcd7f..a794af9
+　　--- a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/common/wlan_lib.c
+　　+++ b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/common/wlan_lib.c
+　　@@ -7012,13 +7012,32 @@ VOID wlanCfgSetDebugLevel(IN P_ADAPTER_T prAdapter)
+　　 	}
+　　 
+　　 }
+　　+#ifdef CFG_SUPPORT_INSMOD_COUNTRYCODE
+　　+BOOLEAN getInsmodCountryArg(char *pucValue)
+　　+{
+　　+	ASSERT(ginsmodcountrycode);
+　　+	ASSERT(pucValue);
+　　 
+　　+	if(kalStrLen(ginsmodcountrycode) > 0)
+　　+	{
+　　+		kalStrnCpy(pucValue, ginsmodcountrycode, WLAN_CFG_VALUE_LEN_MAX - 1);
+　　+		DBGLOG(INIT, ERROR, "pucValue = %s ,ginsmodcountrycode=%s \n",
+　　+			   pucValue,ginsmodcountrycode);
+　　+		return TRUE;
+　　+	}
+　　+	return FALSE;
+　　+}
+　　+#endif
+　　 VOID wlanCfgSetCountryCode(IN P_ADAPTER_T prAdapter)
+　　 {
+　　 	CHAR aucValue[WLAN_CFG_VALUE_LEN_MAX];
+　　 
+　　 	/* Apply COUNTRY Config */
+　　-	if (wlanCfgGet(prAdapter, "Country", aucValue, "", 0) == WLAN_STATUS_SUCCESS) {
+　　+	if (
+　　+#ifdef CFG_SUPPORT_INSMOD_COUNTRYCODE
+　　+    (getInsmodCountryArg(aucValue)==TRUE) || 
+　　+#endif
+　　+	(wlanCfgGet(prAdapter, "Country", aucValue, "", 0) == WLAN_STATUS_SUCCESS)) {
+　　 		prAdapter->rWifiVar.rConnSettings.u2CountryCode =
+　　 		    (((UINT_16) aucValue[0]) << 8) | ((UINT_16) aucValue[1]);
+　　 
+　　diff --git a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/include/config.h b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/include/config.h
+　　old mode 100755
+　　new mode 100644
+　　index 7664fd6..56dc0f4
+　　--- a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/include/config.h
+　　+++ b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/include/config.h
+　　@@ -950,6 +950,8 @@
+　　  */
+　　 #define CFG_SUPPORT_80211_LLC_VLAN 0
+　　 
+　　+
+　　+#define CFG_SUPPORT_INSMOD_COUNTRYCODE 1    //zhen.ma
+　　 /*******************************************************************************
+　　 *                             D A T A   T Y P E S
+　　 ********************************************************************************
+　　diff --git a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/mgmt/reg_rule.c b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/mgmt/reg_rule.c
+　　old mode 100755
+　　new mode 100644
+　　index 37a4e54..bf5899e
+　　--- a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/mgmt/reg_rule.c
+　　+++ b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/mgmt/reg_rule.c
+　　@@ -242,6 +242,30 @@ const struct ieee80211_regdomain regdom_in = {
+　　 	REG_RULE_LIGHT(5745-10, 5825+10, 40, 0) }
+　　 };
+　　 
+　　+const struct ieee80211_regdomain regdom_id = {
+　　+	.n_reg_rules = 1,
+　　+	.reg_rules = {
+　　+	/* channels 1..11 */
+　　+	REG_RULE_LIGHT(2412-10, 2462+10, 40, 0) }
+　　+};
+　　+
+　　+const struct ieee80211_regdomain regdom_th = {
+　　+	.n_reg_rules = 6,
+　　+	.reg_rules = {
+　　+	/* channels 1..11 */
+　　+	REG_RULE_LIGHT(2412-10, 2462+10, 40, 0),
+　　+	/* channels 12,13 */
+　　+	REG_RULE_LIGHT(2467-10, 2472+10, 40, 0),
+　　+	/* channels 36..48 */
+　　+	REG_RULE_LIGHT(5180-10, 5240+10, 40, 0),
+　　+	/* channels 52..64 */
+　　+	REG_RULE_LIGHT(5260-10, 5320+10, 80, NL80211_RRF_DFS),
+　　+	/* channels 100..140 */
+　　+	REG_RULE_LIGHT(5500-10, 5700+10, 160, NL80211_RRF_DFS),
+　　+	/* channels 149..165 */
+　　+	REG_RULE_LIGHT(5745-10, 5825+10, 40, 0) }
+　　+};
+　　+
+　　 /*
+　　  * Step2. Decclare struct mtk_regdomain
+　　  */
+　　@@ -271,11 +295,21 @@ const struct mtk_regdomain my_regdom_cz = {
+　　 	.prRegdRules = &regdom_cz_nl
+　　 };
+　　 
+　　-const struct mtk_regdomain my_regdom_in = {
+　　+const struct mtk_regdomain my_regdom_in = {        //India
+　　 	.country_code = "IN",
+　　 	.prRegdRules = &regdom_in
+　　 };
+　　 
+　　+const struct mtk_regdomain my_regdom_id = {        //Indonesia
+　　+	.country_code = "ID",
+　　+	.prRegdRules = &regdom_id
+　　+};
+　　+
+　　+const struct mtk_regdomain my_regdom_th = {        //Thailand
+　　+	.country_code = "TH",
+　　+	.prRegdRules = &regdom_th
+　　+};
+　　+
+　　 /*
+　　  * Step3. Register to table
+　　  */
+　　@@ -287,6 +321,8 @@ const struct mtk_regdomain *g_prRegRuleTable[] = {
+　　 	&my_regdom_nl,
+　　 	&my_regdom_cz,
+　　 	&my_regdom_in,
+　　+	&my_regdom_id,
+　　+	&my_regdom_th,
+　　 	NULL /* this NULL SHOULD be at the end of the array */
+　　 };
+　　 
+　　diff --git a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/gl_init.c b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/gl_init.c
+　　old mode 100755
+　　new mode 100644
+　　index b47df38..ab3fc9f
+　　--- a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/gl_init.c
+　　+++ b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/gl_init.c
+　　@@ -118,9 +118,16 @@ MODULE_LICENSE("Dual BSD/GPL");
+　　 char *gprifnamesta = "";
+　　 char *gprifnamep2p = "";
+　　 char *gprifnameap = "";
+　　+#ifdef CFG_SUPPORT_INSMOD_COUNTRYCODE 
+　　+char *ginsmodcountrycode = "";
+　　+#endif
+　　 module_param_named(sta, gprifnamesta, charp, 0);
+　　 module_param_named(p2p, gprifnamep2p, charp, 0);
+　　 module_param_named(ap, gprifnameap, charp, 0);
+　　+#ifdef CFG_SUPPORT_INSMOD_COUNTRYCODE 
+　　+module_param_named(mtkCountryCode, ginsmodcountrycode, charp, 0);
+　　+#endif
+　　+
+　　 #endif /* CFG_DRIVER_INF_NAME_CHANGE */
+　　 
+　　 /* NIC interface name */
+　　diff --git a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/include/gl_os.h b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/include/gl_os.h
+　　old mode 100755
+　　new mode 100644
+　　index 758830a..3e64023
+　　--- a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/include/gl_os.h
+　　+++ b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/include/gl_os.h
+　　@@ -969,6 +969,10 @@ extern struct net_device *gPrDev;
+　　 extern char *gprifnameap;
+　　 extern char *gprifnamep2p;
+　　 extern char *gprifnamesta;
+　　+#ifdef CFG_SUPPORT_INSMOD_COUNTRYCODE 
+　　+extern char *ginsmodcountrycode ;
+　　+#endif
+　　+
+　　 #endif /* CFG_DRIVER_INF_NAME_CHANGE */
+　　 
+　　 extern void wlanRegisterNotifier(void);
+　　
+P2p：
+　　commit e5f943d08c5a1b5fa92d94265d9db063564f98a3
+　　Author: 10158804 <zeng.liang101@zte.com.cn>
+　　Date:   Fri Jul 28 18:14:14 2017 +0800
+　　
+　　    reSolve the problem of Wi-Fi Direct Test
+　　    
+　　    【曾亮】【需求】【Android7.1】【国外市场】【是否需要合入其他主线：否】
+　　    【是否与中间件或者产品有依赖关系：无】
+　　    【详细描述：解决CTS Verifier失败项Wi-Fi Direct Test】
+　　    【接口及功能变更影响分析：无】
+　　    【测试方法：修改后，CTS Verifier失败项Wi-Fi Direct Test测试通过 】
+　　    【自测结论：ok】【走查信息：自查】
+　　
+　　diff --git a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/gl_p2p.c b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/gl_p2p.c
+　　old mode 100755
+　　new mode 100644
+　　index 50fd7ea..22ce523
+　　--- a/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/gl_p2p.c
+　　+++ b/MT6632_WIFI_DRV/drv_wlan/MT6632/wlan/os/linux/gl_p2p.c
+　　@@ -1551,7 +1551,7 @@ int p2pDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd)
+　　 		return -EINVAL;
+　　 	}
+　　 
+　　-	if (i4Cmd == IOCTL_GET_DRIVER)
+　　+	if (i4Cmd == IOCTL_GET_DRIVER || i4Cmd == SIOCDEVPRIVATE + 1)
+　　 		ret = priv_support_driver_cmd(prDev, prIfReq, i4Cmd);
+　　 	else if (i4Cmd == SIOCGIWPRIV)
+　　 		ret = mtk_p2p_wext_get_priv(prDev, &rIwReqInfo, &(prIwReq->u), NULL);
+
+
+　　　另外蓝牙部分解决了一个待机后无法唤醒的问题。驱动的修改如下，需要配合mt7668_patch_e2_hdr.bin的修改。
+diff --git a/bluetooth/bt_driver/mtk7668/btmtk_main.c b/bluetooth/bt_driver/mtk7668/btmtk_main.c
+index 771c4d8..2fd71b4 100644
+--- a/bluetooth/bt_driver/mtk7668/btmtk_main.c
++++ b/bluetooth/bt_driver/mtk7668/btmtk_main.c
+@@ -384,7 +384,10 @@ int btmtk_remove_card(struct btmtk_private *priv)
+ 
+ 
+         BTMTK_INFO("%s stop main_thread\n", __func__);
+-        kthread_stop(priv->main_thread.task);
++
++        if(!PTR_ERR(priv->main_thread.task))
++            kthread_stop(priv->main_thread.task);
++
+         BTMTK_INFO("%s stop main_thread done\n", __func__);
+ #ifdef CONFIG_DEBUG_FS
+         /*btmtk_debugfs_remove(hdev);*/
+diff --git a/bluetooth/bt_driver/mtk7668/btmtk_sdio.c b/bluetooth/bt_driver/mtk7668/btmtk_sdio.c
+index b5aa886..8255fb5 100644
+--- a/bluetooth/bt_driver/mtk7668/btmtk_sdio.c
++++ b/bluetooth/bt_driver/mtk7668/btmtk_sdio.c
+@@ -1445,7 +1445,7 @@ static int btmtk_sdio_process_int_status(struct btmtk_private *priv)
+         ret = btmtk_sdio_readl(CHISR, &u32ReadCRValue);
+         BTMTK_DBG("%s check TX_EMPTY CHISR 0x%08x\n", __func__, u32ReadCRValue);
+         if (TX_EMPTY&u32ReadCRValue) {
+-            ret = btmtk_sdio_writel(CHISR, TX_EMPTY);
++            ret = btmtk_sdio_writel(CHISR, (TX_EMPTY | TX_COMPLETE_COUNT));
+             priv->btmtk_dev.tx_dnld_rdy = true;
+             BTMTK_DBG("%s set tx_dnld_rdy 1\n", __func__);
+         }
+
+　　

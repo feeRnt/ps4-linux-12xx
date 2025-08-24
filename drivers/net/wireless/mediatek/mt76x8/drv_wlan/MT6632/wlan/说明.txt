@@ -1,0 +1,1 @@
+请把Makefile.cmm和Makefile.cmm_mp2的对比差异的flag加入你们目前使用的makefile中。
