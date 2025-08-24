@@ -573,10 +573,15 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		// 03 08 01 01 00  2c 01 00
 		
 		//rancido has no delay here
-		/* But the delays may be important.. 
+		/* But the delays may be important..
 		 * Had a strange flickering screen at kernel init
-		 * without them 1 time. . . Not sure who introduced the patches */ 
-		cq_delay(&mn_bridge->cq, 0x012c);
+		 * without them 1 time. . . Not sure who introduced the patches 
+		 *
+		 * EDIT: Seems like flicker is fixed by adding bridge.type = HDMIA
+		 * But blackscreen still remains with this delay on
+		 * even with bridge.type */
+
+		//cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x00);
 
 		//rancido has no delay here vvv
