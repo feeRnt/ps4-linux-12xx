@@ -1,0 +1,70 @@
+LINUX_SRC=/lib/modules/$(shell uname -r)/build
+
+export CONFIG_MTK_COMBO_PLATFORM=x86
+export MTK_COMBO_CHIP=MT6632
+
+PWD=$(shell pwd)
+DRIVER_DIR=$(PWD)/drv_wlan/$(MTK_COMBO_CHIP)/wlan
+#COMMON_DIR=$(PWD)/common
+
+export CONFIG_MTK_WIFI_ONLY=m
+export CONFIG_MTK_COMBO=m
+export CONFIG_MTK_COMBO_WIFI=m
+export CONFIG_MTK_COMBO_COMM=m
+export CONFIG_MTK_COMBO_COMM_UART=m
+export CONFIG_MTK_COMBO_COMM_SDIO=m
+export CONFIG_MT_WIFI_CHRDEV=m
+
+# pcie | sdio | usb
+ifeq ($(hif),)
+    hif=usb
+endif
+
+MODULES_NAME := wlan_$(shell echo $(MTK_COMBO_CHIP) | tr A-Z a-z)
+
+export CONFIG_MTK_COMBO_WIFI_HIF=$(hif)
+
+export CONFIG_MTK_COMBO_PLAT_PATH=x86
+
+##############################################################
+# Compile options
+##############################################################
+#/***** Common part ******/
+
+# Support to change sta, p2p, ap interface names
+# y: enable, n: disable
+# eg. insmod wlan_mt76x8_usb.ko sta=wlan p2p=p2p ap=ap
+CFG_DRIVER_INF_NAME_CHANGE=n
+
+
+#/***** Manage configs into compile options ******/
+
+ifeq ($(CFG_DRIVER_INF_NAME_CHANGE), y)
+PLATFORM_FLAGS += -DCFG_DRIVER_INF_NAME_CHANGE
+endif
+
+
+all: driver common
+
+driver: common
+	+cd $(DRIVER_DIR) && make -C $(LINUX_SRC) M=$(DRIVER_DIR) PLATFORM_FLAGS="$(PLATFORM_FLAGS)" modules
+	@cd $(DRIVER_DIR) && cp $(MODULES_NAME)_$(hif).ko $(MODULES_NAME).ko
+#	@cat $(DRIVER_DIR)/Module.symvers >> $(LINUX_SRC)/Module.symvers
+
+#common:
+#	+cd $(COMMON_DIR) && make -C $(LINUX_SRC) M=$(COMMON_DIR) modules
+#	@cat $(COMMON_DIR)/Module.symvers >> $(LINUX_SRC)/Module.symvers
+
+clean: symvers_clean
+
+symvers_clean: driver_clean common_clean
+	@cp $(LINUX_SRC)/Module.symvers.original $(LINUX_SRC)/Module.symvers
+
+driver_clean:
+	cd $(DRIVER_DIR) && make -C $(LINUX_SRC) M=$(DRIVER_DIR) clean
+	-rm $(DRIVER_DIR)/$(MODULES_NAME).ko
+
+#common_clean:
+#	cd $(COMMON_DIR) && make -C $(LINUX_SRC) M=$(COMMON_DIR) clean
+
+.PHONY: all clean common common_clean driver driver_clean

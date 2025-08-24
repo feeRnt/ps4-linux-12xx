@@ -1,0 +1,18 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+#choice
+
+#	prompt "MT76x8 combo driver variant"
+	#default MT6632
+config MT6632
+    tristate "Mediatek MT6632 combo driver support"
+    default y
+    help
+      This adds support for the MT6632 combo driver,
+      which supports the MT6632 and the MT7668 wireless
+      cards.
+
+# Insert the MT7663 combo driver option here.
+# You can technically build both but I guess it's unnecessary
+
+#endchoice
