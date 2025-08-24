@@ -58,6 +58,11 @@ cd /lib/firmware/mrvl
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/pcie8897_uapsta.bin
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin
+
+mkdir -p /lib/firmware/mediatek
+cd /lib/firmware/mediatek
+wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7668pr2h.bin
+
 #### Extra firmware that are / might be needed for kernel compilation. 
 EOF
 # Wget code snippet from https://github.com/TigerClips1
