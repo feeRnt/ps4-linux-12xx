@@ -317,6 +317,16 @@ jobs:
           echo "files available after test..."
           ls -a
 
+          # copy extra firmware to /lib/firmware
+
+          echo "Copying extra firmware to /lib/firmware"
+
+          if [ -d extra_firmware ]; then
+            if [ -z "$( ls -A 'extra_firmware/' )" ]; then
+              cp -r extra_firmware /lib/firmware
+            fi
+          fi
+
           export localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'`
           # Removes everything up to =, and then the '"' and '-' 
           # Using uppercase localversion will mess with your final kernel img version.
