@@ -352,6 +352,32 @@ static int aeolia_probe_slot(struct sdhci_pci_slot *slot)
 		return -ENODEV;
 	}
 	slot->host->irq = slot->chip->pdev->irq;
+
+	/**			-- Quirk Handling --			**
+	* Needed by certain PS4 console models with the Marvell 88w8897 WiFi+BT chip,
+	* typically present on Belize CUH-1215 and CUH-1216 motherboards.
+	*
+	* Although there's a pathway to identify the model using the AMD VGA controller ID:
+	* #define PCI_DEVICE_ID_CUH_11XX 0x9920
+	* #define PCI_DEVICE_ID_CUH_12XX 0x9922
+	* from drivers/gpu/drm/amd/amdgpu/ps4_bridge.c,
+	*
+	* there is report from an Aeolia CUH-1003 model as well, with the same issue.
+
+	* So it's best to use the SDHCI IDs directly.
+	* Ideally we'd match against the card's CIS vendor and device IDs as well,
+	* but since this host controller has to initialize before we init the card,
+	* there seems to be no good way to check that.
+	*
+	* On unaffected systems, the quirk only prevents usage of predefined clock timings,
+	* for standard clock modes (SDR50, SDR104), and instead calculates it on the fly
+	* using host capabiilites. So it should be harmless in all cases.
+	*/
+	if ((slot->chip->pdev->device == PCI_DEVICE_ID_SONY_AEOLIA_SDHCI) || \
+	    (slot->chip->pdev->device == PCI_DEVICE_ID_SONY_BELIZE_SDHCI)) {
+		slot->host->quirks2 |= SDHCI_QUIRK2_PRESET_VALUE_BROKEN;
+        }
+
 	return 0;
 }
 

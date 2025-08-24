@@ -165,7 +165,7 @@ static const struct mmc_fixup __maybe_unused sdio_fixup_methods[] = {
 		   add_limit_rate_quirk, 150000000),
 	/* On multi function cards, the base, non wifi, non BT, function, is called F0
 	 * Since 8897 traditionally doesn't have any need for any quirk handling, the SDIO_IDs
-	 * file doesn't include the F0 ID. which is the 0x912c. (I assume).
+	 * file doesn't include the F0 ID. which is the 0x912c.
 	 */
 	SDIO_FIXUP(SDIO_VENDOR_ID_MARVELL, SDIO_DEVICE_ID_MARVELL_8897_F0,
 		   add_limit_rate_quirk, 150000000),
