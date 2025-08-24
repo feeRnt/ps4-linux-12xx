@@ -81,6 +81,14 @@ static int mmc_io_rw_direct_host(struct mmc_host *host, int write, unsigned fn,
 	cmd.flags = MMC_RSP_SPI_R5 | MMC_RSP_R5 | MMC_CMD_AC;
 
 	err = mmc_wait_for_cmd(host, &cmd, 0);
+	/* https://fa.linux.kernel.narkive.com/t6hn0noQ/patch-mmc-sdio-retry-cmd52-53-when-error-happens
+	 * Use 3 retries instead of 0 retries:
+	 *
+	 * err = mmc_wait_for_cmd(host, &cmd, MMC_CMD_RETRIES);
+	 * Although proposed by a Marvell engineer, it now seems unnecessary with
+	 * the current patches - on the PS4 88w8897 cards with errors at sdio_init_func.
+	 * Keeping the comment for future reference if some card fails to initialize.
+	 */
 	if (err)
 		return err;
 
