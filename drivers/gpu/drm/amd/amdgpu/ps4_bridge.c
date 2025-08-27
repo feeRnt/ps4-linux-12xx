@@ -782,8 +782,9 @@ int ps4_bridge_register(struct drm_connector *connector,
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
 
 	// TODO (ps4patches): This seems to be the new way of adding bridges
-	drm_bridge_add(&mn_bridge->bridge);
+	//drm_bridge_add(&mn_bridge->bridge);
 	//Seems like no driver really implemented it in this version of the kernel
+	/* Edit: It is not needed for proper functionality */
 
 	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL);
 
