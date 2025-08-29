@@ -2,6 +2,8 @@
 # Compile Options
 # ---------------------------------------------------
 export CONFIG_MTK_COMBO_WIFI_HIF=sdio
+# We just build for sdio now for some reason
+# Can define into a Kconfig option but kept this for now
 export CONFIG_MTK_WIFI_ONLY=m
 export MODULE_NAME=wlan_mt76x8_sdio
 WLAN_CHIP_LIST:=-UMT6620 -UMT6628 -UMT5931 -UMT6630 -UMT6632
@@ -17,7 +19,7 @@ ccflags-y += -DWLAN_INCLUDE_PROC
 ccflags-y += -DCFG_ANDROID_AOSP_PRIV_CMD
 ccflags-y += -DCFG_SUPPORT_AGPS_ASSIST=1
 ccflags-y += -DCFG_SUPPORT_TSF_USING_BOOTTIME=1
-ccflags-y += -Werror
+#ccflags-y += -Werror
 ccflags-y:=$(filter-out -U$(WLAN_CHIP_ID),$(ccflags-y))
 ccflags-y += -DLINUX -D$(WLAN_CHIP_ID)
 

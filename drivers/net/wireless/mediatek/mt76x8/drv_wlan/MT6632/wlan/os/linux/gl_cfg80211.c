@@ -129,7 +129,11 @@
 /*----------------------------------------------------------------------------*/
 int
 mtk_cfg80211_change_iface(struct wiphy *wiphy,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
+			  struct net_device *ndev, enum nl80211_iftype type, struct vif_params *params)
+#else
 			  struct net_device *ndev, enum nl80211_iftype type, u32 *flags, struct vif_params *params)
+#endif
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 	WLAN_STATUS rStatus = WLAN_STATUS_SUCCESS;
@@ -1633,12 +1637,20 @@ int mtk_cfg80211_set_rekey_data(struct wiphy *wiphy, struct net_device *dev, str
 }
 
 void mtk_cfg80211_mgmt_frame_register(IN struct wiphy *wiphy,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0))
+				      IN struct wireless_dev *wdev, struct mgmt_frame_regs *upd)
+#else
 				      IN struct wireless_dev *wdev, IN u16 frame_type, IN bool reg)
+#endif
 {
 #if 0
 	P_MSG_P2P_MGMT_FRAME_REGISTER_T prMgmtFrameRegister = (P_MSG_P2P_MGMT_FRAME_REGISTER_T) NULL;
 #endif
 	P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T) NULL;
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0))
+	IN u16 frame_type = BIT(upd->global_stypes << 4);
+	IN bool reg = false;
+#endif
 
 	do {
 

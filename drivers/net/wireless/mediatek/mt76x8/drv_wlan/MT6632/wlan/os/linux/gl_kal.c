@@ -79,6 +79,9 @@
 #endif
 #include <linux/ctype.h>
 
+#include <net/checksum.h>
+#include <net/ip6_checksum.h>
+
 /*******************************************************************************
 *                              C O N S T A N T S
 ********************************************************************************
@@ -877,7 +880,7 @@ WLAN_STATUS kalRxIndicateOnePkt(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPkt)
 
 	}
 #endif
-	prNetDev->last_rx = jiffies;
+//	prNetDev->last_rx = jiffies;
 #if CFG_SUPPORT_SNIFFER
 	if (prGlueInfo->fgIsEnableMon) {
 		skb_reset_mac_header(prSkb);
@@ -948,6 +951,9 @@ WLAN_STATUS kalRxIndicateOnePkt(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPkt)
 *
 */
 /*----------------------------------------------------------------------------*/
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
+		struct cfg80211_roam_info roam_info = {};
+#endif
 VOID
 kalIndicateStatusAndComplete(IN P_GLUE_INFO_T prGlueInfo, IN WLAN_STATUS eStatus, IN PVOID pvBuf, IN UINT_32 u4BufLen)
 {
@@ -1060,13 +1066,28 @@ kalIndicateStatusAndComplete(IN P_GLUE_INFO_T prGlueInfo, IN WLAN_STATUS eStatus
 									  ieee80211_channel_to_frequency
 									  (ucChannelNum, KAL_BAND_5GHZ));
 				}
-
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
+		roam_info.channel = prChannel;
+		roam_info.bssid = arBssid;
+		roam_info.req_ie =
+			prGlueInfo->aucReqIe;
+		roam_info.req_ie_len =
+			prGlueInfo->u4ReqIeLength;
+		roam_info.resp_ie =
+			prGlueInfo->aucRspIe;
+		roam_info.resp_ie_len =
+			prGlueInfo->u4RspIeLength;
+				cfg80211_roamed(prGlueInfo->prDevHandler,
+						&roam_info,
+						GFP_KERNEL);
+#else
 				cfg80211_roamed(prGlueInfo->prDevHandler,
 						prChannel,
 						arBssid,
 						prGlueInfo->aucReqIe,
 						prGlueInfo->u4ReqIeLength,
 						prGlueInfo->aucRspIe, prGlueInfo->u4RspIeLength, GFP_KERNEL);
+#endif
 			} else {
 				cfg80211_connect_result(prGlueInfo->prDevHandler, arBssid,
 							prGlueInfo->aucReqIe,
@@ -3470,12 +3491,24 @@ UINT_32 kalGetTxPendingCmdCount(IN P_GLUE_INFO_T prGlueInfo)
 
 /* static struct timer_list tickfn; */
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+static void legacy_timer_emu_func(struct timer_list *t)
+{
+	struct legacy_timer_emu *lt = from_timer(lt, t, t);
+	lt->function(lt->data);
+}
+#endif
+
 VOID kalOsTimerInitialize(IN P_GLUE_INFO_T prGlueInfo, IN PVOID prTimerHandler)
 {
 
 	ASSERT(prGlueInfo);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	timer_setup(&(prGlueInfo->tickfn).t, legacy_timer_emu_func, 0);
+#else
 	init_timer(&(prGlueInfo->tickfn));
+#endif
 	prGlueInfo->tickfn.function = prTimerHandler;
 	prGlueInfo->tickfn.data = (unsigned long)prGlueInfo;
 }
@@ -3496,12 +3529,24 @@ BOOLEAN kalSetTimer(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Interval)
 	ASSERT(prGlueInfo);
 
 	if (HAL_IS_RX_DIRECT(prGlueInfo->prAdapter)) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+		mod_timer(&(prGlueInfo->tickfn).t, jiffies + u4Interval * HZ / MSEC_PER_SEC);
+#else
 		mod_timer(&prGlueInfo->tickfn, jiffies + u4Interval * HZ / MSEC_PER_SEC);
+#endif
 	} else {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+		del_timer_sync(&(prGlueInfo->tickfn).t);
+		
+		add_timer(&(prGlueInfo->tickfn).t);
+		mod_timer(&(prGlueInfo->tickfn).t, jiffies + u4Interval * HZ / MSEC_PER_SEC);
+//		add_timer(&(prGlueInfo->tickfn).t);
+#else
 		del_timer_sync(&(prGlueInfo->tickfn));
 
 		prGlueInfo->tickfn.expires = jiffies + u4Interval * HZ / MSEC_PER_SEC;
 		add_timer(&(prGlueInfo->tickfn));
+#endif
 	}
 
 	return TRUE;		/* success */
@@ -3523,7 +3568,11 @@ BOOLEAN kalCancelTimer(IN P_GLUE_INFO_T prGlueInfo)
 
 	clear_bit(GLUE_FLAG_TIMEOUT_BIT, &prGlueInfo->ulFlag);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	if (del_timer_sync(&(prGlueInfo->tickfn).t) >= 0)
+#else
 	if (del_timer_sync(&(prGlueInfo->tickfn)) >= 0)
+#endif
 		return TRUE;
 	else
 		return FALSE;
@@ -4010,7 +4059,11 @@ struct file *kalFileOpen(const char *path, int flags, int rights)
 	int err = 0;
 
 	oldfs = get_fs();
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0)
+	set_fs(KERNEL_DS);
+#else
 	set_fs(get_ds());
+#endif
 	filp = filp_open(path, flags, rights);
 	set_fs(oldfs);
 	if (IS_ERR(filp)) {
@@ -4031,9 +4084,18 @@ UINT_32 kalFileRead(struct file *file, unsigned long long offset, unsigned char 
 	int ret;
 
 	oldfs = get_fs();
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0)
+	set_fs(KERNEL_DS);
+#else
 	set_fs(get_ds());
-
-	ret = vfs_read(file, data, size, &offset);
+#endif
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
+		ret = kernel_read(file, data, size, &offset);
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
+		ret = __vfs_read(file, data, size, &offset);
+#else
+		ret = vfs_read(file, data, size, &offset);
+#endif
 
 	set_fs(oldfs);
 	return ret;
@@ -4045,9 +4107,19 @@ UINT_32 kalFileWrite(struct file *file, unsigned long long offset, unsigned char
 	int ret;
 
 	oldfs = get_fs();
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 1, 0)
+	set_fs(KERNEL_DS);
+#else
 	set_fs(get_ds());
+#endif
 
-	ret = vfs_write(file, data, size, &offset);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 14, 0)
+		ret = kernel_write(file, data, size, &offset);
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 1, 0)
+		ret = __vfs_write(file, data, size, &offset);
+#else
+		ret = vfs_write(file, data, size, &offset);
+#endif
 
 	set_fs(oldfs);
 	return ret;
@@ -4505,7 +4577,11 @@ VOID kalSchedScanResults(IN P_GLUE_INFO_T prGlueInfo)
 {
 	ASSERT(prGlueInfo);
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
+	cfg80211_sched_scan_results(priv_to_wiphy(prGlueInfo),0);
+#else
 	cfg80211_sched_scan_results(priv_to_wiphy(prGlueInfo));
+#endif
 
 }
 
@@ -4951,6 +5027,15 @@ const struct file_operations rMetProcFops = {
 	.write = kalMetWriteProcfs
 };
 #endif
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,6,0))
+const struct proc_ops rMetProcCtrlFops = {
+	.proc_write = kalMetCtrlWriteProcfs
+};
+
+const struct proc_ops rMetProcPortFops = {
+	.proc_write = kalMetPortWriteProcfs
+};
+#else
 const struct file_operations rMetProcCtrlFops = {
 	.write = kalMetCtrlWriteProcfs
 };
@@ -4958,6 +5043,7 @@ const struct file_operations rMetProcCtrlFops = {
 const struct file_operations rMetProcPortFops = {
 	.write = kalMetPortWriteProcfs
 };
+#endif
 
 int kalMetInitProcfs(IN P_GLUE_INFO_T prGlueInfo)
 {
@@ -5036,6 +5122,15 @@ nla_put_failure:
 
 UINT_64 kalGetBootTime(void)
 {
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,39) && LINUX_VERSION_CODE < KERNEL_VERSION(4, 20, 0))
+	struct timespec ts;
+	UINT_64 bootTime = 0;
+	get_monotonic_boottime(&ts);
+	bootTime = ((UINT_64)ts.tv_sec * USEC_PER_SEC) + ts.tv_nsec / NSEC_PER_USEC;
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 20, 0)
+	UINT_64 bootTime = 0;
+	bootTime = ktime_to_us(ktime_get_boottime());
+#else
 	struct timespec ts;
 	UINT_64 bootTime = 0;
 
@@ -5048,6 +5143,7 @@ UINT_64 kalGetBootTime(void)
 	bootTime = ts.tv_sec;
 	bootTime *= USEC_PER_SEC;
 	bootTime += ts.tv_nsec / NSEC_PER_USEC;
+#endif
 	return bootTime;
 }
 

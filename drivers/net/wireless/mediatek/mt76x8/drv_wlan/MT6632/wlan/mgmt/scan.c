@@ -638,7 +638,7 @@ scanSearchExistingBssDescWithSsid(IN P_ADAPTER_T prAdapter,
 	case BSS_TYPE_INFRASTRUCTURE:
 #if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 		scanSearchBssDescOfRoamSsid(prAdapter);
-		/* fall through */
+		__attribute__ ((__fallthrough__));/* FALL THRU */
 #endif
 	case BSS_TYPE_BOW_DEVICE:
 		prBssDesc = scanSearchBssDescByBssidAndSsid(prAdapter, aucBSSID, fgCheckSsid, prSsid);

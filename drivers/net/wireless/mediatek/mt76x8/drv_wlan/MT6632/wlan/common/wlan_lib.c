@@ -7595,6 +7595,7 @@ textresume:
 					x++;
 					continue;
 				}
+				__attribute__ ((__fallthrough__));/* FALL THRU */
 			case '\n':
 				/* \ <lf> -> line continuation */
 				x++;
@@ -8059,7 +8060,7 @@ WLAN_STATUS wlanCfgParse(IN P_ADAPTER_T prAdapter, PUINT_8 pucConfigBuf, UINT_32
 				DBGLOG(INIT, WARN, "[3 parameter mode][%s],[%s],[%s]\n", ppcArgs[0], ppcArgs[1], ucTmp);
 				wlanCfgParseAddEntry(prAdapter, ppcArgs[1], NULL, ucTmp, NULL);
 				kalMemSet(arcArgv_size, 0, WLAN_CFG_ARGV_MAX);
-				kalMemSet(apcArgv, 0, WLAN_CFG_ARGV_MAX);
+				kalMemSet(apcArgv, 0, WLAN_CFG_ARGV_MAX * sizeof(apcArgv[0]));
 				i4Nargs = 0;
 				goto exit;
 
@@ -8111,7 +8112,7 @@ WLAN_STATUS wlanCfgParse(IN P_ADAPTER_T prAdapter, PUINT_8 pucConfigBuf, UINT_32
 				DBGLOG(INIT, WARN, "[3 parameter mode][%s],[%s],[%s]\n", ppcArgs[0], ppcArgs[1], ucTmp);
 				wlanCfgParseAddEntry(prAdapter, ppcArgs[1], NULL, ucTmp, NULL);
 				kalMemSet(arcArgv_size, 0, WLAN_CFG_ARGV_MAX);
-				kalMemSet(apcArgv, 0, WLAN_CFG_ARGV_MAX);
+				kalMemSet(apcArgv, 0, WLAN_CFG_ARGV_MAX * sizeof(apcArgv[0]));
 				i4Nargs = 0;
 				break;
 
@@ -8184,7 +8185,7 @@ WLAN_STATUS wlanCfgParse(IN P_ADAPTER_T prAdapter, PUINT_8 pucConfigBuf, UINT_32
 
 #endif
 			kalMemSet(arcArgv_size, 0, WLAN_CFG_ARGV_MAX);
-			kalMemSet(apcArgv, 0, WLAN_CFG_ARGV_MAX);
+			kalMemSet(apcArgv, 0, WLAN_CFG_ARGV_MAX * sizeof(apcArgv[0]));
 			i4Nargs = 0;
 			break;
 

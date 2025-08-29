@@ -259,7 +259,11 @@ typedef enum _ENUM_KAL_MEM_ALLOCATION_TYPE_E {
 } ENUM_KAL_MEM_ALLOCATION_TYPE;
 
 #ifdef CONFIG_ANDROID		/* Defined in Android kernel source */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
+typedef struct wakeup_source KAL_WAKE_LOCK_T, *P_KAL_WAKE_LOCK_T;
+#else
 typedef struct wake_lock KAL_WAKE_LOCK_T, *P_KAL_WAKE_LOCK_T;
+#endif
 #else
 typedef UINT_32 KAL_WAKE_LOCK_T, *P_KAL_WAKE_LOCK_T;
 #endif

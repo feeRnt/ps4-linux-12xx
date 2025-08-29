@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config MT76X8
+	tristate "MediaTek MT76X8 devices support"
+	depends on CFG80211
+	default y
+	help
+	  This adds support for MT76x8 based WiFi + Bluetooth cards.
+
+if MT76X8
+source "drivers/net/wireless/mediatek/mt76x8/drv_wlan/Kconfig"
+endif #MT76X8

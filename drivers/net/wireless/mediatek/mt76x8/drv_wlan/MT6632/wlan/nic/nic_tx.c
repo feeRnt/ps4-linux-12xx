@@ -3257,7 +3257,11 @@ VOID nicTxCancelSendingCmd(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
 /*----------------------------------------------------------------------------*/
 VOID nicTxDirectStartCheckQTimer(IN P_ADAPTER_T prAdapter)
 {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	mod_timer(&(prAdapter->rTxDirectHifTimer).t, jiffies + 1);
+#else
 	mod_timer(&prAdapter->rTxDirectHifTimer, jiffies + 1);
+#endif
 }
 
 VOID nicTxDirectClearSkbQ(IN P_ADAPTER_T prAdapter)
@@ -3717,7 +3721,11 @@ static WLAN_STATUS nicTxDirectStartXmitMain(struct sk_buff *prSkb, P_MSDU_INFO_T
 		if (!halTxIsDataBufEnough(prAdapter, prMsduInfo)) {
 			QUEUE_INSERT_HEAD(&prAdapter->rTxDirectHifQueue[ucHifTc],
 					  (P_QUE_ENTRY_T) prMsduInfo);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+			mod_timer(&(prAdapter->rTxDirectHifTimer).t, jiffies + TX_DIRECT_CHECK_INTERVAL);
+#else
 			mod_timer(&prAdapter->rTxDirectHifTimer, jiffies + TX_DIRECT_CHECK_INTERVAL);
+#endif
 
 			return WLAN_STATUS_SUCCESS;
 		}
@@ -3886,7 +3894,11 @@ WLAN_STATUS nicTxDirectStartXmit(struct sk_buff *prSkb, P_GLUE_INFO_T prGlueInfo
 
 end:
 	if (skb_queue_len(&prAdapter->rTxDirectSkbQueue))
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+		mod_timer(&(prAdapter->rTxDirectSkbTimer).t, jiffies + TX_DIRECT_CHECK_INTERVAL);
+#else
 		mod_timer(&prAdapter->rTxDirectSkbTimer, jiffies + TX_DIRECT_CHECK_INTERVAL);
+#endif
 	spin_unlock_bh(&prGlueInfo->rSpinLock[SPIN_LOCK_TX_DIRECT]);
 	return ret;
 }

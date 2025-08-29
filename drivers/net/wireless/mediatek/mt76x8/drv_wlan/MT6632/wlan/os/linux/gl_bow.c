@@ -390,10 +390,17 @@ static long bow_ampc_ioctl(IN struct file *filp, IN unsigned int cmd, IN OUT uns
 	if ((prGlueInfo->rBowInfo.fgIsRegistered == FALSE) || (prGlueInfo->ulFlag & GLUE_FLAG_HALT))
 		return -EFAULT;
 	/* permission check */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
+	if (_IOC_DIR(cmd) & _IOC_READ)
+		err = !access_ok((void __user *)arg, _IOC_SIZE(cmd));
+	else if (_IOC_DIR(cmd) & _IOC_WRITE)
+		err = !access_ok((void __user *)arg, _IOC_SIZE(cmd));
+#else
 	if (_IOC_DIR(cmd) & _IOC_READ)
 		err = !access_ok(VERIFY_WRITE, (void __user *)arg, _IOC_SIZE(cmd));
 	else if (_IOC_DIR(cmd) & _IOC_WRITE)
 		err = !access_ok(VERIFY_READ, (void __user *)arg, _IOC_SIZE(cmd));
+#endif
 	if (err)
 		return -EFAULT;
 

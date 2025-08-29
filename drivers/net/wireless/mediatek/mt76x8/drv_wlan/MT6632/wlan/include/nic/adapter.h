@@ -1052,8 +1052,13 @@ struct _ADAPTER_T {
 	BOOLEAN fgTxDirectInited;
 
 	#define TX_DIRECT_CHECK_INTERVAL	(1000 * HZ / USEC_PER_SEC)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+	struct legacy_timer_emu rTxDirectSkbTimer; /* check if an empty MsduInfo is available */
+	struct legacy_timer_emu rTxDirectHifTimer; /* check if HIF port is ready to accept a new Msdu */
+#else
 	struct timer_list rTxDirectSkbTimer; /* check if an empty MsduInfo is available */
 	struct timer_list rTxDirectHifTimer; /* check if HIF port is ready to accept a new Msdu */
+#endif
 
 	struct sk_buff_head rTxDirectSkbQueue;
 	QUE_T rTxDirectHifQueue[TX_PORT_NUM];

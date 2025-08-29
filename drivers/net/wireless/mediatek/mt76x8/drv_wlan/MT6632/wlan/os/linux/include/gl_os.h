@@ -128,8 +128,17 @@
 #include <linux/jiffies.h>	/* jiffies */
 #include <linux/delay.h>	/* udelay and mdelay macro */
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 11, 0)
+#include <linux/sched/signal.h>
+#include <uapi/linux/sched/types.h>
+#endif
+
 #ifdef CONFIG_HAS_WAKELOCK
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0)
+#include <linux/device.h>
+#else
 #include <linux/wakelock.h>
+#endif
 #endif
 
 #if LINUX_VERSION_CODE > KERNEL_VERSION(2, 6, 12)
@@ -542,7 +551,21 @@ struct _GLUE_INFO_T {
 	struct work_struct rTxMsduFreeWork;
 	struct delayed_work rRxPktDeAggWork;
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+ 	struct legacy_timer_emu {
+ 		struct timer_list t;
+ 		void (*function)(unsigned long);
+ 		unsigned long data;
+ 	} _timer;
+#else
+	struct timer_list _timer;
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+ 	struct legacy_timer_emu tickfn;
+#else
 	struct timer_list tickfn;
+#endif
 
 #if CFG_SUPPORT_EXT_CONFIG
 	UINT_16 au2ExtCfg[256];	/* NVRAM data buffer */
@@ -979,7 +1002,13 @@ void p2pSetMulticastListWorkQueueWrapper(P_GLUE_INFO_T prGlueInfo);
 
 P_GLUE_INFO_T wlanGetGlueInfo(VOID);
 
-#if KERNEL_VERSION(3, 14, 0) <= LINUX_VERSION_CODE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 2, 0)
+u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb,
+		    struct net_device *sb_dev);
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0)
+u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb,
+		    struct net_device *sb_dev, select_queue_fallback_t fallback);
+#elif KERNEL_VERSION(3, 14, 0) <= LINUX_VERSION_CODE
 u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb,
 		    void *accel_priv, select_queue_fallback_t fallback);
 #elif KERNEL_VERSION(3, 13, 0) <= LINUX_VERSION_CODE

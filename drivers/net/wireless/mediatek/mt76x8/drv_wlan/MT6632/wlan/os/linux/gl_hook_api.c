@@ -3282,7 +3282,7 @@ INT_32 TxBfProfilePnWrite(struct net_device *prNetDev, UINT_8 profileIdx, UINT_1
 	rTxBfActionInfo.rProfilePnWrite.ucTxBfCategory = BF_PN_WRITE;
 	rTxBfActionInfo.rProfilePnWrite.ucPfmuIdx = profileIdx;
 	rTxBfActionInfo.rProfilePnWrite.u2bw = u2bw;
-	memcpy(&rTxBfActionInfo.rProfilePnWrite.ucBuf[0], &au2XSTS, sizeof(UINT_16)*12);
+	memcpy(&rTxBfActionInfo.rProfilePnWrite.ucBuf[0], &au2XSTS, sizeof(rTxBfActionInfo.rProfilePnWrite.ucBuf[0]));
 
 	i4Status = kalIoctl(prGlueInfo,
 			    wlanoidTxBfAction,

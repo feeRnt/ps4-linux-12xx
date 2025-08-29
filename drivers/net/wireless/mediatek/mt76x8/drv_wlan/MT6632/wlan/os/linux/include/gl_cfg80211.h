@@ -164,7 +164,11 @@ typedef enum _ENUM_TESTMODE_STA_STATISTICS_ATTR {
 /* cfg80211 hooks */
 int
 mtk_cfg80211_change_iface(struct wiphy *wiphy,
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
+			  struct net_device *ndev, enum nl80211_iftype type, struct vif_params *params);
+#else
 			  struct net_device *ndev, enum nl80211_iftype type, u32 *flags, struct vif_params *params);
+#endif
 
 int
 mtk_cfg80211_add_key(struct wiphy *wiphy,
@@ -232,7 +236,11 @@ int mtk_cfg80211_mgmt_tx(struct wiphy *wiphy,
 #endif
 
 void mtk_cfg80211_mgmt_frame_register(IN struct wiphy *wiphy,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0))
+				      IN struct wireless_dev *wdev, struct mgmt_frame_regs *upd);
+#else
 				      IN struct wireless_dev *wdev, IN u16 frame_type, IN bool reg);
+#endif
 
 int mtk_cfg80211_mgmt_tx_cancel_wait(struct wiphy *wiphy, struct wireless_dev *wdev, u64 cookie);
 

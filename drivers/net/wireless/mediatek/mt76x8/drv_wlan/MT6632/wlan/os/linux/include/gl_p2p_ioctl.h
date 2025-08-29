@@ -372,7 +372,11 @@ extern const UINT_32 mtk_cipher_suites[5];
 #if KERNEL_VERSION(4, 1, 0) <= CFG80211_VERSION_CODE
 struct wireless_dev *mtk_p2p_cfg80211_add_iface(struct wiphy *wiphy,
 						const char *name, unsigned char name_assign_type,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 12, 0)
 						enum nl80211_iftype type, u32 *flags, struct vif_params *params);
+#else
+						enum nl80211_iftype type, struct vif_params *params);
+#endif
 #else
 struct wireless_dev *mtk_p2p_cfg80211_add_iface(struct wiphy *wiphy,
 						const char *name,
@@ -382,7 +386,11 @@ struct wireless_dev *mtk_p2p_cfg80211_add_iface(struct wiphy *wiphy,
 int
 mtk_p2p_cfg80211_change_iface(struct wiphy *wiphy,
 			      struct net_device *ndev,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4, 12, 0)
 			      enum nl80211_iftype type, u32 *flags, struct vif_params *params);
+#else
+			      enum nl80211_iftype type, struct vif_params *params);
+#endif
 
 int mtk_p2p_cfg80211_del_iface(struct wiphy *wiphy, struct wireless_dev *wdev);
 
@@ -496,7 +504,11 @@ int mtk_p2p_cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *dev);
 int mtk_p2p_cfg80211_set_channel(struct wiphy *wiphy, struct cfg80211_chan_def *chandef);
 
 void mtk_p2p_cfg80211_mgmt_frame_register(IN struct wiphy *wiphy,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0))
+					  struct wireless_dev *wdev, struct mgmt_frame_regs *upd);
+#else
 					  struct wireless_dev *wdev, IN u16 frame_type, IN bool reg);
+#endif
 
 int
 mtk_p2p_cfg80211_set_bitrate_mask(IN struct wiphy *wiphy,

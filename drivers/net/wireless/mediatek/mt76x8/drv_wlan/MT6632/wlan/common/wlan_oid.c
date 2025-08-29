@@ -7622,9 +7622,11 @@ wlanoidSetAcpiDevicePowerState(IN P_ADAPTER_T prAdapter,
 	case ParamDeviceStateD1:
 		DBGLOG(REQ, INFO, "Set Power State: D1\n");
 		/* no break here */
+		__attribute__ ((__fallthrough__));/* FALL THRU */
 	case ParamDeviceStateD2:
 		DBGLOG(REQ, INFO, "Set Power State: D2\n");
 		/* no break here */
+		__attribute__ ((__fallthrough__));/* FALL THRU */
 	case ParamDeviceStateD3:
 		DBGLOG(REQ, INFO, "Set Power State: D3\n");
 		fgRetValue = nicpmSetAcpiPowerD3(prAdapter);
@@ -11027,7 +11029,7 @@ wlanoidSetP2pMode(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4S
 	}
 
 	prSetP2P = (P_PARAM_CUSTOM_P2P_SET_STRUCT_T) pvSetBuffer;
-	prSetP2P->u4Mode = 3;
+	prSetP2P->u4Mode = 2;
 	DBGLOG(P2P, INFO, "Set P2P enable[%ld] mode[%ld]\n", prSetP2P->u4Enable, prSetP2P->u4Mode);
 
 	/*

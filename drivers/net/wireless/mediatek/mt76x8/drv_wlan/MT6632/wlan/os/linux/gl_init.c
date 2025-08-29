@@ -368,7 +368,11 @@ static struct cfg80211_ops mtk_wlan_ops = {
 	.cancel_remain_on_channel = mtk_cfg80211_cancel_remain_on_channel,
 	.mgmt_tx = mtk_cfg80211_mgmt_tx,
 	/* .mgmt_tx_cancel_wait        = mtk_cfg80211_mgmt_tx_cancel_wait, */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0))
+	.update_mgmt_frame_registrations = mtk_cfg80211_mgmt_frame_register,
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)) || defined(COMPAT_KERNEL_RELEASE)
 	.mgmt_frame_register = mtk_cfg80211_mgmt_frame_register,
+#endif
 
 #ifdef CONFIG_NL80211_TESTMODE
 	.testmode_cmd = mtk_cfg80211_testmode_cmd,
@@ -392,6 +396,9 @@ static const struct wiphy_vendor_command mtk_wlan_vendor_ops[] = {
 			.subcmd = WIFI_SUBCMD_GET_CHANNEL_LIST
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0))
+		.policy = VENDOR_CMD_RAW_DATA,
+#endif
 		.doit = mtk_cfg80211_vendor_get_channel_list
 	},
 	{
@@ -400,6 +407,9 @@ static const struct wiphy_vendor_command mtk_wlan_vendor_ops[] = {
 			.subcmd = WIFI_SUBCMD_SET_COUNTRY_CODE
 		},
 		.flags = WIPHY_VENDOR_CMD_NEED_WDEV | WIPHY_VENDOR_CMD_NEED_NETDEV,
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 3, 0))
+		.policy = VENDOR_CMD_RAW_DATA,
+#endif
 		.doit = mtk_cfg80211_vendor_set_country_code
 	}
 
@@ -525,7 +535,27 @@ unsigned int _cfg80211_classify8021d(struct sk_buff *skb)
 }
 #endif
 
-#if KERNEL_VERSION(3, 14, 0) <= LINUX_VERSION_CODE
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+static void legacy_timer_emu_func(struct timer_list *t)
+{
+	struct legacy_timer_emu *lt = from_timer(lt, t, t);
+	lt->function(lt->data);
+}
+#endif
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 2, 0)
+u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb,
+		    struct net_device *sb_dev)
+{
+	return mtk_wlan_ndev_select_queue(skb);
+}
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 19, 0)
+u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb,
+		    struct net_device *sb_dev, select_queue_fallback_t fallback)
+{
+	return mtk_wlan_ndev_select_queue(skb);
+}
+#elif KERNEL_VERSION(3, 14, 0) <= LINUX_VERSION_CODE
 u16 wlanSelectQueue(struct net_device *dev, struct sk_buff *skb,
 		    void *accel_priv, select_queue_fallback_t fallback)
 {
@@ -955,7 +985,11 @@ VOID wlanSchedScanStoppedWorkQueue(struct work_struct *work)
 
 	/* 2. indication to cfg80211 */
 	/* 20150205 change cfg80211_sched_scan_stopped to work queue due to sched_scan_mtx dead lock issue */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
+	cfg80211_sched_scan_stopped(priv_to_wiphy(prGlueInfo),0);
+#else
 	cfg80211_sched_scan_stopped(priv_to_wiphy(prGlueInfo));
+#endif
 	DBGLOG(SCN, INFO,
 	       "cfg80211_sched_scan_stopped event send done WorkQueue thread return from wlanSchedScanStoppedWorkQueue\n");
 	return;
@@ -2347,13 +2381,23 @@ static INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 			if (!prAdapter->fgTxDirectInited) {
 				skb_queue_head_init(&prAdapter->rTxDirectSkbQueue);
 
-				init_timer(&prAdapter->rTxDirectSkbTimer);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+				timer_setup(&(prAdapter->rTxDirectSkbTimer).t, legacy_timer_emu_func, 0);
 				prAdapter->rTxDirectSkbTimer.data = (unsigned long)prGlueInfo;
 				prAdapter->rTxDirectSkbTimer.function = nicTxDirectTimerCheckSkbQ;
 
-				init_timer(&prAdapter->rTxDirectHifTimer);
+				timer_setup(&(prAdapter->rTxDirectHifTimer).t, legacy_timer_emu_func, 0);
 				prAdapter->rTxDirectHifTimer.data = (unsigned long)prGlueInfo;
 				prAdapter->rTxDirectHifTimer.function = nicTxDirectTimerCheckHifQ;
+#else
+                                init_timer(&prAdapter->rTxDirectSkbTimer);
+                                prAdapter->rTxDirectSkbTimer.data = (unsigned long)prGlueInfo;
+                                prAdapter->rTxDirectSkbTimer.function = nicTxDirectTimerCheckSkbQ;
+
+                                init_timer(&prAdapter->rTxDirectHifTimer);
+                                prAdapter->rTxDirectHifTimer.data = (unsigned long)prGlueInfo;
+                                prAdapter->rTxDirectHifTimer.function = nicTxDirectTimerCheckHifQ;
+#endif
 
 				prAdapter->fgTxDirectInited = TRUE;
 			}
@@ -2718,8 +2762,13 @@ static VOID wlanRemove(VOID)
 
 	if (HAL_IS_TX_DIRECT(prAdapter)) {
 		if (prAdapter->fgTxDirectInited) {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+			del_timer_sync(&(prAdapter->rTxDirectSkbTimer).t);
+			del_timer_sync(&(prAdapter->rTxDirectHifTimer).t);
+#else
 			del_timer_sync(&prAdapter->rTxDirectSkbTimer);
 			del_timer_sync(&prAdapter->rTxDirectHifTimer);
+#endif
 		}
 	}
 

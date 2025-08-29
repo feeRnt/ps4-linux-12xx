@@ -1989,7 +1989,11 @@ priv_set_driver(IN struct net_device *prNetDev,
 
 	ASSERT(IW_IS_GET(u2Cmd));
 	if (prIwReqData->data.length != 0) {
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 0, 0))
+		if (!access_ok(prIwReqData->data.pointer, prIwReqData->data.length)) {
+#else
 		if (!access_ok(VERIFY_READ, prIwReqData->data.pointer, prIwReqData->data.length)) {
+#endif
 			DBGLOG(REQ, INFO, "%s access_ok Read fail written = %d\n", __func__, i4BytesWritten);
 			return -EFAULT;
 		}
