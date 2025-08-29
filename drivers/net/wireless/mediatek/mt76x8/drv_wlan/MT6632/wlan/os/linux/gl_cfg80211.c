@@ -3269,6 +3269,7 @@ int mtk_cfg80211_tdls_oper(struct wiphy *wiphy, struct net_device *dev, u8 *peer
 #endif
 #if (CFG_SUPPORT_SINGLE_SKU == 1)
 
+/*
 #if (CFG_BUILT_IN_DRIVER == 0)
 bool is_world_regdom(char *alpha2)
 {
@@ -3278,6 +3279,12 @@ bool is_world_regdom(char *alpha2)
 	return (alpha2[0] == '0') && (alpha2[1] == '0');
 }
 #endif
+*/ /* Not needed as it is defined in linux source? */
+/*(.text+0x17e0): multiple definition of `is_world_regdom';
+ * drivers/net/wireless/mediatek/mt76x8/drv_wlan/
+ * MT6632/wlan/os/linux/gl_cfg80211.o:gl_cfg80211.c:(.text+0x2ab0):
+ * first defined here*/
+
 
 enum regd_state regd_state_machine(IN struct regulatory_request *pRequest)
 {
