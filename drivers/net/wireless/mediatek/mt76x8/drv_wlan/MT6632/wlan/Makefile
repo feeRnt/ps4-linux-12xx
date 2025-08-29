@@ -4,7 +4,8 @@
 export CONFIG_MTK_COMBO_WIFI_HIF=sdio
 # We just build for sdio now for some reason
 # Can define into a Kconfig option but kept this for now
-export CONFIG_MTK_WIFI_ONLY=m
+#export CONFIG_MTK_WIFI_ONLY=m
+export CONFIG_MTK_WIFI_ONLY=y
 export MODULE_NAME=wlan_mt76x8_sdio
 WLAN_CHIP_LIST:=-UMT6620 -UMT6628 -UMT5931 -UMT6630 -UMT6632
 ccflags-y += $(WLAN_CHIP_LIST)
