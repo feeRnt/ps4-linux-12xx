@@ -118,9 +118,17 @@ MODULE_SUPPORTED_DEVICE(NIC_NAME);
 
 Putting the name in directly for now */
 
+/*
 MODULE_AUTHOR("NIC_AUTHOR");
 MODULE_DESCRIPTION("NIC_DESC");
 MODULE_SUPPORTED_DEVICE("MT6632");
+*/ /* Same error with this. I don't know what's wrong.
+      Maybe this needs to be at the top or bottom of file.
+      Following ChalesYu patch */
+
+MODULE_AUTHOR(NIC_AUTHOR);
+MODULE_DESCRIPTION(NIC_DESC);
+//MODULE_SUPPORTED_DEVICE(NIC_NAME);
 
 /* MODULE_LICENSE("MTK Propietary"); */
 MODULE_LICENSE("Dual BSD/GPL");
