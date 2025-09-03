@@ -686,7 +686,7 @@ static const struct drm_display_mode mode_720p = {
 };
 /* 16 - 1920x1080@60Hz */
 static const struct drm_display_mode mode_1080p = {
-	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
+	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED, 148500, 1920, 2008,
 		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
 	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
@@ -779,6 +779,10 @@ int ps4_bridge_register(struct drm_connector *connector,
 
 	mn_bridge->encoder = encoder;
 	mn_bridge->connector = connector;
+
+	//from codedwrench source:
+	mn_bridge->connector->connector_type = DRM_MODE_CONNECTOR_HDMIA;
+
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
 
 	// TODO (ps4patches): This seems to be the new way of adding bridges
