@@ -750,7 +750,8 @@ enum drm_mode_status ps4_bridge_mode_valid(struct drm_connector *connector,
 }
 
 static int ps4_bridge_attach(struct drm_bridge *bridge,
-			     enum drm_bridge_attach_flags flags)
+                             struct drm_encoder *encoder,
+                             enum drm_bridge_attach_flags flags)
 {
 	/* struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge); */
 
