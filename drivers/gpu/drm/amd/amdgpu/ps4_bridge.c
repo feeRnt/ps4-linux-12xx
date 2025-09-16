@@ -695,7 +695,7 @@ static const struct drm_display_mode mode_720p = {
 };
 /* 16 - 1920x1080@60Hz */
 static const struct drm_display_mode mode_1080p = {
-	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
+	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED, 148500, 1920, 2008,
 		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
