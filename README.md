@@ -2,23 +2,47 @@
 Linux Kernel - On the Sony PlayStation 4
 ========================================
 
-This is a Linux Kernel source tailored to run on exploitable PlayStation 4 systems with various subsystem patches from the [fail0verflow team](https://github.com/fail0verflow/ps4-linux), [eeply](https://github.com/eeply/ps4-linux), [Ps3itaTeam](https://github.com/Ps3itaTeam/ps4-linux), [mircoho](https://github.com/ps4gentoo/ps4-linux-5.3.7), [codedwrench](https://github.com/codedwrench/ps4-linux/), [crashniels](https://github.com/crashniels/linux/), config file changes based on [saya](https://www.youtube.com/channel/UCc20KAcPCj9Ut8IQF3umSjg) -- and others.
+This is a Linux Kernel source tailored to run on exploitable PlayStation 4 systems with various subsystem patches from     
+the [fail0verflow team](https://github.com/fail0verflow/ps4-linux),    
+[eeply](https://github.com/eeply/ps4-linux),    
+[Ps3itaTeam](https://github.com/Ps3itaTeam/ps4-linux),   
+[rancido](https://github.com/rancido),    
+[mircoho](https://github.com/ps4gentoo/ps4-linux-5.3.7),    
+[codedwrench](https://github.com/codedwrench/ps4-linux/),    
+[crashniels](https://github.com/crashniels/linux/),     
+[saya](https://www.youtube.com/channel/UCc20KAcPCj9Ut8IQF3umSjg),    
+[DFAUS](https://github.com/DFAUS-git/ps4-baikal-5.4.247-kernel),    
+[whitehax0r](https://github.com/whitehax0r/ps4-linux-baikal),  -- and others. 
 
-This fork aims to make the internal WiFi+Bluetooth modules on specific PlayStation models with the Marvell    
+This fork aimed to make the internal WiFi+Bluetooth modules on specific PlayStation models with the Marvell    
 88w8897 combo card (internal codename Torus 2) functional, as they typically error out on the default kernels.
+
+Over time, I also managed to fix the common blackscreen at GUI login issue on newer kernels, and added
+support for various miscellaneous components such as the MT7668 WiFi and BT chip on certain consoles.    
+The branch names are meant to be descriptive and provide an idea, but they're far from perfect!
+
+Merging all the main fixes into a few distinct branches is a WIP.
+
+
+-------
 
 The console models that are known to have the Torus 2 module, and their testing results from this patched kernel are:
 ``` 
 CUH-1216(A/B) { WiFi: Functional | Bluetooth: Functional }    
-CUH-1215(A/B) { WiFi: Functional | Bluetooth: Functional }    
-CUH-1003      { WiFi: Functional? | Bluetooth: Functional? } 
+CUH-1215(A/B) { WiFi: Functional | Bluetooth: Functional }
+CUH-1003      { WiFi: Functional? | Bluetooth: Functional? }
 [A and B are just hard-drive specification: 500 GB vs 1000GB].   
 ```
 
 <br>
 
+- TODO: Add a list with all supported console models, their southbridges, and their compatible kernels.
+
+---- 
+<br>
+
 The main patches which in combination fix the module are:     
-[150 MHz rate limit quirk on the 88w8897 card's Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/df7f7dbb1b0fff6026e159540f029988c8067b70).
+[150 MHz rate limit quir	k on the 88w8897 card's Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/df7f7dbb1b0fff6026e159540f029988c8067b70).
 
 relying on the [patch for added sdio_id for the Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/f4835fb020010acff2b70e4c5fa9430e07f0073b),
 
@@ -43,16 +67,27 @@ There are different branches that you can select on the repo,
 `ps4-linux-5.15.y` and `ps4-linux-5.15.y-conservative2` are branches with excessive debug logs, that helped me pinpoint the issue on the whole MMC stack. Due to the logging, it is not advisable to use those kernel branches.    
 
 The `ps4-linux-5.15.y-fix` is a branch without the PS4 patches from codedwrench's Baikal branch. It still
-runs, but you will get bad errors, even on Aeolia/Belize consoles. Should be used for testing only.
+runs as intended (no blackscreen fix yet), but you will get bad errors, even on Aeolia/Belize consoles. Should be used for testing only. 
+
+However, it probably runs on Aeolia consoles unlike the \*-belize branches. (Not tested yet)
 
 
 The main release branches are:    
-`ps4-linux-5.15.15-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.15 on Aeolia/Belize southbridges.    
-`ps4-linux-5.15.15-fix-baikal` : The clean WiFi fix branch for Kernel version 5.15.15 on Baikal southbridges.    
+- `ps4-linux-5.15.15-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.15 on Belize southbridges.    
+
+- `ps4-linux-5.15.15-fix-baikal` : The clean WiFi fix branch for Kernel version 5.15.15 on Baikal southbridges.    
 Baikals don't have the WiFi/BT issue fixed here, but it's kept for testing only.    
-`ps4-linux-5.15.189-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.189 on Aeolia/Belize southbridges.   
-`ps4-linux-6.15.y-crashniels` : The clean WiFi fix branch for Kernel version 6.15.4, on Aeolia/Belize southbridges.    
-Based on crashniels' source, it causes display issues on certain monitors without 1080p or proper EDID exchange support. 
+
+- `ps4-linux-5.15.15-fix-belize_mt7668` : The branch for testing the MT7668 chip on Belize consoles...    
+Use this if you'd like to test WiFi and bluetooth functionality on a console with this chip.
+
+`ps4-linux-5.15.189-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.189 on Belize southbridges.
+
+- `ps4-linux-5.4.247-baikal-dfaus: A branch for version 5.4.247 with fixed blackscreen and MT7668 support for Baikal southbridges.    
+Based on DFAUS' source.
+
+- `ps4-linux-6.15.y-crashniels` : The clean WiFi fix branch for Kernel version 6.15.4, on Aeolia/Belize southbridges.    
+Based on crashniels' source.
 
 To compile them, you can simply fork the repo, go to the Actions tab and run the Workflow file for `build-kernel_latest.yaml` for a particular branch.
 
@@ -80,7 +115,7 @@ To get some pre-compiled kernels, go to the [releases section](https://github.co
 
 If something doesn't work, or your model still has unsupported WiFi, you can open a GitHub issue to share the concerns.
 
-Happy 802.11-ing ! 😃️
+=-=-=-=
 
 <br>
 <br>
