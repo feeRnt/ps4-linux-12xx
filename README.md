@@ -7,12 +7,14 @@ the [fail0verflow team](https://github.com/fail0verflow/ps4-linux),
 [eeply](https://github.com/eeply/ps4-linux),    
 [Ps3itaTeam](https://github.com/Ps3itaTeam/ps4-linux),   
 [rancido](https://github.com/rancido),    
+valeryy (no Github - contributed to PS4 Baikal southbridges),    
 [mircoho](https://github.com/ps4gentoo/ps4-linux-5.3.7),    
 [codedwrench](https://github.com/codedwrench/ps4-linux/),    
+[tihmstar](https://github.com/tihmstar/ps4-linux/tree/ps4-4.14.93-belize),    
 [crashniels](https://github.com/crashniels/linux/),     
 [saya](https://www.youtube.com/channel/UCc20KAcPCj9Ut8IQF3umSjg),    
-[DFAUS](https://github.com/DFAUS-git/ps4-baikal-5.4.247-kernel),    
-[whitehax0r](https://github.com/whitehax0r/ps4-linux-baikal),  -- and others. 
+[whitehax0r](https://github.com/whitehax0r/ps4-linux-baikal),    
+[DFAUS](https://github.com/DFAUS-git/ps4-baikal-5.4.247-kernel) -- and others.
 
 This fork aimed to make the internal WiFi+Bluetooth modules on specific PlayStation models with the Marvell    
 88w8897 combo card (internal codename Torus 2) functional, as they typically error out on the default kernels.
@@ -42,11 +44,11 @@ CUH-1003      { WiFi: Functional? | Bluetooth: Functional? }
 <br>
 
 The main patches which in combination fix the module are:     
-[150 MHz rate limit quir	k on the 88w8897 card's Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/df7f7dbb1b0fff6026e159540f029988c8067b70).
+[150 MHz rate limit quirk on the 88w8897 card's Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/df7f7dbb1b0fff6026e159540f029988c8067b70).
 
 relying on the [patch for added sdio_id for the Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/f4835fb020010acff2b70e4c5fa9430e07f0073b),
 
-Then a [few SDHCI Host quirks for the PlayStation SDHCI host; a couple of which might be unnecessary \(haven't tested the redundancy yet\)](https://github.com/feeRnt/ps4-linux-12xx/commit/e6f342df7737722d5e27f0ae3974e493c5fe4ca4),
+Then a [few SDHCI Host quirks for the PlayStation SDHCI host](https://github.com/feeRnt/ps4-linux-12xx/commit/e6f342df7737722d5e27f0ae3974e493c5fe4ca4),
 
 additionally with [extra retries for MMC CMD 52 or 53, which it would usually fail on](https://github.com/feeRnt/ps4-linux-12xx/commit/c57162e5ec7a4aa3af3310a36dc963b5c0298dfe).
 
@@ -81,7 +83,7 @@ Baikals don't have the WiFi/BT issue fixed here, but it's kept for testing only.
 - `ps4-linux-5.15.15-fix-belize_mt7668` : The branch for testing the MT7668 chip on Belize consoles...    
 Use this if you'd like to test WiFi and bluetooth functionality on a console with this chip.
 
-`ps4-linux-5.15.189-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.189 on Belize southbridges.
+- `ps4-linux-5.15.189-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.189 on Belize southbridges.
 
 - `ps4-linux-5.4.247-baikal-dfaus: A branch for version 5.4.247 with fixed blackscreen and MT7668 support for Baikal southbridges.    
 Based on DFAUS' source.
@@ -113,7 +115,7 @@ make ${MAKE_OPTS} modules_install
 
 To get some pre-compiled kernels, go to the [releases section](https://github.com/feeRnt/ps4-linux-12xx/releases), and choose a kernel (bzImage) based on your needed version.
 
-If something doesn't work, or your model still has unsupported WiFi, you can open a GitHub issue to share the concerns.
+If something doesn't work, or your model still has unsupported WiFi, you can open a GitHub issue to share its details.
 
 =-=-=-=
 
