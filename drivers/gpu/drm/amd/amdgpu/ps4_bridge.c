@@ -129,6 +129,9 @@
 #define PCI_DEVICE_ID_CUH_2XXX 0x9923
 #define PCI_DEVICE_ID_CUH_7XXX 0x9924
 
+/* HDMI 1.4 bandwidth limit: 340 MHz pixel clock */
+#define HDMI_14_MAX_TMDS_CLOCK 340000
+
 struct edid *drm_get_edid(struct drm_connector *connector,
  				 struct i2c_adapter *adapter);
 
@@ -825,9 +828,7 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 		count++;
 	}
 
-	drm_connector_update_edid_property(connector, NULL);
-
-	DRM_INFO("Added %d hardcoded modes (1080p60 is default)\n", count);
+	DRM_INFO("Total modes available: %d\n", count);
 	return count;
 }
 
@@ -864,24 +865,17 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 
 enum drm_mode_status ps4_bridge_mode_valid(struct drm_connector *connector,
 				  const struct drm_display_mode *mode)
-{
-	/* Basic hardware limits check only */
-	if (mode->hdisplay > 1920 || mode->vdisplay > 1080) {
-		DRM_DEBUG_KMS("Mode %dx%d exceeds max 1920x1080\n",
-			      mode->hdisplay, mode->vdisplay);
-		return MODE_BAD;
+{	
+	if (mode->clock > HDMI_14_MAX_TMDS_CLOCK) {
+		DRM_DEBUG_KMS("Mode %dx%d@%d clock %d kHz exceeds HDMI 1.4 limit (340 MHz)\n",
+			      mode->hdisplay, mode->vdisplay,
+			      drm_mode_vrefresh(mode), mode->clock);
+		return MODE_CLOCK_HIGH;
 	}
 	
-	/* Check refresh rate - support up to 120Hz */
-	if (drm_mode_vrefresh(mode) > 121) {
-		DRM_DEBUG_KMS("Refresh rate %d exceeds max 120Hz\n",
-			      drm_mode_vrefresh(mode));
-		return MODE_BAD;
-	}
-	
-	DRM_DEBUG_KMS("Mode %dx%d@%d validated\n",
+	DRM_DEBUG_KMS("Mode %dx%d@%d (clock: %d kHz) validated\n",
 		      mode->hdisplay, mode->vdisplay,
-		      drm_mode_vrefresh(mode));
+		      drm_mode_vrefresh(mode), mode->clock);
 	return MODE_OK;
 }
 
