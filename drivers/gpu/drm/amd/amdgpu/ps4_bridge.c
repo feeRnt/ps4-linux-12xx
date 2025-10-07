@@ -135,6 +135,30 @@
 struct edid *drm_get_edid(struct drm_connector *connector,
  				 struct i2c_adapter *adapter);
 
+/* ICC I2C message structure matching drivers/ps4/icc/i2c.c */
+#define ICC_MAX_READ_DATA 0xff
+#define ICC_MAX_WRITE_DATA 0xf8
+
+struct icc_i2c_msg {
+	/* Header */
+	u8 code;
+	u16 length;
+	u8 count;
+	struct {
+		u8 major;
+		u8 length;
+		u8 minor;
+		u8 count;
+		struct {
+			u8 length;
+			u8 slave_addr;
+			u8 reg_addr;
+			u8 data[ICC_MAX_WRITE_DATA];
+		} xfer;
+	} cmd;
+} __packed;
+
+/* Legacy command queue structure (for non-I2C operations) */
 struct i2c_cmd_hdr {
 	u8 major;
 	u8 length;
@@ -304,60 +328,107 @@ static inline struct ps4_bridge *
 	return container_of(bridge, struct ps4_bridge, bridge);
 }
 
-/* I2C adapter for EDID/DDC communication */
+/* I2C adapter for EDID/DDC communication using proper ICC format */
 static int ps4_bridge_i2c_xfer(struct i2c_adapter *adapter,
 			       struct i2c_msg *msgs, int num)
 {
 	struct ps4_bridge *mn_bridge = i2c_get_adapdata(adapter);
-	int i, ret = 0;
-	u8 reply_offset;
+	struct icc_i2c_msg msg;
+	u8 resultbuf[8 + ICC_MAX_READ_DATA];
+	int ret;
 
-	mutex_lock(&mn_bridge->mutex);
-	cq_init(&mn_bridge->cq, 5); /* Code 5 for DDC/EDID I2C */
-
-	for (i = 0; i < num; i++) {
-		if (msgs[i].flags & I2C_M_RD) {
-			/* Read operation */
-			cq_cmd(&mn_bridge->cq, CMD_READ);
-			*mn_bridge->cq.p++ = msgs[i].len;
-			*mn_bridge->cq.p++ = 0x00; /* DDC address high byte */
-			*mn_bridge->cq.p++ = msgs[i].addr << 1; /* DDC address */
-			*mn_bridge->cq.p++ = 0;
-		} else {
-			/* Write operation - typically setting read offset */
-			cq_cmd(&mn_bridge->cq, CMD_WRITE);
-			*mn_bridge->cq.p++ = msgs[i].len;
-			*mn_bridge->cq.p++ = 0x00;
-			*mn_bridge->cq.p++ = msgs[i].addr << 1;
-			memcpy(mn_bridge->cq.p, msgs[i].buf, msgs[i].len);
-			mn_bridge->cq.p += msgs[i].len;
+	/* EDID reads are typically 2-message transfers: write offset, then read data */
+	if (num == 2 && !(msgs[0].flags & I2C_M_RD) && (msgs[1].flags & I2C_M_RD)) {
+		/* Standard EDID read pattern: WRITE(offset) + READ(data) */
+		
+		if (msgs[1].len > ICC_MAX_READ_DATA) {
+			DRM_ERROR("I2C read too large: %d bytes (max %d)\n", 
+				  msgs[1].len, ICC_MAX_READ_DATA);
+			return -E2BIG;
 		}
-	}
 
-	ret = cq_exec(&mn_bridge->cq);
-	if (ret < 0) {
-		DRM_DEBUG_KMS("I2C transaction failed: %d\n", ret);
+		memset(&msg, 0, sizeof(msg));
+		
+		/* Build ICC I2C message structure (from drivers/ps4/icc/i2c.c) */
+		msg.code = 4;  /* ICC I2C command code */
+		msg.count = 1;
+		msg.cmd.major = 1;  /* 1 = read, 2 = write */
+		msg.cmd.minor = 1;
+		msg.cmd.count = 1;
+		msg.cmd.length = 8;  /* Fixed header length for read */
+		msg.cmd.xfer.length = msgs[1].len;
+		msg.cmd.xfer.slave_addr = msgs[1].addr << 1;  /* 0x50 -> 0xA0 */
+		msg.cmd.xfer.reg_addr = msgs[0].buf[0];  /* Offset from write message */
+		msg.cmd.xfer.data[0] = 0;  /* Unknown byte (required) */
+		
+		msg.length = msg.cmd.length + 4;
+
+		DRM_DEBUG_KMS("I2C ICC read: addr=0x%02x offset=0x%02x len=%d\n",
+			      msgs[1].addr, msgs[0].buf[0], msgs[1].len);
+
+		mutex_lock(&mn_bridge->mutex);
+		ret = apcie_icc_cmd(0x10, 0x0, &msg, msg.length, 
+				    resultbuf, sizeof(resultbuf));
 		mutex_unlock(&mn_bridge->mutex);
-		return ret;
-	}
 
-	/* Copy read data back to message buffers */
-	reply_offset = 3;
-	for (i = 0; i < num; i++) {
-		if (msgs[i].flags & I2C_M_RD) {
-			if (reply_offset + msgs[i].len <= sizeof(mn_bridge->cq.reply.databuf)) {
-				memcpy(msgs[i].buf, &mn_bridge->cq.reply.databuf[reply_offset], msgs[i].len);
-				reply_offset += msgs[i].len;
-			} else {
-				DRM_ERROR("I2C reply buffer overflow\n");
-				mutex_unlock(&mn_bridge->mutex);
-				return -EIO;
-			}
+		if (ret < 8) {
+			DRM_ERROR("I2C ICC command failed: %d\n", ret);
+			return -EIO;
 		}
+
+		/* Check status bytes (must be 0x00, 0x00 for success) */
+		if (resultbuf[0] != 0 || resultbuf[1] != 0) {
+			DRM_ERROR("I2C transaction failed: status %02x %02x\n",
+				  resultbuf[0], resultbuf[1]);
+			return -EIO;
+		}
+
+		/* Data starts at offset 8 in reply buffer */
+		memcpy(msgs[1].buf, &resultbuf[8], msgs[1].len);
+
+		DRM_DEBUG_KMS("I2C ICC read successful\n");
+		return num;
+	}
+	else if (num == 1 && (msgs[0].flags & I2C_M_RD)) {
+		/* Single read message (less common for EDID) */
+		
+		if (msgs[0].len > ICC_MAX_READ_DATA) {
+			DRM_ERROR("I2C read too large: %d bytes\n", msgs[0].len);
+			return -E2BIG;
+		}
+
+		memset(&msg, 0, sizeof(msg));
+		
+		msg.code = 4;
+		msg.count = 1;
+		msg.cmd.major = 1;  /* Read */
+		msg.cmd.minor = 1;
+		msg.cmd.count = 1;
+		msg.cmd.length = 8;
+		msg.cmd.xfer.length = msgs[0].len;
+		msg.cmd.xfer.slave_addr = msgs[0].addr << 1;
+		msg.cmd.xfer.reg_addr = 0;  /* Start from 0 */
+		msg.cmd.xfer.data[0] = 0;
+		
+		msg.length = msg.cmd.length + 4;
+
+		mutex_lock(&mn_bridge->mutex);
+		ret = apcie_icc_cmd(0x10, 0x0, &msg, msg.length,
+				    resultbuf, sizeof(resultbuf));
+		mutex_unlock(&mn_bridge->mutex);
+
+		if (ret < 8 || resultbuf[0] != 0 || resultbuf[1] != 0) {
+			DRM_ERROR("I2C single read failed\n");
+			return -EIO;
+		}
+
+		memcpy(msgs[0].buf, &resultbuf[8], msgs[0].len);
+		return num;
 	}
 
-	mutex_unlock(&mn_bridge->mutex);
-	return num;
+	DRM_ERROR("I2C: Unsupported message pattern (num=%d, flags[0]=0x%x)\n",
+		  num, num > 0 ? msgs[0].flags : 0);
+	return -EOPNOTSUPP;
 }
 
 static u32 ps4_bridge_i2c_func(struct i2c_adapter *adapter)
@@ -790,21 +861,67 @@ static const struct drm_display_mode mode_1080p120 = {
 
 int ps4_bridge_get_modes(struct drm_connector *connector)
 {
+	struct ps4_bridge *mn_bridge = &g_bridge;
 	struct drm_device *dev = connector->dev;
+	struct edid *edid = NULL;
+	struct drm_display_mode *mode, *tmp;
 	struct drm_display_mode *newmode;
 	int count = 0;
 
-	pr_info("ps4_bridge_get_modes - using hardcoded modes for stable boot\n");
+	DRM_INFO("ps4_bridge_get_modes - reading EDID from display\n");
 
-	/* Always use hardcoded modes for reliable boot.
-	 * EDID reading is disabled to prevent boot black screen issues.
-	 * The hardware will auto-detect the actual mode anyway. */
+	/* Read EDID via our I2C/DDC adapter */
+	edid = drm_get_edid(connector, &mn_bridge->ddc);
+	
+	if (edid) {
+		DRM_INFO("EDID found, parsing modes\n");
+		
+		/* Free old EDID if exists */
+		if (mn_bridge->edid) {
+			kfree(mn_bridge->edid);
+		}
+		mn_bridge->edid = edid;
+		
+		/* Update connector EDID property */
+		drm_connector_update_edid_property(connector, edid);
+		
+		/* Add all modes from EDID */
+		count = drm_add_edid_modes(connector, edid);
+		DRM_INFO("drm_add_edid_modes returned %d modes\n", count);
+		
+		/* CRITICAL: Filter out modes exceeding HDMI 1.4 bandwidth (340 MHz)
+		 * This prevents boot black screen from high-res/high-refresh modes */
+		list_for_each_entry_safe(mode, tmp, &connector->probed_modes, head) {
+			/* Remove PREFERRED flag from ALL EDID modes */
+			mode->type &= ~DRM_MODE_TYPE_PREFERRED;
+			
+			/* Remove modes exceeding HDMI 1.4 limit */
+			if (mode->clock > HDMI_14_MAX_TMDS_CLOCK) {
+				DRM_INFO("FILTERED: %dx%d@%dHz (clock %d kHz > HDMI 1.4 limit %d kHz)\n",
+					 mode->hdisplay, mode->vdisplay,
+					 drm_mode_vrefresh(mode), mode->clock, 
+					 HDMI_14_MAX_TMDS_CLOCK);
+				list_del(&mode->head);
+				drm_mode_destroy(dev, mode);
+				count--;
+			}
+		}
+		
+		DRM_INFO("After HDMI 1.4 filtering: %d valid modes from EDID\n", count);
+	} else {
+		DRM_WARN("No EDID found - using fallback modes only\n");
+		drm_connector_update_edid_property(connector, NULL);
+	}
 
-	/* 1080p60 - PREFERRED mode for stable boot */
+	/* ALWAYS add hardcoded modes for boot reliability */
+	
+	/* 1080p60 - FORCED as PREFERRED for stable boot */
 	newmode = drm_mode_duplicate(dev, &mode_1080p);
 	if (newmode) {
+		newmode->type |= DRM_MODE_TYPE_PREFERRED;
 		drm_mode_probed_add(connector, newmode);
 		count++;
+		DRM_INFO("Added 1080p60 as PREFERRED boot mode\n");
 	}
 
 	/* 1080p120 - for high refresh displays */
@@ -821,14 +938,14 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 		count++;
 	}
 
-    /* 480p60 - compatibility mode */
+	/* 480p60 - compatibility mode */
 	newmode = drm_mode_duplicate(dev, &mode_480p);
 	if (newmode) {
 		drm_mode_probed_add(connector, newmode);
 		count++;
 	}
 
-	DRM_INFO("Total modes available: %d\n", count);
+	DRM_INFO("Total modes available: %d (1080p60 is PREFERRED for boot)\n", count);
 	return count;
 }
 
