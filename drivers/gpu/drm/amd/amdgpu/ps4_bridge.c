@@ -30,6 +30,9 @@
  *
 */
 #include <asm/ps4.h>
+#include <linux/types.h>
+#include <linux/mutex.h>
+#include <linux/list.h>
 
 #include <drm/drm_crtc.h>
 #include <drm/drm_crtc_helper.h>
@@ -160,6 +163,8 @@ struct ps4_bridge {
 	struct drm_bridge bridge;
 	struct i2c_cmdqueue cq;
 	struct mutex mutex;
+	struct i2c_adapter ddc;
+	struct edid *edid;
 
 	int mode;
 };
@@ -296,6 +301,72 @@ static inline struct ps4_bridge *
 	return container_of(bridge, struct ps4_bridge, bridge);
 }
 
+/* I2C adapter for EDID/DDC communication */
+static int ps4_bridge_i2c_xfer(struct i2c_adapter *adapter,
+			       struct i2c_msg *msgs, int num)
+{
+	struct ps4_bridge *mn_bridge = i2c_get_adapdata(adapter);
+	int i, ret = 0;
+	u8 reply_offset;
+
+	mutex_lock(&mn_bridge->mutex);
+	cq_init(&mn_bridge->cq, 5); /* Code 5 for DDC/EDID I2C */
+
+	for (i = 0; i < num; i++) {
+		if (msgs[i].flags & I2C_M_RD) {
+			/* Read operation */
+			cq_cmd(&mn_bridge->cq, CMD_READ);
+			*mn_bridge->cq.p++ = msgs[i].len;
+			*mn_bridge->cq.p++ = 0x00; /* DDC address high byte */
+			*mn_bridge->cq.p++ = msgs[i].addr << 1; /* DDC address */
+			*mn_bridge->cq.p++ = 0;
+		} else {
+			/* Write operation - typically setting read offset */
+			cq_cmd(&mn_bridge->cq, CMD_WRITE);
+			*mn_bridge->cq.p++ = msgs[i].len;
+			*mn_bridge->cq.p++ = 0x00;
+			*mn_bridge->cq.p++ = msgs[i].addr << 1;
+			memcpy(mn_bridge->cq.p, msgs[i].buf, msgs[i].len);
+			mn_bridge->cq.p += msgs[i].len;
+		}
+	}
+
+	ret = cq_exec(&mn_bridge->cq);
+	if (ret < 0) {
+		DRM_DEBUG_KMS("I2C transaction failed: %d\n", ret);
+		mutex_unlock(&mn_bridge->mutex);
+		return ret;
+	}
+
+	/* Copy read data back to message buffers */
+	reply_offset = 3;
+	for (i = 0; i < num; i++) {
+		if (msgs[i].flags & I2C_M_RD) {
+			if (reply_offset + msgs[i].len <= sizeof(mn_bridge->cq.reply.databuf)) {
+				memcpy(msgs[i].buf, &mn_bridge->cq.reply.databuf[reply_offset], msgs[i].len);
+				reply_offset += msgs[i].len;
+			} else {
+				DRM_ERROR("I2C reply buffer overflow\n");
+				mutex_unlock(&mn_bridge->mutex);
+				return -EIO;
+			}
+		}
+	}
+
+	mutex_unlock(&mn_bridge->mutex);
+	return num;
+}
+
+static u32 ps4_bridge_i2c_func(struct i2c_adapter *adapter)
+{
+	return I2C_FUNC_I2C | I2C_FUNC_SMBUS_EMUL;
+}
+
+static const struct i2c_algorithm ps4_bridge_i2c_algo = {
+	.master_xfer = ps4_bridge_i2c_xfer,
+	.functionality = ps4_bridge_i2c_func,
+};
+
 void ps4_bridge_mode_set(struct drm_bridge *bridge,
 			 const struct drm_display_mode *mode,
 			 const struct drm_display_mode *adjusted_mode)
@@ -303,11 +374,17 @@ void ps4_bridge_mode_set(struct drm_bridge *bridge,
 	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 
 	/* This gets called before pre_enable/enable, so we just stash
-	 * the vic ID for later */
+	 * the vic ID for later. Try to match CEA mode, but allow non-CEA modes too */
 	mn_bridge->mode = drm_match_cea_mode(adjusted_mode);
-	DRM_DEBUG_KMS("vic mode: %d\n", mn_bridge->mode);
+	DRM_DEBUG_KMS("Mode: %dx%d@%d, VIC: %d\n", 
+		      adjusted_mode->hdisplay, adjusted_mode->vdisplay,
+		      drm_mode_vrefresh(adjusted_mode), mn_bridge->mode);
+	
+	/* If no VIC match, we'll use mode 0 and let the hardware auto-detect */
 	if (!mn_bridge->mode) {
-		DRM_ERROR("attempted to set non-CEA mode\n");
+		DRM_INFO("Non-CEA mode %dx%d@%d, using auto-detect\n",
+			 adjusted_mode->hdisplay, adjusted_mode->vdisplay,
+			 drm_mode_vrefresh(adjusted_mode));
 	}
 }
 
@@ -387,19 +464,19 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 	struct drm_device *dev = connector->dev;
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	u8 dp[3];
+	u8 vic_mode;
 
 	DRM_DEBUG("Enable PS4_BRIDGE_ENABLE\n");
-	if (!mn_bridge->mode) {
-		DRM_ERROR("mode not available\n");
-		return;
-	}
+	
+	/* Use VIC if available, otherwise use a safe default (16 = 1080p60) */
+	vic_mode = mn_bridge->mode ? mn_bridge->mode : 16;
 
 	if(pdev->vendor != PCI_VENDOR_ID_ATI) {
 		DRM_ERROR("Invalid vendor: %04x", pdev->vendor);
 		return;
 	}
 
-	DRM_DEBUG_KMS("ps4_bridge_enable (mode: %d)\n", mn_bridge->mode);
+	DRM_DEBUG_KMS("ps4_bridge_enable (VIC: %d)\n", vic_mode);
 
 	/* Here come the dragons */
 
@@ -432,11 +509,11 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_writereg(&mn_bridge->cq, TSYSCTRL, TSYSCTRL_HDMI);
 		cq_writereg(&mn_bridge->cq, VINCNT, VINCNT_VIF_FILEN);
 		cq_writereg(&mn_bridge->cq, 0x7071, 0);
-		cq_writereg(&mn_bridge->cq, 0x7062, mn_bridge->mode);
+		cq_writereg(&mn_bridge->cq, 0x7062, vic_mode);
 		cq_writereg(&mn_bridge->cq, 0x765a, 0);
-		cq_writereg(&mn_bridge->cq, 0x7062, mn_bridge->mode | 0x80);
+		cq_writereg(&mn_bridge->cq, 0x7062, vic_mode | 0x80);
 		cq_writereg(&mn_bridge->cq, 0x7215, 0x28); /* aspect */
-		cq_writereg(&mn_bridge->cq, 0x7217, mn_bridge->mode);
+		cq_writereg(&mn_bridge->cq, 0x7217, vic_mode);
 		cq_writereg(&mn_bridge->cq, 0x7218, 0);
 		cq_writereg(&mn_bridge->cq, CSCMOD, 0xdc);
 		cq_writereg(&mn_bridge->cq, C420SET, 0xaa);
@@ -556,10 +633,10 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_writereg(&mn_bridge->cq, 0x7009, 0x00);
 		cq_writereg(&mn_bridge->cq, 0x7040, 0x42);
 		cq_writereg(&mn_bridge->cq, 0x7225, 0x28);
-		cq_writereg(&mn_bridge->cq, 0x7227, mn_bridge->mode);
+		cq_writereg(&mn_bridge->cq, 0x7227, vic_mode);
 		cq_writereg(&mn_bridge->cq, 0x7228, 0x00);
-		cq_writereg(&mn_bridge->cq, 0x7070, mn_bridge->mode);
-		cq_writereg(&mn_bridge->cq, 0x7071, mn_bridge->mode | 0x80);
+		cq_writereg(&mn_bridge->cq, 0x7070, vic_mode);
+		cq_writereg(&mn_bridge->cq, 0x7071, vic_mode | 0x80);
 		cq_writereg(&mn_bridge->cq, 0x7072, 0x00);
 		cq_writereg(&mn_bridge->cq, 0x7073, 0x00);
 		cq_writereg(&mn_bridge->cq, 0x7074, 0x00);
@@ -712,22 +789,46 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 {
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *newmode;
-	pr_info("ps4_bridge_get_modes\n");
+	int count = 0;
 
+	pr_info("ps4_bridge_get_modes - using hardcoded modes for stable boot\n");
+
+	/* Always use hardcoded modes for reliable boot.
+	 * EDID reading is disabled to prevent boot black screen issues.
+	 * The hardware will auto-detect the actual mode anyway. */
+
+	/* 1080p60 - PREFERRED mode for stable boot */
 	newmode = drm_mode_duplicate(dev, &mode_1080p);
-	drm_mode_probed_add(connector, newmode);
+	if (newmode) {
+		drm_mode_probed_add(connector, newmode);
+		count++;
+	}
 
+	/* 1080p120 - for high refresh displays */
 	newmode = drm_mode_duplicate(dev, &mode_1080p120);
-	drm_mode_probed_add(connector, newmode);
+	if (newmode) {
+		drm_mode_probed_add(connector, newmode);
+		count++;
+	}
 
-	//newmode = drm_mode_duplicate(dev, &mode_720p);
-	//drm_mode_probed_add(connector, newmode);
-	//newmode = drm_mode_duplicate(dev, &mode_480p);
-	//drm_mode_probed_add(connector, newmode);
+	/* 720p60 - compatibility mode */
+	newmode = drm_mode_duplicate(dev, &mode_720p);
+	if (newmode) {
+		drm_mode_probed_add(connector, newmode);
+		count++;
+	}
+
+    /* 480p60 - compatibility mode */
+	newmode = drm_mode_duplicate(dev, &mode_480p);
+	if (newmode) {
+		drm_mode_probed_add(connector, newmode);
+		count++;
+	}
 
 	drm_connector_update_edid_property(connector, NULL);
 
-	return 0;
+	DRM_INFO("Added %d hardcoded modes (1080p60 is default)\n", count);
+	return count;
 }
 
 enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
@@ -764,17 +865,23 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 enum drm_mode_status ps4_bridge_mode_valid(struct drm_connector *connector,
 				  const struct drm_display_mode *mode)
 {
-	int vic = drm_match_cea_mode(mode);
-
-	/* Allow anything that we can match up to a VIC (CEA modes) */
-	if (!vic || (vic != 16 && vic != 4 && vic != 63)) {
-	// Might need to disable 63 (1920x1080-120Hz)
-
-	/*
-	if (!vic || (vic != 16 && vic != 4)) {
-	*/
+	/* Basic hardware limits check only */
+	if (mode->hdisplay > 1920 || mode->vdisplay > 1080) {
+		DRM_DEBUG_KMS("Mode %dx%d exceeds max 1920x1080\n",
+			      mode->hdisplay, mode->vdisplay);
 		return MODE_BAD;
 	}
+	
+	/* Check refresh rate - support up to 120Hz */
+	if (drm_mode_vrefresh(mode) > 121) {
+		DRM_DEBUG_KMS("Refresh rate %d exceeds max 120Hz\n",
+			      drm_mode_vrefresh(mode));
+		return MODE_BAD;
+	}
+	
+	DRM_DEBUG_KMS("Mode %dx%d@%d validated\n",
+		      mode->hdisplay, mode->vdisplay,
+		      drm_mode_vrefresh(mode));
 	return MODE_OK;
 }
 
@@ -801,11 +908,28 @@ int ps4_bridge_register(struct drm_connector *connector,
 {
 	int ret;
 	struct ps4_bridge *mn_bridge = &g_bridge;
+	struct drm_device *dev = connector->dev;
 
 	mn_bridge->encoder = encoder;
 	mn_bridge->connector = connector;
 	mn_bridge->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
+	mn_bridge->edid = NULL;
+
+	/* Initialize I2C adapter for EDID/DDC */
+	mn_bridge->ddc.owner = THIS_MODULE;
+	mn_bridge->ddc.algo = &ps4_bridge_i2c_algo;
+	mn_bridge->ddc.dev.parent = dev->dev;
+	snprintf(mn_bridge->ddc.name, sizeof(mn_bridge->ddc.name),
+		 "PS4 Bridge DDC");
+	i2c_set_adapdata(&mn_bridge->ddc, mn_bridge);
+	
+	ret = i2c_add_adapter(&mn_bridge->ddc);
+	if (ret) {
+		DRM_ERROR("Failed to register I2C adapter: %d\n", ret);
+		return ret;
+	}
+	DRM_INFO("PS4 Bridge I2C adapter registered\n");
 
 	// TODO (ps4patches): This seems to be the new way of adding bridges
 	drm_bridge_add(&mn_bridge->bridge);
@@ -817,6 +941,7 @@ int ps4_bridge_register(struct drm_connector *connector,
 	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
 	if (ret) {
 		DRM_ERROR("Failed to initialize bridge with drm\n");
+		i2c_del_adapter(&mn_bridge->ddc);
 		return -EINVAL;
 	}
 
