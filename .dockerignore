@@ -1,0 +1,6 @@
+# .dockerignore
+node_modules/
+*.log
+.git/
+*.md
+#can't read .git during sha generation if you ignore it in docker.

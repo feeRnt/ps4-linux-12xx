@@ -32,6 +32,7 @@
 *.lzo
 *.mod
 *.mod.c
+*.ns_deps
 *.o
 *.o.*
 *.patch
@@ -40,6 +41,7 @@
 *.so.dbg
 *.su
 *.symtypes
+*.symversions
 *.tab.[ch]
 *.tar
 *.xz
@@ -55,6 +57,8 @@ modules.order
 /linux
 /vmlinux
 /vmlinux.32
+/vmlinux.map
+/vmlinux.symvers
 /vmlinux-gdb.py
 /vmlinuz
 /System.map
@@ -92,6 +96,10 @@ modules.order
 !.gitignore
 !.mailmap
 
+# Added
+!.github
+!.dockerignore
+!.Dockerfile*
 #
 # Generated include files
 #
@@ -106,6 +114,10 @@ patches-*
 # quilt's files
 patches
 series
+
+# ctags files
+tags
+TAGS
 
 # cscope files
 cscope.*
@@ -146,3 +158,6 @@ x509.genkey
 
 # Clang's compilation database file
 /compile_commands.json
+
+# Documentation toolchain
+sphinx_*/
