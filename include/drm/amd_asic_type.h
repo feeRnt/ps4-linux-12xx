@@ -34,26 +34,28 @@ enum amd_asic_type {
 	CHIP_BONAIRE,	/* 5 */
 	CHIP_KAVERI,	/* 6 */
 	CHIP_KABINI,	/* 7 */
-	CHIP_HAWAII,	/* 8 */
-	CHIP_MULLINS,	/* 9 */
-	CHIP_TOPAZ,	/* 10 */
-	CHIP_TONGA,	/* 11 */
-	CHIP_FIJI,	/* 12 */
-	CHIP_CARRIZO,	/* 13 */
-	CHIP_STONEY,	/* 14 */
-	CHIP_POLARIS10,	/* 15 */
-	CHIP_POLARIS11,	/* 16 */
-	CHIP_POLARIS12,	/* 17 */
-	CHIP_VEGAM,	/* 18 */
-	CHIP_VEGA10,	/* 19 */
-	CHIP_VEGA12,	/* 20 */
-	CHIP_VEGA20,	/* 21 */
-	CHIP_RAVEN,	/* 22 */
-	CHIP_ARCTURUS,	/* 23 */
-	CHIP_RENOIR,	/* 24 */
-	CHIP_NAVI10,	/* 25 */
-	CHIP_NAVI14,	/* 26 */
-	CHIP_NAVI12,	/* 27 */
+	CHIP_LIVERPOOL, /* 8 - PS4 Phat/Slim */
+	CHIP_GLADIUS,   /* 9 - PS4 Pro */
+	CHIP_HAWAII,	/* 10 */
+	CHIP_MULLINS,	/* 11 */
+	CHIP_TOPAZ,	/* 12 */
+	CHIP_TONGA,	/* 13 */
+	CHIP_FIJI,	/* 14 */
+	CHIP_CARRIZO,	/* 15 */
+	CHIP_STONEY,	/* 16 */
+	CHIP_POLARIS10,	/* 17 */
+	CHIP_POLARIS11,	/* 18 */
+	CHIP_POLARIS12,	/* 19 */
+	CHIP_VEGAM,	/* 20 */
+	CHIP_VEGA10,	/* 21 */
+	CHIP_VEGA12,	/* 22 */
+	CHIP_VEGA20,	/* 23 */
+	CHIP_RAVEN,	/* 24 */
+	CHIP_ARCTURUS,	/* 25 */
+	CHIP_RENOIR,	/* 26 */
+	CHIP_NAVI10,	/* 27 */
+	CHIP_NAVI14,	/* 28 */
+	CHIP_NAVI12,	/* 29 */
 	CHIP_LAST,
 };
 

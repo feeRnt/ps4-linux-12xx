@@ -57,6 +57,8 @@ static const struct kfd2kgd_calls *kfd2kgd_funcs[] = {
 #endif
 #ifdef CONFIG_DRM_AMDGPU_CIK
 	[CHIP_HAWAII] = &gfx_v7_kfd2kgd,
+	[CHIP_GLADIUS] = &gfx_v7_kfd2kgd,
+	[CHIP_LIVERPOOL] = &gfx_v7_kfd2kgd,
 #endif
 	[CHIP_TONGA] = &gfx_v8_kfd2kgd,
 	[CHIP_FIJI] = &gfx_v8_kfd2kgd,
@@ -217,9 +219,9 @@ static const struct kfd_device_info polaris10_device_info = {
 	.event_interrupt_class = &event_interrupt_class_cik,
 	.num_of_watch_points = 4,
 	.mqd_size_aligned = MQD_SIZE_ALIGNED,
-	.supports_cwsr = true,
-	.needs_iommu_device = false,
-	.needs_pci_atomics = true,
+	.supports_cwsr = true, // Codedwrench has false - for PS4
+	.needs_iommu_device = false, // Codedwrench has true - for PS4
+	.needs_pci_atomics = true, // Codedwrench has false - for PS4
 	.num_sdma_engines = 2,
 	.num_xgmi_sdma_engines = 0,
 	.num_sdma_queues_per_engine = 2,
@@ -467,6 +469,8 @@ static const struct kfd_device_info *kfd_supported_devices[][2] = {
 	[CHIP_RAVEN] = {&raven_device_info, NULL},
 #endif
 	[CHIP_HAWAII] = {&hawaii_device_info, NULL},
+	[CHIP_LIVERPOOL] = {&polaris10_device_info, NULL},
+	[CHIP_GLADIUS] = {&polaris10_device_info, NULL},
 	[CHIP_TONGA] = {&tonga_device_info, NULL},
 	[CHIP_FIJI] = {&fiji_device_info, &fiji_vf_device_info},
 	[CHIP_POLARIS10] = {&polaris10_device_info, &polaris10_vf_device_info},

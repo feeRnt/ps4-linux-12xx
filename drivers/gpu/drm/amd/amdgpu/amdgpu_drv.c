@@ -45,6 +45,9 @@
 
 #include "amdgpu_ras.h"
 
+#ifdef CONFIG_X86_PS4
+#include <asm/ps4.h>
+#endif
 /*
  * KMS wrapper.
  * - 3.0.0 - initial driver
