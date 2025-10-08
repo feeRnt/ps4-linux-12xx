@@ -36,7 +36,6 @@
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_edid.h>
-#include <drm/drmP.h>
 
 #include <drm/drm_bridge.h>
 #include <drm/drm_encoder.h>
@@ -44,6 +43,8 @@
 #include <linux/i2c.h>
 #include <linux/i2c-algo-bit.h>
 
+#include <linux/pci.h>
+#include <linux/pci_ids.h>
 
 #include "amdgpu.h"
 #include "amdgpu_mode.h"
@@ -388,6 +389,8 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 	struct drm_connector *connector = mn_bridge->connector;
 	struct drm_device *dev = connector->dev;
 	struct pci_dev *pdev = dev->pdev;
+	//struct pci_dev *pdev = to_pci_dev(dev->dev);
+	/* not present in kern v5.6*/
 	u8 dp[3];
 	DRM_DEBUG("Enable PS4_BRIDGE_ENABLE\n");
 	if (!mn_bridge->mode) {
@@ -788,6 +791,7 @@ int ps4_bridge_register(struct drm_connector *connector,
 	// TODO (ps4patches): This seems to be the new way of adding bridges
 	//drm_bridge_add(&mn_bridge->bridge);
 	//Seems like no driver really implemented it in this version of the kernel
+	//(~5.4)
 	/* Edit: It is not needed for proper functionality */
 
 	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL);
@@ -802,7 +806,11 @@ int ps4_bridge_register(struct drm_connector *connector,
 		return -EINVAL;
 	}
 
-	encoder->bridge = &mn_bridge->bridge;
-
+	/* encoder->bridge = &mn_bridge->bridge; */
+	/* encoder no longer has a bridge element in kernel 5.6. 
+	 * But does this mean we can get rid of this as well? */
+	/* But if it works without it on Phat/Slim,
+	 * it should work on Pro as well
+	 * (5.15.15 works on Phat vs only 5.4 in slim) */
 	return 0;
 }
