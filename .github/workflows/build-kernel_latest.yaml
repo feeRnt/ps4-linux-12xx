@@ -344,7 +344,7 @@ jobs:
           export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
           export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
-          export KERNEL_PKG=kernel-${localversion}.tar.gz
+          #export KERNEL_PKG=kernel-${localversion}.tar.gz
           export MAKE_OPTS="-j`nproc` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
@@ -369,8 +369,9 @@ jobs:
           echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
           cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
           cd ${GCE_INSTALL_DIR}
-          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion".tar.gz boot/bzImage lib/modules/* --owner=0 --group=0
+          # tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion".tar.gz boot/bzImage lib/modules/* --owner=0 --group=0
           # I assume it'll never package the kernel, unless the compile succeeds, since -e is set
+          cp boot/bzImage /container/workspace/kernel-source-container/bzImage_"$localversion"
 
           ## GCE = Google Compute Engine, adapted from 
           #https://github.com/google/bbr/blob/v3/gce-install.sh
@@ -403,8 +404,10 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: kernel_${{ steps.kernel-version-env.outputs.localversion }}
-          path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
+          #path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
+          path: ${{ github.workspace }}/kernel-source-host/bzImage_${{ steps.kernel-version-env.outputs.localversion }}
           # This path is the github actiions root
+
 
       # - name: Delete the kernel image artifact from workspace
       #  run: |
