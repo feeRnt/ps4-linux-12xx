@@ -1,3 +1,4 @@
+
 /*
  * Panasonic MN86471A / MN864729 DP->HDMI bridge driver (via PS4 Aeolia ICC interface)
  *
@@ -336,6 +337,9 @@ static int ps4_bridge_i2c_xfer(struct i2c_adapter *adapter,
 	struct icc_i2c_msg msg;
 	u8 resultbuf[8 + ICC_MAX_READ_DATA];
 	int ret;
+	int i;
+
+	DRM_DEBUG_KMS("I2C transfer: %d messages\n", num);
 
 	/* EDID reads are typically 2-message transfers: write offset, then read data */
 	if (num == 2 && !(msgs[0].flags & I2C_M_RD) && (msgs[1].flags & I2C_M_RD)) {
@@ -347,7 +351,22 @@ static int ps4_bridge_i2c_xfer(struct i2c_adapter *adapter,
 			return -E2BIG;
 		}
 
+		/* Verify addresses match */
+		if (msgs[0].addr != msgs[1].addr) {
+			DRM_ERROR("I2C address mismatch: 0x%02x vs 0x%02x\n",
+				  msgs[0].addr, msgs[1].addr);
+			return -EINVAL;
+		}
+
+		/* Verify write message has data */
+		if (msgs[0].len != 1) {
+			DRM_ERROR("I2C write length incorrect: %d (expected 1)\n",
+				  msgs[0].len);
+			return -EINVAL;
+		}
+
 		memset(&msg, 0, sizeof(msg));
+		memset(resultbuf, 0, sizeof(resultbuf));
 		
 		/* Build ICC I2C message structure (from drivers/ps4/icc/i2c.c) */
 		msg.code = 4;  /* ICC I2C command code */
@@ -363,8 +382,9 @@ static int ps4_bridge_i2c_xfer(struct i2c_adapter *adapter,
 		
 		msg.length = msg.cmd.length + 4;
 
-		DRM_DEBUG_KMS("I2C ICC read: addr=0x%02x offset=0x%02x len=%d\n",
-			      msgs[1].addr, msgs[0].buf[0], msgs[1].len);
+		DRM_DEBUG_KMS("I2C ICC read: addr=0x%02x (shifted=0x%02x) offset=0x%02x len=%d\n",
+			      msgs[1].addr, msg.cmd.xfer.slave_addr, 
+			      msgs[0].buf[0], msgs[1].len);
 
 		mutex_lock(&mn_bridge->mutex);
 		ret = apcie_icc_cmd(0x10, 0x0, &msg, msg.length, 
@@ -376,6 +396,9 @@ static int ps4_bridge_i2c_xfer(struct i2c_adapter *adapter,
 			return -EIO;
 		}
 
+		DRM_DEBUG_KMS("I2C ICC response: ret=%d status[0]=0x%02x status[1]=0x%02x\n",
+			      ret, resultbuf[0], resultbuf[1]);
+
 		/* Check status bytes (must be 0x00, 0x00 for success) */
 		if (resultbuf[0] != 0 || resultbuf[1] != 0) {
 			DRM_ERROR("I2C transaction failed: status %02x %02x\n",
@@ -383,10 +406,24 @@ static int ps4_bridge_i2c_xfer(struct i2c_adapter *adapter,
 			return -EIO;
 		}
 
+		/* Verify we got enough data */
+		if (ret < 8 + msgs[1].len) {
+			DRM_ERROR("I2C incomplete data: got %d, expected %d\n",
+				  ret, 8 + msgs[1].len);
+			return -EIO;
+		}
+
 		/* Data starts at offset 8 in reply buffer */
 		memcpy(msgs[1].buf, &resultbuf[8], msgs[1].len);
 
-		DRM_DEBUG_KMS("I2C ICC read successful\n");
+		/* Debug dump first few bytes */
+		DRM_DEBUG_KMS("I2C read data[0-7]: %02x %02x %02x %02x %02x %02x %02x %02x\n",
+			      msgs[1].buf[0], msgs[1].buf[1], msgs[1].buf[2], msgs[1].buf[3],
+			      msgs[1].len > 4 ? msgs[1].buf[4] : 0,
+			      msgs[1].len > 5 ? msgs[1].buf[5] : 0,
+			      msgs[1].len > 6 ? msgs[1].buf[6] : 0,
+			      msgs[1].len > 7 ? msgs[1].buf[7] : 0);
+
 		return num;
 	}
 	else if (num == 1 && (msgs[0].flags & I2C_M_RD)) {
@@ -398,6 +435,7 @@ static int ps4_bridge_i2c_xfer(struct i2c_adapter *adapter,
 		}
 
 		memset(&msg, 0, sizeof(msg));
+		memset(resultbuf, 0, sizeof(resultbuf));
 		
 		msg.code = 4;
 		msg.count = 1;
@@ -412,22 +450,48 @@ static int ps4_bridge_i2c_xfer(struct i2c_adapter *adapter,
 		
 		msg.length = msg.cmd.length + 4;
 
+		DRM_DEBUG_KMS("I2C ICC single read: addr=0x%02x len=%d\n",
+			      msgs[0].addr, msgs[0].len);
+
 		mutex_lock(&mn_bridge->mutex);
 		ret = apcie_icc_cmd(0x10, 0x0, &msg, msg.length,
 				    resultbuf, sizeof(resultbuf));
 		mutex_unlock(&mn_bridge->mutex);
 
-		if (ret < 8 || resultbuf[0] != 0 || resultbuf[1] != 0) {
-			DRM_ERROR("I2C single read failed\n");
+		if (ret < 8) {
+			DRM_ERROR("I2C single read failed: %d\n", ret);
+			return -EIO;
+		}
+
+		if (resultbuf[0] != 0 || resultbuf[1] != 0) {
+			DRM_ERROR("I2C single read status error: %02x %02x\n",
+				  resultbuf[0], resultbuf[1]);
 			return -EIO;
 		}
 
 		memcpy(msgs[0].buf, &resultbuf[8], msgs[0].len);
 		return num;
 	}
+	else if (num == 1 && !(msgs[0].flags & I2C_M_RD)) {
+		/* Single write message (e.g., segment pointer) */
+		DRM_DEBUG_KMS("I2C single write: addr=0x%02x len=%d data[0]=0x%02x\n",
+			      msgs[0].addr, msgs[0].len, 
+			      msgs[0].len > 0 ? msgs[0].buf[0] : 0);
+		
+		/* For EDID segment pointer writes, we might just need to acknowledge */
+		/* The actual read will come in the next transfer */
+		return num;
+	}
 
 	DRM_ERROR("I2C: Unsupported message pattern (num=%d, flags[0]=0x%x)\n",
 		  num, num > 0 ? msgs[0].flags : 0);
+	
+	/* Debug all messages */
+	for (i = 0; i < num; i++) {
+		DRM_ERROR("  msg[%d]: addr=0x%02x flags=0x%04x len=%d\n",
+			  i, msgs[i].addr, msgs[i].flags, msgs[i].len);
+	}
+	
 	return -EOPNOTSUPP;
 }
 
@@ -456,7 +520,7 @@ void ps4_bridge_mode_set(struct drm_bridge *bridge,
 	
 	/* If no VIC match, we'll use mode 0 and let the hardware auto-detect */
 	if (!mn_bridge->mode) {
-		DRM_INFO("Non-CEA mode %dx%d@%d, using auto-detect\n",
+		DRM_INFO("Non-CEA mode %dx%d@%d, using auto-detect (VIC=0)\n",
 			 adjusted_mode->hdisplay, adjusted_mode->vdisplay,
 			 drm_mode_vrefresh(adjusted_mode));
 	}
@@ -542,15 +606,16 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 
 	DRM_DEBUG("Enable PS4_BRIDGE_ENABLE\n");
 	
-	/* Use VIC if available, otherwise use a safe default (16 = 1080p60) */
-	vic_mode = mn_bridge->mode ? mn_bridge->mode : 16;
+	/* Use VIC if available, otherwise 0 for auto-detect */
+	vic_mode = mn_bridge->mode;
 
 	if(pdev->vendor != PCI_VENDOR_ID_ATI) {
 		DRM_ERROR("Invalid vendor: %04x", pdev->vendor);
 		return;
 	}
 
-	DRM_DEBUG_KMS("ps4_bridge_enable (VIC: %d)\n", vic_mode);
+	DRM_DEBUG_KMS("ps4_bridge_enable (VIC: %d %s)\n", vic_mode,
+		      vic_mode == 0 ? "(AUTO-DETECT)" : "");
 
 	/* Here come the dragons */
 
