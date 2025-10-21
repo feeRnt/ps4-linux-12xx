@@ -85,7 +85,7 @@ Use this if you'd like to test WiFi and bluetooth functionality on a console wit
 
 - `ps4-linux-5.15.189-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.189 on Belize southbridges.
 
-- `ps4-linux-5.4.247-baikal-dfaus: A branch for version 5.4.247 with fixed blackscreen and MT7668 support for Baikal southbridges.    
+- `ps4-linux-5.4.247-baikal-dfaus`: A branch for version 5.4.247 with fixed blackscreen and MT7668 support for Baikal southbridges.    
 Based on DFAUS' source.
 
 - `ps4-linux-6.15.y-crashniels` : The clean WiFi fix branch for Kernel version 6.15.4, on Aeolia/Belize southbridges.    
