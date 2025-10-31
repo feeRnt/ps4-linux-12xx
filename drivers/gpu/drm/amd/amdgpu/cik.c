@@ -968,8 +968,10 @@ static const u32 liverpool_mgcg_cgcg_init[] =
 	0x21c2, 0xffffffff, 0x00900100, /* CP_RB_WPTR_POLL_CNTL */
 	0x3109, 0xffffffff, 0x0020003f, /* RLC_CGCG_CGLS_CTRL */
 	0x1579, 0xff607fff, 0xfc000100, /* CGTT_DRM_CLK_CTRL0 */
-	// should be handled by gfx7 rlc
-	// 0x30df, 0xffffffff, 0x00000b00, /* RLC_PG_DELAY_2 */
+	/* should be handled by gfx7 rlc (in kernel 6.15?)
+	 * but re-added for kernel 5.15
+	 * Check Spectre, Hawaii and Bonaire cgcg_inits for reference */
+	0x30df, 0xffffffff, 0x00000b00, /* RLC_PG_DELAY_2 */
 };
 
 static const u32 gladius_golden_spm_registers[] =
