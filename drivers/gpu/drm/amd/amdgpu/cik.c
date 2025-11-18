@@ -836,10 +836,10 @@ static const u32 liverpool_golden_common_registers[] =
 	0xc200, 0xffffffff, 0xe0000000, /* GRBM_GFX_INDEX */
 	0xa0d4, 0xffffffff, 0x2a00161a, /* PA_SC_RASTER_CONFIG */
 	0xa0d5, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
-	0x2684, 0xffffffff, 0x00018208, /* CB_HW_CONTROL */
-	0x263e, 0xffffffff, 0x12011003	/* GB_ADDR_CONFIG */
+	0x2684, 0xffffffff, 0x00018208, /* CB_HW_CONTROL ; ColorBuffer HardWare Control */
+	0x263e, 0xffffffff, 0x12011003,	/* GB_ADDR_CONFIG */
 	// is this needed?
-	// 0x1401, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL */
+	0x1401, 0x00002000, 0x00002000 /* GARLIC_FLUSH_CNTL */
 };
 
 static const u32 liverpool_golden_registers[] =
