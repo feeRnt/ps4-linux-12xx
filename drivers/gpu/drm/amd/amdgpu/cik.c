@@ -665,17 +665,17 @@ static const u32 hawaii_golden_registers[] =
 	0xf9e, 0x00000001, 0x00000002,
 	0x31da, 0x00000008, 0x00000008,
 	0x31dc, 0x00000f00, 0x00000800,
-	0x31dd, 0x00000f00, 0x00000800,
-	0x31e6, 0x00ffffff, 0x00ff7fbf,
-	0x31e7, 0x00ffffff, 0x00ff7faf,
-	0x2300, 0x000000ff, 0x00000800,
+	0x31dd, 0x00000f00, 0x00000800, /* Should be SPI_RESOURCE_RESERVE_CU_1 */
+	0x31e6, 0x00ffffff, 0x00ff7fbf, /* Should be SPI_RESOURCE_RESERVE_EN_CU_0 */
+	0x31e7, 0x00ffffff, 0x00ff7faf, /* Should be SPI_RESOURCE_RESERVE_EN_CU_1 */
+	0x2300, 0x000000ff, 0x00000800, /* Should be SQ_CONFIG */
 	0x390, 0x00001fff, 0x00001fff,
 	0x2418, 0x0000007f, 0x00000020,
 	0x2542, 0x00010000, 0x00010000,
 	0x2b80, 0x00100000, 0x000ff07c,
-	0x2b05, 0x000003ff, 0x0000000f,
-	0x2b04, 0xffffffff, 0x7564fdec,
-	0x2b03, 0xffffffff, 0x3120b9a8,
+	0x2b05, 0x000003ff, 0x0000000f,	/* Maybe related to TCP_CHAN_STEER.. _ON? */
+	0x2b04, 0xffffffff, 0x7564fdec, /* Should be something with TCP_CHAN_STEER.. _HI? */
+	0x2b03, 0xffffffff, 0x3120b9a8, /* Should be TCP_CHAN_STEER_LO */
 	0x2b02, 0x20000000, 0x0f9c0000
 };
 
@@ -837,9 +837,7 @@ static const u32 liverpool_golden_common_registers[] =
 	0xa0d4, 0xffffffff, 0x2a00161a, /* PA_SC_RASTER_CONFIG */
 	0xa0d5, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
 	0x2684, 0xffffffff, 0x00018208, /* CB_HW_CONTROL ; ColorBuffer HardWare Control */
-	0x263e, 0xffffffff, 0x12011003,	/* GB_ADDR_CONFIG */
-	// is this needed?
-	0x1401, 0x00002000, 0x00002000 /* GARLIC_FLUSH_CNTL */
+	0x263e, 0xffffffff, 0x12011003	/* GB_ADDR_CONFIG */
 };
 
 static const u32 liverpool_golden_registers[] =
@@ -874,10 +872,11 @@ static const u32 liverpool_golden_registers[] =
 	0x31ed, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_7 */
 	0x31ee, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_8 */
 	0x31ef, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_9 */
+	0x1401, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL; this should not be in golden_common regs */
 	0x2300, 0x000000ff, 0x00000001, /* SQ_CONFIG */
 	0x2542, 0x00010000, 0x00010000, /* TA_CNTL_AUX */
 	0x2b03, 0xffffffff, 0x76325410, /* TCP_CHAN_STEER_LO */
-	0x535, 0xffffffff, 0x00000000, 	/* VM_CONTEXTS_DISABLE */
+	0x535, 0xffffffff, 0x00000000, 	/* VM_CONTEXTS_DISABLE */ /*Why comma before end? IDK*/
 };
 
 static const u32 liverpool_mgcg_cgcg_init[] =
@@ -967,11 +966,11 @@ static const u32 liverpool_mgcg_cgcg_init[] =
 	0xf000, 0xffffffff, 0x96940200, /* CGTS_SM_CTRL_REG */
 	0x21c2, 0xffffffff, 0x00900100, /* CP_RB_WPTR_POLL_CNTL */
 	0x3109, 0xffffffff, 0x0020003f, /* RLC_CGCG_CGLS_CTRL */
-	0x1579, 0xff607fff, 0xfc000100, /* CGTT_DRM_CLK_CTRL0 */
+	0x1579, 0xff607fff, 0xfc000100, /* CGTT_DRM_CLK_CTRL0 */ /* Not in old PS4 patches*/
 	/* should be handled by gfx7 rlc (in kernel 6.15?)
-	 * but re-added for kernel 5.15
+	 * Keep off as this was never in original PS4 Patches, or in other similar GPUs?
 	 * Check Spectre, Hawaii and Bonaire cgcg_inits for reference */
-	0x30df, 0xffffffff, 0x00000b00, /* RLC_PG_DELAY_2 */
+	// 0x30df, 0xffffffff, 0x00000b00, /* RLC_PG_DELAY_2 */
 };
 
 static const u32 gladius_golden_spm_registers[] =
