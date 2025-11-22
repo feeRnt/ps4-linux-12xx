@@ -837,7 +837,8 @@ static const u32 liverpool_golden_common_registers[] =
 	0xa0d4, 0xffffffff, 0x2a00161a, /* PA_SC_RASTER_CONFIG */
 	0xa0d5, 0xffffffff, 0x00000000, /* PA_SC_RASTER_CONFIG_1 */
 	0x2684, 0xffffffff, 0x00018208, /* CB_HW_CONTROL ; ColorBuffer HardWare Control */
-	0x263e, 0xffffffff, 0x12011003	/* GB_ADDR_CONFIG */
+	0x263e, 0xffffffff, 0x12011003,	/* GB_ADDR_CONFIG */
+        0x1401, 0x00002000, 0x00002000  /* GARLIC_FLUSH_CNTL */
 };
 
 static const u32 liverpool_golden_registers[] =
@@ -847,7 +848,7 @@ static const u32 liverpool_golden_registers[] =
 	0xf004, 0xffff0000, 0xff000000, /* CGTS_USER_TCC_DISABLE */
 	0xf080, 0xfdfc0fff, 0x00000100, /* CGTT_SPI_CLK_CTRL */
 	0x1bb6, 0x00010000, 0x00010000, /* CRTC_DOUBLE_BUFFER_CONTROL */
-	/* 0x2684, 0x00210000, 0x00058208, CB_HW_CONTROL */
+	0x2684, 0x00210000, 0x00058208, /* CB_HW_CONTROL */
 	0x260d, 0xf00fffff, 0x00004400, /* DB_DEBUG2 */
 	0x16ec, 0x000000f0, 0x00000070, /* FBC_DEBUG_COMP */
 	0x263e, 0x73773777, 0x12011003, /* GB_ADDR_CONFIG */
@@ -872,10 +873,10 @@ static const u32 liverpool_golden_registers[] =
 	0x31ed, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_7 */
 	0x31ee, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_8 */
 	0x31ef, 0xffffffff, 0x00fffffe, /* SPI_RESOURCE_RESERVE_EN_CU_9 */
-	0x1401, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL; this should not be in golden_common regs */
 	0x2300, 0x000000ff, 0x00000001, /* SQ_CONFIG */
 	0x2542, 0x00010000, 0x00010000, /* TA_CNTL_AUX */
 	0x2b03, 0xffffffff, 0x76325410, /* TCP_CHAN_STEER_LO */
+	0x1401, 0x00002000, 0x00002000, /* GARLIC_FLUSH_CNTL; this should be in pairs? */
 	0x535, 0xffffffff, 0x00000000, 	/* VM_CONTEXTS_DISABLE */ /*Why comma before end? IDK*/
 };
 
