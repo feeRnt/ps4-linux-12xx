@@ -28,12 +28,23 @@ Merging all the main fixes into a few distinct branches is a WIP.
 
 -------
 
-The console models that are known to have the Torus 2 module, and their testing results from this patched kernel are:
-``` 
-CUH-1216(A/B) { WiFi: Functional | Bluetooth: Functional }    
-CUH-1215(A/B) { WiFi: Functional | Bluetooth: Functional }
-CUH-1003      { WiFi: Functional? | Bluetooth: Functional? }
-[A and B are just hard-drive specification: 500 GB vs 1000GB].   
+While the CUH-1216/1215 models are definitively known to have the Torus 2 models with probelmatic WiFi, along with some 11xx models with similar WiFi issues, here is a list of consoles reported working without problem from the kernels in this repo:
+
+| Console Model | Variation | WiFi+BT Chip Present | Compatible Kernel (Patched) |
+|---|---|---| --- |
+| CUH-1216(A/B) | Phat - Belize B0 | 88w8897 (Torus 2) | *6.15.4, 5.15.15* |
+| CUH-1215(A/B) | Phat - Belize | 88w8897 (Torus 2) | *6.15.4, 5.15.15*  |
+CUH-1003  | Phat  - Aeolia | ? | *6.15.4* |
+CUH-1116A | Phat - Aeolia | ? | *6.15.4* |
+CUH-2215B | Pro - Baikal | ? | *5.4.247* |
+CUH-2216A | Slim - Baikal B1 | MediaTek 7668 | *5.4.247* |
+CUH-7116B | Pro - Baikal B1 | ? | *5.4.247* |
+CUH-7202B | Pro - Baikal | ? | *5.4.247* |
+```
+[A and B are just hard-drive specification: 500 GB vs 1000GB].
+
+Aeolia, Belize and Baikal are the console Southbridges.
+B0, B1 etc. are the Southbridge subrevisions.
 ```
 
 <br>
@@ -65,6 +76,8 @@ and here is an image with working internal WiFi and Bluetooth as shown in the lo
 
 Hard work paid off!
 
+----
+<br>
 There are different branches that you can select on the repo,    
 `ps4-linux-5.15.y` and `ps4-linux-5.15.y-conservative2` are branches with excessive debug logs, that helped me pinpoint the issue on the whole MMC stack. Due to the logging, it is not advisable to use those kernel branches.    
 
@@ -77,11 +90,9 @@ However, it probably runs on Aeolia consoles unlike the \*-belize branches. (Not
 The main release branches are:    
 - `ps4-linux-5.15.15-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.15 on Belize southbridges.    
 
-- `ps4-linux-5.15.15-fix-baikal` : The clean WiFi fix branch for Kernel version 5.15.15 on Baikal southbridges.    
-Baikals don't have the WiFi/BT issue fixed here, but it's kept for testing only.    
+- ~~`ps4-linux-5.15.15-fix-baikal` : The clean WiFi fix branch for Kernel version 5.15.15 on Baikal southbridges.~~
+~~Baikals don't have the WiFi/BT issue fixed here, but it's kept for testing only.~~
 
-- `ps4-linux-5.15.15-fix-belize_mt7668` : The branch for testing the MT7668 chip on Belize consoles...    
-Use this if you'd like to test WiFi and bluetooth functionality on a console with this chip.
 
 - `ps4-linux-5.15.189-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.189 on Belize southbridges.
 
@@ -93,14 +104,38 @@ Based on crashniels' source.
 
 To compile them, you can simply fork the repo, go to the Actions tab and run the Workflow file for `build-kernel_latest.yaml` for a particular branch.
 
-Or if you would like to build locally, just clone the repo for your desired branch and run:
+Or if you would like to build locally, just clone the repo for your desired branch and run the necessary commands:
 ```bash
+
+git clone https://github.com/feeRnt/ps4-linux-12xx --branch <desired-branch-name> --depth=3
+#keep a low depth to save on space
+
+cd ps4-linux-12xx
+echo "Copying necessary extra firmware to /lib/firmware"
+sudo cp -ri extra_firmware/* /lib/firmware
+
+sudo mkdir /lib/firmware/mrvl
+wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin \
+&& sudo mv -i sd8897_uapsta.bin /lib/firmware/mrvl
+
+wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin \
+&& sudo mv -i sd8797_uapsta.bin /lib/firmware/mrvl
+
+
+sudo mkdir /lib/firmware/mediatek
+wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7668pr2h.bin \
+&& sudo mv -i mt7668pr2h.bin /lib/firmware/mediatek
+
+
+## Rename .config file
+
 mv config .config
 
 export MAKE_OPTS="-j`nproc` \
               HOSTCC=gcc-11 \
               CC=gcc-11"
-# gcc-11 is ideal for compiling the 5.15.y kernels, otherwise you will have many typecheck and compile errors 
+# gcc-11 is ideal for compiling the 5.15.y kernels
+# Otherwise you will have many typecheck and compile errors
 make ${MAKE_OPTS} olddefconfig
 make ${MAKE_OPTS} prepare
 echo "making kernel. . ."
@@ -117,7 +152,13 @@ To get some pre-compiled kernels, go to the [releases section](https://github.co
 
 If something doesn't work, or your model still has unsupported WiFi, you can open a GitHub issue to share its details.
 
-=-=-=-=
+<br>
+Enjoy your Linux-Station!
+
+=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
+
+---
+
 
 <br>
 <br>
