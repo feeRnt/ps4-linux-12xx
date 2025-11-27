@@ -155,15 +155,11 @@ If something doesn't work, or your model still has unsupported WiFi, you can ope
 <br>
 Enjoy your Linux-Station!
 
-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-
-
 ---
-
-
 <br>
-<br>
-======== Generic Linux Kernel Doucmentation: ========
 
+Generic Linux Kernel Documentation
+------
 
 There are several guides for kernel developers and users. These guides can
 be rendered in a number of formats, like HTML and PDF. Please read
