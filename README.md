@@ -38,6 +38,7 @@ CUH-1003  | Phat  - Aeolia | ? | *6.15.4* |
 CUH-1116A | Phat - Aeolia | ? | *6.15.4* |
 CUH-2215B | Pro - Baikal | ? | *5.4.247* |
 CUH-2216A | Slim - Baikal B1 | MediaTek 7668 | *5.4.247* |
+CUH-2216A | Slim - Belize | MediaTek 7668 | *5.15.15* |
 CUH-7116B | Pro - Baikal B1 | ? | *5.4.247* |
 CUH-7202B | Pro - Baikal | ? | *5.4.247* |
 ```
