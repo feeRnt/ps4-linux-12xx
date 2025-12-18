@@ -383,10 +383,13 @@ static int aeolia_probe_slot(struct sdhci_pci_slot *slot)
 	* for standard clock modes (SDR50, SDR104), and instead calculates it on the fly
 	* using host capabiilites. So it should be harmless in all cases.
 	*/
+	/* Disable for testing broken WiFi on CUH-1004A;
+	 * seems to init card as SDR50 instead of SDR104
 	if ((slot->chip->pdev->device == PCI_DEVICE_ID_SONY_AEOLIA_SDHCI) || \
 	    (slot->chip->pdev->device == PCI_DEVICE_ID_SONY_BELIZE_SDHCI)) {
 		slot->host->quirks2 |= SDHCI_QUIRK2_PRESET_VALUE_BROKEN;
         }
+	*/
 
 	return 0;
 }
