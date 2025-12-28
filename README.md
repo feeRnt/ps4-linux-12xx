@@ -92,29 +92,32 @@ Hard work paid off!
 ----     
 \
 There are different branches that you can select on the repo,    
-`ps4-linux-5.15.y` and `ps4-linux-5.15.y-conservative2` are branches with excessive debug logs, that helped me pinpoint the issue on the whole MMC stack. Due to the logging, it is not advisable to use those kernel branches.    
+`x_old__ps4-linux-5.15.y` and `x_old__ps4-linux-5.15.y-conservative2` are branches with excessive debug logs, that helped me pinpoint the issue on the whole MMC stack. Due to the logging, it is not advisable to use those kernel branches.    
 
-The `ps4-linux-5.15.y-fix` is a branch without the PS4 patches from codedwrench's **Baikal** branch.    
-It still runs as intended on a Belize (no blackscreen fix yet), but you will get bad errors, even on Belize console. Should be used for testing only.
+The other "x_experimental__" prefixed branches were made for debugging & testing a particular subsystem or problem in the kernel, and are not advised to be used.  
+They are only kept for further future experiment, archive or study only.  
+\- \- For example, the `x_experimental__ps4-linux-5.15.15-fix-baikal` branch is non-functional.
+Kernel 5.15 is not reported to be working on any Baikal console, but it's kept for testing only.
 
-However, it probably runs on Aeolia models unlike the \*-belize branches. (Not tested yet)
+\
+The `ps4-linux-5.15.15-aeolia-belize` is a branch without the PS4 patches from codedwrench's **Baikal** branch.    
+It still runs as intended on a Belize (no blackscreen fix yet), but you will get bad errors, even on non-Baikal consoles. Should be used for testing only.
 
+However, it probably runs on Aeolia models, unlike the \*-belize -only branches. (Not tested yet)
+
+----
 
 The main release branches are:    
-- `ps4-linux-5.15.15-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.15 on Belize southbridges.  
+- `ps4-linux-5.15.15-belize` : The clean WiFi, Blackscreen & other misc. fixes' branch for Kernel version 5.15.15 on Belize southbridges.  
 This is the primary branch of the repo.   
 
-- ~~`ps4-linux-5.15.15-fix-baikal` : The clean WiFi fix branch for Kernel version 5.15.15 on Baikal southbridges.~~
-~~Baikals don't have the WiFi/BT issue fixed here, nor is the 5.15 reported to be working on Baikals, but it's kept for testing only.~~
-
-
-- `ps4-linux-5.15.189-fix-belize` : The clean WiFi fix branch for Kernel version 5.15.189 on Belize southbridges.  
+- `ps4-linux-5.15.189-belize` : The clean WiFi & Blackscreen fix branch for Kernel version 5.15.189 on Belize southbridges.  
 (Not as well maintained as 5.15.15)
 
 - `ps4-linux-5.4.247-baikal-dfaus`: A branch for version 5.4.247 with fixed blackscreen and MT7668 support for Baikal southbridges.    
 Based on DFAUS' source.
 
-- `ps4-linux-6.15.y-crashniels` : The clean WiFi fix branch for Kernel version 6.15.4, on Aeolia/Belize southbridges.    
+- `ps4-linux-6.15.4-aeolia-belize-crashniels` : The clean WiFi, Blackscreen & other misc. fixes' branch for Kernel version 6.15.4, on Aeolia/Belize southbridges.    
 Based on crashniels' source.
 
 To compile them, you can simply fork the repo, go to the Actions tab and run the Workflow file for `build-kernel_latest.yaml` for a particular branch.
@@ -149,8 +152,8 @@ mv config .config
 export MAKE_OPTS="-j`nproc` \
               HOSTCC=gcc-11 \
               CC=gcc-11"
-# gcc-11 is ideal for compiling the 5.15.y kernels
-# Otherwise you will have many typecheck and compile errors
+# gcc-11 is ideal for compiling the 5.4, 5.15 & 6.15.y kernels
+# Otherwise you will have many typecheck and compile errors compiling the older kernels
 make ${MAKE_OPTS} olddefconfig
 make ${MAKE_OPTS} prepare
 echo "making kernel. . ."
@@ -209,7 +212,7 @@ attempts at using the display EDID information from your monitor, to use in Linu
 
 
 
-## For a guide on installation and other topics, refer to this [all-around guide.](https://dionkill.github.io/ps4-linux-tutorial/)
+## For an instructional manual on installation and other topics, refer to this [all-around guide.](https://dionkill.github.io/ps4-linux-tutorial/)
 
 ---
 Enjoy your Linux-Station!
