@@ -1,5 +1,5 @@
 /*
- * xhci-aeoliat.c - xHCI host controller driver for Aeolia (Sony PS4)
+ * xhci-aeolia.c - xHCI host controller driver for Aeolia (Sony PS4)
  *
  * Borrows code from xhci-pci.c, hcd-pci.c, and xhci-plat.c.
  *
@@ -150,7 +150,7 @@ static void xhci_aeolia_remove_one(struct pci_dev *dev, int index)
 #define DRV_VERSION	"3.0"
 #define DRV_NAME	"ahci"
 static const struct ata_port_info ahci_port_info = {
-	AHCI_HFLAGS	(AHCI_HFLAG_31BIT_ONLY),
+	AHCI_HFLAGS	(AHCI_HFLAG_31BIT_ONLY), //strange
 	.flags		= AHCI_FLAG_COMMON,
 	.pio_mask	= ATA_PIO4,
 	.udma_mask	= ATA_UDMA6,
@@ -170,7 +170,7 @@ static int ahci_init_one(struct pci_dev *pdev)
 	struct ata_port_info pi = ahci_port_info;
 	const struct ata_port_info *ppi[] = { &pi, NULL };
 	struct ahci_host_priv *hpriv;
-      struct ata_host *host;
+	struct ata_host *host;
 	int n_ports, i, rc;
 	int ahci_pci_bar = 2;
 	resource_size_t		rsrc_start;
@@ -490,7 +490,8 @@ static void xhci_aeolia_remove(struct pci_dev *dev)
 static void xhci_hcd_pci_shutdown(struct pci_dev *dev){
 
 	// We want to use the normal shutdown if we aren't belize
-	if (dev->device != PCI_DEVICE_ID_SONY_BELIZE_XHCI)
+	// (or Baikal?)
+	if (dev->device == PCI_DEVICE_ID_SONY_AEOLIA_XHCI)
 	{
 		usb_hcd_pci_shutdown(dev);
 		return;
