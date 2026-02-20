@@ -25,8 +25,10 @@ The branch names are meant to be descriptive and provide an idea, but they're fa
 
 Merging all the main fixes into a few distinct branches is a WIP.
 
+<br>
 
 -------
+## Console Models and Southbridge
 
 While the CUH-1216/1215 models are definitively known to have the Torus 2 models with probelmatic WiFi, along with some 11xx models with similar WiFi issues, here is a list of consoles reported working without any hiccups from the kernels in this repo:
 
@@ -56,14 +58,14 @@ WiFi+Bluetooth), and instead functioned properly with older firmware
 sourced from the initramfs. For these, each affected kernel release has a "no-built-in-fw"
 version for best functionality. See the releases page of the referring kernels for more
 information.]
-
-
 <br>
 
 - TODO: Add a list with all supported console models, their southbridges, and their compatible kernels.
 
-----
 <br>
+
+----
+## Fixing the Wireless Card on CUH-1216
 
 The main patches which in combination fix the CUH-1216/1215 wireless module are:     
 [150 MHz rate limit quirk on the 88w8897 card's Function 0](https://github.com/feeRnt/ps4-linux-12xx/commit/df7f7dbb1b0fff6026e159540f029988c8067b70).
@@ -89,19 +91,23 @@ and here's a screenshot with working internal WiFi and Bluetooth as shown in the
 
 Hard work paid off!
 
-----     
-\
+<br>
+
+----
+## Branches
+
 There are different branches that you can select on the repo,    
 `x_old__ps4-linux-5.15.y` and `x_old__ps4-linux-5.15.y-conservative2` are branches with excessive debug logs, that helped me pinpoint the issue on the whole MMC stack. Due to the logging, it is not advisable to use those kernel branches.    
 
-The other "x_experimental__" prefixed branches were made for debugging & testing a particular subsystem or problem in the kernel, and are not advised to be used.  
+The other "x_experimental__" or "x_exp__" prefixed branches were made for debugging & testing a particular subsystem or problem in the kernel, and are not advised to be used.  
 They are only kept for further future experiment, archive or study only.  
+
 \- \- For example, the `x_experimental__ps4-linux-5.15.15-fix-baikal` branch is non-functional.
 Kernel 5.15 is not reported to be working on any Baikal console, but it's kept for testing only.
 
 \
 The `ps4-linux-5.15.15-aeolia-belize` is a branch without the PS4 patches from codedwrench's **Baikal** branch.    
-It still runs as intended on a Belize (no blackscreen fix yet), but you will get bad errors, even on non-Baikal consoles. Should be used for testing only.
+It still runs as intended on a Belize (no blackscreen fix yet), but you will get bad errors. Should be used for testing only.
 
 However, it probably runs on Aeolia models, unlike the \*-belize -only branches. (Not tested yet)
 
@@ -120,7 +126,12 @@ Based on DFAUS' source.
 - `ps4-linux-6.15.4-aeolia-belize-crashniels` : The clean WiFi, Blackscreen & other misc. fixes' branch for Kernel version 6.15.4, on Aeolia/Belize southbridges.    
 Based on crashniels' source.
 
-To compile them, you can simply fork the repo, go to the Actions tab and run the Workflow file for `build-kernel_latest.yaml` for a particular branch.
+<br>
+
+---
+## Compile and Build
+
+To compile any of these branches, you can simply fork the repo, go to the Actions tab and run the Workflow file for `build-kernel_latest.yaml` for a particular branch.
 
 Or if you would like to build locally, just clone the repo for your desired branch and run the necessary commands:
 ```bash
@@ -152,7 +163,7 @@ mv config .config
 export MAKE_OPTS="-j`nproc` \
               HOSTCC=gcc-11 \
               CC=gcc-11"
-# gcc-11 is ideal for compiling the 5.4, 5.15 & 6.15.y kernels
+# gcc-11 is ideal for compiling the 5.4 & 5.15.y kernels, and can build 6.15.y too
 # Otherwise you will have many typecheck and compile errors compiling the older kernels
 make ${MAKE_OPTS} olddefconfig
 make ${MAKE_OPTS} prepare
@@ -166,11 +177,19 @@ echo "installing modules . . ."
 make ${MAKE_OPTS} modules_install
 ```
 
+<br>
+
+---
+## Releases and Downloads
+
 To get some pre-compiled kernels, go to the [releases section](https://github.com/feeRnt/ps4-linux-12xx/releases), and choose a kernel (bzImage) based on your needed version.
 
 If something doesn't work, or your model still has unsupported WiFi, you can open a GitHub issue to share its details.
 
-----
+<br>
+
+---
+## Documentation, Guides and the PS4 Linux Future (As of December 2025)
 
 While many of the bugs and issues prevalent in PS4 Linux kernels, and PS4 Linux in general have been fixed over the years, many of them still exist, and are seldom worked on.  
 A few honorable mentions aimed at improving this scene go to:
@@ -212,10 +231,10 @@ attempts at using the display EDID information from your monitor, to use in Linu
 
 
 
-## For an instructional manual on installation and other topics, refer to this [all-around guide.](https://dionkill.github.io/ps4-linux-tutorial/)
+### For an instructional manual on installation and other topics, refer to this [all-around guide.](https://dionkill.github.io/ps4-linux-tutorial/)
 
 ---
-Enjoy your Linux-Station!
+<p align="center">Enjoy your Linux-Station!</p>
 
 ---
 <br>
