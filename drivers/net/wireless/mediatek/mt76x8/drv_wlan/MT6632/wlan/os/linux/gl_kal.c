@@ -1067,8 +1067,8 @@ kalIndicateStatusAndComplete(IN P_GLUE_INFO_T prGlueInfo, IN WLAN_STATUS eStatus
 									  (ucChannelNum, KAL_BAND_5GHZ));
 				}
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
-		roam_info.channel = prChannel;
-		roam_info.bssid = arBssid;
+		roam_info.links[0].channel = prChannel;
+		roam_info.links[0].bssid = arBssid;
 		roam_info.req_ie =
 			prGlueInfo->aucReqIe;
 		roam_info.req_ie_len =
