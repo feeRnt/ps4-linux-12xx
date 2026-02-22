@@ -1,19 +1,22 @@
 ## This is a basic workflow to help you get started with Actions 
 ## Adapted from https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
 
-name: "Compile PS4-Linux Kernel-12xx; Unified Version: Latest - Ignore Errors"
+name: "Compile PS4-Linux Kernel-12xx; Clang Full LTO Version: Latest"
 
 # Controls when the workflow will run
 on:
   # Allows you to run this workflow manually from the Github Actions tab
   workflow_dispatch:
+  push: # Prefer triggering manually for now
+    tags:
+      - 'v*' # Will build on any tag that starts with v: v5.15.15, etc.
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
     env: 
        GITHUB_TOKEN: ${{ github.token }}
-    runs-on: ubuntu-latest # Ubuntu 24.04. Docker Image is same ver. now
+    runs-on: ubuntu-latest # Ubuntu 24.04. Docker Image is the same ver. now
     steps: 
       - name: Set up cache env vars
         id: cache-workspace-vars
@@ -284,6 +287,26 @@ jobs:
           # regex: regex to match annotation, file: capture group that has file name
           # line: capture group that gives the line number, column: capture group for column number
           # severity: capture group that states if error or warning, message: capture group that has problem msg
+      
+      #- name: Set up Swapfile in workspace outside Docker
+      #  id: setup-workspace-swap
+      #  run: |
+      #    echo "Creating and activating swapfile."
+      #    fallocate -l 8G ${{ github.workspace }}/swapfile
+      #    chmod 600 ${{ github.workspace }}/swapfile
+      #    mkswap ${{ github.workspace }}/swapfile
+      #    swapon ${{ github.workspace }}/swapfile
+      #    echo "Current system memory after activating swap: "
+      #    free -h
+      #
+      #    This gives::: swapon: /home/runner/work/ps4-linux-12xx/ps4-linux-12xx/swapfile: 
+      #    swapon failed: Operation not permitted
+
+      - name: Set up Swapfile with Marketplace Actions
+        uses: pierotofy/set-swap-space@fc79b3f67fa8a838184ce84a674ca12238d2c761
+        with:
+          swap-size-gb: 12
+          # Tried 10 G, didn't work for full LTO
 
       - name: Compile the linux kernel with docker run
         id: compile-kernel-step
@@ -304,7 +327,10 @@ jobs:
           echo "Testing if host directory mounting was successful."
           ls -a .
           
-          if [ -f persistence_test* ]; then
+          for _pers_files in persistence_test*; do
+            [ -f "$_pers_files" ] && _persisted=1 && break
+          done
+          if [ "$_persisted" = 1 ]; then
             echo "Files are persisting across runs! Congratulations."
           else
             echo "Files are not persisting across runs, OR, this is the first uncached action run."
@@ -330,20 +356,46 @@ jobs:
           export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
           export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
-          export KERNEL_PKG=kernel-${localversion}.tar.gz
-          export MAKE_OPTS="-j`nproc` \
+          export KERNEL_PKG=kernel-${localversion}_Clang_fullLTO.tar.gz
+
+          export KCFLAGS="-march=btver2 -mtune=btver2 -O3"
+          export KAFLAGS="-march=btver2 -mtune=btver2 -O3"
+          export KCPPFLAGS="-march=btver2 -mtune=btver2 -O3"
+          # I tried to include them in MAKE_OPTS in every sane way, but it doesn't
+          # work. It's redundant to specify them in every command (seemingly)
+
+          # march and mtune optimize the the build instructions
+          # march = oldest architecture on which this code can run
+          # mtune = compiler hint for which architecture the instructions should be
+          # optimized for. The PS4 CPU architecture was based on btver2,
+          # also known as the AMD Jaguar architecture
+
+          # We don't know if -O3 will help, but really anything will help
+          # considering our target hardware was aging when it was new
+
+          export MAKE_OPTS="-j`nproc --ignore=1` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
-                     HOSTCC=gcc-11 \
-                     CC=gcc-11 \
-                     --ignore-errors"
-                     # --keep-going" --ignore-errors is better for checking all the code errors.
-                     # Will not stop if one target depends on another.
+                     LLVM=1"
+                     # Macro for all the LLVM specific switches. 1 = whatever LLVM present
+                     # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
+                     # We ignore 1 core because full LTO runs OOM, even with 10 G swap (would be 3/4 cores)
+
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
           mkdir -p ${GCE_PKG_DIR}
           echo "Debugging gce directory."
           find ${GCE_BUILD_DIR} ${GCE_INSTALL_DIR}/boot ${GCE_PKG_DIR}
+
+          echo -e "\n\n\n Current system resources inside of Docker : : :"
+          echo "CPU cores: `nproc`"
+          echo "RAM: `free -h`"
+          echo "Disk: `df -h`"
+          echo "CPU info: `lscpu | grep 'Model name'`"
+          #echo "System max memory: `cat /sys/fs/cgroup/memory.max`" ;; No such file or dir
+
+          # Enable Full LTO from the config (should be redundant as FullLTO is already set)
+          scripts/config --enable CONFIG_LTO_CLANG_FULL
 
           make ${MAKE_OPTS} olddefconfig
           make ${MAKE_OPTS} prepare
@@ -357,8 +409,10 @@ jobs:
           make ${MAKE_OPTS} modules_install
           echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
           cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
+          echo "Copying used .config to $GCE_INSTALL_DIR/.config. . ."
+          cp .config "$GCE_INSTALL_DIR/.config"
           cd ${GCE_INSTALL_DIR}
-          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion".tar.gz boot/bzImage lib/modules/* --owner=0 --group=0
+          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion"_Clang_fullLTO.tar.gz boot/bzImage lib/modules/* .config --owner=0 --group=0
           # I assume it'll never package the kernel, unless the compile succeeds, since -e is set
 
           ## GCE = Google Compute Engine, adapted from 
@@ -366,6 +420,20 @@ jobs:
           EOF
           
           # Now in runner.
+          
+          #echo "Were we killed by an out of memory DAeMON?"
+          #dmesg | grep -i -E 'killed process|out of memory' "dmesg: read kernel buffer failed: Operation not permitted"
+
+          echo -e "\n\n\n Current system resources outside of Docker : : :"
+          echo "CPU cores: `nproc`"
+          echo "RAM: `free -h`"
+          echo "Disk: `df -h`"
+          echo "CPU info: `lscpu | grep 'Model name'`"
+          #echo "System max memory: `cat /sys/fs/cgroup/memory.max`"
+
+          #echo -e "\n\n\n Here's our full dmesg: "
+          #dmesg "dmesg: read kernel buffer failed: Operation not permitted"
+        
           cd ${{ github.workspace }}/kernel-source-host 
           echo "Available files in runner after docker compile..."
           ls -la
@@ -389,11 +457,12 @@ jobs:
           echo "localversion=$localversion" >> $GITHUB_OUTPUT
 
       - name: Upload kernel image to github actions artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}
-          path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
-          # This path is the github actiions root
+          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang_fullLTO
+          path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang_fullLTO.tar.gz
+          # This path is the github actions root
+          archive: false
 
       # - name: Delete the kernel image artifact from workspace
       #  run: |
@@ -418,6 +487,20 @@ jobs:
         run: |
           echo "There was a cache hit for github workspace, and we just completed the kernel compilation. Hence deleting the old cache."
           gh cache delete --repo ${{ github.repository }} ${{ steps.cache-restore-workspace.outputs.cache-primary-key }}
+
+      #- name: Delete swapfile
+      #  id: delete-workspace-swapfile
+      #  run: |
+      #    echo "Deleting old swap"
+      #    # swapoff /swapfile
+      #    # rm /swapfile
+      #    # Doesn't work either:: "swapoff: Not superuser."
+      #    #
+      #    # rm ${{ github.workspace }}/swapfile
+      #    # pierotofy action uses /swapfile for swap
+      #    # Deletes happen at each run of the action, but doing it manually.
+      #    # Don't want GitHub knocking at household entrance --> nevermind, 
+      #    # just don't include it in cache
 
       - name: Save Cache of Github Workspace
         uses: actions/cache/save@v4
