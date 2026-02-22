@@ -305,7 +305,10 @@ jobs:
           echo "Testing if host directory mounting was successful."
           ls -a .
           
-          if [ -f persistence_test* ]; then
+          for _pers_files in persistence_test*; do
+            [ -f "$_pers_files" ] && _persisted=1 && break
+          done
+          if [ "$_persisted" = 1 ]; then
             echo "Files are persisting across runs! Congratulations."
           else
             echo "Files are not persisting across runs, OR, this is the first uncached action run."

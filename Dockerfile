@@ -39,8 +39,11 @@ ENV TZ=Etc/UTC
 RUN <<"EOF"
 #DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update did not work.
 apt-get update
-apt-get install build-essential clang lld wget git -y 
-# I think llvm meta package is not needed for Kernel build
+apt-get install build-essential clang lld llvm wget git -y
+# I think llvm meta package is not needed for Kernel build. Nevermind it is.
+# Me: Are you 100% sure llvm-ar is in clang package? AI: I am 100% sure
+# Results:
+#Me: Deathbed. AI: Oh yes. That *is* a poisonous mushroom. Would you like to know more about this poisonous mushroom?
 
 #Maybe: Add two separate Dockerfiles for gcc build and LLVM build
 #Download the right Dockerfile from the GH Actions file
