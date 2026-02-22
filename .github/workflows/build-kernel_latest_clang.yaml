@@ -335,7 +335,7 @@ jobs:
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
           export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
           export KERNEL_PKG=kernel-${localversion}.tar.gz
-          export MAKE_OPTS="-j`nproc` \
+          export MAKE_OPTS="-j1 \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
                      LLVM=1"
