@@ -1,6 +1,7 @@
 # State an OS to use with from
 # https://hub.docker.com/search?categories=Operating+systems
-FROM ubuntu:22.04 AS build-env
+#FROM ubuntu:22.04 AS build-env ## Ubuntu 22.04's Clang (v14) is too old for Kernel 6.15
+FROM ubuntu:24.04 AS build-env
 
 # Inherit everything from this first build stage onto this second stage:
 # We can have all the commands in one single stage/directive, but this is cleaner and useful
@@ -38,7 +39,19 @@ ENV TZ=Etc/UTC
 RUN <<"EOF"
 #DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update did not work.
 apt-get update
-apt-get install build-essential wget git -y
+apt-get install build-essential clang lld llvm wget git -y
+# I think llvm meta package is not needed for Kernel build. Nevermind it is.
+# Me: Are you 100% sure llvm-ar is in clang package? AI: I am 100% sure
+# Results:
+#Me: Deathbed. AI: Oh yes. That *is* a poisonous mushroom. Would you like to know more about this poisonous mushroom?
+
+#Maybe: Add two separate Dockerfiles for gcc build and LLVM build
+#Download the right Dockerfile from the GH Actions file
+# On second thought, maybe don't. It seems downloading and installing Clang adds only a few seconds of
+# overhead, and having two different Dockerfiles would invalidate the Docker cache, slowing down builds
+# and taking up GH cache space.
+
+
 apt-get build-dep linux -y
 EOF
 
