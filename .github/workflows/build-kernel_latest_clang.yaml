@@ -42,7 +42,6 @@ jobs:
          curl -fL https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/Dockerfile -o Dockerfile
          curl -fL https://raw.githubusercontent.com/${{ github.repository }}/${{ github.ref_name }}/.dockerignore -o .dockerignore
          # -verbose, -fail if server error, -Links follow,
-         # TO-DO: Download Dockerfile_Clang or Dockerflie_GCC based on the GH_Workflow file.
 
       - name: Show username and group info
         run: |
