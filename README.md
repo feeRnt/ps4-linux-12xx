@@ -5,7 +5,7 @@ Linux Kernel - On the Sony PlayStation 4
 This is a Linux Kernel source tailored to run on exploitable PlayStation 4 systems with various subsystem patches from the [fail0verflow team](https://github.com/fail0verflow/ps4-linux), [eeply](https://github.com/eeply/ps4-linux), [Ps3itaTeam](https://github.com/Ps3itaTeam/ps4-linux), [mircoho](https://github.com/ps4gentoo/ps4-linux-5.3.7), [codedwrench](https://github.com/codedwrench/ps4-linux/), [crashniels](https://github.com/crashniels/linux/) and others.
 
 This fork aims to make the internal WiFi+Bluetooth modules on specific PlayStation models with the Marvell    
-88w8897 combo card (internal codename Torus 2) functional, as they typically error out on the defauflt kernels.
+88w8897 combo card (internal codename Torus 2) functional, as they typically error out on the default kernels.
 
 The console models that are known to have the Torus 2 module, and their testing results from this patched kernel are:
 ``` 
