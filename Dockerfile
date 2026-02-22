@@ -38,7 +38,11 @@ ENV TZ=Etc/UTC
 RUN <<"EOF"
 #DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update did not work.
 apt-get update
-apt-get install build-essential wget git -y
+apt-get install build-essential clang lld wget git -y 
+# I think llvm meta package is not needed for Kernel build
+#TO-DO: Add two separate Dockerfiles for gcc build and LLVM build
+#Download the right Dockerfile from the GH Actions file
+
 apt-get build-dep linux -y
 EOF
 
