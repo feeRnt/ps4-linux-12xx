@@ -388,7 +388,7 @@ jobs:
         id: kernel-version-env
         working-directory: ${{ github.workspace }}/kernel-source-host
         run: |
-          localversion=`cat .config | grep LOCALVERSION | sed -nE 's|^.*="-||p' | tr -d '\"'`
+          localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'`
           echo "localversion is originally = $localversion"
           echo "localversion=$localversion" >> $GITHUB_OUTPUT
 
