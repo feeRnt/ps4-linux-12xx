@@ -39,7 +39,7 @@ While the CUH-1216/1215 models are definitively known to have the Torus 2 models
 CUH-1003  | Phat  - Aeolia | ? | *6.15.4; [probably non-built in firmware version](#builtin-fw-anchor)* |
 CUH-1004A | Phat - Aeolia | Marvell 88w8797 (Torus 1) | *6.15.4; [non-built in firmware version](#builtin-fw-anchor)* |
 CUH-1116A | Phat - Aeolia | ? | *6.15.4* |
-CUH-2215B | Pro - Baikal | ? | *5.4.247* |
+CUH-2215B | ~~Pro - Baikal~~ (Incorrect Model Provided?) | ? | *5.4.247* |
 CUH-2216A | Slim - Baikal B1 | MediaTek 7668 | *5.4.247* |
 CUH-2216A | Slim - Belize | MediaTek 7668 | *5.15.15* |
 CUH-7116B | Pro - Baikal B1 | ? | *5.4.247* |
@@ -184,7 +184,16 @@ make ${MAKE_OPTS} modules_install
 
 To get some pre-compiled kernels, go to the [releases section](https://github.com/feeRnt/ps4-linux-12xx/releases), and choose a kernel (bzImage) based on your needed version.
 
-If something doesn't work, or your model still has unsupported WiFi, you can open a GitHub issue to share its details.
+Please read the boldened out and highlighted text, as they contain some information that might be useful for a particular release. It's very wordy, that needs to be fixed!!
+
+<br>
+
+---
+## Contributing
+
+If something doesn't work on these kernels, has missing features, or your model still has unsupported WiFi, you can open a GitHub issue to share its details.
+
+Pull requests/code contributions are always welcome.
 
 <br>
 
