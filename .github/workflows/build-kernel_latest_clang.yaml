@@ -286,16 +286,24 @@ jobs:
           # line: capture group that gives the line number, column: capture group for column number
           # severity: capture group that states if error or warning, message: capture group that has problem msg
       
-      - name: Set up Swapfile in workspace outside Docker
-        id: setup-workspace-swap
-        run: |
-          echo "Creating and activating swapfile."
-          fallocate -l 8G ${{ github.workspace }}/swapfile
-          chmod 600 ${{ github.workspace }}/swapfile
-          mkswap ${{ github.workspace }}/swapfile
-          swapon ${{ github.workspace }}/swapfile
-          echo "Current system memory after activating swap: "
-          free -h
+      #- name: Set up Swapfile in workspace outside Docker
+      #  id: setup-workspace-swap
+      #  run: |
+      #    echo "Creating and activating swapfile."
+      #    fallocate -l 8G ${{ github.workspace }}/swapfile
+      #    chmod 600 ${{ github.workspace }}/swapfile
+      #    mkswap ${{ github.workspace }}/swapfile
+      #    swapon ${{ github.workspace }}/swapfile
+      #    echo "Current system memory after activating swap: "
+      #    free -h
+      #
+      #    This gives::: swapon: /home/runner/work/ps4-linux-12xx/ps4-linux-12xx/swapfile: 
+      #    swapon failed: Operation not permitted
+
+      - name: Set up Swapfile with Marketplace Actions
+        uses: pierotofy/set-swap-space@fc79b3f67fa8a838184ce84a674ca12238d2c761
+        with:
+          swap-size-gb: 10
 
       - name: Compile the linux kernel with docker run
         id: compile-kernel-step
@@ -459,7 +467,13 @@ jobs:
       - name: Delete swapfile
         id: delete-workspace-swapfile
         run: |
-          rm ${{ github.workspace }}/swapfile
+          echo "Deleting old swap"
+          swapoff /swapfile
+          rm /swapfile
+          # rm ${{ github.workspace }}/swapfile
+          # pierotofy action uses /swapfile for swap
+          # Deletes happen at each run of the action, but doing it manually.
+          # Don't want GitHub knocking at household entrance
 
       - name: Save Cache of Github Workspace
         uses: actions/cache/save@v4
