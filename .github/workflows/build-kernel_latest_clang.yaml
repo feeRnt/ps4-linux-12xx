@@ -303,7 +303,8 @@ jobs:
       - name: Set up Swapfile with Marketplace Actions
         uses: pierotofy/set-swap-space@fc79b3f67fa8a838184ce84a674ca12238d2c761
         with:
-          swap-size-gb: 10
+          swap-size-gb: 12
+          # Tried 10 G, didn't work for full LTO
 
       - name: Compile the linux kernel with docker run
         id: compile-kernel-step
@@ -354,12 +355,14 @@ jobs:
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
           export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
           export KERNEL_PKG=kernel-${localversion}.tar.gz
-          export MAKE_OPTS="-j`nproc` \
+          export MAKE_OPTS="-j`nproc --ignore=1` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
                      LLVM=1"
                      # Macro for all the LLVM specific switches. 1 = whatever LLVM present
                      # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
+                     # We ignore 1 core because full LTO runs OOM, even with 10 G swap (would be 3/4 cores)
+                     #
                      #HOSTCC=gcc-11 \
                      #CC=gcc-11"
           mkdir -p ${GCE_BUILD_DIR}
@@ -464,16 +467,19 @@ jobs:
           echo "There was a cache hit for github workspace, and we just completed the kernel compilation. Hence deleting the old cache."
           gh cache delete --repo ${{ github.repository }} ${{ steps.cache-restore-workspace.outputs.cache-primary-key }}
 
-      - name: Delete swapfile
-        id: delete-workspace-swapfile
-        run: |
-          echo "Deleting old swap"
-          swapoff /swapfile
-          rm /swapfile
-          # rm ${{ github.workspace }}/swapfile
-          # pierotofy action uses /swapfile for swap
-          # Deletes happen at each run of the action, but doing it manually.
-          # Don't want GitHub knocking at household entrance
+      #- name: Delete swapfile
+      #  id: delete-workspace-swapfile
+      #  run: |
+      #    echo "Deleting old swap"
+      #    # swapoff /swapfile
+      #    # rm /swapfile
+      #    # Doesn't work either:: "swapoff: Not superuser."
+      #    #
+      #    # rm ${{ github.workspace }}/swapfile
+      #    # pierotofy action uses /swapfile for swap
+      #    # Deletes happen at each run of the action, but doing it manually.
+      #    # Don't want GitHub knocking at household entrance --> nevermind, 
+      #    # just don't include it in cache
 
       - name: Save Cache of Github Workspace
         uses: actions/cache/save@v4
