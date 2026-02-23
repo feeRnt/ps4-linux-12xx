@@ -339,12 +339,13 @@ jobs:
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
                      LLVM=1 \
-                     -march=btver2 \
-                     -mtune=btver2"
+                     CFLAGS='-march=btver2 -mtune=btver2 -O3' \
+                     CXXFLAGS='-march=btver2 -mtune=btver2 -O3'"
                      # Macro for all the LLVM specific switches. 1 = whatever LLVM present
                      # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
                      #HOSTCC=gcc-11 \
                      #CC=gcc-11"
+                     # to be honest, i dont exactly know if -O3 will help, but really anything will help considering our target hardware was aging when it was new
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
           mkdir -p ${GCE_PKG_DIR}
