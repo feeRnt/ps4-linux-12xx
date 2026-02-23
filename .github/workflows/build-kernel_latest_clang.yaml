@@ -338,9 +338,9 @@ jobs:
           export MAKE_OPTS="-j`nproc` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
-                     LLVM=1 \
-                     CFLAGS='-march=btver2 -mtune=btver2 -O3' \
-                     CXXFLAGS='-march=btver2 -mtune=btver2 -O3'"
+                     CFLAGS="-march=btver2 -mtune=btver2 -O3" \
+                     CXXFLAGS="-march=btver2 -mtune=btver2 -O3" \
+                     LLVM=1"
                      # Macro for all the LLVM specific switches. 1 = whatever LLVM present
                      # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
                      #HOSTCC=gcc-11 \
