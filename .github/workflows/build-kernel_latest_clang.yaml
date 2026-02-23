@@ -349,6 +349,13 @@ jobs:
           echo "Debugging gce directory."
           find ${GCE_BUILD_DIR} ${GCE_INSTALL_DIR}/boot ${GCE_PKG_DIR}
 
+          echo -e "\n\n\n Current system resources inside of Docker : : :"
+          echo "CPU cores: `nproc`"
+          echo "RAM: `free -h`"
+          echo "Disk: `df -h`"
+          echo "CPU info: `lscpu | grep 'Model name'`"
+          echo "System max memory: `cat /sys/fs/cgroup/memory.max`"
+
           make ${MAKE_OPTS} olddefconfig
           make ${MAKE_OPTS} prepare
           echo "Making kernel. . ."
@@ -370,6 +377,20 @@ jobs:
           EOF
           
           # Now in runner.
+          
+          echo "Were we killed by an out of memory DAeMON?"
+          dmesg | grep -i -E 'killed process|out of memory'
+
+          echo -e "\n\n\n Current system resources inside of Docker : : :"
+          echo "CPU cores: `nproc`"
+          echo "RAM: `free -h`"
+          echo "Disk: `df -h`"
+          echo "CPU info: `lscpu | grep 'Model name'`"
+          echo "System max memory: `cat /sys/fs/cgroup/memory.max`"
+
+          echo -e "\n\n\n Here's our full dmesg: "
+          dmesg
+        
           cd ${{ github.workspace }}/kernel-source-host 
           echo "Available files in runner after docker compile..."
           ls -la
@@ -395,7 +416,8 @@ jobs:
       - name: Upload kernel image to github actions artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}
+          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang
+
           path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
           # This path is the github actiions root
 
