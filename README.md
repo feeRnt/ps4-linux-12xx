@@ -74,6 +74,8 @@ If something doesn't work, or your model still has unsupported WiFi, you can ope
 
 Happy 802.11-ing ! 😃️
 
+
+random linux stuff commit
 <br>
 <br>
 ======== Generic Linux Kernel Doucmentation: ========
