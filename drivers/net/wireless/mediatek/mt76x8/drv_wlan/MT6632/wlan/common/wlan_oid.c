@@ -72,7 +72,7 @@
 #include "mgmt/rsn.h"
 #include "gl_wext.h"
 #include "debug.h"
-#include <stddef.h>
+#include <linux/stddef.h>
 
 /******************************************************************************
 *                              C O N S T A N T S
