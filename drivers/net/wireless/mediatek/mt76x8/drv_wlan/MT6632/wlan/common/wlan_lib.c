@@ -1213,7 +1213,7 @@ WLAN_STATUS wlanSendCommandMthread(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prC
 	return rStatus;
 }				/* end of wlanSendCommandMthread() */
 
-VOID wlanTxCmdDoneCb(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
+static VOID wlanTxCmdDoneCb(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo)
 {
 
 	KAL_SPIN_LOCK_DECLARATION();
@@ -1391,7 +1391,7 @@ VOID wlanClearTxCommandQueue(IN P_ADAPTER_T prAdapter)
 * \retval none
 */
 /*----------------------------------------------------------------------------*/
-VOID wlanClearTxOidCommand(IN P_ADAPTER_T prAdapter)
+static VOID wlanClearTxOidCommand(IN P_ADAPTER_T prAdapter)
 {
 	QUE_T rTempCmdQue;
 	P_QUE_T prTempCmdQue = &rTempCmdQue;
@@ -2312,7 +2312,7 @@ BOOLEAN wlanIsHandlerAllowedInRFTest(IN PFN_OID_HANDLER_FUNC pfnOidHandler, IN B
 }
 
 #if CFG_ENABLE_FW_DOWNLOAD
-VOID wlanImageSectionGetFwInfo(IN P_ADAPTER_T prAdapter,
+static VOID wlanImageSectionGetFwInfo(IN P_ADAPTER_T prAdapter,
 			       IN PVOID pvFwImageMapFile, IN UINT_32 u4FwImageFileLength,
 			       IN UINT_8 ucTotSecNum, IN UINT_8 ucCurSecNum, IN ENUM_IMG_DL_IDX_T eDlIdx,
 			       OUT PUINT_32 pu4StartOffset, OUT PUINT_32 pu4Addr, OUT PUINT_32 pu4Len,
@@ -2429,7 +2429,7 @@ OUT PUINT_32 pu4DataMode, OUT PUINT_32 pu4BlockSize, OUT PUINT_32 pu4CRC, OUT PU
 	}
 }
 #endif
-VOID wlanImageSectionGetPatchInfo(IN P_ADAPTER_T prAdapter,
+static VOID wlanImageSectionGetPatchInfo(IN P_ADAPTER_T prAdapter,
 				  IN PVOID pvFwImageMapFile, IN UINT_32 u4FwImageFileLength,
 				  IN UINT_8 ucTotSecNum, IN UINT_8 ucCurSecNum, IN ENUM_IMG_DL_IDX_T eDlIdx,
 				  OUT PUINT_32 pu4StartOffset, OUT PUINT_32 pu4Addr, OUT PUINT_32 pu4Len,
@@ -2696,7 +2696,7 @@ WLAN_STATUS wlanImageSectionDownloadStage(IN P_ADAPTER_T prAdapter,
 *         WLAN_STATUS_FAILURE
 */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS wlanPatchRecvSemaResp(IN P_ADAPTER_T prAdapter, IN UINT_8 ucCmdSeqNum, OUT PUINT_8 pucPatchStatus)
+static WLAN_STATUS wlanPatchRecvSemaResp(IN P_ADAPTER_T prAdapter, IN UINT_8 ucCmdSeqNum, OUT PUINT_8 pucPatchStatus)
 {
 	UINT_8 aucBuffer[sizeof(INIT_HIF_RX_HEADER_T) + sizeof(INIT_EVENT_CMD_RESULT)];
 	P_INIT_HIF_RX_HEADER_T prInitHifRxHeader;
@@ -2755,7 +2755,7 @@ WLAN_STATUS wlanPatchRecvSemaResp(IN P_ADAPTER_T prAdapter, IN UINT_8 ucCmdSeqNu
 * @return (none)
 */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS wlanPatchSendSemaControl(IN P_ADAPTER_T prAdapter, OUT PUINT_8 pucSeqNum)
+static WLAN_STATUS wlanPatchSendSemaControl(IN P_ADAPTER_T prAdapter, OUT PUINT_8 pucSeqNum)
 {
 	P_CMD_INFO_T prCmdInfo;
 	P_INIT_HIF_TX_HEADER_T prInitHifTxHeader;
@@ -2807,7 +2807,7 @@ WLAN_STATUS wlanPatchSendSemaControl(IN P_ADAPTER_T prAdapter, OUT PUINT_8 pucSe
 	return u4Status;
 }
 
-BOOLEAN wlanPatchIsDownloaded(IN P_ADAPTER_T prAdapter)
+static BOOLEAN wlanPatchIsDownloaded(IN P_ADAPTER_T prAdapter)
 {
 	UINT_8 ucSeqNum, ucPatchStatus;
 	WLAN_STATUS rStatus;
@@ -2849,7 +2849,7 @@ BOOLEAN wlanPatchIsDownloaded(IN P_ADAPTER_T prAdapter)
 
 }
 
-WLAN_STATUS wlanPatchSendComplete(IN P_ADAPTER_T prAdapter)
+static WLAN_STATUS wlanPatchSendComplete(IN P_ADAPTER_T prAdapter)
 {
 	P_CMD_INFO_T prCmdInfo;
 	P_INIT_HIF_TX_HEADER_T prInitHifTxHeader;
@@ -5082,7 +5082,7 @@ static INT_32 wlanCal6628EfuseForm(IN P_ADAPTER_T prAdapter, INT_32 au4Input)
 #endif
 
 #if CFG_SUPPORT_NVRAM_5G
-WLAN_STATUS wlanLoadManufactureData_5G(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo)
+static WLAN_STATUS wlanLoadManufactureData_5G(IN P_ADAPTER_T prAdapter, IN P_REG_INFO_T prRegInfo)
 {
 
 	P_BANDEDGE_5G_T pr5GBandEdge;
@@ -6070,7 +6070,7 @@ VOID wlanDumpBssStatistics(IN P_ADAPTER_T prAdapter, UINT_8 ucBssIdx)
 	}
 }
 
-VOID wlanDumpAllBssStatistics(IN P_ADAPTER_T prAdapter)
+static VOID wlanDumpAllBssStatistics(IN P_ADAPTER_T prAdapter)
 {
 	P_BSS_INFO_T prBssInfo;
 	/* ENUM_WMM_ACI_T eAci; */
@@ -6414,7 +6414,7 @@ WLAN_STATUS wlanQueryNicCapabilityV2(IN P_ADAPTER_T prAdapter)
 	return WLAN_STATUS_SUCCESS;
 }
 
-VOID wlanSetNicResourceParameters(IN P_ADAPTER_T prAdapter)
+static VOID wlanSetNicResourceParameters(IN P_ADAPTER_T prAdapter)
 {
 	UINT_8 string[128], idx;
 	UINT_32 u4share;
@@ -7268,7 +7268,7 @@ WLAN_STATUS wlanCfgGet(IN P_ADAPTER_T prAdapter, const PCHAR pucKey, PCHAR pucVa
 
 }
 
-VOID wlanCfgRecordValue(IN P_ADAPTER_T prAdapter, const PCHAR pucKey, UINT_32 u4Value)
+static VOID wlanCfgRecordValue(IN P_ADAPTER_T prAdapter, const PCHAR pucKey, UINT_32 u4Value)
 {
 	P_WLAN_CFG_ENTRY_T prWlanCfgEntry;
 	UINT_8 aucBuf[WLAN_CFG_VALUE_LEN_MAX];
@@ -7490,7 +7490,7 @@ struct WLAN_CFG_PARSE_STATE_S {
 	UINT_32 maxSize;
 };
 
-INT_32 wlanCfgFindNextToken(struct WLAN_CFG_PARSE_STATE_S *state)
+static INT_32 wlanCfgFindNextToken(struct WLAN_CFG_PARSE_STATE_S *state)
 {
 	CHAR *x = state->ptr;
 	CHAR *s;
@@ -7704,7 +7704,7 @@ exit:
 }
 #endif
 
-WLAN_STATUS
+static WLAN_STATUS
 wlanCfgParseAddEntry(IN P_ADAPTER_T prAdapter,
 		     PUINT_8 pucKeyHead, PUINT_8 pucKeyTail, PUINT_8 pucValueHead, PUINT_8 pucValueTail)
 {
@@ -7758,7 +7758,7 @@ enum {
 
 #if CFG_SUPPORT_EASY_DEBUG
 
-INT_8 atoi(UCHAR ch)
+static INT_8 atoi(UCHAR ch)
 {
 	if (ch >= 'a' && ch <= 'f')
 		return ch - 87;
@@ -7770,7 +7770,7 @@ INT_8 atoi(UCHAR ch)
 	return 0;
 }
 
-WLAN_STATUS wlanCfgParseToFW(PCHAR *args, PCHAR args_size, UCHAR nargs, PCHAR buffer, UCHAR times)
+static WLAN_STATUS wlanCfgParseToFW(PCHAR *args, PCHAR args_size, UCHAR nargs, PCHAR buffer, UCHAR times)
 {
 	PUCHAR data = NULL;
 	char ch;
@@ -8537,7 +8537,7 @@ VOID wlanChipRstPreAct(IN P_ADAPTER_T prAdapter)
 }
 
 #if CFG_ENABLE_PER_STA_STATISTICS
-VOID wlanTxLifetimeUpdateStaStats(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
+static VOID wlanTxLifetimeUpdateStaStats(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 {
 	P_STA_RECORD_T prStaRec;
 	UINT_32 u4DeltaTime;
@@ -8560,7 +8560,7 @@ VOID wlanTxLifetimeUpdateStaStats(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prM
 }
 #endif
 
-BOOLEAN wlanTxLifetimeIsProfilingEnabled(IN P_ADAPTER_T prAdapter)
+static BOOLEAN wlanTxLifetimeIsProfilingEnabled(IN P_ADAPTER_T prAdapter)
 {
 	BOOLEAN fgEnabled = FALSE;
 #if CFG_SUPPORT_WFD
@@ -8575,7 +8575,7 @@ BOOLEAN wlanTxLifetimeIsProfilingEnabled(IN P_ADAPTER_T prAdapter)
 	return fgEnabled;
 }
 
-BOOLEAN wlanTxLifetimeIsTargetMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
+static BOOLEAN wlanTxLifetimeIsTargetMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 {
 	BOOLEAN fgResult = TRUE;
 
@@ -8606,7 +8606,7 @@ BOOLEAN wlanTxLifetimeIsTargetMsdu(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T pr
 	return fgResult;
 }
 
-VOID wlanTxLifetimeTagPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_PROFILING_TAG_T eTag)
+static VOID wlanTxLifetimeTagPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_PROFILING_TAG_T eTag)
 {
 	P_PKT_PROFILE_T prPktProfile = &prMsduInfo->rPktProfile;
 
@@ -9371,7 +9371,7 @@ UINT_8  wlanGetAntPathType(
 }
 
 #if ((CFG_SISO_SW_DEVELOP == 1) || (CFG_SUPPORT_ANT_SELECT == 1))
-UINT_8
+static UINT_8
 wlanAntPathFavorSelect(
 	enum ENUM_WF_PATH_FAVOR_T eWfPathFavor
 	)
