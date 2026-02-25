@@ -863,7 +863,25 @@ int mtk_cfg80211_scan(struct wiphy *wiphy, struct cfg80211_scan_request *request
 			rScanRequest.arChnlInfoList[i].u4CenterFreq1 = request->channels[i]->center_freq;
 			rScanRequest.arChnlInfoList[i].u4CenterFreq2 = 0;
 			rScanRequest.arChnlInfoList[i].u2PriChnlFreq = request->channels[i]->center_freq;
-#if KERNEL_VERSION(3, 12, 0) <= CFG80211_VERSION_CODE
+
+/* Channel Width element was removed in Linux 6.7 as there was no way to select it besides the default:
+ * https://github.com/torvalds/linux/commit/5add321c329b1746589b51359259666ca3dbe219
+ *
+ * The default width selected seems to be:
+ * net/mac80211/scan.c: chandef->width = NL80211_CHAN_WIDTH_20_NOHT;
+ * which is == 0 in the nl80211_chan_width enum -> include/uapi/linux/nl80211.h
+ * Similar to MT6632/wlan/include/wlan_lib.h:
+ * typedef enum _ENUM_MAX_BANDWIDTH_SETTING_T {
+ *	MAX_BW_20MHZ = 0,
+ *	. . .
+ * }
+ * And 0 is also what was selected in the past here before Linux 3.12.
+ *
+ * Either enter 0 again, or the NL80211 WIDTH define
+ */
+#if KERNEL_VERSION(6, 7, 0) <= CFG80211_VERSION_CODE
+			rScanRequest.arChnlInfoList[i].ucChnlBw = NL80211_CHAN_WIDTH_20_NOHT; // = 0 {enum}
+#elif KERNEL_VERSION(3, 12, 0) <= CFG80211_VERSION_CODE
 			rScanRequest.arChnlInfoList[i].ucChnlBw = request->scan_width;
 #else
 			rScanRequest.arChnlInfoList[i].ucChnlBw = 0;
