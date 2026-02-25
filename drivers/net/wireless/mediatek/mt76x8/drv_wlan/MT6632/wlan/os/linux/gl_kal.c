@@ -929,10 +929,24 @@ WLAN_STATUS kalRxIndicateOnePkt(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPkt)
 		kal_skb_reset_mac_len(prSkb);
 	}
 
+/* Since Linux 5.18, netif_rx_ni has been removed, as it's no longer used.
+ * https://github.com/torvalds/linux/commit/2655926aea9beea62c9ba80c032485456fd848f0
+ *
+ * Apparently netif_rx can be called from any context.
+ * Credits: https://patches.dpdk.org/project/dpdk/patch/20220525102641.20982-1-jslaby@suse.cz/
+ * Although they use "> version_5.18.0", instead of ">=" , which I think is incorrect:
+ * https://www.kernel.org/pub/linux/kernel/v5.x/ChangeLog-5.18 */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 18, 0)
+	if (!in_interrupt())
+		netif_rx(prSkb);	/* only in non-interrupt context */
+	else
+		netif_rx(prSkb);
+#else
 	if (!in_interrupt())
 		netif_rx_ni(prSkb);	/* only in non-interrupt context */
 	else
 		netif_rx(prSkb);
+#endif
 
 	return WLAN_STATUS_SUCCESS;
 }
