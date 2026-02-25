@@ -2777,7 +2777,13 @@ static VOID wlanRemove(VOID)
 
 	if (HAL_IS_TX_DIRECT(prAdapter)) {
 		if (prAdapter->fgTxDirectInited) {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+/* del_timer* was change to timer_delete* in Linux 6.15:
+ * https://github.com/torvalds/linux/commit/8fa7292fee5c5240402371ea89ab285ec856c916
+ * Fix Credits: InterLinked1 @https://github.com/asterisk/dahdi-linux/pull/92 */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+			timer_delete_sync(&(prAdapter->rTxDirectSkbTimer).t);
+			timer_delete_sync(&(prAdapter->rTxDirectHifTimer).t);
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 			del_timer_sync(&(prAdapter->rTxDirectSkbTimer).t);
 			del_timer_sync(&(prAdapter->rTxDirectHifTimer).t);
 #else

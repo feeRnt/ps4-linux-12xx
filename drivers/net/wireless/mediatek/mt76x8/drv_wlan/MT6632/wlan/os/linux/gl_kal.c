@@ -3538,7 +3538,17 @@ BOOLEAN kalSetTimer(IN P_GLUE_INFO_T prGlueInfo, IN UINT_32 u4Interval)
 		mod_timer(&prGlueInfo->tickfn, jiffies + u4Interval * HZ / MSEC_PER_SEC);
 #endif
 	} else {
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+/* del_timer* was change to timer_delete* in Linux 6.15:
+ * https://github.com/torvalds/linux/commit/8fa7292fee5c5240402371ea89ab285ec856c916
+ * Fix Credits: InterLinked1 @https://github.com/asterisk/dahdi-linux/pull/92 */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+		timer_delete_sync(&(prGlueInfo->tickfn).t);
+
+		add_timer(&(prGlueInfo->tickfn).t);
+		mod_timer(&(prGlueInfo->tickfn).t, jiffies + u4Interval * HZ / MSEC_PER_SEC);
+		// mod_timer can act directly as an add_timer, but both together can also work
+		// https://docs.kernel.org/6.15/driver-api/basics.html#time-and-timer-routines
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 		del_timer_sync(&(prGlueInfo->tickfn).t);
 		
 		add_timer(&(prGlueInfo->tickfn).t);
