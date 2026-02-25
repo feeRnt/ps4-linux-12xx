@@ -4004,7 +4004,7 @@ VOID rlmSendSmPowerSaveFrame(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec, UIN
 * \return none
 */
 /*----------------------------------------------------------------------------*/
-VOID rlmSendNotifyChannelWidthFrame(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec, UINT_8 ucChannelWidth)
+static VOID rlmSendNotifyChannelWidthFrame(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec, UINT_8 ucChannelWidth)
 {
 	P_MSDU_INFO_T prMsduInfo;
 	P_ACTION_NOTIFY_CHANNEL_WIDTH_FRAME prTxFrame;

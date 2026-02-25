@@ -87,7 +87,7 @@ ECO_INFO_T mt7668_eco_table[] = {
 ********************************************************************************
 */
 
-VOID
+static VOID
 mt7668ConstructFirmwarePrio(P_GLUE_INFO_T prGlueInfo, PPUINT_8 apucNameTable,
 PPUINT_8 apucName, PUINT_8 pucNameIdx, UINT_8 ucMaxNameIdx)
 {

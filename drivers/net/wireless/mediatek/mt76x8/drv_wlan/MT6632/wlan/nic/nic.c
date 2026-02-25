@@ -563,7 +563,7 @@ VOID nicMCRInit(IN P_ADAPTER_T prAdapter)
 	/* 4 <0> Initial value */
 }
 
-VOID nicHifInit(IN P_ADAPTER_T prAdapter)
+static VOID nicHifInit(IN P_ADAPTER_T prAdapter)
 {
 
 	ASSERT(prAdapter);
@@ -669,8 +669,8 @@ VOID nicProcessAbnormalInterrupt(IN P_ADAPTER_T prAdapter)
 * @return (none)
 */
 /*----------------------------------------------------------------------------*/
-VOID nicProcessFwOwnBackInterrupt(IN P_ADAPTER_T prAdapter)
-{
+static VOID nicProcessFwOwnBackInterrupt(IN P_ADAPTER_T prAdapter)
+{static 
 
 }				/* end of nicProcessFwOwnBackInterrupt() */
 
@@ -2122,7 +2122,7 @@ WLAN_STATUS nicSetAutoTxPower(IN P_ADAPTER_T prAdapter, IN P_CMD_AUTO_POWER_PARA
 *         WLAN_STATUS_FAILURE
 */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS nicSetAutoTxPowerControl(IN P_ADAPTER_T prAdapter, IN P_CMD_TX_PWR_T prTxPwrParam)
+static WLAN_STATUS nicSetAutoTxPowerControl(IN P_ADAPTER_T prAdapter, IN P_CMD_TX_PWR_T prTxPwrParam)
 {
 	DEBUGFUNC("nicUpdateTxPower");
 
@@ -3516,17 +3516,17 @@ WLAN_STATUS nicApplyNetworkAddress(IN P_ADAPTER_T prAdapter)
 }
 
 #if 1
-UINT_8 nicGetChipHwVer(VOID)
+static UINT_8 nicGetChipHwVer(VOID)
 {
 	return g_eco_info.ucHwVer;
 }
 
-UINT_8 nicGetChipSwVer(VOID)
+static UINT_8 nicGetChipSwVer(VOID)
 {
 	return g_eco_info.ucRomVer;
 }
 
-UINT_8 nicGetChipFactoryVer(VOID)
+static UINT_8 nicGetChipFactoryVer(VOID)
 {
 	return g_eco_info.ucFactoryVer;
 }

@@ -2465,7 +2465,7 @@ static VOID wlanImageSectionGetPatchInfo(IN P_ADAPTER_T prAdapter,
 	kalMemCopy(&prAdapter->rVerInfo.rPatchHeader, prPatchFormat, sizeof(PATCH_FORMAT_T));
 }
 
-VOID wlanImageSectionGetInfo(IN P_ADAPTER_T prAdapter,
+static VOID wlanImageSectionGetInfo(IN P_ADAPTER_T prAdapter,
 			     IN PVOID pvFwImageMapFile, IN UINT_32 u4FwImageFileLength,
 			     IN UINT_8 ucTotSecNum, IN UINT_8 ucCurSecNum, IN ENUM_IMG_DL_IDX_T eDlIdx,
 			     OUT PUINT_32 pu4StartOffset, OUT PUINT_32 pu4Addr, OUT PUINT_32 pu4Len,

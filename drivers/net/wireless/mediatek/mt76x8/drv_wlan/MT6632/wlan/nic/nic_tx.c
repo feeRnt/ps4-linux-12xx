@@ -1005,7 +1005,7 @@ UINT_32 nicTxGetMsduPendingCnt(IN P_ADAPTER_T prAdapter)
 
 #endif
 
-VOID nicTxComposeDescAppend(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
+static VOID nicTxComposeDescAppend(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	OUT PUINT_8 prTxDescBuffer)
 {
 	P_HW_MAC_TX_DESC_APPEND_T prHwTxDescAppend;
@@ -1028,7 +1028,7 @@ VOID nicTxComposeDescAppend(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInf
 * @retval VOID
 */
 /*----------------------------------------------------------------------------*/
-VOID
+static VOID
 nicTxComposeDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo,
 	IN UINT_32 u4TxDescLength, IN BOOLEAN fgIsTemplate, OUT PUINT_8 prTxDescBuffer)
 {
@@ -1300,7 +1300,7 @@ nicTxComposeSecurityFrameDesc(IN P_ADAPTER_T prAdapter,
 		*pucTxDescLength = ucTxDescAndPaddingLength;
 }
 
-BOOLEAN nicTxIsTXDTemplateAllowed(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN P_STA_RECORD_T prStaRec)
+static BOOLEAN nicTxIsTXDTemplateAllowed(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN P_STA_RECORD_T prStaRec)
 {
 	if (prMsduInfo->fgIsTXDTemplateValid) {
 		if (prMsduInfo->fgIs802_1x)
@@ -1432,7 +1432,7 @@ nicTxFillDataDesc(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 	nicTxFillDesc(prAdapter, prMsduInfo, pucOutputBuf, NULL);
 }
 
-VOID
+static VOID
 nicTxCopyDesc(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucTarTxDesc, IN PUINT_8 pucSrcTxDesc, OUT PUINT_8 pucTxDescLength)
 {
 	UINT_8 ucTxDescLength;
@@ -2360,7 +2360,7 @@ WLAN_STATUS nicTxInitResetResource(IN P_ADAPTER_T prAdapter)
 
 #endif
 
-BOOLEAN nicTxProcessMngPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
+static BOOLEAN nicTxProcessMngPacket(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo)
 {
 #if 0
 	UINT_16 u2RateCode;

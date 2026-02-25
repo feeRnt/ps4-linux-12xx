@@ -195,7 +195,7 @@ VOID scnInit(IN P_ADAPTER_T prAdapter)
 	prScanInfo->fgNloScanning = FALSE;
 }				/* end of scnInit() */
 
-VOID scnFreeAllPendingScanRquests(IN P_ADAPTER_T prAdapter)
+static VOID scnFreeAllPendingScanRquests(IN P_ADAPTER_T prAdapter)
 {
 	P_SCAN_INFO_T prScanInfo;
 	P_MSG_HDR_T prMsgHdr;
@@ -710,7 +710,7 @@ scanSearchExistingBssDescWithSsid(IN P_ADAPTER_T prAdapter,
 * @return (none)
 */
 /*----------------------------------------------------------------------------*/
-BOOLEAN scanByPassRemoveBssDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc)
+static BOOLEAN scanByPassRemoveBssDesc(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc)
 {
 	P_SCAN_INFO_T prScanInfo;
 	P_SCAN_PARAM_T prScanParam;
@@ -1792,7 +1792,7 @@ WLAN_STATUS scanAddScanResult(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDes
 
 }				/* end of scanAddScanResult() */
 
-BOOLEAN scanCheckBssIsLegal(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc)
+static BOOLEAN scanCheckBssIsLegal(IN P_ADAPTER_T prAdapter, P_BSS_DESC_T prBssDesc)
 {
 	BOOLEAN fgAddToScanResult = FALSE;
 	ENUM_BAND_T eBand;

@@ -1065,7 +1065,7 @@ cnmStaSendRemoveCmd(P_ADAPTER_T prAdapter,
 		DBGLOG(MEM, WARN, "%s: CMD_ID_REMOVE_STA_RECORD result 0x%08x\n", __func__, rStatus);
 }
 
-PUINT_8 cnmStaRecGetTypeString(ENUM_STA_TYPE_T eStaType)
+static PUINT_8 cnmStaRecGetTypeString(ENUM_STA_TYPE_T eStaType)
 {
 	PUINT_8 pucTypeString = NULL;
 
@@ -1079,7 +1079,7 @@ PUINT_8 cnmStaRecGetTypeString(ENUM_STA_TYPE_T eStaType)
 	return pucTypeString;
 }
 
-PUINT_8 cnmStaRecGetRoleString(ENUM_STA_TYPE_T eStaType)
+static PUINT_8 cnmStaRecGetRoleString(ENUM_STA_TYPE_T eStaType)
 {
 	PUINT_8 pucRoleString = NULL;
 

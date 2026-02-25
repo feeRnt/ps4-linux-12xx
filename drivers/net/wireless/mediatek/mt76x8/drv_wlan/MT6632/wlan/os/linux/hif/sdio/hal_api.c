@@ -617,7 +617,7 @@ BOOLEAN halTxIsDataBufEnough(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduIn
 * @return FALSE     no available resource to release
 */
 /*----------------------------------------------------------------------------*/
-BOOLEAN halTxCalculateResource(IN P_ADAPTER_T prAdapter, IN PUINT_16 au2TxRlsCnt, OUT PUINT_16 au2FreeTcResource)
+static BOOLEAN halTxCalculateResource(IN P_ADAPTER_T prAdapter, IN PUINT_16 au2TxRlsCnt, OUT PUINT_16 au2FreeTcResource)
 {
 	P_TX_TCQ_STATUS_T prTcqStatus;
 	BOOLEAN bStatus = FALSE;
@@ -772,7 +772,7 @@ BOOLEAN halTxCalculateResource(IN P_ADAPTER_T prAdapter, IN PUINT_16 au2TxRlsCnt
 
 	return bStatus;
 }
-BOOLEAN halTxReleaseResource(IN P_ADAPTER_T prAdapter, IN PUINT_16 au2TxRlsCnt)
+static BOOLEAN halTxReleaseResource(IN P_ADAPTER_T prAdapter, IN PUINT_16 au2TxRlsCnt)
 {
 	P_TX_TCQ_STATUS_T prTcqStatus;
 	BOOLEAN bStatus = FALSE;
@@ -860,7 +860,7 @@ WLAN_STATUS halTxPollingResource(IN P_ADAPTER_T prAdapter, IN UINT_8 ucTC)
 	return u4Status;
 }
 
-VOID halTxInterruptSanityCheck(IN P_ADAPTER_T prAdapter, IN PUINT_16 au2TxRlsCnt)
+static VOID halTxInterruptSanityCheck(IN P_ADAPTER_T prAdapter, IN PUINT_16 au2TxRlsCnt)
 {
 	UINT_8 ucIdx;
 	BOOLEAN fgError = FALSE;
@@ -1832,7 +1832,7 @@ WLAN_STATUS halReleaseIOBuffer(IN P_ADAPTER_T prAdapter)
 *           FALSE
 */
 /*----------------------------------------------------------------------------*/
-VOID halPrintFirmwareAssertInfo(IN P_ADAPTER_T prAdapter)
+static VOID halPrintFirmwareAssertInfo(IN P_ADAPTER_T prAdapter)
 {
 	UINT_32 u4MailBox0, u4MailBox1;
 	UINT_32 line = 0;
@@ -1939,7 +1939,7 @@ VOID halGetMailbox(IN P_ADAPTER_T prAdapter, IN UINT_32 u4MailboxNum, OUT PUINT_
 	}
 }
 
-VOID halDeAggRxPktProc(P_ADAPTER_T prAdapter, P_SDIO_RX_COALESCING_BUF_T prRxBuf)
+static VOID halDeAggRxPktProc(P_ADAPTER_T prAdapter, P_SDIO_RX_COALESCING_BUF_T prRxBuf)
 {
 	P_GL_HIF_INFO_T prHifInfo;
 	P_RX_CTRL_T prRxCtrl;

@@ -145,7 +145,7 @@ VOID p2pGenerate_IEForAssocReq(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsdu
 
 }				/* p2pGenerate_IEForAssocReq */
 
-UINT_32
+static UINT_32
 wfdFuncAppendAttriDevInfo(IN P_ADAPTER_T prAdapter,
 			  IN BOOLEAN fgIsAssocFrame, IN PUINT_16 pu2Offset, IN PUINT_8 pucBuf, IN UINT_16 u2BufSize)
 {

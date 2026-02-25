@@ -334,7 +334,7 @@ static MSG_HNDL_ENTRY_T arMsgMapTable[] = {
 * \return none
 */
 /*----------------------------------------------------------------------------*/
-VOID mboxInitMsgMap(VOID)
+static VOID mboxInitMsgMap(VOID)
 {
 	UINT_32 i, idx;
 	MSG_HNDL_ENTRY_T rTempEntry;

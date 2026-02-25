@@ -1530,7 +1530,7 @@ void rsnParserCheckForRSNCCMPPSK(P_ADAPTER_T prAdapter, P_RSN_INFO_ELEM_T prIe,
 * \return (none)
 */
 /*----------------------------------------------------------------------------*/
-VOID rsnGenMicErrorEvent(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgFlags)
+static VOID rsnGenMicErrorEvent(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgFlags)
 {
 	P_PARAM_AUTH_EVENT_T prAuthEvent;
 
@@ -2545,7 +2545,7 @@ VOID rsnPmfGenerateTimeoutIE(P_ADAPTER_T prAdapter, P_MSDU_INFO_T prMsduInfo)
 *      Called by: AAA module, Handle by Sa Query timeout
 */
 /*----------------------------------------------------------------------------*/
-UINT_8 rsnApCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+static UINT_8 rsnApCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 {
 	P_BSS_INFO_T prBssInfo;
 	UINT_32 now;
@@ -2594,7 +2594,7 @@ UINT_8 rsnApCheckSaQueryTimeout(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prSt
 *      Called by: AAA module, Handle TX SAQ request
 */
 /*----------------------------------------------------------------------------*/
-void rsnApStartSaQueryTimer(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec, IN ULONG ulParamPtr)
+static void rsnApStartSaQueryTimer(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec, IN ULONG ulParamPtr)
 {
 	P_BSS_INFO_T prBssInfo;
 	P_MSDU_INFO_T prMsduInfo;
@@ -2708,7 +2708,7 @@ void rsnApStartSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 *      Called by: AAA module, stop TX SAQ if receive correct SAQ response
 */
 /*----------------------------------------------------------------------------*/
-void rsnApStopSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
+static void rsnApStopSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 {
 	ASSERT(prStaRec);
 
@@ -2728,7 +2728,7 @@ void rsnApStopSaQuery(IN P_ADAPTER_T prAdapter, IN P_STA_RECORD_T prStaRec)
 *      Called by: AAA module, Handle Rx action request
 */
 /*----------------------------------------------------------------------------*/
-void rsnApSaQueryRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
+static void rsnApSaQueryRequest(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb)
 {
 	P_BSS_INFO_T prBssInfo;
 	P_MSDU_INFO_T prMsduInfo;

@@ -810,7 +810,7 @@ P_DOMAIN_INFO_ENTRY rlmDomainGetDomainInfo(P_ADAPTER_T prAdapter)
 * \return none
 */
 /*----------------------------------------------------------------------------*/
-VOID
+static VOID
 rlmDomainGetChnlList_V2(P_ADAPTER_T prAdapter,
 		     ENUM_BAND_T eSpecificBand, BOOLEAN fgNoDfs,
 		     UINT_8 ucMaxChannelNum, PUINT_8 pucNumOfChannel, P_RF_CHANNEL_INFO_T paucChannelList)
@@ -930,7 +930,7 @@ VOID rlmDomainSendCmd(P_ADAPTER_T prAdapter, BOOLEAN fgIsOid)
 }
 
 
-VOID rlmDomainSendDomainInfoCmd_V2(P_ADAPTER_T prAdapter, BOOLEAN fgIsOid)
+static VOID rlmDomainSendDomainInfoCmd_V2(P_ADAPTER_T prAdapter, BOOLEAN fgIsOid)
 {
 #if (CFG_SUPPORT_SINGLE_SKU == 1)
 	u8 max_channel_count = 0;
@@ -1147,7 +1147,7 @@ VOID rlmDomainSendPassiveScanInfoCmd(P_ADAPTER_T prAdapter, BOOLEAN fgIsOid)
 *         FALSE Illegal channel for current regulatory domain
 */
 /*----------------------------------------------------------------------------*/
-BOOLEAN rlmDomainIsLegalChannel_V2(P_ADAPTER_T prAdapter, ENUM_BAND_T eBand, UINT_8 ucChannel)
+static BOOLEAN rlmDomainIsLegalChannel_V2(P_ADAPTER_T prAdapter, ENUM_BAND_T eBand, UINT_8 ucChannel)
 {
 #if (CFG_SUPPORT_SINGLE_SKU == 1)
 	UINT_8 idx, start_idx, end_idx;
@@ -1448,7 +1448,7 @@ rlmDomainIsValidRfSetting(P_ADAPTER_T prAdapter,
  * This function coverts country code from alphabet chars to u32,
  * the caller need to pass country code chars and do size check
  */
-UINT_32 rlmDomainAlpha2ToU32(PCHAR pcAlpha2, UINT_8 ucAlpha2Size)
+static UINT_32 rlmDomainAlpha2ToU32(PCHAR pcAlpha2, UINT_8 ucAlpha2Size)
 {
 	UINT_8 ucIdx;
 	UINT_32 u4CountryCode = 0;
@@ -1480,7 +1480,7 @@ UINT_32 rlmDomainAlpha2ToU32(PCHAR pcAlpha2, UINT_8 ucAlpha2Size)
 */
 /*----------------------------------------------------------------------------*/
 
-BOOL rlmDomainTxPwrLimitGetCountryRange(
+static BOOL rlmDomainTxPwrLimitGetCountryRange(
 	UINT_32 u4CountryCode, PUINT_8 pucBuf, UINT_32 u4BufLen,
 	PUINT_32 pu4CountryStart, PUINT_32 pu4CountryEnd)
 {
@@ -1522,7 +1522,7 @@ BOOL rlmDomainTxPwrLimitGetCountryRange(
 	return TRUE;
 }
 
-BOOL rlmDomainTxPwrLimitSearchSection(const char *pSectionName,
+static BOOL rlmDomainTxPwrLimitSearchSection(const char *pSectionName,
 	PINT_8 pucBuf, PUINT_32 pu4Pos, UINT_32 u4BufEnd)
 {
 	UINT_32 u4TmpPos = *pu4Pos;
@@ -1552,7 +1552,7 @@ BOOL rlmDomainTxPwrLimitSearchSection(const char *pSectionName,
 	return TRUE;
 }
 
-BOOL rlmDomainTxPwrLimitSectionEnd(PUINT_8 pucBuf,
+static BOOL rlmDomainTxPwrLimitSectionEnd(PUINT_8 pucBuf,
 	const char *pSectionName, PUINT_32 pu4Pos, UINT_32 u4BufEnd)
 {
 	UINT_32 u4TmpPos = *pu4Pos;
@@ -1593,7 +1593,7 @@ BOOL rlmDomainTxPwrLimitSectionEnd(PUINT_8 pucBuf,
 	return TRUE;
 }
 
-INT_8 rlmDomainTxPwrLimitGetChIdx(
+static INT_8 rlmDomainTxPwrLimitGetChIdx(
 	struct TX_PWR_LIMIT_DATA *pTxPwrLimit, UINT_8 ucChannel)
 {
 	INT_8 cIdx = 0;
@@ -1608,7 +1608,7 @@ INT_8 rlmDomainTxPwrLimitGetChIdx(
 	return -1;
 }
 
-BOOL rlmDomainTxPwrLimitLoadChannelSetting(
+static BOOL rlmDomainTxPwrLimitLoadChannelSetting(
 	PUINT_8 pucBuf, PUINT_32 pu4Pos, UINT_32 u4BufEnd,
 	struct TX_PWR_LIMIT_DATA *pTxPwrLimit, UINT_8 ucSectionIdx)
 {
@@ -1731,7 +1731,7 @@ BOOL rlmDomainTxPwrLimitLoadChannelSetting(
 	return TRUE;
 }
 
-VOID rlmDomainTxPwrLimitRemoveComments(
+static VOID rlmDomainTxPwrLimitRemoveComments(
 	PUINT_8 pucBuf, UINT_32 u4BufLen)
 {
 	UINT_32 u4TmpPos = 0;
@@ -1755,7 +1755,7 @@ VOID rlmDomainTxPwrLimitRemoveComments(
 	}
 }
 
-BOOL rlmDomainTxPwrLimitLoad(
+static BOOL rlmDomainTxPwrLimitLoad(
 	P_ADAPTER_T prAdapter, PUINT_8 pucBuf, UINT_32 u4BufLen,
 	UINT_32 u4CountryCode, struct TX_PWR_LIMIT_DATA *pTxPwrLimit)
 {
@@ -1797,7 +1797,7 @@ BOOL rlmDomainTxPwrLimitLoad(
 	return TRUE;
 }
 
-VOID rlmDomainTxPwrLimitSetChValues(
+static VOID rlmDomainTxPwrLimitSetChValues(
 	P_CMD_CHANNEL_POWER_LIMIT_V2 pCmd, struct CHANNEL_TX_PWR_LIMIT *pChTxPwrLimit)
 {
 	UINT_8 section = 0, e = 0;
@@ -1851,7 +1851,7 @@ VOID rlmDomainTxPwrLimitSetChValues(
 				pChTxPwrLimit->rTxPwrLimitValue[section][e]);
 }
 
-VOID rlmDomainTxPwrLimitSetValues(
+static VOID rlmDomainTxPwrLimitSetValues(
 	P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_V2_T pSetCmd,
 	struct TX_PWR_LIMIT_DATA *pTxPwrLimit)
 {
@@ -1877,7 +1877,7 @@ VOID rlmDomainTxPwrLimitSetValues(
 	}
 }
 
-BOOL rlmDomainTxPwrLimitLoadFromFile(P_ADAPTER_T prAdapter,
+static BOOL rlmDomainTxPwrLimitLoadFromFile(P_ADAPTER_T prAdapter,
 	UINT_32 u4CountryCode, struct TX_PWR_LIMIT_DATA *pTxPwrLimit)
 {
 	PUINT_8 pucConfigBuf;
@@ -1925,7 +1925,7 @@ error:
 	return bRet;
 }
 
-BOOLEAN rlmDomainGetTxPwrLimit(u32 country_code,
+static BOOLEAN rlmDomainGetTxPwrLimit(u32 country_code,
 							  P_GLUE_INFO_T prGlueInfo,
 							  P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_V2_T pSetCmd_2g,
 							  P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_V2_T pSetCmd_5g
@@ -2164,7 +2164,7 @@ UINT_16 rlmDomainPwrLimitDefaultTableDecision(P_ADAPTER_T prAdapter, UINT_16 u2C
 * @return (none)
 */
 /*----------------------------------------------------------------------------*/
-VOID rlmDomainBuildCmdByDefaultTable(P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_T prCmd, UINT_16 u2DefaultTableIndex)
+static VOID rlmDomainBuildCmdByDefaultTable(P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_T prCmd, UINT_16 u2DefaultTableIndex)
 {
 	UINT_8 i, k;
 	P_COUNTRY_POWER_LIMIT_TABLE_DEFAULT prPwrLimitSubBand;
@@ -2291,7 +2291,7 @@ VOID rlmDomainBuildCmdByDefaultTable(P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_T prC
 * @return (none)
 */
 /*----------------------------------------------------------------------------*/
-VOID rlmDomainBuildCmdByConfigTable(P_ADAPTER_T prAdapter, P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_T prCmd)
+static VOID rlmDomainBuildCmdByConfigTable(P_ADAPTER_T prAdapter, P_CMD_SET_COUNTRY_CHANNEL_POWER_LIMIT_T prCmd)
 {
 	UINT_8 i, k;
 	UINT_16 u2CountryCodeTable = COUNTRY_CODE_NULL;
@@ -2399,7 +2399,7 @@ VOID rlmDomainBuildCmdByConfigTable(P_ADAPTER_T prAdapter, P_CMD_SET_COUNTRY_CHA
 * @return (none)
 */
 /*----------------------------------------------------------------------------*/
-VOID rlmDomainSendPwrLimitCmd_V2(P_ADAPTER_T prAdapter)
+static VOID rlmDomainSendPwrLimitCmd_V2(P_ADAPTER_T prAdapter)
 {
 #if (CFG_SUPPORT_SINGLE_SKU == 1)
 	WLAN_STATUS rStatus;
@@ -2711,7 +2711,7 @@ enum regd_state rlmDomainGetCtrlState(void)
 }
 
 
-void rlmDomainResetActiveChannel(void)
+static void rlmDomainResetActiveChannel(void)
 {
 	g_mtk_regd_control.n_channel_active_2g = 0;
 	g_mtk_regd_control.n_channel_active_5g = 0;
@@ -2802,7 +2802,7 @@ enum nl80211_dfs_regions rlmDomainGetDfsRegion(void)
 	return g_mtk_regd_control.dfs_region;
 }
 
-void rlmDomainSetTempCountryCode(char *alpha2, u8 size_of_alpha2)
+static void rlmDomainSetTempCountryCode(char *alpha2, u8 size_of_alpha2)
 {
 	u8 idx, max;
 	u8 buf_size;
@@ -2897,7 +2897,7 @@ struct wiphy *rlmDomainGetRefWiphy(void)
  * @ buf: string buffer to put the transformed string
  * @ buf_size: size of the buf
  **/
-void rlmDomainChannelFlagString(u32 flags, char *buf, size_t buf_size)
+static void rlmDomainChannelFlagString(u32 flags, char *buf, size_t buf_size)
 {
 	INT_32 buf_written = 0;
 

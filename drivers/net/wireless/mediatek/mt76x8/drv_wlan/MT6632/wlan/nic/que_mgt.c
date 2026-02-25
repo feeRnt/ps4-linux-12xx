@@ -756,7 +756,7 @@ P_SW_RFB_T qmFlushRxQueues(IN P_ADAPTER_T prAdapter)
 * \return The flushed packets (in a list of SW_RFBs)
 */
 /*----------------------------------------------------------------------------*/
-P_SW_RFB_T qmFlushStaRxQueue(IN P_ADAPTER_T prAdapter, IN UINT_32 u4StaRecIdx, IN UINT_32 u4Tid)
+static P_SW_RFB_T qmFlushStaRxQueue(IN P_ADAPTER_T prAdapter, IN UINT_32 u4StaRecIdx, IN UINT_32 u4Tid)
 {
 	/* UINT_32 i; */
 	P_SW_RFB_T prSwRfbListHead;
@@ -1205,13 +1205,13 @@ VOID qmDetermineStaRecIndex(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInf
 #endif
 }
 
-P_STA_RECORD_T qmDetermineStaToBeDequeued(IN P_ADAPTER_T prAdapter, IN UINT_32 u4StartStaRecIndex)
+static P_STA_RECORD_T qmDetermineStaToBeDequeued(IN P_ADAPTER_T prAdapter, IN UINT_32 u4StartStaRecIndex)
 {
 
 	return NULL;
 }
 
-P_QUE_T qmDequeueStaTxPackets(IN P_ADAPTER_T prAdapter)
+static P_QUE_T qmDequeueStaTxPackets(IN P_ADAPTER_T prAdapter)
 {
 
 	return NULL;
@@ -1874,7 +1874,7 @@ VOID qmUpdateAverageTxQueLen(IN P_ADAPTER_T prAdapter)
 #endif
 }
 
-VOID qmAllocateResidualTcResource(IN P_ADAPTER_T prAdapter, IN PINT_32 ai4TcResDemand,
+static VOID qmAllocateResidualTcResource(IN P_ADAPTER_T prAdapter, IN PINT_32 ai4TcResDemand,
 	IN PUINT_32 pu4ResidualResource, IN PUINT_32 pu4ShareCount)
 {
 	P_QUE_MGT_T prQM = &prAdapter->rQM;
@@ -3696,7 +3696,7 @@ VOID qmDelRxBaEntry(IN P_ADAPTER_T prAdapter, IN UINT_8 ucStaRecIdx, IN UINT_8 u
 #endif
 }
 
-VOID mqmParseAssocReqWmmIe(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucIE, IN P_STA_RECORD_T prStaRec)
+static VOID mqmParseAssocReqWmmIe(IN P_ADAPTER_T prAdapter, IN PUINT_8 pucIE, IN P_STA_RECORD_T prStaRec)
 {
 	P_IE_WMM_INFO_T prIeWmmInfo;
 	UINT_8 ucQosInfo;
@@ -3816,7 +3816,7 @@ VOID mqmProcessAssocReq(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN PUIN
 	}
 }
 
-VOID mqmParseAssocRspWmmIe(IN PUINT_8 pucIE, IN P_STA_RECORD_T prStaRec)
+static VOID mqmParseAssocRspWmmIe(IN PUINT_8 pucIE, IN P_STA_RECORD_T prStaRec)
 {
 	UINT_8 aucWfaOui[] = VENDOR_OUI_WFA;
 
@@ -3968,7 +3968,7 @@ VOID mqmProcessBcn(IN P_ADAPTER_T prAdapter, IN P_SW_RFB_T prSwRfb, IN PUINT_8 p
 	}
 }
 
-BOOLEAN mqmUpdateEdcaParameters(IN P_BSS_INFO_T prBssInfo, IN PUINT_8 pucIE, IN BOOLEAN fgForceOverride)
+static BOOLEAN mqmUpdateEdcaParameters(IN P_BSS_INFO_T prBssInfo, IN PUINT_8 pucIE, IN BOOLEAN fgForceOverride)
 {
 	P_AC_QUE_PARMS_T prAcQueParams;
 	P_IE_WMM_PARAM_T prIeWmmParam;
@@ -4655,7 +4655,7 @@ UINT_32 mqmGenerateWmmParamIEByParam(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssIn
 
 #endif
 
-BOOLEAN isProbeResponse(IN P_MSDU_INFO_T prMgmtTxMsdu)
+static BOOLEAN isProbeResponse(IN P_MSDU_INFO_T prMgmtTxMsdu)
 {
 	P_WLAN_MAC_HEADER_T prWlanHdr = (P_WLAN_MAC_HEADER_T) NULL;
 
@@ -5977,7 +5977,7 @@ VOID qmResetTcControlResource(IN P_ADAPTER_T prAdapter)
 #if CFG_SUPPORT_REPLAY_DETECTION
 /* To change PN number to UINT64 */
 #define CCMPTSCPNNUM	6
-BOOLEAN qmRxPNtoU64(PUINT_8 pucPN, UINT_8 uPNNum, PUINT_64 pu8Rets)
+static BOOLEAN qmRxPNtoU64(PUINT_8 pucPN, UINT_8 uPNNum, PUINT_64 pu8Rets)
 {
 	UINT_8 ucCount = 0;
 	UINT_64 u8Data = 0;

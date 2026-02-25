@@ -199,7 +199,7 @@ APPEND_VAR_IE_ENTRY_T txProbRspIETable[] = {
 * @retval   VOID
 */
 /*----------------------------------------------------------------------------*/
-VOID bssDetermineStaRecPhyTypeSet(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc, OUT P_STA_RECORD_T prStaRec)
+static VOID bssDetermineStaRecPhyTypeSet(IN P_ADAPTER_T prAdapter, IN P_BSS_DESC_T prBssDesc, OUT P_STA_RECORD_T prStaRec)
 {
 	P_WIFI_VAR_T prWifiVar = &prAdapter->rWifiVar;
 	UINT_8 ucHtOption = FEATURE_ENABLED;
@@ -2370,12 +2370,12 @@ VOID bssSetTIMBitmap(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN UIN
 
 #endif /* CFG_SUPPORT_AAA */
 
-VOID bssCreateStaRecFromAuth(IN P_ADAPTER_T prAdapter)
+static VOID bssCreateStaRecFromAuth(IN P_ADAPTER_T prAdapter)
 {
 
 }
 
-VOID bssUpdateStaRecFromAssocReq(IN P_ADAPTER_T prAdapter)
+static VOID bssUpdateStaRecFromAssocReq(IN P_ADAPTER_T prAdapter)
 {
 
 }

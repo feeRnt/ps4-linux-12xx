@@ -1754,7 +1754,7 @@ VOID kalSendCompleteAndAwakeQueue(IN P_GLUE_INFO_T prGlueInfo, IN PVOID pvPacket
 * \note
 */
 /*----------------------------------------------------------------------------*/
-VOID kalQueryRegistryMacAddr(IN P_GLUE_INFO_T prGlueInfo, OUT PUINT_8 paucMacAddr)
+static VOID kalQueryRegistryMacAddr(IN P_GLUE_INFO_T prGlueInfo, OUT PUINT_8 paucMacAddr)
 {
 	UINT_8 aucZeroMac[MAC_ADDR_LEN] = { 0, 0, 0, 0, 0, 0 }
 
@@ -1793,7 +1793,7 @@ UINT_32 kalReadExtCfg(IN P_GLUE_INFO_T prGlueInfo)
 }
 #endif
 
-BOOLEAN
+static BOOLEAN
 kalIPv4FrameClassifier(IN P_GLUE_INFO_T prGlueInfo,
 		       IN P_NATIVE_PACKET prPacket, IN PUINT_8 pucIpHdr, OUT P_TX_PACKET_INFO prTxPktInfo)
 {
@@ -2506,7 +2506,7 @@ VOID kalClearCommandQueue(IN P_GLUE_INFO_T prGlueInfo)
 	}
 }
 
-UINT_32 kalProcessTxPacket(P_GLUE_INFO_T prGlueInfo, struct sk_buff *prSkb)
+static UINT_32 kalProcessTxPacket(P_GLUE_INFO_T prGlueInfo, struct sk_buff *prSkb)
 {
 	UINT_32 u4Status = WLAN_STATUS_SUCCESS;
 
@@ -2540,7 +2540,7 @@ UINT_32 kalProcessTxPacket(P_GLUE_INFO_T prGlueInfo, struct sk_buff *prSkb)
 * \retval none
 */
 /*----------------------------------------------------------------------------*/
-VOID kalProcessTxReq(P_GLUE_INFO_T prGlueInfo, PBOOLEAN pfgNeedHwAccess)
+static VOID kalProcessTxReq(P_GLUE_INFO_T prGlueInfo, PBOOLEAN pfgNeedHwAccess)
 {
 	P_QUE_T prCmdQue = NULL;
 	P_QUE_T prTxQueue = NULL;
@@ -4113,7 +4113,7 @@ UINT_32 kalFileRead(struct file *file, unsigned long long offset, unsigned char 
 	return ret;
 }
 
-UINT_32 kalFileWrite(struct file *file, unsigned long long offset, unsigned char *data, unsigned int size)
+static UINT_32 kalFileWrite(struct file *file, unsigned long long offset, unsigned char *data, unsigned int size)
 {
 #ifdef set_fs
 	mm_segment_t oldfs;
@@ -4707,7 +4707,7 @@ kalGetIPv6Address(IN struct net_device *prDev,
 }
 #endif /* IS_ENABLED(CONFIG_IPV6) */
 
-VOID
+static VOID
 kalSetNetAddress(IN P_GLUE_INFO_T prGlueInfo,
 		 IN UINT_8 ucBssIdx,
 		 IN PUINT_8 pucIPv4Addr, IN UINT_32 u4NumIPv4Addr, IN PUINT_8 pucIPv6Addr, IN UINT_32 u4NumIPv6Addr)
@@ -5203,13 +5203,13 @@ WLAN_STATUS kalCloseCorDumpFile(BOOLEAN fgIsN9)
 #endif
 
 #if CFG_WOW_SUPPORT
-VOID kalWowInit(IN P_GLUE_INFO_T prGlueInfo)
+VOID kalWowInit(IN P_GLUE_INFO_T prGlueInfo) //Maybe this needs static too
 {
 	kalMemZero(&prGlueInfo->prAdapter->rWowCtrl.stWowPort, sizeof(WOW_PORT_T));
 	prGlueInfo->prAdapter->rWowCtrl.ucReason = INVALID_WOW_WAKE_UP_REASON;
 }
 
-VOID kalWowCmdEventSetCb(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf)
+static VOID kalWowCmdEventSetCb(IN P_ADAPTER_T prAdapter, IN P_CMD_INFO_T prCmdInfo, IN PUINT_8 pucEventBuf)
 {
 	ASSERT(prAdapter);
 	ASSERT(prCmdInfo);

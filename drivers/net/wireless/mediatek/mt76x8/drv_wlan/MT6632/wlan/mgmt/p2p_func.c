@@ -499,7 +499,7 @@ p2pFuncUpdateBssInfoForJOIN(IN P_ADAPTER_T prAdapter,
 	} while (FALSE);
 }				/* end of p2pUpdateBssInfoForJOIN() */
 
-WLAN_STATUS
+static WLAN_STATUS
 p2pFunMgmtFrameTxDone(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T prMsduInfo, IN ENUM_TX_RESULT_CODE_T rTxDoneStatus)
 {
 	BOOLEAN fgIsSuccess = FALSE;
@@ -4069,7 +4069,7 @@ p2pFuncGetSpecAttriAction(IN P_IE_P2P_T prP2pIE,
 	}			/* ucOuiType */
 }
 
-WLAN_STATUS
+static WLAN_STATUS
 p2pFuncGenerateBeaconProbeRsp(IN P_ADAPTER_T prAdapter,
 			      IN P_BSS_INFO_T prBssInfo, IN P_MSDU_INFO_T prMsduInfo, IN BOOLEAN fgIsProbeRsp)
 {
@@ -4100,7 +4100,7 @@ p2pFuncGenerateBeaconProbeRsp(IN P_ADAPTER_T prAdapter,
 	return rWlanStatus;
 }				/* p2pFuncGenerateBeaconProbeRsp */
 
-WLAN_STATUS
+static WLAN_STATUS
 p2pFuncComposeBeaconProbeRspTemplate(IN P_ADAPTER_T prAdapter,
 				     IN P_BSS_INFO_T prP2pBssInfo,
 				     IN PUINT_8 pucBcnBuffer,
@@ -4257,7 +4257,7 @@ VOID wfdFuncGenerateWfdIEForAssocRsp(IN P_ADAPTER_T prAdapter, IN P_MSDU_INFO_T 
 #endif
 }				/* wfdFuncGenerateWfdIEForAssocRsp */
 
-VOID
+static VOID
 p2pFuncComposeNoaAttribute(IN P_ADAPTER_T prAdapter,
 			   IN UINT_8 ucBssIndex, OUT PUINT_8 aucNoaAttrArray, OUT PUINT_32 pu4Len)
 {

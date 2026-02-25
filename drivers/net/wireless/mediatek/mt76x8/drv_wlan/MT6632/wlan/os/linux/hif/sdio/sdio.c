@@ -502,14 +502,14 @@ static int mtk_sdio_suspend(struct device *pDev, pm_message_t state)
 	return mtk_sdio_pm_suspend(pDev);
 }
 
-int mtk_sdio_resume(struct device *pDev)
+static int mtk_sdio_resume(struct device *pDev)
 {
 	/* printk(KERN_INFO "mtk_sdio: mtk_sdio_resume dev(0x%p)\n", pDev); */
 
 	return mtk_sdio_pm_resume(pDev);
 }
 #if (CFG_SDIO_ASYNC_IRQ_AUTO_ENABLE == 1)
-int mtk_sdio_async_irq_enable(struct sdio_func *func)
+static int mtk_sdio_async_irq_enable(struct sdio_func *func)
 {
 #define SDIO_CCCR_IRQ_EXT	0x16
 #define SDIO_IRQ_EXT_SAI	BIT(0)
@@ -846,7 +846,7 @@ VOID glBusFreeIrq(PVOID pvData, PVOID pvCookie)
 #endif
 }				/* end of glBusreeIrq() */
 
-BOOLEAN glIsReadClearReg(UINT_32 u4Address)
+static BOOLEAN glIsReadClearReg(UINT_32 u4Address)
 {
 	switch (u4Address) {
 	case MCR_WHISR:

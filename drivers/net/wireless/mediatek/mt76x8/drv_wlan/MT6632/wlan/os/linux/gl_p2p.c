@@ -496,7 +496,7 @@ const struct net_device_ops p2p_netdev_ops = {
 *           FALSE
 */
 /*----------------------------------------------------------------------------*/
-BOOLEAN p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucIdex)
+static BOOLEAN p2PAllocInfo(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucIdex)
 {
 	P_ADAPTER_T prAdapter = NULL;
 	P_WIFI_VAR_T prWifiVar = NULL;

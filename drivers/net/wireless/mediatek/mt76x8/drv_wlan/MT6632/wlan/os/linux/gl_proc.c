@@ -686,7 +686,7 @@ static struct txpwr_table txpwr_tables[] = {
 
 #define TMP_SZ (448)
 #define CDD_PWR_OFFSET (6)
-void print_txpwr_tbl(struct txpwr_table *txpwr_tbl, unsigned char ch,
+static void print_txpwr_tbl(struct txpwr_table *txpwr_tbl, unsigned char ch,
 		     unsigned char *tx_pwr[], char pwr_offset[],
 		     char *stream_buf[], unsigned int stream_pos[])
 {

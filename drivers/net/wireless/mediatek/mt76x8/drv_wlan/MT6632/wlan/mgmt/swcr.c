@@ -208,7 +208,7 @@ enum {
 ********************************************************************************
 */
 
-void dumpQueue(P_ADAPTER_T prAdapter)
+static void dumpQueue(P_ADAPTER_T prAdapter)
 {
 
 	P_TX_CTRL_T prTxCtrl;
@@ -264,7 +264,7 @@ void dumpQueue(P_ADAPTER_T prAdapter)
 
 }
 
-void dumpSTA(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec)
+static void dumpSTA(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec)
 {
 	UINT_8 ucWTEntry;
 	UINT_32 i;
@@ -327,7 +327,7 @@ void dumpSTA(P_ADAPTER_T prAdapter, P_STA_RECORD_T prStaRec)
 
 }
 
-VOID dumpBss(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
+static VOID dumpBss(P_ADAPTER_T prAdapter, P_BSS_INFO_T prBssInfo)
 {
 
 	DBGLOG(SW4, INFO, "SSID %s\n", prBssInfo->aucSSID);
@@ -693,7 +693,7 @@ VOID swCtrlCmdCategory1(P_ADAPTER_T prAdapter, UINT_8 ucCate, UINT_8 ucAction, U
 
 #if TEST_PS
 
-VOID
+static VOID
 testPsSendQoSNullFrame(IN P_ADAPTER_T prAdapter,
 		       IN P_STA_RECORD_T prStaRec,
 		       IN UINT_8 ucUP,
@@ -746,7 +746,7 @@ testPsSendQoSNullFrame(IN P_ADAPTER_T prAdapter,
 
 }
 
-VOID testPsSetupBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
+static VOID testPsSetupBss(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex)
 {
 	P_BSS_INFO_T prBssInfo;
 	UINT_8 _aucZeroMacAddr[] = NULL_MAC_ADDR;

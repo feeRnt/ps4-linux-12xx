@@ -180,14 +180,14 @@ static PUINT_8 apucEepromName[] = {
 };
 #endif
 
-int CFG80211_Suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow)
+static int CFG80211_Suspend(struct wiphy *wiphy, struct cfg80211_wowlan *wow)
 {
 	DBGLOG(INIT, INFO, "CFG80211 suspend CB\n");
 
 	return 0;
 }
 
-int CFG80211_Resume(struct wiphy *wiphy)
+static int CFG80211_Resume(struct wiphy *wiphy)
 {
 	DBGLOG(INIT, INFO, "CFG80211 resume CB\n");
 
@@ -804,7 +804,7 @@ static int wlanGetDevIdx(struct net_device *prDev)
 * \retval OTHER The execution of IOCTL command is failed.
 */
 /*----------------------------------------------------------------------------*/
-int wlanDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd)
+static int wlanDoIOCTL(struct net_device *prDev, struct ifreq *prIfReq, int i4Cmd)
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 	int ret = 0;
@@ -990,7 +990,7 @@ static void wlanSetMulticastListWorkQueue(struct work_struct *work)
 *           None
 */
 /*----------------------------------------------------------------------------*/
-VOID wlanSchedScanStoppedWorkQueue(struct work_struct *work)
+static VOID wlanSchedScanStoppedWorkQueue(struct work_struct *work)
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 	struct net_device *prDev = gPrDev;
@@ -1098,7 +1098,7 @@ int wlanHardStartXmit(struct sk_buff *prSkb, struct net_device *prDev)
 * \return net_device_stats buffer pointer.
 */
 /*----------------------------------------------------------------------------*/
-struct net_device_stats *wlanGetStats(IN struct net_device *prDev)
+static struct net_device_stats *wlanGetStats(IN struct net_device *prDev)
 {
 	return (struct net_device_stats *)kalGetStats(prDev);
 }				/* end of wlanGetStats() */
@@ -1294,7 +1294,7 @@ static const struct net_device_ops wlan_mon_netdev_ops = {
 	.ndo_stop = wlanMonStop,
 };
 
-void wlanMonWorkHandler(struct work_struct *work)
+static void wlanMonWorkHandler(struct work_struct *work)
 {
 	P_GLUE_INFO_T prGlueInfo;
 
@@ -1610,7 +1610,7 @@ static void wlanDestroyWirelessDevice(void)
 	gprWdev = NULL;
 }
 
-VOID wlanWakeLockInit(P_GLUE_INFO_T prGlueInfo)
+static VOID wlanWakeLockInit(P_GLUE_INFO_T prGlueInfo)
 {
 #ifdef CONFIG_ANDROID
 	KAL_WAKE_LOCK_INIT(NULL, &prGlueInfo->rIntrWakeLock, "WLAN interrupt");
@@ -1618,7 +1618,7 @@ VOID wlanWakeLockInit(P_GLUE_INFO_T prGlueInfo)
 #endif
 }
 
-VOID wlanWakeLockUninit(P_GLUE_INFO_T prGlueInfo)
+static VOID wlanWakeLockUninit(P_GLUE_INFO_T prGlueInfo)
 {
 #if defined(CONFIG_ANDROID) && (CFG_ENABLE_WAKE_LOCK)
 	if (KAL_WAKE_LOCK_ACTIVE(NULL, &prGlueInfo->rIntrWakeLock))
@@ -1996,7 +1996,7 @@ int set_p2p_mode_handler(struct net_device *netdev, PARAM_CUSTOM_P2P_SET_STRUCT_
 * \retval VOID
 */
 /*----------------------------------------------------------------------------*/
-VOID wlanGetParseConfig(P_ADAPTER_T prAdapter)
+static VOID wlanGetParseConfig(P_ADAPTER_T prAdapter)
 {
 	PUINT_8 pucConfigBuf;
 	UINT_32 u4ConfigReadLen;
@@ -2163,7 +2163,7 @@ label_exit:
 * \retval WLAN_STATUS_FAILURE Failed
 */
 /*----------------------------------------------------------------------------*/
-WLAN_STATUS wlanDownloadBufferBin(P_ADAPTER_T prAdapter)
+static WLAN_STATUS wlanDownloadBufferBin(P_ADAPTER_T prAdapter)
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 #if (CFG_FW_Report_Efuse_Address)

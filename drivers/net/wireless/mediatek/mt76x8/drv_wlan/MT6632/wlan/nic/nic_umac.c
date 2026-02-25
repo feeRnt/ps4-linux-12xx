@@ -173,7 +173,7 @@ const UMAC_PG_INFO_AND_RESERVE_CNT_CR_OFFSET_MAP_T  g_arPsePgInfoAndReserveCrOff
 */
 /*----------------------------------------------------------------------------*/
 
-OUT BOOLEAN halUmacWrapSourcePortSanityCheck(IN BOOLEAN fgPsePleFlag, IN UINT_8 ucPageGroupID)
+static OUT BOOLEAN halUmacWrapSourcePortSanityCheck(IN BOOLEAN fgPsePleFlag, IN UINT_8 ucPageGroupID)
 {
 
 	if (fgPsePleFlag == UMAC_PSE_CFG_POOL_INDEX) {
@@ -199,7 +199,7 @@ OUT BOOLEAN halUmacWrapSourcePortSanityCheck(IN BOOLEAN fgPsePleFlag, IN UINT_8 
 */
 /*----------------------------------------------------------------------------*/
 
-OUT UINT_16 halUmacWrapRsvPgCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleFlag, IN UINT_8 ucPageGroupID)
+static OUT UINT_16 halUmacWrapRsvPgCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleFlag, IN UINT_8 ucPageGroupID)
 {
 	UINT_32 u4RegAddr = 0;
 	UINT_32 u4Value = 0;
@@ -229,7 +229,7 @@ OUT UINT_16 halUmacWrapRsvPgCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleFla
 */
 /*----------------------------------------------------------------------------*/
 
-OUT UINT_16 halUmacWrapSrcPgCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleFlag, IN UINT_8 ucPageGroupID)
+static OUT UINT_16 halUmacWrapSrcPgCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleFlag, IN UINT_8 ucPageGroupID)
 {
 	UINT_32 u4RegAddr = 0;
 	UINT_32 u4Value = 0;
@@ -258,7 +258,7 @@ OUT UINT_16 halUmacWrapSrcPgCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleFla
 */
 /*----------------------------------------------------------------------------*/
 
-OUT UINT_16 halUmacPbufCtrlTotalPageNum(IN P_ADAPTER_T prAdapter, IN UINT_16 fgPsePleFlag)
+static OUT UINT_16 halUmacPbufCtrlTotalPageNum(IN P_ADAPTER_T prAdapter, IN UINT_16 fgPsePleFlag)
 {
 	UINT_32 u4Value = 0;
 
@@ -278,7 +278,7 @@ OUT UINT_16 halUmacPbufCtrlTotalPageNum(IN P_ADAPTER_T prAdapter, IN UINT_16 fgP
 */
 /*----------------------------------------------------------------------------*/
 
-OUT UINT_16 halUmacWrapFrePageCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleFlag)
+static OUT UINT_16 halUmacWrapFrePageCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleFlag)
 {
 	UINT_32 u4Value = 0;
 
@@ -297,7 +297,7 @@ OUT UINT_16 halUmacWrapFrePageCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleF
 */
 /*----------------------------------------------------------------------------*/
 
-OUT UINT_16 halUmacWrapFfaCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleFlag)
+static OUT UINT_16 halUmacWrapFfaCnt(IN P_ADAPTER_T prAdapter, IN BOOLEAN fgPsePleFlag)
 {
 	UINT_32 u4Value = 0;
 

@@ -124,7 +124,7 @@
 ********************************************************************************
 */
 
-BOOLEAN
+static BOOLEAN
 mtk_p2p_cfg80211func_channel_sco_switch(IN enum nl80211_channel_type channel_type,
 					   IN P_ENUM_CHNL_EXT_T prChnlSco)
 {
@@ -159,7 +159,7 @@ mtk_p2p_cfg80211func_channel_sco_switch(IN enum nl80211_channel_type channel_typ
 	return fgIsValid;
 }
 
-BOOLEAN
+static BOOLEAN
 mtk_p2p_cfg80211func_channel_format_switch(IN struct cfg80211_chan_def *channel_def,
 					   IN struct ieee80211_channel *channel,
 					   IN P_RF_CHANNEL_INFO_T prRfChnlInfo)

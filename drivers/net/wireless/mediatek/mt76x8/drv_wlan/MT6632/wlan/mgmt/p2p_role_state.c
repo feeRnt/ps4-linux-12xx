@@ -51,14 +51,14 @@
  *****************************************************************************/
 #include "precomp.h"
 
-VOID
+static VOID
 p2pRoleStateInit_IDLE(IN P_ADAPTER_T prAdapter, IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo, IN P_BSS_INFO_T prP2pBssInfo)
 {
 
 	cnmTimerStartTimer(prAdapter, &(prP2pRoleFsmInfo->rP2pRoleFsmTimeoutTimer), P2P_AP_CHNL_HOLD_TIME_MS);
 }				/* p2pRoleStateInit_IDLE */
 
-VOID
+static VOID
 p2pRoleStateAbort_IDLE(IN P_ADAPTER_T prAdapter,
 		       IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo, IN P_P2P_CHNL_REQ_INFO_T prP2pChnlReqInfo)
 {
@@ -70,7 +70,7 @@ p2pRoleStateAbort_IDLE(IN P_ADAPTER_T prAdapter,
 	cnmTimerStopTimer(prAdapter, &(prP2pRoleFsmInfo->rP2pRoleFsmTimeoutTimer));
 }				/* p2pRoleStateAbort_IDLE */
 
-VOID p2pRoleStateInit_SCAN(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo)
+static VOID p2pRoleStateInit_SCAN(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo)
 {
 	P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo = (P_P2P_DEV_FSM_INFO_T) NULL;
 	P_P2P_SCAN_REQ_INFO_T prDevScanReqInfo = NULL;
@@ -99,7 +99,7 @@ VOID p2pRoleStateInit_SCAN(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_
 	} while (FALSE);
 }				/* p2pRoleStateInit_SCAN */
 
-VOID p2pRoleStateAbort_SCAN(IN P_ADAPTER_T prAdapter, IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo)
+static VOID p2pRoleStateAbort_SCAN(IN P_ADAPTER_T prAdapter, IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo)
 {
 	P_P2P_SCAN_REQ_INFO_T prScanInfo = (P_P2P_SCAN_REQ_INFO_T) NULL;
 
@@ -113,7 +113,7 @@ VOID p2pRoleStateAbort_SCAN(IN P_ADAPTER_T prAdapter, IN P_P2P_ROLE_FSM_INFO_T p
 	} while (FALSE);
 }				/* p2pRoleStateAbort_SCAN */
 
-VOID
+static VOID
 p2pRoleStateInit_REQING_CHANNEL(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
 {
 
@@ -125,7 +125,7 @@ p2pRoleStateInit_REQING_CHANNEL(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN
 	} while (FALSE);
 }				/* p2pRoleStateInit_REQING_CHANNEL */
 
-VOID
+static VOID
 p2pRoleStateAbort_REQING_CHANNEL(IN P_ADAPTER_T prAdapter,
 				 IN P_BSS_INFO_T prP2pRoleBssInfo,
 				 IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo, IN ENUM_P2P_ROLE_STATE_T eNextState)
@@ -153,7 +153,7 @@ p2pRoleStateAbort_REQING_CHANNEL(IN P_ADAPTER_T prAdapter,
 	} while (FALSE);
 }				/* p2pRoleStateAbort_REQING_CHANNEL */
 
-VOID
+static VOID
 p2pRoleStateInit_AP_CHNL_DETECTION(IN P_ADAPTER_T prAdapter,
 				   IN UINT_8 ucBssIndex,
 				   IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo, IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo)
@@ -215,7 +215,7 @@ p2pRoleStateInit_AP_CHNL_DETECTION(IN P_ADAPTER_T prAdapter,
 
 }				/* p2pRoleStateInit_AP_CHNL_DETECTION */
 
-VOID
+static VOID
 p2pRoleStateAbort_AP_CHNL_DETECTION(IN P_ADAPTER_T prAdapter,
 				    IN UINT_8 ucBssIndex,
 				    IN P_P2P_CONNECTION_REQ_INFO_T prP2pConnReqInfo,
@@ -261,7 +261,7 @@ p2pRoleStateAbort_AP_CHNL_DETECTION(IN P_ADAPTER_T prAdapter,
 	} while (FALSE);
 }
 
-VOID
+static VOID
 p2pRoleStateInit_GC_JOIN(IN P_ADAPTER_T prAdapter,
 			 IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo, IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
 {
@@ -284,7 +284,7 @@ p2pRoleStateInit_GC_JOIN(IN P_ADAPTER_T prAdapter,
 	} while (FALSE);
 }				/* p2pRoleStateInit_GC_JOIN */
 
-VOID
+static VOID
 p2pRoleStateAbort_GC_JOIN(IN P_ADAPTER_T prAdapter,
 			  IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo,
 			  IN P_P2P_JOIN_INFO_T prJoinInfo, IN ENUM_P2P_ROLE_STATE_T eNextState)
@@ -319,7 +319,7 @@ p2pRoleStateAbort_GC_JOIN(IN P_ADAPTER_T prAdapter,
 }
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
-VOID
+static VOID
 p2pRoleStateInit_DFS_CAC(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
 {
 
@@ -330,7 +330,7 @@ p2pRoleStateInit_DFS_CAC(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN P_P2P_
 	} while (FALSE);
 }				/* p2pRoleStateInit_DFS_CAC */
 
-VOID
+static VOID
 p2pRoleStateAbort_DFS_CAC(IN P_ADAPTER_T prAdapter,
 				 IN P_BSS_INFO_T prP2pRoleBssInfo,
 				 IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo, IN ENUM_P2P_ROLE_STATE_T eNextState)
@@ -343,7 +343,7 @@ p2pRoleStateAbort_DFS_CAC(IN P_ADAPTER_T prAdapter,
 	} while (FALSE);
 }				/* p2pRoleStateAbort_DFS_CAC */
 
-VOID
+static VOID
 p2pRoleStateInit_SWITCH_CHANNEL(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
 {
 
@@ -354,7 +354,7 @@ p2pRoleStateInit_SWITCH_CHANNEL(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIdx, IN
 	} while (FALSE);
 }				/* p2pRoleStateInit_SWITCH_CHANNEL */
 
-VOID
+static VOID
 p2pRoleStateAbort_SWITCH_CHANNEL(IN P_ADAPTER_T prAdapter,
 				 IN P_BSS_INFO_T prP2pRoleBssInfo,
 				 IN P_P2P_ROLE_FSM_INFO_T prP2pRoleFsmInfo, IN ENUM_P2P_ROLE_STATE_T eNextState)
@@ -366,7 +366,7 @@ p2pRoleStateAbort_SWITCH_CHANNEL(IN P_ADAPTER_T prAdapter,
 }				/* p2pRoleStateAbort_SWITCH_CHANNEL */
 #endif
 
-VOID
+static VOID
 p2pRoleStatePrepare_To_REQING_CHANNEL_STATE(IN P_ADAPTER_T prAdapter,
 					    IN P_BSS_INFO_T prBssInfo,
 					    IN P_P2P_CONNECTION_REQ_INFO_T prConnReqInfo,
@@ -438,7 +438,7 @@ p2pRoleStatePrepare_To_REQING_CHANNEL_STATE(IN P_ADAPTER_T prAdapter,
 }
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
-VOID
+static VOID
 p2pRoleStatePrepare_To_DFS_CAC_STATE(IN P_ADAPTER_T prAdapter,
 					IN P_BSS_INFO_T prBssInfo,
 					IN ENUM_CHANNEL_WIDTH_T rChannelWidth,

@@ -211,7 +211,7 @@ VOID aaaFsmRunEventStart(IN P_MSG_HDR_T prMsgHdr)
 
 #if CFG_SUPPORT_AAA
 
-VOID aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG plParamPtr)
+static VOID aaaFsmRunEventTxReqTimeOut(IN P_ADAPTER_T prAdapter, IN ULONG plParamPtr)
 {
 	P_STA_RECORD_T prStaRec = (P_STA_RECORD_T) plParamPtr;
 	P_BSS_INFO_T prBssInfo;

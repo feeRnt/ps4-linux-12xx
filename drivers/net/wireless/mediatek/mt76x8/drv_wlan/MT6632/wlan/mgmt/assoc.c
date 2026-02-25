@@ -403,7 +403,7 @@ static __KAL_INLINE__ VOID assocBuildReAssocReqFrameCommonIEs(IN P_ADAPTER_T prA
 */
 /*----------------------------------------------------------------------------*/
 VOID
-assocComposeReAssocReqFrameHeaderAndFF(IN P_ADAPTER_T prAdapter,
+static assocComposeReAssocReqFrameHeaderAndFF(IN P_ADAPTER_T prAdapter,
 				       IN P_STA_RECORD_T prStaRec,
 				       IN PUINT_8 pucBuffer, IN UINT_8 aucMACAddress[], IN OUT PUINT_16 pu2PayloadLen)
 {

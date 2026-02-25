@@ -251,7 +251,7 @@ wext_support_ioctl_SIOCSIWPMKSA_Action(IN struct net_device *prDev, IN char *prE
 ********************************************************************************
 */
 
-void MAP_CHANNEL_ID_TO_KHZ(UINT_32 ch, UINT_32 khz)
+static void MAP_CHANNEL_ID_TO_KHZ(UINT_32 ch, UINT_32 khz)
 {
 	switch (ch) {
 	case 1:
@@ -3197,7 +3197,7 @@ static int wext_set_country(IN struct net_device *prNetDev, IN struct iw_point *
 *
 */
 /*----------------------------------------------------------------------------*/
-int wext_get_priv(IN struct net_device *prNetDev, OUT struct iw_point *prData)
+static int wext_get_priv(IN struct net_device *prNetDev, OUT struct iw_point *prData)
 {
 	UINT_16 u2BufferSize = prData->length;
 

@@ -121,7 +121,7 @@ enum {
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEStart(struct net_device *prNetDev, UINT_8 *prInBuf)
+static INT_32 MT_ATEStart(struct net_device *prNetDev, UINT_8 *prInBuf)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -158,7 +158,7 @@ INT_32 MT_ATEStart(struct net_device *prNetDev, UINT_8 *prInBuf)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ICAPStart(struct net_device *prNetDev, UINT_8 *prInBuf)
+static INT_32 MT_ICAPStart(struct net_device *prNetDev, UINT_8 *prInBuf)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -232,7 +232,7 @@ INT_32 MT_ATEStop(struct net_device *prNetDev, UINT_8 *prInBuf)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEStartTX(struct net_device *prNetDev, UINT_8 *prInBuf)
+static INT_32 MT_ATEStartTX(struct net_device *prNetDev, UINT_8 *prInBuf)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -273,7 +273,7 @@ INT_32 MT_ATEStartTX(struct net_device *prNetDev, UINT_8 *prInBuf)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEStopTX(struct net_device *prNetDev, UINT_8 *prInBuf)
+static INT_32 MT_ATEStopTX(struct net_device *prNetDev, UINT_8 *prInBuf)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -314,7 +314,7 @@ INT_32 MT_ATEStopTX(struct net_device *prNetDev, UINT_8 *prInBuf)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEStartRX(struct net_device *prNetDev, UINT_8 *prInBuf)
+static INT_32 MT_ATEStartRX(struct net_device *prNetDev, UINT_8 *prInBuf)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -355,7 +355,7 @@ INT_32 MT_ATEStartRX(struct net_device *prNetDev, UINT_8 *prInBuf)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEStopRX(struct net_device *prNetDev, UINT_8 *prInBuf)
+static INT_32 MT_ATEStopRX(struct net_device *prNetDev, UINT_8 *prInBuf)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -397,7 +397,7 @@ INT_32 MT_ATEStopRX(struct net_device *prNetDev, UINT_8 *prInBuf)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetChannel(struct net_device *prNetDev, UINT_32 u4SXIdx, UINT_32 u4SetFreq)
+static INT_32 MT_ATESetChannel(struct net_device *prNetDev, UINT_32 u4SXIdx, UINT_32 u4SetFreq)
 {
 	UINT_32 u4BufLen = 0;
 	UINT_32 i4SetChan;
@@ -450,7 +450,7 @@ INT_32 MT_ATESetChannel(struct net_device *prNetDev, UINT_32 u4SXIdx, UINT_32 u4
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetPreamble(struct net_device *prNetDev, UINT_32 u4Mode)
+static INT_32 MT_ATESetPreamble(struct net_device *prNetDev, UINT_32 u4Mode)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -495,7 +495,7 @@ INT_32 MT_ATESetPreamble(struct net_device *prNetDev, UINT_32 u4Mode)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetSystemBW(struct net_device *prNetDev, UINT_32 u4BW)
+static INT_32 MT_ATESetSystemBW(struct net_device *prNetDev, UINT_32 u4BW)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -574,7 +574,7 @@ INT_32 MT_ATESetSystemBW(struct net_device *prNetDev, UINT_32 u4BW)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxLength(struct net_device *prNetDev, UINT_32 u4TxLength)
+static INT_32 MT_ATESetTxLength(struct net_device *prNetDev, UINT_32 u4TxLength)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -616,7 +616,7 @@ INT_32 MT_ATESetTxLength(struct net_device *prNetDev, UINT_32 u4TxLength)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxCount(struct net_device *prNetDev, UINT_32 u4TxCount)
+static INT_32 MT_ATESetTxCount(struct net_device *prNetDev, UINT_32 u4TxCount)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -662,7 +662,7 @@ INT_32 MT_ATESetTxCount(struct net_device *prNetDev, UINT_32 u4TxCount)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxIPG(struct net_device *prNetDev, UINT_32 u4TxIPG)
+static INT_32 MT_ATESetTxIPG(struct net_device *prNetDev, UINT_32 u4TxIPG)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -707,7 +707,7 @@ INT_32 MT_ATESetTxIPG(struct net_device *prNetDev, UINT_32 u4TxIPG)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxPower0(struct net_device *prNetDev, UINT_32 u4TxPower0)
+static INT_32 MT_ATESetTxPower0(struct net_device *prNetDev, UINT_32 u4TxPower0)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -754,7 +754,7 @@ INT_32 MT_ATESetTxPower0(struct net_device *prNetDev, UINT_32 u4TxPower0)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetPerPacketBW(struct net_device *prNetDev, UINT_32 u4BW)
+static INT_32 MT_ATESetPerPacketBW(struct net_device *prNetDev, UINT_32 u4BW)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -833,7 +833,7 @@ INT_32 MT_ATESetPerPacketBW(struct net_device *prNetDev, UINT_32 u4BW)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEPrimarySetting(struct net_device *prNetDev, UINT_32 u4PrimaryCh)
+static INT_32 MT_ATEPrimarySetting(struct net_device *prNetDev, UINT_32 u4PrimaryCh)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -878,7 +878,7 @@ INT_32 MT_ATEPrimarySetting(struct net_device *prNetDev, UINT_32 u4PrimaryCh)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxGi(struct net_device *prNetDev, UINT_32 u4SetTxGi)
+static INT_32 MT_ATESetTxGi(struct net_device *prNetDev, UINT_32 u4SetTxGi)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -923,7 +923,7 @@ INT_32 MT_ATESetTxGi(struct net_device *prNetDev, UINT_32 u4SetTxGi)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxPath(struct net_device *prNetDev, UINT_32 u4Tx_path)
+static INT_32 MT_ATESetTxPath(struct net_device *prNetDev, UINT_32 u4Tx_path)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -965,7 +965,7 @@ INT_32 MT_ATESetTxPath(struct net_device *prNetDev, UINT_32 u4Tx_path)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxPayLoad(struct net_device *prNetDev, UINT_32 u4Gen_payload_rule, UINT_8 ucPayload)
+static INT_32 MT_ATESetTxPayLoad(struct net_device *prNetDev, UINT_32 u4Gen_payload_rule, UINT_8 ucPayload)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1007,7 +1007,7 @@ INT_32 MT_ATESetTxPayLoad(struct net_device *prNetDev, UINT_32 u4Gen_payload_rul
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxSTBC(struct net_device *prNetDev, UINT_32 u4Stbc)
+static INT_32 MT_ATESetTxSTBC(struct net_device *prNetDev, UINT_32 u4Stbc)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1052,7 +1052,7 @@ INT_32 MT_ATESetTxSTBC(struct net_device *prNetDev, UINT_32 u4Stbc)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxVhtNss(struct net_device *prNetDev, UINT_32 u4VhtNss)
+static INT_32 MT_ATESetTxVhtNss(struct net_device *prNetDev, UINT_32 u4VhtNss)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1093,7 +1093,7 @@ INT_32 MT_ATESetTxVhtNss(struct net_device *prNetDev, UINT_32 u4VhtNss)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetRate(struct net_device *prNetDev, UINT_32 u4Rate)
+static INT_32 MT_ATESetRate(struct net_device *prNetDev, UINT_32 u4Rate)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1135,7 +1135,7 @@ INT_32 MT_ATESetRate(struct net_device *prNetDev, UINT_32 u4Rate)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetEncodeMode(struct net_device *prNetDev, UINT_32 u4Ldpc)
+static INT_32 MT_ATESetEncodeMode(struct net_device *prNetDev, UINT_32 u4Ldpc)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1180,7 +1180,7 @@ INT_32 MT_ATESetEncodeMode(struct net_device *prNetDev, UINT_32 u4Ldpc)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetiBFEnable(struct net_device *prNetDev, UINT_32 u4iBF)
+static INT_32 MT_ATESetiBFEnable(struct net_device *prNetDev, UINT_32 u4iBF)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1225,7 +1225,7 @@ INT_32 MT_ATESetiBFEnable(struct net_device *prNetDev, UINT_32 u4iBF)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESeteBFEnable(struct net_device *prNetDev, UINT_32 u4eBF)
+static INT_32 MT_ATESeteBFEnable(struct net_device *prNetDev, UINT_32 u4eBF)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1270,7 +1270,7 @@ INT_32 MT_ATESeteBFEnable(struct net_device *prNetDev, UINT_32 u4eBF)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetMACAddress(struct net_device *prNetDev, UINT_32 u4Type, PUINT_8 ucAddr)
+static INT_32 MT_ATESetMACAddress(struct net_device *prNetDev, UINT_32 u4Type, PUINT_8 ucAddr)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1330,7 +1330,7 @@ INT_32 MT_ATESetMACAddress(struct net_device *prNetDev, UINT_32 u4Type, PUINT_8 
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATELogOnOff(struct net_device *prNetDev, UINT_32 u4Type, UINT_32 u4On_off, UINT_32 u4Size)
+static INT_32 MT_ATELogOnOff(struct net_device *prNetDev, UINT_32 u4Type, UINT_32 u4On_off, UINT_32 u4Size)
 {
 	INT_32 i4Status = 0, i, i4TargetLength = 0, i4MaxDumpRXVCnt = 500;
 	UINT_32 u4BufLen = 0, rxv;
@@ -1422,7 +1422,7 @@ INT_32 MT_ATELogOnOff(struct net_device *prNetDev, UINT_32 u4Type, UINT_32 u4On_
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEResetTXRXCounter(struct net_device *prNetDev)
+static INT_32 MT_ATEResetTXRXCounter(struct net_device *prNetDev)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1463,7 +1463,7 @@ INT_32 MT_ATEResetTXRXCounter(struct net_device *prNetDev)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetDBDCBandIndex(struct net_device *prNetDev, UINT_32 u4BandIdx)
+static INT_32 MT_ATESetDBDCBandIndex(struct net_device *prNetDev, UINT_32 u4BandIdx)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1504,7 +1504,7 @@ INT_32 MT_ATESetDBDCBandIndex(struct net_device *prNetDev, UINT_32 u4BandIdx)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetBand(struct net_device *prNetDev, INT_32 i4Band)
+static INT_32 MT_ATESetBand(struct net_device *prNetDev, INT_32 i4Band)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1545,7 +1545,7 @@ INT_32 MT_ATESetBand(struct net_device *prNetDev, INT_32 i4Band)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxToneType(struct net_device *prNetDev, INT_32 i4ToneType)
+static INT_32 MT_ATESetTxToneType(struct net_device *prNetDev, INT_32 i4ToneType)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1586,7 +1586,7 @@ INT_32 MT_ATESetTxToneType(struct net_device *prNetDev, INT_32 i4ToneType)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxToneBW(struct net_device *prNetDev, INT_32 i4ToneFreq)
+static INT_32 MT_ATESetTxToneBW(struct net_device *prNetDev, INT_32 i4ToneFreq)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1628,7 +1628,7 @@ INT_32 MT_ATESetTxToneBW(struct net_device *prNetDev, INT_32 i4ToneFreq)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxToneDCOffset(struct net_device *prNetDev, INT_32 i4DcOffsetI, INT_32 i4DcOffsetQ)
+static INT_32 MT_ATESetTxToneDCOffset(struct net_device *prNetDev, INT_32 i4DcOffsetI, INT_32 i4DcOffsetQ)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1671,7 +1671,7 @@ INT_32 MT_ATESetTxToneDCOffset(struct net_device *prNetDev, INT_32 i4DcOffsetI, 
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetDBDCTxTonePower(struct net_device *prNetDev, INT_32 i4AntIndex, INT_32 i4RF_Power, INT_32 i4Digi_Power)
+static INT_32 MT_ATESetDBDCTxTonePower(struct net_device *prNetDev, INT_32 i4AntIndex, INT_32 i4RF_Power, INT_32 i4Digi_Power)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1727,7 +1727,7 @@ INT_32 MT_ATESetDBDCTxTonePower(struct net_device *prNetDev, INT_32 i4AntIndex, 
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEDBDCTxTone(struct net_device *prNetDev, INT_32 i4Control)
+static INT_32 MT_ATEDBDCTxTone(struct net_device *prNetDev, INT_32 i4Control)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1773,7 +1773,7 @@ INT_32 MT_ATEDBDCTxTone(struct net_device *prNetDev, INT_32 i4Control)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetMacHeader(struct net_device *prNetDev, UINT_32 u4FrameCtrl, UINT_32 u4DurationID, UINT_32 u4SeqCtrl)
+static INT_32 MT_ATESetMacHeader(struct net_device *prNetDev, UINT_32 u4FrameCtrl, UINT_32 u4DurationID, UINT_32 u4SeqCtrl)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status;
@@ -1827,7 +1827,7 @@ INT_32 MT_ATESetMacHeader(struct net_device *prNetDev, UINT_32 u4FrameCtrl, UINT
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATE_IRRSetADC(struct net_device *prNetDev,
+static INT_32 MT_ATE_IRRSetADC(struct net_device *prNetDev,
 			UINT_32 u4WFIdx,
 			UINT_32 u4ChFreq,
 			UINT_32 u4BW, UINT_32 u4Sx, UINT_32 u4Band, UINT_32 u4RunType, UINT_32 u4FType)
@@ -1889,7 +1889,7 @@ INT_32 MT_ATE_IRRSetADC(struct net_device *prNetDev,
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATE_IRRSetRxGain(struct net_device *prNetDev,
+static INT_32 MT_ATE_IRRSetRxGain(struct net_device *prNetDev,
 			   UINT_32 u4PgaLpfg, UINT_32 u4Lna, UINT_32 u4Band, UINT_32 u4WF_inx, UINT_32 u4Rfdgc)
 {
 	UINT_32 u4BufLen = 0, i = 0;
@@ -1941,7 +1941,7 @@ INT_32 MT_ATE_IRRSetRxGain(struct net_device *prNetDev,
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATE_IRRSetTTG(struct net_device *prNetDev,
+static INT_32 MT_ATE_IRRSetTTG(struct net_device *prNetDev,
 			UINT_32 u4TTGPwrIdx, UINT_32 u4ChFreq, UINT_32 u4FIToneFreq, UINT_32 u4Band)
 {
 	UINT_32 u4BufLen = 0, i = 0;
@@ -1992,7 +1992,7 @@ INT_32 MT_ATE_IRRSetTTG(struct net_device *prNetDev,
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATE_IRRSetTrunOnTTG(struct net_device *prNetDev, UINT_32 u4TTGOnOff, UINT_32 u4Band, UINT_32 u4WF_inx)
+static INT_32 MT_ATE_IRRSetTrunOnTTG(struct net_device *prNetDev, UINT_32 u4TTGOnOff, UINT_32 u4Band, UINT_32 u4WF_inx)
 {
 	UINT_32 u4BufLen = 0, i = 0;
 	INT_32 i4Status;
@@ -2041,7 +2041,7 @@ INT_32 MT_ATE_IRRSetTrunOnTTG(struct net_device *prNetDev, UINT_32 u4TTGOnOff, U
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATE_TMRSetting(struct net_device *prNetDev,
+static INT_32 MT_ATE_TMRSetting(struct net_device *prNetDev,
 			 UINT_32 u4Setting, UINT_32 u4Version, UINT_32 u4MPThres, UINT_32 u4MPIter)
 {
 	UINT_32 u4BufLen = 0;
@@ -2126,7 +2126,7 @@ INT_32 MT_ATE_TMRSetting(struct net_device *prNetDev,
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEMPSSetSeqData(struct net_device *prNetDev,
+static INT_32 MT_ATEMPSSetSeqData(struct net_device *prNetDev,
 			UINT_32 u4TestNum, UINT_32 *pu4Phy, UINT_32 u4Band)
 {
 	UINT_32 u4BufLen = 0, i;
@@ -2183,7 +2183,7 @@ INT_32 MT_ATEMPSSetSeqData(struct net_device *prNetDev,
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEMPSSetPayloadLength(struct net_device *prNetDev,
+static INT_32 MT_ATEMPSSetPayloadLength(struct net_device *prNetDev,
 			UINT_32 u4TestNum, UINT_32 *pu4Length, UINT_32 u4Band)
 {
 	UINT_32 u4BufLen = 0, i;
@@ -2225,7 +2225,7 @@ INT_32 MT_ATEMPSSetPayloadLength(struct net_device *prNetDev,
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEMPSSetPacketCount(struct net_device *prNetDev,
+static INT_32 MT_ATEMPSSetPacketCount(struct net_device *prNetDev,
 			UINT_32 u4TestNum, UINT_32 *pu4PktCnt, UINT_32 u4Band)
 {
 	UINT_32 u4BufLen = 0, i;
@@ -2267,7 +2267,7 @@ INT_32 MT_ATEMPSSetPacketCount(struct net_device *prNetDev,
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEMPSSetPowerGain(struct net_device *prNetDev,
+static INT_32 MT_ATEMPSSetPowerGain(struct net_device *prNetDev,
 			UINT_32 u4TestNum, UINT_32 *pu4PwrGain, UINT_32 u4Band)
 {
 	UINT_32 u4BufLen = 0, i;
@@ -2309,7 +2309,7 @@ INT_32 MT_ATEMPSSetPowerGain(struct net_device *prNetDev,
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEMPSSetNss(struct net_device *prNetDev,
+static INT_32 MT_ATEMPSSetNss(struct net_device *prNetDev,
 			UINT_32 u4TestNum, UINT_32 *pu4Nss, UINT_32 u4Band)
 {
 	UINT_32 u4BufLen = 0, i;
@@ -2351,7 +2351,7 @@ INT_32 MT_ATEMPSSetNss(struct net_device *prNetDev,
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEMPSSetPerpacketBW(struct net_device *prNetDev,
+static INT_32 MT_ATEMPSSetPerpacketBW(struct net_device *prNetDev,
 			UINT_32 u4TestNum, UINT_32 *pu4PerPktBW, UINT_32 u4Band)
 {
 	UINT_32 u4BufLen = 0, i;
@@ -2393,7 +2393,7 @@ INT_32 MT_ATEMPSSetPerpacketBW(struct net_device *prNetDev,
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATERDDStart(struct net_device *prNetDev, UINT_8 *prInBuf)
+static INT_32 MT_ATERDDStart(struct net_device *prNetDev, UINT_8 *prInBuf)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status = 0;
@@ -2432,7 +2432,7 @@ INT_32 MT_ATERDDStart(struct net_device *prNetDev, UINT_8 *prInBuf)
 * \retval -EFAULT			If kalIoctl return nonzero.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATERDDStop(struct net_device *prNetDev, UINT_8 *prInBuf)
+static INT_32 MT_ATERDDStop(struct net_device *prNetDev, UINT_8 *prInBuf)
 {
 	UINT_32 u4BufLen = 0;
 	INT_32 i4Status = 0;
@@ -2477,7 +2477,7 @@ INT_32 MT_ATERDDStop(struct net_device *prNetDev, UINT_8 *prInBuf)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATEWriteEfuse(struct net_device *prNetDev, UINT_16 u2Offset, UINT_16 u2Content)
+static INT_32 MT_ATEWriteEfuse(struct net_device *prNetDev, UINT_16 u2Offset, UINT_16 u2Content)
 {
 	UINT_32 u4BufLen = 0;
 	PARAM_CUSTOM_ACCESS_EFUSE_T rAccessEfuseInfoRead, rAccessEfuseInfoWrite;
@@ -2548,7 +2548,7 @@ INT_32 MT_ATEWriteEfuse(struct net_device *prNetDev, UINT_16 u2Offset, UINT_16 u
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetTxTargetPower(struct net_device *prNetDev, UINT_8 ucTxTargetPower)
+static INT_32 MT_ATESetTxTargetPower(struct net_device *prNetDev, UINT_8 ucTxTargetPower)
 {
 	UINT_32 u4BufLen = 0;
 	PARAM_CUSTOM_SET_TX_TARGET_POWER_T rSetTxTargetPwr;
@@ -2588,7 +2588,7 @@ INT_32 MT_ATESetTxTargetPower(struct net_device *prNetDev, UINT_8 ucTxTargetPowe
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetRddReport(struct net_device *prNetDev, UINT_8 ucDbdcIdx)
+static INT_32 MT_ATESetRddReport(struct net_device *prNetDev, UINT_8 ucDbdcIdx)
 {
 	UINT_32 u4BufLen = 0;
 	PARAM_CUSTOM_SET_RDD_REPORT_T rSetRddReport;
@@ -2626,7 +2626,7 @@ INT_32 MT_ATESetRddReport(struct net_device *prNetDev, UINT_8 ucDbdcIdx)
 * \retval -EINVAL			If invalid argument.
 */
 /*----------------------------------------------------------------------------*/
-INT_32 MT_ATESetRadarDetectMode(struct net_device *prNetDev, UINT_8 ucRadarDetectMode)
+static INT_32 MT_ATESetRadarDetectMode(struct net_device *prNetDev, UINT_8 ucRadarDetectMode)
 {
 	UINT_32 u4BufLen = 0;
 	struct PARAM_CUSTOM_SET_RADAR_DETECT_MODE rSetRadarDetectMode;
@@ -2654,7 +2654,7 @@ INT_32 MT_ATESetRadarDetectMode(struct net_device *prNetDev, UINT_8 ucRadarDetec
 #endif
 
 #if CFG_SUPPORT_TX_BF
-INT_32 TxBfProfileTag_InValid(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucInValid)
+static INT_32 TxBfProfileTag_InValid(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucInValid)
 {
 	INT_32 i4Status = 0;
 
@@ -2663,7 +2663,7 @@ INT_32 TxBfProfileTag_InValid(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 p
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_PfmuIdx(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucProfileIdx)
+static INT_32 TxBfProfileTag_PfmuIdx(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucProfileIdx)
 {
 	INT_32 i4Status = 0;
 
@@ -2672,7 +2672,7 @@ INT_32 TxBfProfileTag_PfmuIdx(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 p
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_TxBfType(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucBFType)
+static INT_32 TxBfProfileTag_TxBfType(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucBFType)
 {
 	INT_32 i4Status = 0;
 
@@ -2681,7 +2681,7 @@ INT_32 TxBfProfileTag_TxBfType(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_DBW(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucBW)
+static INT_32 TxBfProfileTag_DBW(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucBW)
 {
 	INT_32 i4Status = 0;
 
@@ -2690,7 +2690,7 @@ INT_32 TxBfProfileTag_DBW(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfm
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_SuMu(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucSuMu)
+static INT_32 TxBfProfileTag_SuMu(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPfmuTag1, UINT_8 ucSuMu)
 {
 	INT_32 i4Status = 0;
 
@@ -2699,7 +2699,7 @@ INT_32 TxBfProfileTag_SuMu(struct net_device *prNetDev, P_PFMU_PROFILE_TAG1 prPf
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_Mem(struct net_device *prNetDev,
+static INT_32 TxBfProfileTag_Mem(struct net_device *prNetDev,
 			  P_PFMU_PROFILE_TAG1 prPfmuTag1, PUINT_8 aucMemAddrColIdx, PUINT_8 aucMemAddrRowIdx)
 {
 	INT_32 i4Status = 0;
@@ -2717,7 +2717,7 @@ INT_32 TxBfProfileTag_Mem(struct net_device *prNetDev,
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_Matrix(struct net_device *prNetDev,
+static INT_32 TxBfProfileTag_Matrix(struct net_device *prNetDev,
 			     P_PFMU_PROFILE_TAG1 prPfmuTag1,
 			     UINT_8 ucNrow,
 			     UINT_8 ucNcol, UINT_8 ucNgroup, UINT_8 ucLM, UINT_8 ucCodeBook, UINT_8 ucHtcExist)
@@ -2734,7 +2734,7 @@ INT_32 TxBfProfileTag_Matrix(struct net_device *prNetDev,
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_SNR(struct net_device *prNetDev,
+static INT_32 TxBfProfileTag_SNR(struct net_device *prNetDev,
 			  P_PFMU_PROFILE_TAG1 prPfmuTag1,
 			  UINT_8 ucSNR_STS0, UINT_8 ucSNR_STS1, UINT_8 ucSNR_STS2, UINT_8 ucSNR_STS3)
 {
@@ -2748,7 +2748,7 @@ INT_32 TxBfProfileTag_SNR(struct net_device *prNetDev,
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_SmtAnt(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucSmartAnt)
+static INT_32 TxBfProfileTag_SmtAnt(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucSmartAnt)
 {
 	INT_32 i4Status = 0;
 
@@ -2757,7 +2757,7 @@ INT_32 TxBfProfileTag_SmtAnt(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 pr
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_SeIdx(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucSeIdx)
+static INT_32 TxBfProfileTag_SeIdx(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucSeIdx)
 {
 	INT_32 i4Status = 0;
 
@@ -2766,7 +2766,7 @@ INT_32 TxBfProfileTag_SeIdx(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prP
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_RmsdThd(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucRmsdThrd)
+static INT_32 TxBfProfileTag_RmsdThd(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucRmsdThrd)
 {
 	INT_32 i4Status = 0;
 
@@ -2775,7 +2775,7 @@ INT_32 TxBfProfileTag_RmsdThd(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 p
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_McsThd(struct net_device *prNetDev,
+static INT_32 TxBfProfileTag_McsThd(struct net_device *prNetDev,
 			     P_PFMU_PROFILE_TAG2 prPfmuTag2, PUINT_8 pMCSThLSS, PUINT_8 pMCSThSSS)
 {
 	INT_32 i4Status = 0;
@@ -2790,7 +2790,7 @@ INT_32 TxBfProfileTag_McsThd(struct net_device *prNetDev,
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_TimeOut(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucTimeOut)
+static INT_32 TxBfProfileTag_TimeOut(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucTimeOut)
 {
 	INT_32 i4Status = 0;
 
@@ -2799,7 +2799,7 @@ INT_32 TxBfProfileTag_TimeOut(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 p
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_DesiredBW(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucDesiredBW)
+static INT_32 TxBfProfileTag_DesiredBW(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucDesiredBW)
 {
 	INT_32 i4Status = 0;
 
@@ -2808,7 +2808,7 @@ INT_32 TxBfProfileTag_DesiredBW(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_DesiredNc(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucDesiredNc)
+static INT_32 TxBfProfileTag_DesiredNc(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucDesiredNc)
 {
 	INT_32 i4Status = 0;
 
@@ -2817,7 +2817,7 @@ INT_32 TxBfProfileTag_DesiredNc(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2
 	return i4Status;
 }
 
-INT_32 TxBfProfileTag_DesiredNr(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucDesiredNr)
+static INT_32 TxBfProfileTag_DesiredNr(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 ucDesiredNr)
 {
 	INT_32 i4Status = 0;
 
@@ -2826,7 +2826,7 @@ INT_32 TxBfProfileTag_DesiredNr(struct net_device *prNetDev, P_PFMU_PROFILE_TAG2
 	return i4Status;
 }
 
-INT_32 TxBfProfileTagWrite(struct net_device *prNetDev,
+static INT_32 TxBfProfileTagWrite(struct net_device *prNetDev,
 			   P_PFMU_PROFILE_TAG1 prPfmuTag1, P_PFMU_PROFILE_TAG2 prPfmuTag2, UINT_8 profileIdx)
 {
 	INT_32 i4Status = 0;
@@ -2942,7 +2942,7 @@ INT_32 TxBfProfileTagWrite(struct net_device *prNetDev,
 	return i4Status;
 }
 
-INT_32 TxBfProfileTagRead(struct net_device *prNetDev, UINT_8 profileIdx, UINT_8 fgBFer)
+static INT_32 TxBfProfileTagRead(struct net_device *prNetDev, UINT_8 profileIdx, UINT_8 fgBFer)
 {
 	INT_32 i4Status = 0;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -2969,7 +2969,7 @@ INT_32 TxBfProfileTagRead(struct net_device *prNetDev, UINT_8 profileIdx, UINT_8
 	return i4Status;
 }
 
-INT_32 StaRecCmmUpdate(struct net_device *prNetDev,
+static INT_32 StaRecCmmUpdate(struct net_device *prNetDev,
 		       UINT_8 ucWlanId, UINT_8 ucBssId, UINT_8 u4Aid, UINT_8 aucMacAddr[MAC_ADDR_LEN]
 )
 {
@@ -3003,7 +3003,7 @@ INT_32 StaRecCmmUpdate(struct net_device *prNetDev,
 	return i4Status;
 }
 
-INT_32 StaRecBfUpdate(struct net_device *prNetDev,
+static INT_32 StaRecBfUpdate(struct net_device *prNetDev,
 		      STA_REC_BF_UPD_ARGUMENT rStaRecBfUpdArg, UINT_8 aucMemRow[4], UINT_8 aucMemCol[4]
 )
 {
@@ -3066,7 +3066,7 @@ INT_32 StaRecBfUpdate(struct net_device *prNetDev,
 	return i4Status;
 }
 
-INT_32 DevInfoUpdate(struct net_device *prNetDev, UINT_8 ucOwnMacIdx, UINT_8 fgBand, UINT_8 aucMacAddr[MAC_ADDR_LEN])
+static INT_32 DevInfoUpdate(struct net_device *prNetDev, UINT_8 ucOwnMacIdx, UINT_8 fgBand, UINT_8 aucMacAddr[MAC_ADDR_LEN])
 {
 	CMD_DEVINFO_ACTIVE_T rDevInfo;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -3095,7 +3095,7 @@ INT_32 DevInfoUpdate(struct net_device *prNetDev, UINT_8 ucOwnMacIdx, UINT_8 fgB
 	return i4Status;
 }
 
-INT_32 BssInfoUpdate(struct net_device *prNetDev, UINT_8 ucOwnMacIdx, UINT_8 ucBssIdx, UINT_8 ucBssId[MAC_ADDR_LEN])
+static INT_32 BssInfoUpdate(struct net_device *prNetDev, UINT_8 ucOwnMacIdx, UINT_8 ucBssIdx, UINT_8 ucBssId[MAC_ADDR_LEN])
 {
 	CMD_BSSINFO_BASIC_T rBssInfo;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -3125,7 +3125,7 @@ INT_32 BssInfoUpdate(struct net_device *prNetDev, UINT_8 ucOwnMacIdx, UINT_8 ucB
 	return i4Status;
 }
 
-INT_32 TxBfProfileDataRead(struct net_device *prNetDev,
+static INT_32 TxBfProfileDataRead(struct net_device *prNetDev,
 			   UINT_8 profileIdx, UINT_8 fgBFer, UINT_8 ucSubCarrIdxMsb, UINT_8 ucSubCarrIdxLsb)
 {
 	INT_32 i4Status = 0;
@@ -3157,7 +3157,7 @@ INT_32 TxBfProfileDataRead(struct net_device *prNetDev,
 	return i4Status;
 }
 
-INT_32 TxBfProfileDataWrite(struct net_device *prNetDev,
+static INT_32 TxBfProfileDataWrite(struct net_device *prNetDev,
 			    UINT_8 profileIdx,
 			    UINT_16 u2SubCarrIdx, UINT_16 au2Phi[6], UINT_8 aucPsi[6], UINT_8 aucDSnr[4]
 )
@@ -3224,7 +3224,7 @@ INT_32 TxBfProfileDataWrite(struct net_device *prNetDev,
 	return i4Status;
 }
 
-INT_32 TxBfProfilePnRead(struct net_device *prNetDev, UINT_8 profileIdx)
+static INT_32 TxBfProfilePnRead(struct net_device *prNetDev, UINT_8 profileIdx)
 {
 	INT_32 i4Status = 0;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -3250,7 +3250,7 @@ INT_32 TxBfProfilePnRead(struct net_device *prNetDev, UINT_8 profileIdx)
 	return i4Status;
 }
 
-INT_32 TxBfProfilePnWrite(struct net_device *prNetDev, UINT_8 profileIdx, UINT_16 u2bw, UINT_16 au2XSTS[12])
+static INT_32 TxBfProfilePnWrite(struct net_device *prNetDev, UINT_8 profileIdx, UINT_16 u2bw, UINT_16 au2XSTS[12])
 {
 	INT_32 i4Status = 0;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -3291,7 +3291,7 @@ INT_32 TxBfProfilePnWrite(struct net_device *prNetDev, UINT_8 profileIdx, UINT_1
 	return i4Status;
 }
 
-INT_32 TxBfSounding(struct net_device *prNetDev, UINT_8 ucSuMu,	/* 0/1/2/3 */
+static INT_32 TxBfSounding(struct net_device *prNetDev, UINT_8 ucSuMu,	/* 0/1/2/3 */
 		    UINT_8 ucNumSta,	/* 00~04 */
 		    UINT_8 ucSndInterval,	/* 00~FF */
 		    UINT_8 ucWLan0,	/* 00~7F */
@@ -3364,7 +3364,7 @@ INT_32 TxBfSounding(struct net_device *prNetDev, UINT_8 ucSuMu,	/* 0/1/2/3 */
 	return i4Status;
 }
 
-INT_32 TxBfSoundingStop(struct net_device *prNetDev)
+static INT_32 TxBfSoundingStop(struct net_device *prNetDev)
 {
 	INT_32 i4Status = 0;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -3390,7 +3390,7 @@ INT_32 TxBfSoundingStop(struct net_device *prNetDev)
 	return i4Status;
 }
 
-INT_32 TxBfTxApply(struct net_device *prNetDev, UINT_8 ucWlanId, UINT_8 fgETxBf, UINT_8 fgITxBf, UINT_8 fgMuTxBf)
+static INT_32 TxBfTxApply(struct net_device *prNetDev, UINT_8 ucWlanId, UINT_8 fgETxBf, UINT_8 fgITxBf, UINT_8 fgMuTxBf)
 {
 	INT_32 i4Status = 0;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -3421,7 +3421,7 @@ INT_32 TxBfTxApply(struct net_device *prNetDev, UINT_8 ucWlanId, UINT_8 fgETxBf,
 	return i4Status;
 }
 
-INT_32 TxBfPfmuMemAlloc(struct net_device *prNetDev, UINT_8 ucSuMuMode, UINT_8 ucWlanIdx)
+static INT_32 TxBfPfmuMemAlloc(struct net_device *prNetDev, UINT_8 ucSuMuMode, UINT_8 ucWlanIdx)
 {
 	INT_32 i4Status = 0;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -3449,7 +3449,7 @@ INT_32 TxBfPfmuMemAlloc(struct net_device *prNetDev, UINT_8 ucSuMuMode, UINT_8 u
 	return i4Status;
 }
 
-INT_32 TxBfPfmuMemRelease(struct net_device *prNetDev, UINT_8 ucWlanId)
+static INT_32 TxBfPfmuMemRelease(struct net_device *prNetDev, UINT_8 ucWlanId)
 {
 	INT_32 i4Status = 0;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -3475,7 +3475,7 @@ INT_32 TxBfPfmuMemRelease(struct net_device *prNetDev, UINT_8 ucWlanId)
 	return i4Status;
 }
 
-INT_32 TxBfBssInfoUpdate(struct net_device *prNetDev, UINT_8 ucOwnMacIdx, UINT_8 ucBssIdx, UINT_8 ucBssId[MAC_ADDR_LEN])
+static INT_32 TxBfBssInfoUpdate(struct net_device *prNetDev, UINT_8 ucOwnMacIdx, UINT_8 ucBssIdx, UINT_8 ucBssId[MAC_ADDR_LEN])
 {
 	INT_32 i4Status = 0;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -3514,7 +3514,7 @@ INT_32 TxBfBssInfoUpdate(struct net_device *prNetDev, UINT_8 ucOwnMacIdx, UINT_8
 /* iwpriv ra0 set assoc=[mac:hh:hh:hh:hh:hh:hh]-[wtbl:dd]-
 *[ownmac:dd]-[type:xx]-[mode:mmm]-[bw:dd]-[nss:ss]-[maxrate:kkk_dd]
 */
-INT_32 TxBfManualAssoc(struct net_device *prNetDev, UINT_8 aucMac[MAC_ADDR_LEN], UINT_8 ucType,	/* no use */
+static INT_32 TxBfManualAssoc(struct net_device *prNetDev, UINT_8 aucMac[MAC_ADDR_LEN], UINT_8 ucType,	/* no use */
 		       UINT_8 ucWtbl,
 		       UINT_8 ucOwnmac,
 		       UINT_8 ucMode,

@@ -2622,7 +2622,7 @@ int mtk_cfg80211_assoc(struct wiphy *wiphy, struct net_device *ndev, struct cfg8
 
 #if CFG_SUPPORT_NFC_BEAM_PLUS
 
-int mtk_cfg80211_testmode_get_scan_done(IN struct wiphy *wiphy, IN void *data, IN int len, IN P_GLUE_INFO_T prGlueInfo)
+static int mtk_cfg80211_testmode_get_scan_done(IN struct wiphy *wiphy, IN void *data, IN int len, IN P_GLUE_INFO_T prGlueInfo)
 {
 #define NL80211_TESTMODE_P2P_SCANDONE_INVALID 0
 #define NL80211_TESTMODE_P2P_SCANDONE_STATUS 1
@@ -3315,7 +3315,7 @@ enum regd_state regd_state_machine(IN struct regulatory_request *pRequest)
 }
 
 
-void
+static void
 mtk_apply_custom_regulatory(IN struct wiphy *pWiphy,
 							IN const struct ieee80211_regdomain *pRegdom)
 {

@@ -223,7 +223,7 @@ const UINT_16 tkipSBOX2[256] = {
 * \return (none)
 */
 /*----------------------------------------------------------------------------*/
-VOID tkipMicB(IN OUT PUINT_32 pu4L, IN OUT PUINT_32 pu4R)
+static VOID tkipMicB(IN OUT PUINT_32 pu4L, IN OUT PUINT_32 pu4R)
 {
 	ASSERT(pu4L);
 	ASSERT(pu4R);
@@ -253,7 +253,7 @@ VOID tkipMicB(IN OUT PUINT_32 pu4L, IN OUT PUINT_32 pu4R)
 * \return (none)
 */
 /*----------------------------------------------------------------------------*/
-VOID
+static VOID
 tkipMicGen(IN PUCHAR pucMickey,
 	   IN PUCHAR pucData,
 	   IN UINT_32 u4DataLen, IN PUCHAR pucSa, IN PUCHAR pucDa, IN UCHAR ucPriority, OUT PUCHAR pucMic)
@@ -346,7 +346,7 @@ tkipMicGen(IN PUCHAR pucMickey,
 * \retval NONE
 */
 /*----------------------------------------------------------------------------*/
-VOID
+static VOID
 tkipMicEncapsulate(IN PUINT_8 pucDa,
 		   IN PUINT_8 pucSa,
 		   IN UINT_8 ucPriority,
