@@ -2736,23 +2736,46 @@ mtk_cfg80211_change_station(struct wiphy *wiphy, struct net_device *ndev, const 
 	prAdapter = prGlueInfo->prAdapter;
 	prAisBssInfo = prAdapter->prAisBssInfo;
 
+	/* station_parameters and link_station_parameters were made more exclusive in Linux 6.0
+	 * https://github.com/torvalds/linux/commit/b95eb7f0eee479478eb1a7c0a42a80167708c1df */
+#if KERNEL_VERSION(6, 0, 0) <= CFG80211_VERSION_CODE
+	if (params == NULL)
+		return 0;
+	else if (params->link_sta_params.supported_rates == NULL)
+		return 0;
+#else
 	if (params == NULL)
 		return 0;
 	else if (params->supported_rates == NULL)
 		return 0;
+#endif
+	// Apparently putting preprocessor directives within a C if-else is bad style.. Gah.
 
 	/* init */
 	kalMemZero(&rCmdUpdate, sizeof(rCmdUpdate));
 	kalMemCopy(rCmdUpdate.aucPeerMac, mac, 6);
 
-	if (params->supported_rates != NULL) {
+#if KERNEL_VERSION(6, 0, 0) <= CFG80211_VERSION_CODE
+	if (params->link_sta_params.supported_rates != NULL) {
+		u4Temp = params->link_sta_params.supported_rates_len;
+		if (u4Temp > CMD_PEER_UPDATE_SUP_RATE_MAX)
+			u4Temp = CMD_PEER_UPDATE_SUP_RATE_MAX;
+		kalMemCopy(rCmdUpdate.aucSupRate, params->link_sta_params.supported_rates, u4Temp);
+		rCmdUpdate.u2SupRateLen = u4Temp;
+	}
 
+#else
+	if (params->supported_rates != NULL) {
 		u4Temp = params->supported_rates_len;
 		if (u4Temp > CMD_PEER_UPDATE_SUP_RATE_MAX)
 			u4Temp = CMD_PEER_UPDATE_SUP_RATE_MAX;
 		kalMemCopy(rCmdUpdate.aucSupRate, params->supported_rates, u4Temp);
 		rCmdUpdate.u2SupRateLen = u4Temp;
 	}
+#endif
+	// I shall follow bad style over bad...
+	// 6.  Break any of these rules sooner than [write] anything outright barbarous.
+	//		-- Orwell
 
 	/*
 	 * In supplicant, only recognize WLAN_EID_QOS 46, not 0xDD WMM
@@ -2772,8 +2795,22 @@ mtk_cfg80211_change_station(struct wiphy *wiphy, struct net_device *ndev, const 
 		rCmdUpdate.u2ExtCapLen = u4Temp;
 	}
 
-	if (params->ht_capa != NULL) {
+#if KERNEL_VERSION(6, 0, 0) <= CFG80211_VERSION_CODE
+	if (params->link_sta_params.ht_capa != NULL) {
+		rCmdUpdate.rHtCap.u2CapInfo = params->link_sta_params.ht_capa->cap_info;
+		rCmdUpdate.rHtCap.ucAmpduParamsInfo = params->link_sta_params.ht_capa->ampdu_params_info;
+		rCmdUpdate.rHtCap.u2ExtHtCapInfo = params->link_sta_params.ht_capa->extended_ht_cap_info;
+		rCmdUpdate.rHtCap.u4TxBfCapInfo = params->link_sta_params.ht_capa->tx_BF_cap_info;
+		rCmdUpdate.rHtCap.ucAntennaSelInfo = params->link_sta_params.ht_capa->antenna_selection_info;
+		kalMemCopy(rCmdUpdate.rHtCap.rMCS.arRxMask,
+			   params->link_sta_params.ht_capa->mcs.rx_mask, sizeof(rCmdUpdate.rHtCap.rMCS.arRxMask));
 
+		rCmdUpdate.rHtCap.rMCS.u2RxHighest = params->link_sta_params.ht_capa->mcs.rx_highest;
+		rCmdUpdate.rHtCap.rMCS.ucTxParams = params->link_sta_params.ht_capa->mcs.tx_params;
+		rCmdUpdate.fgIsSupHt = TRUE;
+	}
+#else
+	if (params->ht_capa != NULL) {
 		rCmdUpdate.rHtCap.u2CapInfo = params->ht_capa->cap_info;
 		rCmdUpdate.rHtCap.ucAmpduParamsInfo = params->ht_capa->ampdu_params_info;
 		rCmdUpdate.rHtCap.u2ExtHtCapInfo = params->ht_capa->extended_ht_cap_info;
@@ -2786,12 +2823,19 @@ mtk_cfg80211_change_station(struct wiphy *wiphy, struct net_device *ndev, const 
 		rCmdUpdate.rHtCap.rMCS.ucTxParams = params->ht_capa->mcs.tx_params;
 		rCmdUpdate.fgIsSupHt = TRUE;
 	}
+#endif
 	/* vht */
-
+#if KERNEL_VERSION(6, 0, 0) <= CFG80211_VERSION_CODE
+	if (params->link_sta_params.vht_capa != NULL) {
+		/* rCmdUpdate.rVHtCap */
+		/* rCmdUpdate.rVHtCap */
+	}
+#else
 	if (params->vht_capa != NULL) {
 		/* rCmdUpdate.rVHtCap */
 		/* rCmdUpdate.rVHtCap */
 	}
+#endif
 
 	/* update a TDLS peer record */
 	/* sanity check */
@@ -2841,7 +2885,7 @@ mtk_cfg80211_change_station(struct wiphy *wiphy, struct net_device *ndev, u8 *ma
 
 	if (params == NULL)
 		return 0;
-	else if (params->supported_rates == NULL)
+	else if (params->supported_rates == NULL) // This #if block's for Kernel < 3.16 ONLY
 		return 0;
 
 	/* init */
