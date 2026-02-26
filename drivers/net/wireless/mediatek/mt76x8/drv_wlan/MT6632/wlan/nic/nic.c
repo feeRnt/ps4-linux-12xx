@@ -670,7 +670,7 @@ VOID nicProcessAbnormalInterrupt(IN P_ADAPTER_T prAdapter)
 */
 /*----------------------------------------------------------------------------*/
 static VOID nicProcessFwOwnBackInterrupt(IN P_ADAPTER_T prAdapter)
-{static 
+{ 
 
 }				/* end of nicProcessFwOwnBackInterrupt() */
 
