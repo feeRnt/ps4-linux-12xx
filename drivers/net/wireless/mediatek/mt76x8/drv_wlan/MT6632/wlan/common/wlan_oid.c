@@ -11336,7 +11336,7 @@ WLAN_STATUS wlanoidResetBAScoreboard(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuf
 #define PARAM_CHANNEL           "CHANNEL"
 #define PARAM_RTT               "RTT"
 
-WLAN_STATUS
+static WLAN_STATUS
 batchSetCmd(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBufferLen, OUT PUINT_32 pu4WritenLen)
 {
 	P_CHANNEL_INFO_T prRfChannelInfo;
@@ -11528,7 +11528,7 @@ batchSetCmd(IN P_ADAPTER_T prAdapter, IN PVOID pvSetBuffer, IN UINT_32 u4SetBuff
 	return rStatus;
 }
 
-WLAN_STATUS
+static WLAN_STATUS
 batchGetCmd(IN P_ADAPTER_T prAdapter,
 	    OUT PVOID pvQueryBuffer, IN UINT_32 u4QueryBufferLen, OUT PUINT_32 pu4QueryInfoLen)
 {
