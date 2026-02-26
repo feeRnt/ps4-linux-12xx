@@ -743,6 +743,9 @@ nla_put_failure:
 	return -1;
 }
 #endif
+
+/* Not sure if this needds any changes from commit https://github.com/torvalds/linux/commit/7b0a0e3c3a88260b6fcb017e49f198463aa62ed1
+ * For Linux 6.0 and above. Probably not */
 int mtk_cfg80211_vendor_get_channel_list(struct wiphy *wiphy, struct wireless_dev *wdev, const void *data, int data_len)
 	{
 		P_GLUE_INFO_T prGlueInfo;

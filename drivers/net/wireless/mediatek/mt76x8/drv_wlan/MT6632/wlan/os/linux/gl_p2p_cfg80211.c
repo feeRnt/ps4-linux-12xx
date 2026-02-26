@@ -614,9 +614,17 @@ int mtk_p2p_cfg80211_del_iface(struct wiphy *wiphy, struct wireless_dev *wdev)
 	return 0;
 }				/* mtk_p2p_cfg80211_del_iface */
 
+/* link_id was introduced to nl80211 ops in Linux 6.0, changing many functions prototypes:
+ * https://github.com/torvalds/linux/commit/7b0a0e3c3a88260b6fcb017e49f198463aa62ed1 */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+int mtk_p2p_cfg80211_add_key(struct wiphy *wiphy,
+			     struct net_device *ndev, int link_id,
+			     u8 key_index, bool pairwise, const u8 *mac_addr, struct key_params *params)
+#else
 int mtk_p2p_cfg80211_add_key(struct wiphy *wiphy,
 			     struct net_device *ndev,
 			     u8 key_index, bool pairwise, const u8 *mac_addr, struct key_params *params)
+#endif
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 	INT_32 i4Rslt = -EINVAL;
@@ -756,12 +764,23 @@ int mtk_p2p_cfg80211_add_key(struct wiphy *wiphy,
 	return i4Rslt;
 }
 
+/* see note above about link id introduction */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+int mtk_p2p_cfg80211_get_key(struct wiphy *wiphy,
+			     struct net_device *ndev,
+			     int link_id,
+			     u8 key_index,
+			     bool pairwise,
+			     const u8 *mac_addr, void *cookie, void (*callback) (void *cookie, struct key_params *)
+)
+#else
 int mtk_p2p_cfg80211_get_key(struct wiphy *wiphy,
 			     struct net_device *ndev,
 			     u8 key_index,
 			     bool pairwise,
 			     const u8 *mac_addr, void *cookie, void (*callback) (void *cookie, struct key_params *)
 )
+#endif
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 
@@ -774,8 +793,14 @@ int mtk_p2p_cfg80211_get_key(struct wiphy *wiphy,
 	return -EINVAL;
 }
 
+/* see note above about link id introduction */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+int mtk_p2p_cfg80211_del_key(struct wiphy *wiphy,
+			     struct net_device *ndev, int link_id, u8 key_index, bool pairwise, const u8 *mac_addr)
+#else
 int mtk_p2p_cfg80211_del_key(struct wiphy *wiphy,
 			     struct net_device *ndev, u8 key_index, bool pairwise, const u8 *mac_addr)
+#endif
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 	PARAM_REMOVE_KEY_T rRemoveKey;
@@ -823,9 +848,16 @@ int mtk_p2p_cfg80211_del_key(struct wiphy *wiphy,
 	return i4Rslt;
 }
 
+/* see note above about link id introduction */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+int
+mtk_p2p_cfg80211_set_default_key(struct wiphy *wiphy,
+				 struct net_device *netdev, int link_id, u8 key_index, bool unicast, bool multicast)
+#else
 int
 mtk_p2p_cfg80211_set_default_key(struct wiphy *wiphy,
 				 struct net_device *netdev, u8 key_index, bool unicast, bool multicast)
+#endif
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 	PARAM_DEFAULT_KEY_T rDefaultKey;
@@ -886,7 +918,13 @@ mtk_p2p_cfg80211_set_default_key(struct wiphy *wiphy,
  *         others:  failure
  */
 /*----------------------------------------------------------------------------*/
+
+/* see note above about link id introduction */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+int mtk_p2p_cfg80211_set_mgmt_key(struct wiphy *wiphy, struct net_device *dev, int link_id, u8 key_index)
+#else
 int mtk_p2p_cfg80211_set_mgmt_key(struct wiphy *wiphy, struct net_device *dev, u8 key_index)
+#endif
 {
 	DBGLOG(RSN, INFO, "mtk_p2p_cfg80211_set_mgmt_key, kid:%d\n", key_index);
 
@@ -1219,7 +1257,13 @@ int mtk_p2p_cfg80211_set_txpower(struct wiphy *wiphy,
 	return -EINVAL;
 }
 
+/* link_id was introduced to get_txpower in nl80211 from Linux 6.14
+ * https://github.com/torvalds/linux/commit/7a53af85d3bbdbe06cd47b81a6d99a04dc0a3963 */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 14, 0))
+int mtk_p2p_cfg80211_get_txpower(struct wiphy *wiphy, struct wireless_dev *wdev, unsigned int link_id, int *dbm)
+#else
 int mtk_p2p_cfg80211_get_txpower(struct wiphy *wiphy, struct wireless_dev *wdev, int *dbm)
+#endif
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 
@@ -1465,8 +1509,15 @@ int mtk_p2p_cfg80211_start_ap(struct wiphy *wiphy, struct net_device *dev, struc
 
 #if (CFG_SUPPORT_DFS_MASTER == 1)
 
+/* MLO with link id was added for radar detection in Linux 6.12:
+ * https://github.com/torvalds/linux/commit/81f67d60ebf290da068af96ad0c4a4e4faebdf1d */
+#if KERNEL_VERSION(6, 12, 0) <= CFG80211_VERSION_CODE
+static int mtk_p2p_cfg80211_start_radar_detection_impl(struct wiphy *wiphy, struct net_device *dev,
+					struct cfg80211_chan_def *chandef, unsigned int cac_time_ms, int link_id)
+#else
 static int mtk_p2p_cfg80211_start_radar_detection_impl(struct wiphy *wiphy, struct net_device *dev,
 					struct cfg80211_chan_def *chandef, unsigned int cac_time_ms)
+#endif
 {
 	P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T) NULL;
 	INT_32 i4Rslt = -EINVAL;
@@ -1555,7 +1606,14 @@ static int mtk_p2p_cfg80211_start_radar_detection_impl(struct wiphy *wiphy, stru
 	return i4Rslt;
 }
 
-#if KERNEL_VERSION(3, 15, 0) <= CFG80211_VERSION_CODE
+#if KERNEL_VERSION(6, 12, 0) <= CFG80211_VERSION_CODE
+int mtk_p2p_cfg80211_start_radar_detection(struct wiphy *wiphy, struct net_device *dev,
+					struct cfg80211_chan_def *chandef, unsigned int cac_time_ms, int link_id)
+{
+	return mtk_p2p_cfg80211_start_radar_detection_impl(
+			wiphy, dev, chandef, cac_time_ms, link_id);
+}
+#elif KERNEL_VERSION(3, 15, 0) <= CFG80211_VERSION_CODE
 int mtk_p2p_cfg80211_start_radar_detection(struct wiphy *wiphy, struct net_device *dev,
 					struct cfg80211_chan_def *chandef, unsigned int cac_time_ms)
 {
@@ -1753,8 +1811,18 @@ struct cfg80211_beacon_data {
 };
 #endif
 
+/* Since Linux 6.7, cfg80211 beacon data struct has been moved into cfg80211 ap settings as a substruct:
+ * https://github.com/torvalds/linux/commit/66f85d57b7109baf8a7d5ee04049ac9412611d35 */
+#if KERNEL_VERSION(6, 7, 0) <= CFG80211_VERSION_CODE
+int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_ap_settings *params)
+#else
 int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_beacon_data *info)
+#endif
 {
+#if KERNEL_VERSION(6, 7, 0) <= CFG80211_VERSION_CODE
+	const struct cfg80211_beacon_data *info = &params->beacon;
+	// beacon_data exists at this pointer now
+#endif
 	P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T) NULL;
 	INT_32 i4Rslt = -EINVAL;
 	P_MSG_P2P_BEACON_UPDATE_T prP2pBcnUpdateMsg = (P_MSG_P2P_BEACON_UPDATE_T) NULL;
@@ -1881,6 +1949,10 @@ int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, 
 	return i4Rslt;
 }				/* mtk_p2p_cfg80211_change_beacon */
 
+/* see note above about link id introduction */
+#if KERNEL_VERSION(6, 0, 0) <= CFG80211_VERSION_CODE
+int mtk_p2p_cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *dev, unsigned int link_id)
+#else
 int mtk_p2p_cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *dev)
 {
 	P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T) NULL;
@@ -2731,10 +2803,18 @@ int mtk_p2p_cfg80211_set_channel(IN struct wiphy *wiphy, struct cfg80211_chan_de
 
 /* mtk_p2p_cfg80211_set_channel */
 
+/* see note above about link id introduction */
+#if KERNEL_VERSION(6, 0, 0) <= CFG80211_VERSION_CODE
+int
+mtk_p2p_cfg80211_set_bitrate_mask(IN struct wiphy *wiphy,
+				  IN struct net_device *dev, unsigned int link_id,
+				  IN const u8 *peer, IN const struct cfg80211_bitrate_mask *mask)
+#else
 int
 mtk_p2p_cfg80211_set_bitrate_mask(IN struct wiphy *wiphy,
 				  IN struct net_device *dev,
 				  IN const u8 *peer, IN const struct cfg80211_bitrate_mask *mask)
+#endif
 {
 	INT_32 i4Rslt = -EINVAL;
 	P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T) NULL;

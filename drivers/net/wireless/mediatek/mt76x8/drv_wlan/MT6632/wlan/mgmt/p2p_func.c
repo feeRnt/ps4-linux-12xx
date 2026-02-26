@@ -1221,8 +1221,16 @@ VOID p2pFuncDfsSwitchCh(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN 
 	prGlueInfo = prAdapter->prGlueInfo;
 
 	DBGLOG(P2P, INFO, "p2pFuncDfsSwitchCh: Update to OS\n");
+
+	/* Support for multi-link operations changed this function prototype, needs a default channel link_id (0) now
+	 * https://github.com/torvalds/linux/commit/7b0a0e3c3a88260b6fcb017e49f198463aa62ed1 */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+	cfg80211_ch_switch_notify(prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->prDevHandler,
+					prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->chandef, 0);
+#else
 	cfg80211_ch_switch_notify(prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->prDevHandler,
 					prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->chandef);
+#endif
 	DBGLOG(P2P, INFO, "p2pFuncDfsSwitchCh: Update to OS Done\n");
 
 	if (prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->chandef) {
