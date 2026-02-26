@@ -88,6 +88,14 @@
 #include "linux/kallsyms.h"
 /*#include <linux/ftrace_event.h>*/
 
+
+/* For some reason local_clock from KAL_GET_HOST_CLOCK is an implicit declaration
+ * now in Linux 6.15.4. 5.15.15 was the last build when I didn't have this error.
+ * Just include it either way for good measure.
+ * if KERNEL_VERSION(5, 15, 0) <= CFG80211_VERSION_CODE */
+#include <linux/sched/clock.h>
+/*#endif*/
+
 #if DBG
 extern int allocatedMemSize;
 #endif
