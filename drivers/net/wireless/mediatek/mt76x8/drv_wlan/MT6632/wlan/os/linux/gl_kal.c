@@ -3594,8 +3594,10 @@ BOOLEAN kalCancelTimer(IN P_GLUE_INFO_T prGlueInfo)
 	ASSERT(prGlueInfo);
 
 	clear_bit(GLUE_FLAG_TIMEOUT_BIT, &prGlueInfo->ulFlag);
-
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+/* see the change of del timer to timer delete up above */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 15, 0)
+	if (timer_delete_sync(&(prGlueInfo->tickfn).t) >= 0)
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 	if (del_timer_sync(&(prGlueInfo->tickfn).t) >= 0)
 #else
 	if (del_timer_sync(&(prGlueInfo->tickfn)) >= 0)
