@@ -1607,6 +1607,7 @@ static int mtk_p2p_cfg80211_start_radar_detection_impl(struct wiphy *wiphy, stru
 	return i4Rslt;
 }
 
+/* MLO support for radar functions starting from Linux 6.12; see os/linux/include/gl_p2p_ioctl.h */
 #if KERNEL_VERSION(6, 12, 0) <= CFG80211_VERSION_CODE
 int mtk_p2p_cfg80211_start_radar_detection(struct wiphy *wiphy, struct net_device *dev,
 					struct cfg80211_chan_def *chandef, unsigned int cac_time_ms, int link_id)
@@ -1958,6 +1959,7 @@ int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, 
 int mtk_p2p_cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *dev, unsigned int link_id)
 #else
 int mtk_p2p_cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *dev)
+#endif
 {
 	P_GLUE_INFO_T prGlueInfo = (P_GLUE_INFO_T) NULL;
 	INT_32 i4Rslt = -EINVAL;
