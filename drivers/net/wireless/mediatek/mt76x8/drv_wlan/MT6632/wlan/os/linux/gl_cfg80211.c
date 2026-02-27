@@ -3312,7 +3312,8 @@ int mtk_cfg80211_tdls_oper(struct wiphy *wiphy, struct net_device *dev,
 	kalMemZero(&rCmdOper, sizeof(rCmdOper));
 	kalMemCopy(rCmdOper.aucPeerMac, peer, 6);
 
-	rCmdOper.oper = oper;
+	rCmdOper.oper = (ENUM_TDLS_LINK_OPER)oper; // Do explicit casting of nl80211_tdls_operation to ENUM_TDLS_LINK_OPER
+						   // to fix implicit conversion compile warning
 
 	kalIoctl(prGlueInfo, TdlsexLinkOper, &rCmdOper, sizeof(TDLS_CMD_LINK_OPER_T), FALSE, FALSE, FALSE,
 		 /* FALSE,    //6628 -> 6630  fgIsP2pOid-> x */
@@ -3362,7 +3363,7 @@ bool is_world_regdom(char *alpha2)
  * first defined here*/
 
 
-enum regd_state regd_state_machine(IN struct regulatory_request *pRequest)
+static enum regd_state regd_state_machine(IN struct regulatory_request *pRequest)
 {
 	switch (pRequest->initiator) {
 	case NL80211_REGDOM_SET_BY_USER:

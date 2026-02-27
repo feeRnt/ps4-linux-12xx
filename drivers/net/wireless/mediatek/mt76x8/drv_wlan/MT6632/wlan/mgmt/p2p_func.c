@@ -214,11 +214,11 @@ VOID p2pFuncRequestScan(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_P2P
 
 				prScanReqV2->ucChannelListNum = prScanReqInfo->ucNumChannelList;
 			}
-			/* fallthrough */
+			__attribute__((__fallthrough__)); // /* fall through */ wasn't working on gcc-11
 		case SCAN_CHANNEL_FULL:
-			/* fallthrough */
+			__attribute__((__fallthrough__));
 		case SCAN_CHANNEL_2G4:
-			/* fallthrough */
+			__attribute__((__fallthrough__));
 		case SCAN_CHANNEL_P2P_SOCIAL:
 			{
 				/* UINT_8 aucP2pSsid[] = P2P_WILDCARD_SSID; */
@@ -910,7 +910,7 @@ p2pFuncSwitchOPMode(IN P_ADAPTER_T prAdapter,
 			switch (eOpMode) {
 			case OP_MODE_INFRASTRUCTURE:
 				DBGLOG(P2P, TRACE, "p2pFuncSwitchOPMode: Switch to Client.\n");
-				/* fall through */
+				__attribute__((__fallthrough__)); // /* fall through */ wasn't working on gcc-11
 			case OP_MODE_ACCESS_POINT:
 				/* Change interface address. */
 				if (eOpMode == OP_MODE_ACCESS_POINT) {

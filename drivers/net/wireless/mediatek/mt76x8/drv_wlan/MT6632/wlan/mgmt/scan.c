@@ -634,7 +634,7 @@ scanSearchExistingBssDescWithSsid(IN P_ADAPTER_T prAdapter,
 	switch (eBSSType) {
 	case BSS_TYPE_P2P_DEVICE:
 		fgCheckSsid = FALSE;
-		/* fall through */
+		__attribute__((__fallthrough__)); // /* fall through */ was not working on gcc-11
 	case BSS_TYPE_INFRASTRUCTURE:
 #if CFG_SUPPORT_ROAMING_SKIP_ONE_AP
 		scanSearchBssDescOfRoamSsid(prAdapter);

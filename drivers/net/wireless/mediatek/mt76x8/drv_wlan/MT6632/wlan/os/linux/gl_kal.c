@@ -2712,8 +2712,9 @@ int hif_thread(void *data)
 		}
 
 		/* Unlock wakelock if hif_thread going to idle */
-		if (!(prGlueInfo->ulFlag & GLUE_FLAG_HIF_PROCESS))
+		if (!(prGlueInfo->ulFlag & GLUE_FLAG_HIF_PROCESS)) {
 			KAL_WAKE_UNLOCK(prGlueInfo->prAdapter, &rHifThreadWakeLock);
+		}
 
 		/*
 		 * sleep on waitqueue if no events occurred. Event contain (1) GLUE_FLAG_INT
@@ -2817,8 +2818,9 @@ int rx_thread(void *data)
 		}
 
 		/* Unlock wakelock if rx_thread going to idle */
-		if (!(prGlueInfo->ulFlag & GLUE_FLAG_RX_PROCESS))
+		if (!(prGlueInfo->ulFlag & GLUE_FLAG_RX_PROCESS)) {
 			KAL_WAKE_UNLOCK(prGlueInfo->prAdapter, &rRxThreadWakeLock);
+		}
 
 		/*
 		 * sleep on waitqueue if no events occurred.
@@ -2920,8 +2922,9 @@ int main_thread(void *data)
 		}
 
 		/* Unlock wakelock if main_thread going to idle */
-		if (!(prGlueInfo->ulFlag & GLUE_FLAG_MAIN_PROCESS))
+		if (!(prGlueInfo->ulFlag & GLUE_FLAG_MAIN_PROCESS)) {
 			KAL_WAKE_UNLOCK(prGlueInfo->prAdapter, &rTxThreadWakeLock);
+		}
 
 		/*
 		 * sleep on waitqueue if no events occurred. Event contain (1) GLUE_FLAG_INT
