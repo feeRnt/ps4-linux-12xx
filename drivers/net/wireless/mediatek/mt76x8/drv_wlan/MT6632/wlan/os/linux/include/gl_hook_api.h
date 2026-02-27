@@ -53,6 +53,8 @@
 *    \brief  This file includes private ioctl support.
 */
 
+#include "gl_ate_agent.h"
+
 #ifndef _GL_HOOK_API_H
 #define _GL_HOOK_API_H
 #if CFG_SUPPORT_QA_TOOL
