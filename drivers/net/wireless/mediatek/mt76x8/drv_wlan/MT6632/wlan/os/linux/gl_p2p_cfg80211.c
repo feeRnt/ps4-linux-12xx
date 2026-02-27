@@ -1812,10 +1812,13 @@ struct cfg80211_beacon_data {
 };
 #endif
 
-/* Since Linux 6.7, cfg80211 beacon data struct has been moved into cfg80211 ap settings as a substruct:
- * https://github.com/torvalds/linux/commit/66f85d57b7109baf8a7d5ee04049ac9412611d35 */
+/* In Linux 6.7, cfg80211 beacon data struct was moved into cfg80211_ap_settings as a substruct:
+ * https://github.com/torvalds/linux/commit/66f85d57b7109baf8a7d5ee04049ac9412611d35
+ * Later (also in 6.7), it was moved to cfg80211 ap update:
+ * https://github.com/torvalds/linux/commit/bb55441c57ccc5cc2eab44e1a97698b9d708871d*/
 #if KERNEL_VERSION(6, 7, 0) <= CFG80211_VERSION_CODE
-int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_ap_settings *params)
+/*int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_ap_settings *params)*/
+int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_ap_update *params)
 #else
 int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_beacon_data *info)
 #endif

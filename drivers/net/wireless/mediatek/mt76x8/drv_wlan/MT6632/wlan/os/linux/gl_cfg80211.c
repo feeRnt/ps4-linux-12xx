@@ -3165,12 +3165,23 @@ int mtk_cfg80211_del_station(struct wiphy *wiphy, struct net_device *ndev, u8 *m
 * \retval WLAN_STATUS_INVALID_LENGTH
 */
 /*----------------------------------------------------------------------------*/
+
 #if KERNEL_VERSION(3, 18, 0) <= CFG80211_VERSION_CODE
+/* tdls_mgmt included link_id since Linux 6.5; see os/linux/include/gl_cfg80211.h */
+#if KERNEL_VERSION(6, 5, 0) <= CFG80211_VERSION_CODE
+int
+mtk_cfg80211_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
+		       const u8 *peer, int link_id,
+		       u8 action_code, u8 dialog_token,
+		       u16 status_code, u32 peer_capability,
+		       bool initiator, const u8 *buf, size_t len)
+#else
 int
 mtk_cfg80211_tdls_mgmt(struct wiphy *wiphy, struct net_device *dev,
 		       const u8 *peer, u8 action_code, u8 dialog_token,
 		       u16 status_code, u32 peer_capability,
 		       bool initiator, const u8 *buf, size_t len)
+#endif
 {
 	GLUE_INFO_T *prGlueInfo;
 	TDLS_CMD_LINK_MGT_T rCmdMgt;

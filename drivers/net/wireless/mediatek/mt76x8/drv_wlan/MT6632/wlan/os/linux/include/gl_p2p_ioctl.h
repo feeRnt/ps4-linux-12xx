@@ -519,11 +519,10 @@ int mtk_p2p_cfg80211_disassoc(struct wiphy *wiphy, struct net_device *dev, struc
 
 int mtk_p2p_cfg80211_start_ap(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_ap_settings *settings);
 
-/* cfg80211_beacon_data struct was moved into cfg80211_ap_settings as a substruct in Linux 6.7:
- * https://github.com/torvalds/linux/commit/66f85d57b7109baf8a7d5ee04049ac9412611d35
- * See: include/net/cfg80211.h */
+/* cfg80211_beacon_data struct was moved to cfg80211 ap update in Linux 6.7:
+ * See: include/net/cfg80211.h & os/linux/gl_p2p_cfg80211.c */
 #if KERNEL_VERSION(6, 7, 0) <= CFG80211_VERSION_CODE
-int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_ap_settings *params);
+int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_ap_update *params);
 #else
 int mtk_p2p_cfg80211_change_beacon(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_beacon_data *info);
 #endif
