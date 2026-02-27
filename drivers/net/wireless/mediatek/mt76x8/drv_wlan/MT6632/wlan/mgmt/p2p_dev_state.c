@@ -50,8 +50,9 @@
  *
  *****************************************************************************/
 #include "precomp.h"
+#include "../include/mgmt/p2p_dev_state.h"
 
-static BOOLEAN
+BOOLEAN
 p2pDevStateInit_IDLE(IN P_ADAPTER_T prAdapter,
 		     IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo, OUT P_ENUM_P2P_DEV_STATE_T peNextState)
 {
@@ -94,12 +95,12 @@ p2pDevStateInit_IDLE(IN P_ADAPTER_T prAdapter,
 	return fgIsTransition;
 }				/* p2pDevStateInit_IDLE */
 
-static VOID p2pDevStateAbort_IDLE(IN P_ADAPTER_T prAdapter)
+VOID p2pDevStateAbort_IDLE(IN P_ADAPTER_T prAdapter)
 {
 	/* Currently Aobrt IDLE do nothing. */
 }				/* p2pDevStateAbort_IDLE */
 
-static BOOLEAN
+BOOLEAN
 p2pDevStateInit_REQING_CHANNEL(IN P_ADAPTER_T prAdapter,
 			       IN UINT_8 ucBssIdx,
 			       IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo, OUT P_ENUM_P2P_DEV_STATE_T peNextState)
@@ -165,7 +166,7 @@ p2pDevStateInit_REQING_CHANNEL(IN P_ADAPTER_T prAdapter,
 	return fgIsTransition;
 }				/* p2pDevStateInit_REQING_CHANNEL */
 
-static VOID
+VOID
 p2pDevStateAbort_REQING_CHANNEL(IN P_ADAPTER_T prAdapter,
 				IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo, IN ENUM_P2P_DEV_STATE_T eNextState)
 {
@@ -189,7 +190,7 @@ p2pDevStateAbort_REQING_CHANNEL(IN P_ADAPTER_T prAdapter,
 	} while (FALSE);
 }				/* p2pDevStateAbort_REQING_CHANNEL */
 
-static VOID
+VOID
 p2pDevStateInit_CHNL_ON_HAND(IN P_ADAPTER_T prAdapter,
 			     IN P_BSS_INFO_T prP2pBssInfo,
 			     IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo, IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
@@ -216,7 +217,7 @@ p2pDevStateInit_CHNL_ON_HAND(IN P_ADAPTER_T prAdapter,
 	} while (FALSE);
 }				/* p2pDevStateInit_CHNL_ON_HAND */
 
-static VOID
+VOID
 p2pDevStateAbort_CHNL_ON_HAND(IN P_ADAPTER_T prAdapter,
 			      IN P_BSS_INFO_T prP2pBssInfo,
 			      IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo, IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo)
@@ -239,7 +240,7 @@ p2pDevStateAbort_CHNL_ON_HAND(IN P_ADAPTER_T prAdapter,
 	} while (FALSE);
 }				/* p2pDevStateAbort_CHNL_ON_HAND */
 
-static VOID p2pDevStateInit_SCAN(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo)
+VOID p2pDevStateInit_SCAN(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex, IN P_P2P_SCAN_REQ_INFO_T prScanReqInfo)
 {
 	do {
 		ASSERT_BREAK((prAdapter != NULL) && (prScanReqInfo != NULL));
@@ -250,7 +251,7 @@ static VOID p2pDevStateInit_SCAN(IN P_ADAPTER_T prAdapter, IN UINT_8 ucBssIndex,
 	} while (FALSE);
 }				/* p2pDevStateInit_CHNL_ON_HAND */
 
-static VOID p2pDevStateAbort_SCAN(IN P_ADAPTER_T prAdapter, IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo)
+VOID p2pDevStateAbort_SCAN(IN P_ADAPTER_T prAdapter, IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo)
 {
 	P_P2P_SCAN_REQ_INFO_T prScanInfo = (P_P2P_SCAN_REQ_INFO_T) NULL;
 
@@ -265,7 +266,7 @@ static VOID p2pDevStateAbort_SCAN(IN P_ADAPTER_T prAdapter, IN P_P2P_DEV_FSM_INF
 	} while (FALSE);
 }				/* p2pDevStateAbort_CHNL_ON_HAND */
 
-static BOOLEAN
+BOOLEAN
 p2pDevStateInit_OFF_CHNL_TX(IN P_ADAPTER_T prAdapter,
 			    IN P_P2P_DEV_FSM_INFO_T prP2pDevFsmInfo,
 			    IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo,
@@ -320,7 +321,7 @@ p2pDevStateInit_OFF_CHNL_TX(IN P_ADAPTER_T prAdapter,
 	return fgIsTransition;
 }				/* p2pDevSateInit_OFF_CHNL_TX */
 
-static VOID
+VOID
 p2pDevStateAbort_OFF_CHNL_TX(IN P_ADAPTER_T prAdapter,
 			     IN P_P2P_MGMT_TX_REQ_INFO_T prP2pMgmtTxInfo,
 			     IN P_P2P_CHNL_REQ_INFO_T prChnlReqInfo, IN ENUM_P2P_DEV_STATE_T eNextState)
