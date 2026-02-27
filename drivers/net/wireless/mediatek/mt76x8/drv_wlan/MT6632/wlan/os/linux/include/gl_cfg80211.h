@@ -170,6 +170,8 @@ mtk_cfg80211_change_iface(struct wiphy *wiphy,
 			  struct net_device *ndev, enum nl80211_iftype type, u32 *flags, struct vif_params *params);
 #endif
 
+/* TODO: link_id 's in this file were added only after Linux 6.0.
+ * Add #if preprocessor directives here. See os/linux/gl_cfg80211.c ; */
 int
 mtk_cfg80211_add_key(struct wiphy *wiphy,
 		     struct net_device *ndev, int link_id,

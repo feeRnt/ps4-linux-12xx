@@ -1222,11 +1222,34 @@ VOID p2pFuncDfsSwitchCh(IN P_ADAPTER_T prAdapter, IN P_BSS_INFO_T prBssInfo, IN 
 
 	DBGLOG(P2P, INFO, "p2pFuncDfsSwitchCh: Update to OS\n");
 
-	/* Support for multi-link operations changed this function prototype, needs a default channel link_id (0) now
+
+	/* chandef and other members of wireless_dev were moved to substructs in Linux 6.0
+	 * https://github.com/torvalds/linux/commit/7b0a0e3c3a88260b6fcb017e49f198463aa62ed1 */
+
+	/* #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
+	cfg80211_ch_switch_notify(prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->prDevHandler,
+					prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->links[0].ap.chandef, 0); */
+	/* However, this does not require any change on our end, because we use chandef from struct cfg80211_chan_def directly,
+	 * or from cfg80211_ap_settings->chandef, which have not changed. Search: os/linux/gl_p2p_cfg80211.c: "chandef =" */
+
+	/* GUESSUMPTIONS: We have multiple prP2PInfos, which are some internal structure for all adapter P2P "devs",
+	 * and we need to select *which* dev we want with the index [x], and prDevHandler internally translates to *wiphy
+	 * (not the cfg80211 wireless_dev's wiphy). prP2PInfo-[index] != wireless_dev->links[id] !!!
+	 * chandef is not a member of cfg80211.h wireless_dev we're accessing, but it's stored internally */
+
+	/* Support for multi-link operations changed this function prototype, needs a channel link_id (def: 0) now
 	 * https://github.com/torvalds/linux/commit/7b0a0e3c3a88260b6fcb017e49f198463aa62ed1 */
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
 	cfg80211_ch_switch_notify(prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->prDevHandler,
 					prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->chandef, 0);
+	// not sure if the default 0, or ucRoleIndex should be given, which seems to be the "ID"
+	/* prototype: *dev, *chandef, link_id ;; TODO: Around Linux 6.3, was the prototype "dev, chandef, int, int(?????)" */
+	/* Follow prev. developers' direction since they supposedly tested on Linux 6.1
+	 * TODO: Make sure this is right.*/
+
+	/* Edit: ucRoleIndex & links_id are  probably quite different. roleIndex seems to state which function a connnection is using:
+	 * AP, STA, P2P etc., whereas link_id is to state which *link* is being used in each AP, STA, or P2P. I doubt most drivers
+	 * are capable of multi-link operations at present, and definitely not a driver from 2016. Following Kernel patch guide's ideal*/
 #else
 	cfg80211_ch_switch_notify(prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->prDevHandler,
 					prGlueInfo->prP2PInfo[prP2pRoleFsmInfo->ucRoleIndex]->chandef);

@@ -480,7 +480,7 @@ struct wireless_dev *mtk_p2p_cfg80211_add_iface(struct wiphy *wiphy,
 			default:
 				DBGLOG(P2P, TRACE, "Other type :%d .\n", type);
 				prSwitchModeMsg->eOpMode = OP_MODE_P2P_DEVICE;
-				kalP2PSetRole(prGlueInfo, 0, u4Idx);
+				kalP2PSetRole(prGlueInfo, 0, u4Idx); /* Default is 0? */
 				break;
 			}
 			mboxSendMsg(prGlueInfo->prAdapter, MBOX_ID_0, (P_MSG_HDR_T) prSwitchModeMsg,
@@ -647,6 +647,7 @@ int mtk_p2p_cfg80211_add_key(struct wiphy *wiphy,
 
 	if (mtk_Netdev_To_RoleIdx(prGlueInfo, ndev, &ucRoleIdx) != 0)
 		return -EINVAL;
+	/* So RoleIdx should always be 0, even for p2p? */
 #if DBG
 	DBGLOG(RSN, TRACE, "mtk_p2p_cfg80211_add_key\n");
 	if (mac_addr) {
@@ -2135,6 +2136,7 @@ int mtk_p2p_cfg80211_mgmt_tx(struct wiphy *wiphy,
 
 		prGlueInfo = *((P_GLUE_INFO_T *) wiphy_priv(wiphy));
 		/* The owner of this function please check following line*/
+		/* Wonder if they ever did */
 		prGlueP2pInfo = (P_GL_P2P_INFO_T) prGlueInfo->prP2PInfo;
 
 		dev = wdev->netdev;

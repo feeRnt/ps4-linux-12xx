@@ -1081,8 +1081,14 @@ kalIndicateStatusAndComplete(IN P_GLUE_INFO_T prGlueInfo, IN WLAN_STATUS eStatus
 									  (ucChannelNum, KAL_BAND_5GHZ));
 				}
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4,12,0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6,0,0) // Proper 6.0 patch;
+/* See wlan/os/linux/gl_cfg80211.c  and <linux/net/cfg80211.h> cfg80211_roam_info{} */
 		roam_info.links[0].channel = prChannel;
 		roam_info.links[0].bssid = arBssid;
+#else
+		roam_info.channel = prChannel;
+		roam_info.bssid = arBssid;
+#endif
 		roam_info.req_ie =
 			prGlueInfo->aucReqIe;
 		roam_info.req_ie_len =

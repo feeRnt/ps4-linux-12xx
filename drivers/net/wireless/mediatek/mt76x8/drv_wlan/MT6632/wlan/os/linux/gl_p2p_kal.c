@@ -1313,9 +1313,16 @@ VOID kalP2PRddDetectUpdate(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex)
 		}
 
 		/* cac start disable for next cac slot if enable in dfs channel */
+
+		/* cac_started and other radio cac's were moved to links[x] substruct in Linux 6.12
+		 * https://github.com/torvalds/linux/commit/62c16f219a73c237b5bef9bd160e32fbb38794f9 */
+		#if KERNEL_VERSION(6, 12, 0) <= CFG80211_VERSION_CODE
+		prGlueInfo->prP2PInfo[ucRoleIndex]->prWdev->links[0].cac_started = FALSE;
+		#else
 		prGlueInfo->prP2PInfo[ucRoleIndex]->prWdev->cac_started = FALSE;
+		#endif
 		DBGLOG(INIT, INFO, "kalP2PRddDetectUpdate: Update to OS\n");
-		cfg80211_radar_event(prGlueInfo->prP2PInfo[ucRoleIndex]->prWdev->wiphy,
+		cfg80211_radar_event(prGlueInfo->prP2PInfo[ucRoleIndex]->prWdev->wiphy, //Notice: prWdev=wireless_device struct
 				prGlueInfo->prP2PInfo[ucRoleIndex]->chandef, GFP_KERNEL);
 		DBGLOG(INIT, INFO, "kalP2PRddDetectUpdate: Update to OS Done\n");
 
@@ -1350,7 +1357,12 @@ VOID kalP2PCacFinishedUpdate(IN P_GLUE_INFO_T prGlueInfo, IN UINT_8 ucRoleIndex)
 		}
 
 		DBGLOG(INIT, INFO, "kalP2PCacFinishedUpdate: Update to OS\n");
-#if KERNEL_VERSION(3, 14, 0) <= CFG80211_VERSION_CODE
+/* link id introduced to radar operations in Kernel 6.12
+ * https://github.com/torvalds/linux/commit/81f67d60ebf290da068af96ad0c4a4e4faebdf1d */
+#if KERNEL_VERSION(6, 12, 0) <= CFG80211_VERSION_CODE
+		cfg80211_cac_event(prGlueInfo->prP2PInfo[ucRoleIndex]->prDevHandler,
+				prGlueInfo->prP2PInfo[ucRoleIndex]->chandef, NL80211_RADAR_CAC_FINISHED, GFP_KERNEL, 0);
+#elif KERNEL_VERSION(3, 14, 0) <= CFG80211_VERSION_CODE
 		cfg80211_cac_event(prGlueInfo->prP2PInfo[ucRoleIndex]->prDevHandler,
 				prGlueInfo->prP2PInfo[ucRoleIndex]->chandef, NL80211_RADAR_CAC_FINISHED, GFP_KERNEL);
 #else

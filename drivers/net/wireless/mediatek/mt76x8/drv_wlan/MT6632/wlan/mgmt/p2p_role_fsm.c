@@ -96,7 +96,8 @@ UINT_8 p2pRoleFsmInit(IN P_ADAPTER_T prAdapter, IN UINT_8 ucRoleIdx)
 
 		kalMemZero(prP2pRoleFsmInfo, sizeof(P2P_ROLE_FSM_INFO_T));
 
-		prP2pRoleFsmInfo->ucRoleIndex = ucRoleIdx;
+		prP2pRoleFsmInfo->ucRoleIndex = ucRoleIdx; // IMPORTANT: this is links[ucRoleIndex];
+							   // should it be equated to links_id? Probably not.
 
 		prP2pRoleFsmInfo->eCurrentState = P2P_ROLE_STATE_IDLE;
 
