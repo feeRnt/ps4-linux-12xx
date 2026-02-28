@@ -172,6 +172,20 @@ static struct ps4_bridge g_bridge = {
 	.mutex = __MUTEX_INITIALIZER(g_bridge.mutex)
 };
 
+/* Function prototype declarations, to fix compilation warnings */
+void ps4_bridge_mode_set(struct drm_bridge *bridge,
+			 const struct drm_display_mode *mode,
+			 const struct drm_display_mode *adjusted_mode);
+
+int ps4_bridge_get_modes(struct drm_connector *connector);
+
+enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
+		bool force);
+
+int ps4_bridge_register(struct drm_connector *connector,
+			     struct drm_encoder *encoder);
+
+
 static void cq_init(struct i2c_cmdqueue *q, u8 code)
 {
 	q->req.code = code;
@@ -671,14 +685,14 @@ static void ps4_bridge_post_disable(struct drm_bridge *bridge)
  * Other CEA modes *should* work (and are allowed if externally added) */
 
 /* 1 - 640x480@60Hz */
-static const struct drm_display_mode mode_480p = {
+static const struct drm_display_mode mode_480p __maybe_unused = {
 	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 		 752, 800, 0, 480, 490, 492, 525, 0,
 		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
 	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
 };
 /* 4 - 1280x720@60Hz */
-static const struct drm_display_mode mode_720p = {
+static const struct drm_display_mode mode_720p __maybe_unused = {
 	DRM_MODE("1280x720", DRM_MODE_TYPE_DRIVER, 74250, 1280, 1390,
 		 1430, 1650, 0, 720, 725, 730, 750, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
