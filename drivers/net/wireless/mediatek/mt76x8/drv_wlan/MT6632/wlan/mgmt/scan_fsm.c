@@ -94,10 +94,13 @@ UINT_8 g_aucScanChannelMDRDY[SCN_SCAN_DONE_PRINT_BUFFER_LENGTH];
 *                           P R I V A T E   D A T A
 ********************************************************************************
 */
+
+#if 0
 static PUINT_8 apucDebugScanState[SCAN_STATE_NUM] = {
 	(PUINT_8) DISP_STRING("IDLE"),
 	(PUINT_8) DISP_STRING("SCANNING"),
 };
+#endif /* DBG */
 
 /*******************************************************************************
 *                                 M A C R O S
@@ -134,8 +137,9 @@ VOID scnFsmSteps(IN P_ADAPTER_T prAdapter, IN ENUM_SCAN_STATE_T eNextState)
 	prScanParam = &prScanInfo->rScanParam;
 
 	do {
-		DBGLOG(SCN, STATE, "[SCAN]TRANSITION: [%s] -> [%s]\n",
-			apucDebugScanState[prScanInfo->eCurrentState], apucDebugScanState[eNextState]);
+		/* DBGLOG(SCN, STATE, "[SCAN]TRANSITION: [%s] -> [%s]\n",
+			apucDebugScanState[prScanInfo->eCurrentState], apucDebugScanState[eNextState]); */
+		/* This debug log causes excessive spam in Kernel Ring Buffer (dmesg); disable for now. */
 
 		/* NOTE(Kevin): This is the only place to change the eCurrentState(except initial) */
 		prScanInfo->eCurrentState = eNextState;
