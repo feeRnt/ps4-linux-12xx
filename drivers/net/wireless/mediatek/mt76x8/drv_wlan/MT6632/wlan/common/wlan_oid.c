@@ -4922,7 +4922,8 @@ wlanSendSetQueryExtCmd(IN P_ADAPTER_T prAdapter,
 	}
 	/* increase command sequence number */
 	ucCmdSeqNum = nicIncreaseCmdSeqNum(prAdapter);
-	DBGLOG(REQ, TRACE, "ucCmdSeqNum =%d\n", ucCmdSeqNum);
+	/* DBGLOG(REQ, TRACE, "ucCmdSeqNum =%d\n", ucCmdSeqNum); */
+	/* This debug log MIGHT cause excessive spam in Kernel Ring Buffer (dmesg); disable for now. */
 
 	/* Setup common CMD Info Packet */
 	prCmdInfo->eCmdType = COMMAND_TYPE_NETWORK_IOCTL;
@@ -9060,7 +9061,8 @@ wlanSendSetQueryCmd(IN P_ADAPTER_T prAdapter,
 	}
 	/* increase command sequence number */
 	ucCmdSeqNum = nicIncreaseCmdSeqNum(prAdapter);
-	DBGLOG(REQ, TRACE, "ucCmdSeqNum =%d\n", ucCmdSeqNum);
+	/* DBGLOG(REQ, TRACE, "ucCmdSeqNum =%d\n", ucCmdSeqNum); */
+	/* This debug log causes excessive spam in Kernel Ring Buffer (dmesg); disable for now. */
 
 	/* Setup common CMD Info Packet */
 	prCmdInfo->eCmdType = COMMAND_TYPE_NETWORK_IOCTL;
