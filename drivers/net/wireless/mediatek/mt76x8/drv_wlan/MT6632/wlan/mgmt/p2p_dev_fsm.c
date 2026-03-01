@@ -53,7 +53,7 @@
 #include "p2p_dev_state.h"
 #if CFG_ENABLE_WIFI_DIRECT
 
-#if 1
+#if 0
 /*lint -save -e64 Type mismatch */
 static PUINT_8 apucDebugP2pDevState[P2P_DEV_STATE_NUM] = {
 	(PUINT_8) DISP_STRING("P2P_DEV_STATE_IDLE"),
@@ -329,8 +329,9 @@ p2pDevFsmStateTransition(IN P_ADAPTER_T prAdapter,
 		fgIsLeaveState = fgIsLeaveState ? FALSE : TRUE;
 
 		if (!fgIsLeaveState) {
-			DBGLOG(P2P, STATE, "[P2P_DEV]TRANSITION: [%s] -> [%s]\n",
-			       apucDebugP2pDevState[prP2pDevFsmInfo->eCurrentState], apucDebugP2pDevState[eNextState]);
+			/* DBGLOG(P2P, STATE, "[P2P_DEV]TRANSITION: [%s] -> [%s]\n",
+			       apucDebugP2pDevState[prP2pDevFsmInfo->eCurrentState], apucDebugP2pDevState[eNextState]); */
+			/* This debug log causes excessive spam in Kernel Ring Buffer (dmesg); disable for now. */
 
 			/* Transition into current state. */
 			prP2pDevFsmInfo->eCurrentState = eNextState;
