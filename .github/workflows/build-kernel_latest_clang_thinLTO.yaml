@@ -1,20 +1,20 @@
 ## This is a basic workflow to help you get started with Actions 
 ## Adapted from https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
 
-name: "Compile PS4-Linux Kernel-12xx; Clang Version: Latest"
+name: "Compile PS4-Linux Kernel-12xx; Clang Thin LTO Version: Latest"
 
 # Controls when the workflow will run
 on:
   # Allows you to run this workflow manually from the Github Actions tab
   workflow_dispatch:
-  push:
+  #push: # Trigger manually for now
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   build:
     env: 
        GITHUB_TOKEN: ${{ github.token }}
-    runs-on: ubuntu-latest # Ubuntu 24.04. But Docker image I use is Ubuntu 22.04 
+    runs-on: ubuntu-latest # Ubuntu 24.04. Docker Image is the same ver. now
     steps: 
       - name: Set up cache env vars
         id: cache-workspace-vars
@@ -362,7 +362,7 @@ jobs:
                      # Macro for all the LLVM specific switches. 1 = whatever LLVM present
                      # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
                      # We ignore 1 core because full LTO runs OOM, even with 10 G swap (would be 3/4 cores)
-                     #
+                     # Even for thin LTOs and other compilations, keeping one spare proc is a nice idea.
                      #HOSTCC=gcc-11 \
                      #CC=gcc-11"
           mkdir -p ${GCE_BUILD_DIR}
@@ -390,8 +390,10 @@ jobs:
           make ${MAKE_OPTS} modules_install
           echo "Copying bzImage to $GCE_INSTALL_DIR/boot. . ."
           cp arch/x86/boot/bzImage "$GCE_INSTALL_DIR/boot/"
+          echo "Copying used .config to $GCE_INSTALL_DIR/.config. . ."
+          cp .config "$GCE_INSTALL_DIR/.config"
           cd ${GCE_INSTALL_DIR}
-          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion".tar.gz boot/bzImage lib/modules/* --owner=0 --group=0
+          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion".tar.gz boot/bzImage lib/modules/* .config --owner=0 --group=0
           # I assume it'll never package the kernel, unless the compile succeeds, since -e is set
 
           ## GCE = Google Compute Engine, adapted from 
@@ -400,7 +402,7 @@ jobs:
           
           # Now in runner.
           
-          echo "Were we killed by an out of memory DAeMON?"
+          #echo "Were we killed by an out of memory DAeMON?"
           #dmesg | grep -i -E 'killed process|out of memory' "dmesg: read kernel buffer failed: Operation not permitted"
 
           echo -e "\n\n\n Current system resources outside of Docker : : :"
@@ -408,9 +410,8 @@ jobs:
           echo "RAM: `free -h`"
           echo "Disk: `df -h`"
           echo "CPU info: `lscpu | grep 'Model name'`"
-          echo "System max memory: `cat /sys/fs/cgroup/memory.max`"
 
-          echo -e "\n\n\n Here's our full dmesg: "
+          #echo -e "\n\n\n Here's our full dmesg: "
           #dmesg "dmesg: read kernel buffer failed: Operation not permitted"
         
           cd ${{ github.workspace }}/kernel-source-host 
@@ -438,8 +439,7 @@ jobs:
       - name: Upload kernel image to github actions artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang
-
+          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang_thinLTO
           path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
           # This path is the github actiions root
 

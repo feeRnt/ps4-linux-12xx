@@ -1,13 +1,13 @@
 ## This is a basic workflow to help you get started with Actions 
 ## Adapted from https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
 
-name: "Compile PS4-Linux Kernel-12xx; Unified Version: Latest"
+name: "Compile PS4-Linux Kernel-12xx; Clang Full LTO Version: Latest"
 
 # Controls when the workflow will run
 on:
   # Allows you to run this workflow manually from the Github Actions tab
   workflow_dispatch:
-  push:
+  #push: # Trigger manually for now
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -285,7 +285,7 @@ jobs:
           # regex: regex to match annotation, file: capture group that has file name
           # line: capture group that gives the line number, column: capture group for column number
           # severity: capture group that states if error or warning, message: capture group that has problem msg
-
+      
       #- name: Set up Swapfile in workspace outside Docker
       #  id: setup-workspace-swap
       #  run: |
@@ -297,7 +297,7 @@ jobs:
       #    echo "Current system memory after activating swap: "
       #    free -h
       #
-      #    This gives::: swapon: /home/runner/work/ps4-linux-12xx/ps4-linux-12xx/swapfile:
+      #    This gives::: swapon: /home/runner/work/ps4-linux-12xx/ps4-linux-12xx/swapfile: 
       #    swapon failed: Operation not permitted
 
       - name: Set up Swapfile with Marketplace Actions
@@ -324,7 +324,7 @@ jobs:
           set -e
           echo "Testing if host directory mounting was successful."
           ls -a .
-
+          
           for _pers_files in persistence_test*; do
             [ -f "$_pers_files" ] && _persisted=1 && break
           done
@@ -355,12 +355,16 @@ jobs:
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
           export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
           export KERNEL_PKG=kernel-${localversion}.tar.gz
-          export MAKE_OPTS="-j`nproc` \
+          export MAKE_OPTS="-j`nproc --ignore=1` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
-                     HOSTCC=gcc-11 \
-                     CC=gcc-11"
-
+                     LLVM=1"
+                     # Macro for all the LLVM specific switches. 1 = whatever LLVM present
+                     # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
+                     # We ignore 1 core because full LTO runs OOM, even with 10 G swap (would be 3/4 cores)
+                     #
+                     #HOSTCC=gcc-11 \
+                     #CC=gcc-11"
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
           mkdir -p ${GCE_PKG_DIR}
@@ -372,6 +376,7 @@ jobs:
           echo "RAM: `free -h`"
           echo "Disk: `df -h`"
           echo "CPU info: `lscpu | grep 'Model name'`"
+          #echo "System max memory: `cat /sys/fs/cgroup/memory.max`" ;; No such file or dir
 
 
           make ${MAKE_OPTS} olddefconfig
@@ -397,13 +402,20 @@ jobs:
           EOF
           
           # Now in runner.
+          
+          #echo "Were we killed by an out of memory DAeMON?"
+          #dmesg | grep -i -E 'killed process|out of memory' "dmesg: read kernel buffer failed: Operation not permitted"
 
           echo -e "\n\n\n Current system resources outside of Docker : : :"
           echo "CPU cores: `nproc`"
           echo "RAM: `free -h`"
           echo "Disk: `df -h`"
           echo "CPU info: `lscpu | grep 'Model name'`"
+          #echo "System max memory: `cat /sys/fs/cgroup/memory.max`"
 
+          #echo -e "\n\n\n Here's our full dmesg: "
+          #dmesg "dmesg: read kernel buffer failed: Operation not permitted"
+        
           cd ${{ github.workspace }}/kernel-source-host 
           echo "Available files in runner after docker compile..."
           ls -la
@@ -429,7 +441,7 @@ jobs:
       - name: Upload kernel image to github actions artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_GCC-11
+          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang_fullLTO
           path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
           # This path is the github actiions root
 
@@ -457,7 +469,19 @@ jobs:
           echo "There was a cache hit for github workspace, and we just completed the kernel compilation. Hence deleting the old cache."
           gh cache delete --repo ${{ github.repository }} ${{ steps.cache-restore-workspace.outputs.cache-primary-key }}
 
-      #- Delete swap file is not necessary, as we never include it in our cache path.
+      #- name: Delete swapfile
+      #  id: delete-workspace-swapfile
+      #  run: |
+      #    echo "Deleting old swap"
+      #    # swapoff /swapfile
+      #    # rm /swapfile
+      #    # Doesn't work either:: "swapoff: Not superuser."
+      #    #
+      #    # rm ${{ github.workspace }}/swapfile
+      #    # pierotofy action uses /swapfile for swap
+      #    # Deletes happen at each run of the action, but doing it manually.
+      #    # Don't want GitHub knocking at household entrance --> nevermind, 
+      #    # just don't include it in cache
 
       - name: Save Cache of Github Workspace
         uses: actions/cache/save@v4

@@ -13,7 +13,7 @@ jobs:
   build:
     env: 
        GITHUB_TOKEN: ${{ github.token }}
-    runs-on: ubuntu-latest # Ubuntu 24.04. But Docker image I use is Ubuntu 22.04 
+    runs-on: ubuntu-latest # Ubuntu 24.04. Docker Image is same ver. now
     steps: 
       - name: Set up cache env vars
         id: cache-workspace-vars
