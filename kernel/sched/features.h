@@ -23,6 +23,13 @@ SCHED_FEAT(RUN_TO_PARITY, true)
  * current.
  */
 SCHED_FEAT(PREEMPT_SHORT, true)
+/*
+ * Allow preemption of tasks with a higher BORE penalty by tasks with a lower
+ * penalty, using the PREEMPT_SHORT mechanism.
+ */
+#ifdef CONFIG_SCHED_BORE
+SCHED_FEAT(PREEMPT_SHORT_BORE, true)
+#endif /* CONFIG_SCHED_BORE */
 
 /*
  * Prefer to schedule the task we woke last (assuming it failed
