@@ -7,7 +7,7 @@ name: "Compile PS4-Linux Kernel-12xx; Clang Thin LTO Version: Latest"
 on:
   # Allows you to run this workflow manually from the Github Actions tab
   workflow_dispatch:
-  #push: # Trigger manually for now
+  push: # Prefer triggering manually for now
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -377,6 +377,9 @@ jobs:
           echo "Disk: `df -h`"
           echo "CPU info: `lscpu | grep 'Model name'`"
           echo "System max memory: `cat /sys/fs/cgroup/memory.max`"
+
+          # Enable Thin LTO from the config
+          scripts/config --set-str CONFIG_LTO_CLANG_THIN "y"
 
           make ${MAKE_OPTS} olddefconfig
           make ${MAKE_OPTS} prepare

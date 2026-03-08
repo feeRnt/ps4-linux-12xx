@@ -378,6 +378,8 @@ jobs:
           echo "CPU info: `lscpu | grep 'Model name'`"
           #echo "System max memory: `cat /sys/fs/cgroup/memory.max`" ;; No such file or dir
 
+          # Enable Full LTO from the config (should be redundant as FullLTO is already set)
+          scripts/config --set-str CONFIG_LTO_CLANG_FULL "y"
 
           make ${MAKE_OPTS} olddefconfig
           make ${MAKE_OPTS} prepare
