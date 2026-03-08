@@ -39,7 +39,7 @@ While the CUH-1216/1215 models are definitively known to have the Torus 2 models
 CUH-1003  | Phat  - Aeolia | ? | *6.15.4; [probably non-built in firmware version](#builtin-fw-anchor)* |
 CUH-1004A | Phat - Aeolia | Marvell 88w8797 (Torus 1) | *6.15.4; [non-built in firmware version](#builtin-fw-anchor)* |
 CUH-1116A | Phat - Aeolia | ? | *6.15.4* |
-CUH-2215B | ~~Pro - Baikal~~ (Incorrect Model Provided?) | ? | *5.4.247* |
+CUH-2215B | Slim - Baikal | ? | *5.4.247* |
 CUH-2216A | Slim - Baikal B1 | MediaTek 7668 | *5.4.247* |
 CUH-2216A | Slim - Belize | MediaTek 7668 | *5.15.15* |
 CUH-7116B | Pro - Baikal B1 | ? | *5.4.247* |
