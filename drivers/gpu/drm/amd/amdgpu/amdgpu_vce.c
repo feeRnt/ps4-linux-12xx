@@ -47,6 +47,7 @@
 #define FIRMWARE_KAVERI	"amdgpu/kaveri_vce.bin"
 #define FIRMWARE_HAWAII	"amdgpu/hawaii_vce.bin"
 #define FIRMWARE_MULLINS	"amdgpu/mullins_vce.bin"
+#define FIRMWARE_LIVERPOOL	"amdgpu/liverpool_vce.bin"
 #endif
 #define FIRMWARE_TONGA		"amdgpu/tonga_vce.bin"
 #define FIRMWARE_CARRIZO	"amdgpu/carrizo_vce.bin"
@@ -67,6 +68,7 @@ MODULE_FIRMWARE(FIRMWARE_KABINI);
 MODULE_FIRMWARE(FIRMWARE_KAVERI);
 MODULE_FIRMWARE(FIRMWARE_HAWAII);
 MODULE_FIRMWARE(FIRMWARE_MULLINS);
+MODULE_FIRMWARE(FIRMWARE_LIVERPOOL);
 #endif
 MODULE_FIRMWARE(FIRMWARE_TONGA);
 MODULE_FIRMWARE(FIRMWARE_CARRIZO);
@@ -118,6 +120,9 @@ int amdgpu_vce_sw_init(struct amdgpu_device *adev, unsigned long size)
 		break;
 	case CHIP_MULLINS:
 		fw_name = FIRMWARE_MULLINS;
+		break;
+	case CHIP_LIVERPOOL:
+		fw_name = FIRMWARE_LIVERPOOL;
 		break;
 #endif
 	case CHIP_TONGA:
@@ -869,6 +874,7 @@ int amdgpu_vce_ring_parse_cs(struct amdgpu_cs_parser *p,
 #ifdef CONFIG_DRM_AMDGPU_CIK
 			case CHIP_KAVERI:
 			case CHIP_MULLINS:
+			/* case CHIP_LIVERPOOL: */ /* Maybe Liverpool and Gladius don't need this HW config */
 #endif
 			case CHIP_CARRIZO:
 				break;
