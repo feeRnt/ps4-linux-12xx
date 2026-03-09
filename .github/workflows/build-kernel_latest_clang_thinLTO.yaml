@@ -354,7 +354,7 @@ jobs:
           export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
           export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
-          export KERNEL_PKG=kernel-${localversion}.tar.gz
+          export KERNEL_PKG=kernel-${localversion}_Clang_thinLTO.tar.gz
           export MAKE_OPTS="-j`nproc --ignore=1` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
@@ -379,7 +379,8 @@ jobs:
           echo "System max memory: `cat /sys/fs/cgroup/memory.max`"
 
           # Enable Thin LTO from the config
-          scripts/config --set-str CONFIG_LTO_CLANG_THIN "y"
+          scripts/config --set-str CONFIG_LTO_CLANG_FULL n
+          scripts/config --set-str CONFIG_LTO_CLANG_THIN y
 
           make ${MAKE_OPTS} olddefconfig
           make ${MAKE_OPTS} prepare
@@ -396,7 +397,7 @@ jobs:
           echo "Copying used .config to $GCE_INSTALL_DIR/.config. . ."
           cp .config "$GCE_INSTALL_DIR/.config"
           cd ${GCE_INSTALL_DIR}
-          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion".tar.gz boot/bzImage lib/modules/* .config --owner=0 --group=0
+          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion"_Clang_thinLTO.tar.gz boot/bzImage lib/modules/* .config --owner=0 --group=0
           # I assume it'll never package the kernel, unless the compile succeeds, since -e is set
 
           ## GCE = Google Compute Engine, adapted from 
@@ -440,11 +441,12 @@ jobs:
           echo "localversion=$localversion" >> $GITHUB_OUTPUT
 
       - name: Upload kernel image to github actions artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang_thinLTO
-          path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
-          # This path is the github actiions root
+          path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang_thinLTO.tar.gz
+          # This path is the github actions root
+          archive: false
 
       # - name: Delete the kernel image artifact from workspace
       #  run: |
