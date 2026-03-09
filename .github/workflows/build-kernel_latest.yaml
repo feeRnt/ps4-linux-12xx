@@ -374,8 +374,8 @@ jobs:
           echo "CPU info: `lscpu | grep 'Model name'`"
 
           # Disable LTO from the config (this is redundant with GCC)
-          scripts/config --set-str CONFIG_LTO_CLANG_FULL n
-          scripts/config --set-str CONFIG_LTO_NONE y
+          scripts/config --disable CONFIG_LTO_CLANG_FULL
+          scripts/config --enable CONFIG_LTO_NONE
 
           make ${MAKE_OPTS} olddefconfig
           make ${MAKE_OPTS} prepare

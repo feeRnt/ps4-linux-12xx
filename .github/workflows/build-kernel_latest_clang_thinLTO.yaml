@@ -379,8 +379,8 @@ jobs:
           echo "System max memory: `cat /sys/fs/cgroup/memory.max`"
 
           # Enable Thin LTO from the config
-          scripts/config --set-str CONFIG_LTO_CLANG_FULL n
-          scripts/config --set-str CONFIG_LTO_CLANG_THIN y
+          scripts/config --disable CONFIG_LTO_CLANG_FULL
+          scripts/config --enable CONFIG_LTO_CLANG_THIN
 
           make ${MAKE_OPTS} olddefconfig
           make ${MAKE_OPTS} prepare
