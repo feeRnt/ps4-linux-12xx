@@ -360,13 +360,20 @@ jobs:
           export MAKE_OPTS="-j`nproc --ignore=1` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
-                     LLVM=1"
+                     LLVM=1 \
+                     KCPPFLAGS='-march=btver2 -mtune=btver2 -O3' \
+                     KAFLAGS='-march=btver2 -mtune=btver2 -O3' \
+                     KCFLAGS='-march=btver2 -mtune=btver2 -O3'"
                      # Macro for all the LLVM specific switches. 1 = whatever LLVM present
                      # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
                      # We ignore 1 core because full LTO runs OOM, even with 10 G swap (would be 3/4 cores)
                      # Even for thin LTOs and other compilations, keeping one spare proc is a nice idea.
-                     #HOSTCC=gcc-11 \
-                     #CC=gcc-11"
+
+                     # march and mtune optimize the the build instructions
+                     # march = oldest architecture on which this code can run
+                     # mtune = compiler hint for which architecture the instructions should be
+                     # optimized for. The PS4 CPU architecture was based on btver2,
+                     # also known as the AMD Jaguar architecture
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
           mkdir -p ${GCE_PKG_DIR}
