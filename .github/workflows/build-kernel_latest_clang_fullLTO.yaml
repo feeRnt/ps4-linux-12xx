@@ -7,7 +7,9 @@ name: "Compile PS4-Linux Kernel-12xx; Clang Full LTO Version: Latest"
 on:
   # Allows you to run this workflow manually from the Github Actions tab
   workflow_dispatch:
-  #push: # Trigger manually for now
+  push: # Prefer triggering manually for now
+    tags:
+      - 'v*' # Will build on any tag that starts with v: v5.15.15, etc.
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
