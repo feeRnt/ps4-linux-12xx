@@ -7,6 +7,7 @@ name: "Compile PS4-Linux Kernel-12xx; Unified Version: Latest - Ignore Errors"
 on:
   # Allows you to run this workflow manually from the Github Actions tab
   workflow_dispatch:
+  #push:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -315,6 +316,19 @@ jobs:
           echo "persisting! $(date --iso=s)" > persistence_test_"$(date --iso=s)".txt: 
           echo "files available after test..."
           ls -a
+
+          # copy extra firmware to /lib/firmware
+
+          echo "Extra firmware copy part"
+
+          if [ -d extra_firmware ]; then
+            if [ ! -z "$( ls -A 'extra_firmware/')" ]; then
+              echo "Copying extra firmware to /lib/firmware"
+              cp -r extra_firmware/* /lib/firmware
+            fi
+          fi
+          echo "Extra firmware available:"
+          find /lib/firmware
 
           export localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'`
           # Removes everything up to =, and then the '"' and '-' 
