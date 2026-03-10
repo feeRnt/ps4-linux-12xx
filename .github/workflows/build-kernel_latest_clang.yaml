@@ -386,12 +386,13 @@ jobs:
           # We don't know if -O3 will help, but really anything will help
           # considering our target hardware was aging when it was new
 
-          export MAKE_OPTS="-j`nproc` \
+          export MAKE_OPTS="-j`nproc --ignore=1` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
                      LLVM=1"
                      # Macro for all the LLVM specific switches. 1 = whatever LLVM present
                      # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
+                     # Ignore 1 core in hopes of fixing memory, realloc or other weird bugs
 
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
