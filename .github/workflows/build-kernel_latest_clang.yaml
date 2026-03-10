@@ -342,6 +342,19 @@ jobs:
           echo "files available after test..."
           ls -a
 
+          # copy extra firmware to /lib/firmware
+
+          echo "Extra firmware copy part"
+
+          if [ -d extra_firmware ]; then
+            if [ ! -z "$( ls -A 'extra_firmware/')" ]; then
+              echo "Copying extra firmware to /lib/firmware"
+              cp -r extra_firmware/* /lib/firmware
+            fi
+          fi
+          echo "Extra firmware available:"
+          find /lib/firmware
+
           export localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'`
           # Removes everything up to =, and then the '"' and '-' 
           # Using uppercase localversion will mess with your final kernel img version.
@@ -487,6 +500,8 @@ jobs:
         run: |
           echo "There was a cache hit for github workspace, and we just completed the kernel compilation. Hence deleting the old cache."
           gh cache delete --repo ${{ github.repository }} ${{ steps.cache-restore-workspace.outputs.cache-primary-key }}
+
+      #- Delete swap file is not necessary, as we never include it in our cache path.
 
       #- name: Delete swapfile
       #  id: delete-workspace-swapfile
