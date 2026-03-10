@@ -4,6 +4,7 @@
 
 #include "aeolia.h"
 
+int apcie_uart_init(struct apcie_dev *sc); /* Don't know why the compiler complains about prototypes despite the definition*/
 void apcie_uart_remove(struct apcie_dev *sc);
 
 int apcie_uart_init(struct apcie_dev *sc)
@@ -49,6 +50,9 @@ void apcie_uart_remove(struct apcie_dev *sc)
 }
 
 #ifdef CONFIG_PM
+void apcie_uart_suspend(struct apcie_dev *sc, pm_message_t state);
+void apcie_uart_resume(struct apcie_dev *sc);
+
 void apcie_uart_suspend(struct apcie_dev *sc, pm_message_t state)
 {
 	int i;
