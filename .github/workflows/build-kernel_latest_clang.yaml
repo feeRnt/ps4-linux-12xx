@@ -1,7 +1,7 @@
 ## This is a basic workflow to help you get started with Actions 
 ## Adapted from https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
 
-name: "Compile PS4-Linux Kernel-12xx; Clang Thin LTO Version: Latest"
+name: "Compile PS4-Linux Kernel-12xx; Clang Version: Latest"
 
 # Controls when the workflow will run
 on:
@@ -305,8 +305,8 @@ jobs:
       - name: Set up Swapfile with Marketplace Actions
         uses: pierotofy/set-swap-space@fc79b3f67fa8a838184ce84a674ca12238d2c761
         with:
-          swap-size-gb: 12
-          # Tried 10 G, didn't work for full LTO
+          swap-size-gb: 4
+          # Unnecessary but keeping anyway== or should I? Uh. Change to 4 GB
 
       - name: Compile the linux kernel with docker run
         id: compile-kernel-step
@@ -356,7 +356,7 @@ jobs:
           export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
           export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
-          export KERNEL_PKG=kernel-${localversion}_Clang_thinLTO.tar.gz
+          export KERNEL_PKG=kernel-${localversion}_Clang.tar.gz
 
           export KCFLAGS="-march=btver2 -mtune=btver2 -O3"
           export KAFLAGS="-march=btver2 -mtune=btver2 -O3"
@@ -373,14 +373,12 @@ jobs:
           # We don't know if -O3 will help, but really anything will help
           # considering our target hardware was aging when it was new
 
-          export MAKE_OPTS="-j`nproc --ignore=1` \
+          export MAKE_OPTS="-j`nproc` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
                      LLVM=1"
                      # Macro for all the LLVM specific switches. 1 = whatever LLVM present
                      # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
-                     # We ignore 1 core because full LTO runs OOM, even with 10 G swap (would be 3/4 cores)
-                     # Even for thin LTOs and other compilations, keeping one spare proc is a nice idea.
 
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
@@ -393,11 +391,11 @@ jobs:
           echo "RAM: `free -h`"
           echo "Disk: `df -h`"
           echo "CPU info: `lscpu | grep 'Model name'`"
-          echo "System max memory: `cat /sys/fs/cgroup/memory.max`"
+          #echo "System max memory: `cat /sys/fs/cgroup/memory.max`" ;; No such file or dir
 
-          # Enable Thin LTO from the config
-          scripts/config --disable CONFIG_LTO_CLANG_FULL
-          scripts/config --enable CONFIG_LTO_CLANG_THIN
+          # Enable Full LTO from the config (should be redundant as FullLTO is already set)
+          #scripts/config --enable CONFIG_LTO_CLANG_FULL --- LTO doesn't exist in 5.4, unless
+          # you try some sort of experimental build
 
           make ${MAKE_OPTS} olddefconfig
           make ${MAKE_OPTS} prepare
@@ -414,7 +412,7 @@ jobs:
           echo "Copying used .config to $GCE_INSTALL_DIR/.config. . ."
           cp .config "$GCE_INSTALL_DIR/.config"
           cd ${GCE_INSTALL_DIR}
-          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion"_Clang_thinLTO.tar.gz boot/bzImage lib/modules/* .config --owner=0 --group=0
+          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion"_Clang.tar.gz boot/bzImage lib/modules/* .config --owner=0 --group=0
           # I assume it'll never package the kernel, unless the compile succeeds, since -e is set
 
           ## GCE = Google Compute Engine, adapted from 
@@ -431,6 +429,7 @@ jobs:
           echo "RAM: `free -h`"
           echo "Disk: `df -h`"
           echo "CPU info: `lscpu | grep 'Model name'`"
+          #echo "System max memory: `cat /sys/fs/cgroup/memory.max`"
 
           #echo -e "\n\n\n Here's our full dmesg: "
           #dmesg "dmesg: read kernel buffer failed: Operation not permitted"
@@ -460,8 +459,8 @@ jobs:
       - name: Upload kernel image to github actions artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang_thinLTO
-          path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang_thinLTO.tar.gz
+          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang
+          path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}_Clang.tar.gz
           # This path is the github actions root
           archive: false
 

@@ -303,8 +303,7 @@ jobs:
       - name: Set up Swapfile with Marketplace Actions
         uses: pierotofy/set-swap-space@fc79b3f67fa8a838184ce84a674ca12238d2c761
         with:
-          swap-size-gb: 12
-          # Tried 10 G, didn't work for full LTO
+          swap-size-gb: 4
 
       - name: Compile the linux kernel with docker run
         id: compile-kernel-step
@@ -403,8 +402,9 @@ jobs:
           echo "CPU info: `lscpu | grep 'Model name'`"
 
           # Disable LTO from the config (this is redundant with GCC)
-          scripts/config --disable CONFIG_LTO_CLANG_FULL
-          scripts/config --enable CONFIG_LTO_NONE
+          #scripts/config --disable CONFIG_LTO_CLANG_FULL
+          #scripts/config --enable CONFIG_LTO_NONE
+          # LTO isn't available with 5.4, unless using experimental build
 
           make ${MAKE_OPTS} olddefconfig
           make ${MAKE_OPTS} prepare
