@@ -7,6 +7,11 @@
 #define ICC_MAX_READ_DATA 0xff
 #define ICC_MAX_WRITE_DATA 0xf8
 
+u32 icc_i2c_functionality(struct i2c_adapter *adap);
+int icc_i2c_init(struct apcie_dev *sc);
+void icc_i2c_remove(struct apcie_dev *sc);
+
+
 /* This is actually multiple nested variable length structures, but since we
  * currently only support one op per transaction, we hardcode it. */
 struct icc_i2c_msg {

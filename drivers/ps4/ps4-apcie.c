@@ -68,20 +68,20 @@ static void apcie_config_msi(struct apcie_dev *sc, u32 func, u32 subfunc,
 
 	glue_clear_mask(sc, APCIE_REG_MSI_CONTROL, APCIE_REG_MSI_CONTROL_ENABLE);
 	/* Unknown */
-	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI(0x8), 0xffffffff);
+	sc_dbg("glue_write32 to offset, value (%px, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI(0x8), 0xffffffff);
 	glue_write32(sc, APCIE_REG_MSI(0x8), 0xffffffff);
 	/* Unknown */
-	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI(0xc + (func << 2)), 0xB7FFFF00 + func * 16);
+	sc_dbg("glue_write32 to offset, value (%px, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI(0xc + (func << 2)), 0xB7FFFF00 + func * 16);
 	glue_write32(sc, APCIE_REG_MSI(0xc + (func << 2)), 0xB7FFFF00 + func * 16);
 
-	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI_ADDR(func), addr);
+	sc_dbg("glue_write32 to offset, value (%px, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI_ADDR(func), addr);
 	glue_write32(sc, APCIE_REG_MSI_ADDR(func), addr);
 	/* Unknown */
 
-	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI(0xcc + (func << 2)), 0);
+	sc_dbg("glue_write32 to offset, value (%px, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI(0xcc + (func << 2)), 0);
 	glue_write32(sc, APCIE_REG_MSI(0xcc + (func << 2)), 0);
 
-	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI_DATA_HI(func),  data & 0xffe0);
+	sc_dbg("glue_write32 to offset, value (%px, %08x, %08x)\n", sc->bar4, APCIE_REG_MSI_DATA_HI(func),  data & 0xffe0);
 	glue_write32(sc, APCIE_REG_MSI_DATA_HI(func), data & 0xffe0);
 
 	if (func < 4) {
@@ -98,7 +98,7 @@ static void apcie_config_msi(struct apcie_dev *sc, u32 func, u32 subfunc,
 		offset = 0xa0 + ((func - 5) << 4) + (subfunc << 2);
 	}
 
-	sc_dbg("glue_write32 to offset, value (%08x, %08x, %08x)\n", sc->bar4,  APCIE_REG_MSI_DATA_LO(offset), data & 0x1f);
+	sc_dbg("glue_write32 to offset, value (%px, %08x, %08x)\n", sc->bar4,  APCIE_REG_MSI_DATA_LO(offset), data & 0x1f);
 	glue_write32(sc, APCIE_REG_MSI_DATA_LO(offset), data & 0x1f);
 
 	if (func == AEOLIA_FUNC_ID_PCIE)
@@ -164,7 +164,7 @@ static void apcie_msi_calc_mask(struct irq_data *data) {
 static void apcie_irq_msi_compose_msg(struct irq_data *data,
 				       struct msi_msg *msg)
 {
-	struct irq_cfg *cfg = irqd_cfg(data);
+	struct irq_cfg *cfg __maybe_unused = irqd_cfg(data);
 
 	memset(msg, 0, sizeof(*msg));
 	msg->address_hi = X86_MSI_BASE_ADDRESS_HIGH;
@@ -351,7 +351,7 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	//info.msi_dev = sc->pdev;
 	info.devid = pci_dev_id(sc->pdev);
 
-	int i, base = 0;
+	/*int i, base = 0; -- unused */
 	struct msi_desc *desc;
 	struct device* bare_dev = &sc->pdev->dev;
 
@@ -372,7 +372,7 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	info.desc = desc;
 	info.data = sc;
 
-	dev_info(&dev->dev, "apcie_assign_irqs(%d) (%d)\n", nvec, info.hwirq);
+	dev_info(&dev->dev, "apcie_assign_irqs(%d) (%ld)\n", nvec, info.hwirq);
 
 	ret = irq_domain_alloc_irqs(sc->irqdomain, nvec, NUMA_NO_NODE, &info);
 	if (ret >= 0) {
@@ -561,8 +561,8 @@ static int apcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 	apcie_initialized = true;
 	return 0;
 
-remove_uart:
-	apcie_uart_remove(sc);
+/* remove_uart:
+	apcie_uart_remove(sc); -- Should work, but dead label*/
 remove_glue:
 	apcie_glue_remove(sc);
 free_bars:

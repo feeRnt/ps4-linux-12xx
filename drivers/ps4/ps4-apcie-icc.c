@@ -36,6 +36,14 @@ int icc_pwrbutton_init(struct apcie_dev *sc);
 void icc_pwrbutton_remove(struct apcie_dev *sc);
 void icc_pwrbutton_trigger(struct apcie_dev *sc, int state);
 
+void resetUsbPort(void); /* resetUsb used only in this file; maybe that should change */
+void resetBtWlan(void);
+
+void do_icc_init(void);
+void icc_reboot(void);
+int apcie_icc_init(struct apcie_dev *sc);
+void apcie_icc_remove(struct apcie_dev *sc);
+
 #define ICC_MAJOR	'I'
 
  struct icc_cmd {
@@ -297,7 +305,7 @@ int apcie_icc_cmd(u8 major, u16 minor, const void *data, u16 length,
 }
 EXPORT_SYMBOL_GPL(apcie_icc_cmd);
 
-void resetUsbPort(void)
+__maybe_unused void resetUsbPort(void)
 {
 	u8 off = 0, on = 1;
 	u8 resp[20];
@@ -324,7 +332,8 @@ void resetUsbPort(void)
 
 void resetBtWlan(void)
 {
-	u8 off = 2, on = 3;
+	/* u8 off = 2; uncomment for disabling Bt/Wlan */
+	u8 on = 3;
 	u8 resp[20];
 	int ret;
 	

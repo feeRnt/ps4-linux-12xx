@@ -1,6 +1,12 @@
 #include <linux/input.h>
 #include "aeolia.h"
 
+/* Prototype declarations */
+void icc_pwrbutton_trigger(struct apcie_dev *sc, int state);
+int icc_pwrbutton_init(struct apcie_dev *sc);
+void icc_pwrbutton_remove(struct apcie_dev *sc);
+/* ---------------------- */ //this file just felt very empty at the top hence the comments
+
 void icc_pwrbutton_trigger(struct apcie_dev *sc, int state)
 {
 	if (sc->icc.pwrbutton_dev) {
