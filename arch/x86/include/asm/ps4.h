@@ -6,12 +6,14 @@
  * as published by the Free Software Foundation; version 2
  * of the License.
  */
+
 #ifndef _ASM_X86_PS4_H
 #define _ASM_X86_PS4_H
 
-#ifdef CONFIG_X86_PS4
-
 #include <linux/irqdomain.h>
+#include <linux/pci.h>
+
+#ifdef CONFIG_X86_PS4
 
 #define PS4_DEFAULT_TSC_FREQ 1594000000
 
