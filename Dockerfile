@@ -1,7 +1,7 @@
 # State an OS to use with from
 # https://hub.docker.com/search?categories=Operating+systems
 #FROM ubuntu:22.04 AS build-env ## Ubuntu 22.04's Clang (v14) is too old for Kernel 6.15
-FROM ubuntu:22.04 AS build-env
+FROM ubuntu:24.04 AS build-env
 
 # Inherit everything from this first build stage onto this second stage:
 # We can have all the commands in one single stage/directive, but this is cleaner and useful
@@ -39,7 +39,7 @@ ENV TZ=Etc/UTC
 RUN <<"EOF"
 #DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get update did not work.
 apt-get update
-apt-get install build-essential clang lld llvm wget git -y
+apt-get install build-essential clang clang-17 lld lld-17 llvm llvm-17 wget git -y
 # I think llvm meta package is not needed for Kernel build. Nevermind it is.
 # Me: Are you 100% sure llvm-ar is in clang package? AI: I am 100% sure
 # Results:

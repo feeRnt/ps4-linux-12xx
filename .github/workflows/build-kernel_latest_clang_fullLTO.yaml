@@ -1,7 +1,9 @@
 ## This is a basic workflow to help you get started with Actions 
 ## Adapted from https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
 
-name: "Compile PS4-Linux Kernel-12xx; Clang Version: Latest"
+name: "Compile PS4-Linux Kernel-12xx; Clang Full LTO Version: Latest"
+# This is actually not fullLTO.. Just keeping it here so it's invokable
+# from GH Actions tab.
 
 # Controls when the workflow will run
 on:
@@ -16,7 +18,7 @@ jobs:
   build:
     env: 
        GITHUB_TOKEN: ${{ github.token }}
-    runs-on: ubuntu-latest # Ubuntu 24.04. Docker Image is v22.04 though
+    runs-on: ubuntu-latest # Ubuntu 24.04. Docker Image is the same ver. now
     steps: 
       - name: Set up cache env vars
         id: cache-workspace-vars
@@ -75,6 +77,18 @@ jobs:
           #Which is set in the buildx build launch parameters
 
           key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}  # Cache key
+          # IMPORTANT: Preventing duplicate Docker caches.
+
+          # GH Caches are only visible between parent->child, main->any branches.
+          # This means if you make a Docker cache in a random branch, it will not be usable
+          # outside of that branch, unless the outside is an offspring.
+          # Child->parent caches are not shared, neither are sibling->sibling branch caches.
+          # https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#restrictions-for-accessing-a-cache
+
+          # So make sure to have your Dockerfile's image run & cached through your main branch, and that it does not
+          # vary across branches. Even if you need different Docker Image versions for older build-tools, get the highest
+          # img version and download your backdated tools in Docker, and select which version to use during .yaml build.
+
           restore-keys: |
             ${{ runner.os }}-docker-
       
@@ -91,8 +105,9 @@ jobs:
         with:
           path: ${{ github.workspace }}/kernel-source-host
           #key:  ${{ env.cache-workspace-restore-key }}
-          key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}
-      
+          key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}-Clang
+          # Use 1 key per LTO-ness. They're only about ~500-800 MB, and without this concurrent builds get confused
+
       - name: Check and make kernel-source-host directory
         run: | 
           cd ${{ github.workspace }}
@@ -306,7 +321,7 @@ jobs:
         uses: pierotofy/set-swap-space@fc79b3f67fa8a838184ce84a674ca12238d2c761
         with:
           swap-size-gb: 4
-          # Unnecessary but keeping anyway== or should I? Uh. Change to 4 GB
+          # Don't need much for plain Clang
 
       - name: Compile the linux kernel with docker run
         id: compile-kernel-step
@@ -389,10 +404,21 @@ jobs:
           export MAKE_OPTS="-j`nproc` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
-                     LLVM=1"
-                     # Macro for all the LLVM specific switches. 1 = whatever LLVM present
+                     CC=clang-17 LD=ld.lld-17 AR=llvm-ar-17 NM=llvm-nm-17 STRIP=llvm-strip-17 \
+                     OBJCOPY=llvm-objcopy-17 OBJDUMP=llvm-objdump-17 OBJSIZE=llvm-size-17 \
+                     READELF=llvm-readelf-17 HOSTCC=clang-17 HOSTCXX=clang++-17 HOSTAR=llvm-ar-17 \
+                     HOSTLD=ld.lld-17"
+
+                     #LLVM=-17" # Kernel 5.4 does not support this -version system described below. Assign manually
+                     # Macro for all the LLVM specific switches. 1/0 = whatever LLVM present
                      # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
-                     # Ignore 1 core in hopes of fixing memory, realloc or other weird bugs?
+                     # We might ignore 1 core because full LTO runs OOM, even with 10 G swap (would be 3/4 cores)
+
+                     # Bug in LLVM-18 (the default for Ubuntu 24.04) causes compile error in ipv6 stack for kernel 5.4.
+                     # Use 17 here. Newer LLVM might just break the build as well. Even if it doesn't break the build,
+                     # using LLVM 20 on the old Kernel 5.4, might just introduce some strange bugs. Let's just spend
+                     # a little extra time to download LLVM-17 everywhere, and use it for Kernel 5.4 for now,
+                     # until we actually have a unified latest 6.15+ kernel for all models.
 
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
@@ -503,7 +529,6 @@ jobs:
           gh cache delete --repo ${{ github.repository }} ${{ steps.cache-restore-workspace.outputs.cache-primary-key }}
 
       #- Delete swap file is not necessary, as we never include it in our cache path.
-
       #- name: Delete swapfile
       #  id: delete-workspace-swapfile
       #  run: |
