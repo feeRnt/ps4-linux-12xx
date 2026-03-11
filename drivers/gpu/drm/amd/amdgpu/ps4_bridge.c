@@ -710,7 +710,8 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 {
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *newmode;
-	DRM_DEBUG_KMS("ps4_bridge_get_modes\n");
+	/* This is usually excessive logging for most */
+	pr_debug("ps4_bridge_get_modes\n");
 
 	newmode = drm_mode_duplicate(dev, &mode_1080p);
 	drm_mode_probed_add(connector, newmode);
