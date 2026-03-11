@@ -402,7 +402,9 @@ jobs:
 
                      # Error in 5.15.15 build with LLVM 18:
                      # ld.lld: error: version script assignment of 'LINUX_2.6' to symbol '__vdso_sgx_enter_enclave' failed: symbol not defined
-                     # This needs < LLVM-18 too. Hopefully *17 toolchain fixes it.
+                     # This needs < LLVM-18 too. Hopefully *17 toolchain fixes it. It doesn't but the fix is trivial enough for a patch.
+                     # It seems the automatic fix would've required required LLVM-15 or lower. I think it's best to fix it either how,
+                     # and using a higher LLVM if possible might be better in the long run for performance. Stick with 17, patch the error.
 
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
