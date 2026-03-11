@@ -390,10 +390,19 @@ jobs:
           export MAKE_OPTS="-j`nproc --ignore=1` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
-                     LLVM=1"
+                     CC=clang-17 LD=ld.lld-17 AR=llvm-ar-17 NM=llvm-nm-17 STRIP=llvm-strip-17 \
+                     OBJCOPY=llvm-objcopy-17 OBJDUMP=llvm-objdump-17 OBJSIZE=llvm-size-17 \
+                     READELF=llvm-readelf-17 HOSTCC=clang-17 HOSTCXX=clang++-17 HOSTAR=llvm-ar-17 \
+                     HOSTLD=ld.lld-17"
+                     #LLVM=-17" # Kernel 5.15.15 does not seem to support this -version system described below. Assign manually
+
                      # Macro for all the LLVM specific switches. 1 = whatever LLVM present
                      # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
                      # We ignore 1 core because full LTO runs OOM, even with 10 G swap (would be 3/4 cores)
+
+                     # Error in 5.15.15 build with LLVM 18:
+                     # ld.lld: error: version script assignment of 'LINUX_2.6' to symbol '__vdso_sgx_enter_enclave' failed: symbol not defined
+                     # This needs < LLVM-18 too. Hopefully *17 toolchain fixes it.
 
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
