@@ -75,6 +75,18 @@ jobs:
           #Which is set in the buildx build launch parameters
 
           key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}  # Cache key
+          # IMPORTANT: Preventing duplicate Docker caches.
+
+          # GH Caches are only visible between parent->child, main->any branches.
+          # This means if you make a Docker cache in a random branch, it will not be usable
+          # outside of that branch, unless the outside is an offspring.
+          # Child->parent caches are not shared, neither are sibling->sibling branch caches.
+          # https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#restrictions-for-accessing-a-cache
+
+          # So make sure to have your Dockerfile's image run & cached through your main branch, and that it does not
+          # vary across branches. Even if you need different Docker Image versions for older build-tools, get the highest
+          # img version and download your backdated tools in Docker, and select which version to use during .yaml build.
+
           restore-keys: |
             ${{ runner.os }}-docker-
       
@@ -91,7 +103,9 @@ jobs:
         with:
           path: ${{ github.workspace }}/kernel-source-host
           #key:  ${{ env.cache-workspace-restore-key }}
-          key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}
+          key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}-Clang-fullLTO
+          # Use 1 key per LTO-ness. They're only about ~500-800 MB, and without this concurrent builds get confused
+
       
       - name: Check and make kernel-source-host directory
         run: | 
@@ -438,15 +452,13 @@ jobs:
           echo "Available files in runner after docker compile..."
           ls -la
           echo "compile-kernel-complete=true" >> $GITHUB_OUTPUT
-          #We just want to ensure that we reached the end of this stage before deleting the old cached rud run.
+          #We just want to ensure that we reached the end of this stage before deleting the old cached run.
           
           set -e
           # Reset exit on fail. Not needed but proof of concept
 
       - name: Remove compile error problem-matching
         run: echo "::remove-matcher owner=kernel-compile-docker::"
-
-
 
       - name: Get kernel version name env
         id: kernel-version-env

@@ -75,6 +75,18 @@ jobs:
           #Which is set in the buildx build launch parameters
 
           key: ${{ runner.os }}-docker-${{ hashFiles('**/Dockerfile') }}  # Cache key
+          # IMPORTANT: Preventing duplicate Docker caches.
+
+          # GH Caches are only visible between parent->child, main->any branches.
+          # This means if you make a Docker cache in a random branch, it will not be usable
+          # outside of that branch, unless the outside is an offspring.
+          # Child->parent caches are not shared, neither are sibling->sibling branch caches.
+          # https://docs.github.com/en/actions/reference/workflows-and-actions/dependency-caching#restrictions-for-accessing-a-cache
+
+          # So make sure to have your Dockerfile's image run & cached through your main branch, and that it does not
+          # vary across branches. Even if you need different Docker Image versions for older build-tools, get the highest
+          # img version and download your backdated tools in Docker, and select which version to use during .yaml build.
+
           restore-keys: |
             ${{ runner.os }}-docker-
       
@@ -91,8 +103,9 @@ jobs:
         with:
           path: ${{ github.workspace }}/kernel-source-host
           #key:  ${{ env.cache-workspace-restore-key }}
-          key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}
-      
+          key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}-Clang-thinLTO
+          # Use 1 key per LTO-ness. They're only about ~500-800 MB, and without this concurrent builds get confused
+
       - name: Check and make kernel-source-host directory
         run: | 
           cd ${{ github.workspace }}
@@ -305,8 +318,8 @@ jobs:
       - name: Set up Swapfile with Marketplace Actions
         uses: pierotofy/set-swap-space@fc79b3f67fa8a838184ce84a674ca12238d2c761
         with:
-          swap-size-gb: 12
-          # Tried 10 G, didn't work for full LTO
+          swap-size-gb: 8
+          # Tried 10 G, didn't work for full LTO; not rly needed for thinLTO
 
       - name: Compile the linux kernel with docker run
         id: compile-kernel-step
