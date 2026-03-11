@@ -2464,7 +2464,7 @@ void baikal_pcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr)
 	dev_info(dev, "Baikal SATA EFUSE VALUE: 0x%02x:0x%02x:0x%02x:0x%02x:0x%02x:0x%02x\n", v16, v17, 0, 0, 0, 0);
 	r_mem = ctlr->r_mem;
 	is_mem = r_mem->r_bustag;
-	bar_addr = r_mem->r_bushandle;
+	bar_addr = (__int64)r_mem->r_bushandle;
 	bar_and_offset_0x20A0 = (unsigned __int32 *)(bar_addr + 0x20A0);
 	v22 = bpcie_ahci_read(ctlr->r_mem, 0x20A0);
 
@@ -3470,7 +3470,7 @@ LABEL_153:
 	*v117 = v120;
 LABEL_154:
 	v180 = ctlr_->r_mem;
-	v181 = v180->r_bushandle;
+	v181 = (__int64)v180->r_bushandle;
 	v182 = (unsigned int *)(v181 + 8256);
 	if ( v180->r_bustag )
 	{
@@ -3488,7 +3488,7 @@ LABEL_154:
 	__outdword((unsigned __int16)v182, v183);
 LABEL_158:
 	v186 = ctlr_->r_mem;
-	v187 = v186->r_bushandle;
+	v187 = (__int64)v186->r_bushandle;
 	v188 = (unsigned int *)(v187 + 8256);
 	if ( v186->r_bustag )
 	{
@@ -3506,7 +3506,7 @@ LABEL_158:
 	__outdword((unsigned __int16)v188, v189);
 LABEL_162:
 	v192 = ctlr_->r_mem;
-	v193 = v192->r_bushandle;
+	v193 = (__int64)v192->r_bushandle;
 	v194 = (unsigned int *)(v193 + 8256);
 	if ( v192->r_bustag )
 	{
@@ -3524,7 +3524,7 @@ LABEL_162:
 	__outdword((unsigned __int16)v194, v195);
 LABEL_166:
 	v198 = ctlr_->r_mem;
-	v199 = v198->r_bushandle;
+	v199 = (__int64)v198->r_bushandle;
 	v200 = (unsigned int *)(v199 + 8256);
 	if ( v198->r_bustag )
 	{
@@ -3544,7 +3544,7 @@ LABEL_170:
 	if ( get_subsys_id() != 0x30100 )
 		goto LABEL_179;
 	v204 = ctlr_->r_mem;
-	v205 = v204->r_bushandle;
+	v205 = (__int64)v204->r_bushandle;
 	v206 = (unsigned int *)(v205 + 8232);
 	if ( v204->r_bustag )
 	{
@@ -3562,7 +3562,7 @@ LABEL_170:
 	__outdword((unsigned __int16)v206, v207);
 LABEL_175:
 	v210 = ctlr_->r_mem;
-	v211 = v210->r_bushandle;
+	v211 = (__int64)v210->r_bushandle;
 	v212 = (unsigned int *)(v211 + 8260);
 	if ( v210->r_bustag )
 	{
@@ -3580,7 +3580,7 @@ LABEL_175:
 	__outdword((unsigned __int16)v212, v213);
 LABEL_179:
 	v216 = ctlr_->r_mem;
-	v217 = v216->r_bushandle;
+	v217 = (__int64)v216->r_bushandle;
 	v218 = (unsigned int *)(v217 + 8220);
 	if ( v216->r_bustag )
 	{
@@ -3598,7 +3598,7 @@ LABEL_179:
 	__outdword((unsigned __int16)v218, v219);
 LABEL_183:
 	v222 = ctlr_->r_mem;
-	v223 = v222->r_bushandle;
+	v223 = (__int64)v222->r_bushandle;
 	v224 = (unsigned int *)(v223 + 8412);
 	if ( v222->r_bustag )
 	{
@@ -3616,7 +3616,7 @@ LABEL_183:
 	__outdword((unsigned __int16)v224, v225);
 LABEL_187:
 	v228 = ctlr_->r_mem;
-	v229 = v228->r_bushandle;
+	v229 = (__int64)v228->r_bushandle;
 	v230 = (unsigned int *)(v229 + 8228);
 	if ( v228->r_bustag )
 	{
@@ -3689,7 +3689,7 @@ LABEL_210:
 	else
 		__outdword((unsigned __int16)v245, 1u);
 	v246 = ctlr_->r_mem;
-	v247 = v246->r_bushandle;
+	v247 = (__int64)v246->r_bushandle;
 	v248 = (unsigned int *)(v247 + 184);
 	if ( v246->r_bustag )
 	{
@@ -3707,7 +3707,7 @@ LABEL_210:
 	__outdword((unsigned __int16)v248, v249);
 LABEL_217:
 	v252 = ctlr_->r_mem;
-	v253 = v252->r_bushandle;
+	v253 = (__int64)v252->r_bushandle;
 	v254 = (unsigned int *)(v253 + 0x118);
 	if ( v252->r_bustag )
 	{

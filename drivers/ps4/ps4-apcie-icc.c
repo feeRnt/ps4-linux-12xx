@@ -296,21 +296,21 @@ static void bpcie_init_usb(struct apcie_dev *sc, int usb_no) {
 
 	offset = usb_no ? 0x68 : 0x64;
 
-	addr = sc->bar2 + BPCIE_USB_BASE + offset;
-	value_to_write = ioread32(addr) | 1;
-	iowrite32(value_to_write, addr);
+	addr = (u32)sc->bar2 + BPCIE_USB_BASE + offset;
+	value_to_write = ioread32((void *)addr) | 1;
+	iowrite32(value_to_write, (void *)addr);
 
 	offset = usb_no ? 0x28 : 0x24;
 
-	addr = sc->bar2 + BPCIE_USB_BASE + offset;
-	value_to_write = ioread32(addr) | 1;
-	iowrite32(value_to_write, addr);
+	addr = (u32)sc->bar2 + BPCIE_USB_BASE + offset;
+	value_to_write = ioread32((void *)addr) | 1;
+	iowrite32(value_to_write, (void *)addr);
 
 	offset = usb_no ? 0x68 : 0x64;
 
-	addr = sc->bar2 + BPCIE_USB_BASE + offset;
-	value_to_write = ioread32(addr) | ~1;
-	iowrite32(value_to_write, addr);
+	addr = (u32)sc->bar2 + BPCIE_USB_BASE + offset;
+	value_to_write = ioread32((void *)addr) | ~1;
+	iowrite32(value_to_write, (void *)addr);
 	//TODO: ??? MISSING TODO. Missing something? Important?
 }
 
