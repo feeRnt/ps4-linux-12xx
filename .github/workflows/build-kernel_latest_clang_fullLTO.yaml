@@ -404,12 +404,12 @@ jobs:
           export MAKE_OPTS="-j`nproc` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
-                     CC=clang-17 LD=ld.lld-17 AR=llvm-ar-17 NM=llvm-nm-17 STRIP=llvm-strip-17 \
-                     OBJCOPY=llvm-objcopy-17 OBJDUMP=llvm-objdump-17 OBJSIZE=llvm-size-17 \
-                     READELF=llvm-readelf-17 HOSTCC=clang-17 HOSTCXX=clang++-17 HOSTAR=llvm-ar-17 \
-                     HOSTLD=ld.lld-17"
+                     CC=clang-14 LD=ld.lld-14 AR=llvm-ar-14 NM=llvm-nm-14 STRIP=llvm-strip-14 \
+                     OBJCOPY=llvm-objcopy-14 OBJDUMP=llvm-objdump-14 OBJSIZE=llvm-size-14 \
+                     READELF=llvm-readelf-14 HOSTCC=clang-14 HOSTCXX=clang++-14 HOSTAR=llvm-ar-14 \
+                     HOSTLD=ld.lld-14"
 
-                     #LLVM=-17" # Kernel 5.4 does not support this -version system described below. Assign manually
+                     #LLVM=-14" # Kernel 5.4 does not support this -version system described below. Assign manually
                      # Macro for all the LLVM specific switches. 1/0 = whatever LLVM present
                      # Otherwise you may specify the major version (e.g. LLVM=-14) of the LLVM installation
                      # We might ignore 1 core because full LTO runs OOM, even with 10 G swap (would be 3/4 cores)
@@ -419,6 +419,9 @@ jobs:
                      # using LLVM 20 on the old Kernel 5.4, might just introduce some strange bugs. Let's just spend
                      # a little extra time to download LLVM-17 everywhere, and use it for Kernel 5.4 for now,
                      # until we actually have a unified latest 6.15+ kernel for all models.
+
+                     # Actually, use LLVM 14 for now, as 5.15 doesn't compile without 14.. 5.4 slipped through the cracks,
+                     # but it's risky to risk unknown bugs.
 
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
