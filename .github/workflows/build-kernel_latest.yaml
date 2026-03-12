@@ -348,8 +348,9 @@ jobs:
           export MAKE_OPTS="-j`nproc` \
                      INSTALL_PATH=${GCE_INSTALL_DIR}/boot \
                      INSTALL_MOD_PATH=${GCE_INSTALL_DIR} \
-                     HOSTCC=gcc-11 \
-                     CC=gcc-11"
+                     LLVM=1"
+                     #HOSTCC=gcc-11 \
+                     #CC=gcc-11"
           mkdir -p ${GCE_BUILD_DIR}
           mkdir -p ${GCE_INSTALL_DIR}/boot
           mkdir -p ${GCE_PKG_DIR}
