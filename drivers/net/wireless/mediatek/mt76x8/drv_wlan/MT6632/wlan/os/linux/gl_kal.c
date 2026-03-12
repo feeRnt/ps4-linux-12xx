@@ -82,6 +82,8 @@
 #include <net/checksum.h>
 #include <net/ip6_checksum.h>
 
+#include <linux/etherdevice.h>
+
 /*******************************************************************************
 *                              C O N S T A N T S
 ********************************************************************************
@@ -599,7 +601,12 @@ VOID kalUpdateMACAddress(IN P_GLUE_INFO_T prGlueInfo, IN PUINT_8 pucMacAddr)
 	ASSERT(pucMacAddr);
 
 	if (UNEQUAL_MAC_ADDR(prGlueInfo->prDevHandler->dev_addr, pucMacAddr))
+		/* dev_addr access&write api change since 5.16; see os/linux/gl_bow.c: */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0))
+		eth_hw_addr_set(prGlueInfo->prDevHandler, pucMacAddr); /*PARAM_MAC_ADDR_LEN = ETH_ALEN = 6 */
+#else
 		memcpy(prGlueInfo->prDevHandler->dev_addr, pucMacAddr, PARAM_MAC_ADDR_LEN);
+#endif
 
 }
 

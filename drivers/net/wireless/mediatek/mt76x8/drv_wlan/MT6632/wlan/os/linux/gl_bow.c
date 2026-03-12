@@ -78,6 +78,8 @@
 #include <linux/poll.h>
 #include "bss.h"
 
+#include <linux/etherdevice.h>
+
 #if CFG_ENABLE_BT_OVER_WIFI
 
 /*******************************************************************************
@@ -1095,10 +1097,18 @@ BOOLEAN kalInitBowDevice(IN P_GLUE_INFO_T prGlueInfo, IN const char *prDevName)
 		/* 1.2 fill hardware address */
 		COPY_MAC_ADDR(rMacAddr, prAdapter->rMyMacAddr);
 		rMacAddr[0] |= 0x2;	/* change to local administrated address */
-		kalMemCopy(prGlueInfo->rBowInfo.prDevHandler->dev_addr, rMacAddr, ETH_ALEN);
-		kalMemCopy(prGlueInfo->rBowInfo.prDevHandler->perm_addr,
-			   prGlueInfo->rBowInfo.prDevHandler->dev_addr, ETH_ALEN);
 
+/* dev_addr access&write api change since 5.16:
+ * https://github.com/torvalds/linux/commit/349f631da4e1bdcb1b4a2a3ee630d689bfe6724d
+ * https://github.com/torvalds/linux/commit/48eab831ae8b9f7002a533fa4235eed63ea1f1a3
+ * https://github.com/aircrack-ng/rtl8812au/pull/1089 */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0))
+		eth_hw_addr_set(prGlueInfo->rBowInfo.prDevHandler, rMacAddr); /* prDevHandler is probably the net_device struct */
+#else
+		kalMemCopy(prGlueInfo->rBowInfo.prDevHandler->dev_addr, rMacAddr, ETH_ALEN);
+#endif
+		kalMemCopy(prGlueInfo->rBowInfo.prDevHandler->perm_addr,
+			   prGlueInfo->rBowInfo.prDevHandler->dev_addr, ETH_ALEN); /* perm addr is not protected; no helper funcs */
 		/* 1.3 register callback functions */
 		prGlueInfo->rBowInfo.prDevHandler->needed_headroom += NIC_TX_HEAD_ROOM;
 		prGlueInfo->rBowInfo.prDevHandler->netdev_ops = &bow_netdev_ops;
