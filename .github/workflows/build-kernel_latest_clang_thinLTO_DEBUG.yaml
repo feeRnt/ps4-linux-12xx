@@ -1,15 +1,15 @@
 ## This is a basic workflow to help you get started with Actions 
 ## Adapted from https://moebuta.org/posts/using-github-actions-to-build-linux-kernels/
 
-name: "Compile PS4-Linux Kernel-12xx; Clang Thin LTO Version: Latest"
+name: "Compile PS4-Linux Kernel-12xx; Clang Thin LTO Version: Latest -- DEBUG"
 
 # Controls when the workflow will run
 on:
   # Allows you to run this workflow manually from the Github Actions tab
   workflow_dispatch:
   push: # Prefer triggering manually for now
-    tags:
-      - 'v*' # Will build on any tag that starts with v: v5.15.15, etc.
+    #tags:
+      #- 'v*' # Will build on any tag that starts with v: v5.15.15, etc.
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
