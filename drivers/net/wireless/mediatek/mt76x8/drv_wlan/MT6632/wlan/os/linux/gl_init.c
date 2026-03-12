@@ -81,6 +81,8 @@
 #endif
 #include "gl_vendor.h"
 
+#include <linux/etherdevice.h>
+
 /*******************************************************************************
 *                              C O N S T A N T S
 ********************************************************************************
@@ -2491,7 +2493,14 @@ static INT_32 wlanProbe(PVOID pvData, PVOID pvDriverData)
 				DBGLOG(INIT, WARN, "set MAC addr fail 0x%lx\n", rStatus);
 				prGlueInfo->u4ReadyFlag = 0;
 			} else {
+				/* dev_addr access&write api change since 5.16; see os/linux/gl_bow.c: */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0))
+				eth_hw_addr_set(prGlueInfo->prDevHandler, MacAddr.sa_data);
+				/* Will copy 6 bytes (ETH_ADDRESS_LENGTH) from the socket address data */
+				/* addr_set expects const u8 *, so remove & to ensure array decaying {char * ~= u8 *) */
+#else
 				kalMemCopy(prGlueInfo->prDevHandler->dev_addr, &MacAddr.sa_data, ETH_ALEN);
+#endif
 				kalMemCopy(prGlueInfo->prDevHandler->perm_addr,
 					   prGlueInfo->prDevHandler->dev_addr, ETH_ALEN);
 

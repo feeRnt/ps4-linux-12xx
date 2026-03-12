@@ -88,6 +88,8 @@
 #include "gl_vendor.h"
 #include "gl_cfg80211.h"
 
+#include <linux/etherdevice.h>
+
 /*******************************************************************************
 *                              C O N S T A N T S
 ********************************************************************************
@@ -944,7 +946,14 @@ BOOLEAN glRegisterP2P(P_GLUE_INFO_T prGlueInfo, const char *prDevName, const cha
 		COPY_MAC_ADDR(rMacAddr, prAdapter->rMyMacAddr);
 		rMacAddr[0] |= 0x2;
 		rMacAddr[0] ^= i << 2;	/* change to local administrated address */
+
+		/* dev_addr access&write api change since 5.16; see os/linux/gl_bow.c: */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0))
+		eth_hw_addr_set(prGlueInfo->prP2PInfo[i]->prDevHandler, rMacAddr);
+		/*realMACAddress decays to pointer, so things work out in the end */
+#else
 		kalMemCopy(prGlueInfo->prP2PInfo[i]->prDevHandler->dev_addr, rMacAddr, ETH_ALEN);
+#endif
 		kalMemCopy(prGlueInfo->prP2PInfo[i]->prDevHandler->perm_addr,
 			prGlueInfo->prP2PInfo[i]->prDevHandler->dev_addr,
 			   ETH_ALEN);

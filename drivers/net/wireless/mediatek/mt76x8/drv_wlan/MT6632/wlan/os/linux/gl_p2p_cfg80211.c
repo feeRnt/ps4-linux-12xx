@@ -89,6 +89,8 @@
 #pragma GCC diagnostic ignored "-Wformat"
 #endif
 
+#include <linux/etherdevice.h>
+
 /*******************************************************************************
 *                              C O N S T A N T S
 ********************************************************************************
@@ -435,9 +437,15 @@ struct wireless_dev *mtk_p2p_cfg80211_add_iface(struct wiphy *wiphy,
 			else
 				rMacAddr[0] ^= prGlueInfo->prAdapter->prP2pInfo->u4DeviceNum << 2;
 		}
-		kalMemCopy(prNewNetDevice->dev_addr, rMacAddr, ETH_ALEN);
-		kalMemCopy(prNewNetDevice->perm_addr, rMacAddr, ETH_ALEN);
 
+		/* dev_addr access&write api change since 5.16; see os/linux/gl_bow.c: */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 16, 0))
+		eth_hw_addr_set(prNewNetDevice, rMacAddr); /*prNewNetDevice is just net_device, bearing dev addr */
+		/* decay to pointer */
+#else
+		kalMemCopy(prNewNetDevice->dev_addr, rMacAddr, ETH_ALEN);
+#endif
+		kalMemCopy(prNewNetDevice->perm_addr, rMacAddr, ETH_ALEN);
 		DBGLOG(P2P, TRACE, "mtk_p2p_cfg80211_add_iface ucBssIdx=%d\n", prNetDevPriv->ucBssIdx);
 
 		/* Switch OP MOde. */
@@ -2604,6 +2612,7 @@ int mtk_p2p_cfg80211_connect(struct wiphy *wiphy, struct net_device *dev, struct
 
 		COPY_MAC_ADDR(prConnReqMsg->aucBssid, sme->bssid);
 		COPY_MAC_ADDR(prConnReqMsg->aucSrcMacAddr, dev->dev_addr);
+		/* Copies TO aucSrcMacAddr = dst, so we're good with accessing const dev addr */
 
 		DBGLOG(P2P, TRACE, "Assoc Req IE Buffer Length:%d\n", sme->ie_len);
 		kalMemCopy(prConnReqMsg->aucIEBuf, sme->ie, sme->ie_len);
