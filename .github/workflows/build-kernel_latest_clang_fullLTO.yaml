@@ -8,8 +8,8 @@ on:
   # Allows you to run this workflow manually from the Github Actions tab
   workflow_dispatch:
   push: # Prefer triggering manually for now
-    tags:
-      - 'v*' # Will build on any tag that starts with v: v5.15.15, etc.
+    #tags:
+      #- 'v*' # Will build on any tag that starts with v: v5.15.15, etc.
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -318,8 +318,9 @@ jobs:
       - name: Set up Swapfile with Marketplace Actions
         uses: pierotofy/set-swap-space@fc79b3f67fa8a838184ce84a674ca12238d2c761
         with:
-          swap-size-gb: 12
+          swap-size-gb: 17
           # Tried 10 G, didn't work for full LTO
+          # Even 12 G isn't working with 6.15.4 w/ MediaTek driver on LLVM-18
 
       - name: Compile the linux kernel with docker run
         id: compile-kernel-step
