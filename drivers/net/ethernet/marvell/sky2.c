@@ -3055,6 +3055,10 @@ static int sky2_poll(struct napi_struct *napi, int work_limit)
 
 	napi_complete_done(napi, work_done);
 	sky2_read32(hw, B0_Y2_SP_LISR);
+#ifdef CONFIG_X86_PS4
+	/* Aeolia: LISR read has no unmas side-effeectt; rearm via ICR */
+	sky2_write32(hw, AEOLIA_SP_ICR,1);
+#endif
 done:
 
 	return work_done;
@@ -3073,7 +3077,10 @@ static irqreturn_t sky2_intr(int irq, void *dev_id)
 	}
 
 	prefetch(&hw->st_le[hw->st_idx]);
-
+#ifdef CONFIG_X86_PS4
+	/* Aeolia: ISRC2 read has no mask sideffect, stop storm ia ICR*/
+	sky2_write32(hw, AEOLIA_SP_ICR,2);
+#endif
 	napi_schedule(&hw->napi);
 
 	return IRQ_HANDLED;
