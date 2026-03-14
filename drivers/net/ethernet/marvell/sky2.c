@@ -3068,8 +3068,12 @@ static irqreturn_t sky2_intr(int irq, void *dev_id)
 {
 	struct sky2_hw *hw = dev_id;
 	u32 status;
-
-	/* Reading this mask interrupts as side effect */
+#ifdef CONFIG_X86_PS4
+	/* Aeolia: mask on entry before any register read to close the
+	 * re-assertion race window. ISRC2 read has no mask side-effect. */
+	sky2_write32(hw, AEOLIA_SP_ICR, 2);
+#endif
+	/* Reading this masks interrupts as side effect (standard Yukon-2 only) */
 	status = sky2_read32(hw, B0_Y2_SP_ISRC2);
 	if (status == 0 || status == ~0) {
 		sky2_write32(hw, B0_Y2_SP_ICR, 2);
@@ -3077,10 +3081,6 @@ static irqreturn_t sky2_intr(int irq, void *dev_id)
 	}
 
 	prefetch(&hw->st_le[hw->st_idx]);
-#ifdef CONFIG_X86_PS4
-	/* Aeolia: ISRC2 read has no mask sideffect, stop storm ia ICR*/
-	sky2_write32(hw, AEOLIA_SP_ICR,2);
-#endif
 	napi_schedule(&hw->napi);
 
 	return IRQ_HANDLED;
