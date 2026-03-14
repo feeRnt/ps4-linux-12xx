@@ -51,13 +51,20 @@ CUH-7202B | Pro - Baikal | ? | *5.4.247* |
 Aeolia, Belize and Baikal are the console Southbridges.
 B0, B1 etc. are the Southbridge subrevisions.
 ```
+
+
+- [[ Note: For 5.4.247 kernels, the latest working Mesa is version 25.1.x.
+Ensure your distribution ships this when picking a distro for these kernels
+for proper GPU function. [See this issue](https://github.com/feeRnt/ps4-linux-12xx/issues/8). ]]
+
+
 <a name="builtin-fw-anchor"></a>
-[ Certain older models (specifically the 1004A) needed a kernel that
+- [[ Certain older models (specifically the 1004A) needed a kernel that
 was built without embedding the latest proprietary firmware blobs (for
-WiFi+Bluetooth), and instead functioned properly with older firmware
+Marvell SDIO WiFi+Bluetooth), and instead functioned properly with older firmware
 sourced from the initramfs. For these, each affected kernel release has a "no-built-in-fw"
 version for best functionality. See the releases page of the referring kernels for more
-information.]
+information. ]]
 <br>
 
 - TODO: Add a list with all supported console models, their southbridges, and their compatible kernels.
@@ -133,15 +140,42 @@ Based on crashniels' source.
 
 To compile any of these branches, you can simply fork the repo, go to the Actions tab and run the Workflow file for `build-kernel_latest.yaml` for a particular branch.
 
-Or if you would like to build locally, just clone the repo for your desired branch and run the necessary commands:
+Or if you would like to build locally, just clone the repo for your desired branch and run the necessary commands (commands based on Ubuntu 24.04):
+
+### Build-deps
+```bash
+
+apt-get update
+apt-get install build-essential
+
+# gcc-11 is ideal for compiling the 5.4 & 5.15.y kernels, and can build 6.15.y too
+# Otherwise you will have many typecheck and compile errors compiling the older kernels
+apt-get-install libssl-dev gcc-11 libgcc-11-dev -y # Needs libssl-dev, at least on 5.x
+
+apt-get install clang-14 lld-14 llvm-14 -y # Needs LLVM-14 to compile 5.4.247 and 5.15.15
+apt-get install clang lld llvm -y # Will get LLVM-18 on Ubuntu 24.04; can compile 6.15.4
+
+apt-get build-dep linux -y
+
+```
+
+### Configuration and compilation
 ```bash
 
 git clone https://github.com/feeRnt/ps4-linux-12xx --branch <desired-branch-name> --depth=3
-#keep a low depth to save on space
+# keep a low depth to save on space
 
 cd ps4-linux-12xx
-echo "Copying necessary extra firmware to /lib/firmware"
-sudo cp -ri extra_firmware/* /lib/firmware
+
+## Copy additional firmware files
+if [ -d extra_firmware ]; then
+    if [ ! -z "$( ls -A 'extra_firmware/')" ]; then
+        echo "Copying extra firmware to /lib/firmware"
+        cp -ri extra_firmware/* /lib/firmware
+    fi
+fi
+
+echo "Copying even more (mainline) extra firmware to /lib/firmware"
 
 sudo mkdir /lib/firmware/mrvl
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin \
@@ -150,21 +184,66 @@ wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin \
 && sudo mv -i sd8797_uapsta.bin /lib/firmware/mrvl
 
-
 sudo mkdir /lib/firmware/mediatek
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7668pr2h.bin \
 && sudo mv -i mt7668pr2h.bin /lib/firmware/mediatek
-
 
 ## Rename .config file
 
 mv config .config
 
+## Set installation variables
+export localversion=`cat .config | grep CONFIG_LOCALVERSION= | sed -nE 's|^.*="-||p' | tr -d '"'` # expects CONFIG_LOCALVERSION starting with a dash
+export INSTALL_DIR="${PWD}/install_path/${localversion}/install"
+
+## Set compiler options
+
+export KCFLAGS="-march=btver2 -mtune=btver2 -O3"
+export KAFLAGS="-march=btver2 -mtune=btver2 -O3"
+export KCPPFLAGS="-march=btver2 -mtune=btver2 -O3"
+# O3 is experimental; maybe O2 gives better performance on 5.x kernels?
+
+## Set build options (for GCC)
 export MAKE_OPTS="-j`nproc` \
-              HOSTCC=gcc-11 \
-              CC=gcc-11"
-# gcc-11 is ideal for compiling the 5.4 & 5.15.y kernels, and can build 6.15.y too
-# Otherwise you will have many typecheck and compile errors compiling the older kernels
+             INSTALL_PATH="${INSTALL_DIR}/boot" \
+             INSTALL_MOD_PATH="${INSTALL_DIR}" \
+             HOSTCC=gcc-11 \
+             CC=gcc-11"
+
+## Set build options (for Clang,LLVM-14)
+# export MAKE_OPTS="-j`nproc` \
+#             INSTALL_PATH="${INSTALL_DIR}/boot" \
+#             INSTALL_MOD_PATH="${INSTALL_DIR}" \
+#             CC=clang-14 LD=ld.lld-14 AR=llvm-ar-14 NM=llvm-nm-14 STRIP=llvm-strip-14 \
+#             OBJCOPY=llvm-objcopy-14 OBJDUMP=llvm-objdump-14 OBJSIZE=llvm-size-14 \
+#             READELF=llvm-readelf-14 HOSTCC=clang-14 HOSTCXX=clang++-14 HOSTAR=llvm-ar-14 \
+#             HOSTLD=ld.lld-14"
+
+
+# Set build options (for Clang,LLVM-18)
+# export MAKE_OPTS="-j`nproc --ignore=1` \
+#             INSTALL_PATH="${INSTALL_DIR}/boot" \
+#             INSTALL_MOD_PATH="${INSTALL_DIR}" \
+#             LLVM=1"
+
+mkdir -p "${INSTALL_DIR}/boot"
+
+## Disable/Enable Link Time Optimization:
+
+scripts/config --disable CONFIG_LTO_CLANG_FULL
+#scripts/config --enable CONFIG_LTO_CLANG_THIN
+scripts/config --enable CONFIG_LTO_NONE
+# Full LTO is enabled by default on the configs in this repo,
+# except for the 5.4 kernels, which don't have this option.
+
+# Explicitly disable it here
+# Selecting GCC as the compiler automatically deselects LTO as well
+
+# Warning ::: you might want to reduce the thread/processor count, j, with fullLTO builds
+# Ensure you have proper RAM and swapspace, otherwise you will likely run Out of Memory (OOM).
+# 32 GB of memory is recommended for fulLTO builds. thinLTO should be much easier however.
+
+## Compilation:
 make ${MAKE_OPTS} olddefconfig
 make ${MAKE_OPTS} prepare
 echo "making kernel. . ."
@@ -172,10 +251,19 @@ make ${MAKE_OPTS}
 echo "making modules . . ."
 make ${MAKE_OPTS} modules
 echo "installing kernel . . ."
-make ${MAKE_OPTS} install
+make ${MAKE_OPTS} install # This step is unnecessary
 echo "installing modules . . ."
 make ${MAKE_OPTS} modules_install
+
+echo "Copying bzImage to $INSTALL_DIR/boot. . ."
+cp arch/x86/boot/bzImage "$INSTALL_DIR/boot/"
+echo "Copying used .config to $INSTALL_DIR/.config. . ."
+cp .config "$INSTALL_DIR/.config"
+cd "${INSTALL_DIR}"
 ```
+
+The bzImage should now be in
+boot/, and any modules compiled in lib/ .
 
 <br>
 
