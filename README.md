@@ -64,8 +64,7 @@ for proper GPU function. [See this issue](https://github.com/feeRnt/ps4-linux-12
 was built without embedding the latest proprietary firmware blobs (for
 Marvell SDIO WiFi+Bluetooth), and instead functioned properly with older firmware
 sourced from the initramfs. For these, each affected kernel release has a "no-built-in-fw"
-version for best functionality. See the releases page of the referring kernels for more
-information. ]]
+version for best functionality. See the releases page of the referring kernels or [this issue](https://github.com/feeRnt/ps4-linux-12xx/issues/2) for info. ]]
 <br>
 
 - TODO: Add a list with all supported console models, their southbridges, and their compatible kernels.
