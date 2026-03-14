@@ -44,6 +44,7 @@ CUH-2216A | Slim - Baikal B1 | MediaTek 7668 | *5.4.247* |
 CUH-2216A | Slim - Belize | MediaTek 7668 | *5.15.15* |
 CUH-7116B | Pro - Baikal B1 | ? | *5.4.247* |
 CUH-7202B | Pro - Baikal | ? | *5.4.247* |
+CUH-7216B | Pro - Baikal | MediaTek 7668 | *5.4.247* |
 
 ```
 [A and B are just hard-drive specification: 500 GB vs 1000GB].
@@ -262,8 +263,7 @@ cp .config "$INSTALL_DIR/.config"
 cd "${INSTALL_DIR}"
 ```
 
-The bzImage should now be in
-boot/, and any modules compiled in lib/ .
+The bzImage should now be in boot/, and any modules compiled in lib/ .
 
 <br>
 
