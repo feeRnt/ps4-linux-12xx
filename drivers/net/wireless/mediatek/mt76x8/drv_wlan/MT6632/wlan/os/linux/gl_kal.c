@@ -3527,7 +3527,7 @@ UINT_32 kalGetTxPendingCmdCount(IN P_GLUE_INFO_T prGlueInfo)
 #if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
 static void legacy_timer_emu_func(struct timer_list *t)
 {
-	struct legacy_timer_emu *lt = from_timer(lt, t, t);
+	struct legacy_timer_emu *lt = container_of(t, struct legacy_timer_emu, t);
 	lt->function(lt->data);
 }
 #endif
