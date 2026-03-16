@@ -84,6 +84,7 @@ static void init_counter_refs(void)
  */
 
 DEFINE_STATIC_KEY_FALSE(arch_scale_freq_key);
+EXPORT_SYMBOL_GPL(arch_scale_freq_key);
 
 static u64 arch_turbo_freq_ratio = SCHED_CAPACITY_SCALE;
 static u64 arch_max_freq_ratio = SCHED_CAPACITY_SCALE;

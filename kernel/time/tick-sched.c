@@ -1384,6 +1384,7 @@ unsigned long tick_nohz_get_idle_calls_cpu(int cpu)
 
 	return ts->idle_calls;
 }
+EXPORT_SYMBOL_GPL(tick_nohz_get_idle_calls_cpu);
 
 static void tick_nohz_account_idle_time(struct tick_sched *ts,
 					ktime_t now)
