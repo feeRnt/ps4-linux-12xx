@@ -179,7 +179,7 @@ static long get_raw_temp(struct k10temp_data *data)
 	if ((regval & data->temp_adjust_mask) ||
 	    (regval & ZEN_CUR_TEMP_TJ_SEL_MASK) == ZEN_CUR_TEMP_TJ_SEL_MASK)
 		temp -= 49000;
-	return temp;
+	return temp; //returns temperature
 }
 
 static const char *k10temp_temp_label[] = {
@@ -283,6 +283,7 @@ static umode_t k10temp_is_visible(const void *drvdata,
 	u32 reg;
 
 	switch (type) {
+	/* Choose what to return */
 	case hwmon_temp:
 		switch (attr) {
 		case hwmon_temp_input:
