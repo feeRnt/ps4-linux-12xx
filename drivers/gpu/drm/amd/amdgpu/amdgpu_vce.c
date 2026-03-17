@@ -183,8 +183,7 @@ int amdgpu_vce_sw_init(struct amdgpu_device *adev, unsigned long size)
 				(binary_id << 8));
 
 	r = amdgpu_bo_create_kernel(adev, size, PAGE_SIZE,
-				    AMDGPU_GEM_DOMAIN_VRAM |
-				    AMDGPU_GEM_DOMAIN_GTT,
+				    AMDGPU_GEM_DOMAIN_GTT, // Only GTT, not VRAM
 				    &adev->vce.vcpu_bo,
 				    &adev->vce.gpu_addr, &adev->vce.cpu_addr);
 	if (r) {
