@@ -337,7 +337,6 @@ int amdgpu_uvd_sw_init(struct amdgpu_device *adev)
 			dev_err(adev->dev, "(%d) failed to allocate UVD bo\n", r);
 			return r;
 		}
-		amdgpu_uvd_force_into_uvd_segment(adev->uvd.inst[j].vcpu_bo);
 	}
 
 	for (i = 0; i < adev->uvd.max_handles; ++i) {
