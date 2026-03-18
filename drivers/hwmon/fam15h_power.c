@@ -29,7 +29,13 @@ MODULE_LICENSE("GPL");
 #define REG_NORTHBRIDGE_CAP		0xe8
 
 /* D18F4 */
+#ifdef CONFIG_X86_PS4
+#define REG_PROCESSOR_TDP		0xf4
+
+#else
 #define REG_PROCESSOR_TDP		0x1b8
+
+#endif
 
 /* D18F5 */
 /* On PS4 AMD Liverpool Systems with Jaguar Architecture,
@@ -38,7 +44,7 @@ MODULE_LICENSE("GPL");
  * They also are not very correctly aligned.. Maybe this is not right */
 #ifdef CONFIG_X86_PS4
 #define REG_TDP_RUNNING_AVERAGE		0xf0
-#define REG_TDP_LIMIT3			0xf4
+#define REG_TDP_LIMIT3			0x88 /*0xf4*/
 
 #else
 
@@ -57,9 +63,9 @@ MODULE_LICENSE("GPL");
 
 struct fam15h_power_data {
 	struct pci_dev *pdev;
-	unsigned int tdp_to_watts;
-	unsigned int base_tdp;
-	unsigned int processor_pwr_watts;
+	unsigned int tdp_to_watts; //Multiplication factor
+	unsigned int base_tdp; //REG_PROCESSOR_TDP
+	unsigned int processor_pwr_watts; //Max power?
 	unsigned int cpu_pwr_sample_ratio;
 	const struct attribute_group *groups[FAM15H_NUM_GROUPS];
 	struct attribute_group group;
@@ -115,7 +121,7 @@ static ssize_t power1_input_show(struct device *dev,
 
 	pci_bus_read_config_dword(f4->bus, PCI_DEVFN(PCI_SLOT(f4->devfn), 5),
 				  REG_TDP_LIMIT3, &val);
-	pr_info("fam15h_power: REG_TDP_LIMIT3 raw value in = %#x in %s.\n",
+	pr_info("fam15h_power: REG_TDP_LIMIT3 raw value = %#x in %s.\n",
 			val, __func__);
 
 	/*
@@ -335,10 +341,10 @@ static int fam15h_power_init_attrs(struct pci_dev *pdev,
 
 	/* PS4 Phat/Liverpool Family is 0x16, and models seem to start from 0x10; selected 0x25 as somewhat
 	 * arbitrary end point*/
-	if (c->x86 == 0x15 &&
+	if ((c->x86 == 0x15 &&
 	    (c->x86_model <= 0xf ||
-	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f)) ||
-	   (c->x86 == 0x16 && (c->x86_model >= 0x10 && c->x86_model <= 0x25))) {
+	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f))) ||
+	   (c->x86 == 0x99 && (c->x86_model >= 0x10 && c->x86_model <= 0x25))) { //keep ps4 check off for now
 		n += 1;
 		pr_info("fam15h_power: x86 == 0x15 && x86_model == %#x in %s.\n",
 				c->x86_model, __func__);
@@ -363,10 +369,10 @@ static int fam15h_power_init_attrs(struct pci_dev *pdev,
 
 	/* We can't rely on REG_PROCESSOR_TDP only, as that seems non existent on PS4 Liverpool (0x16).
 	 * Rely on power1_input functions to get the missing values */
-	if (c->x86 == 0x15 &&
+	if ((c->x86 == 0x15 &&
 	    (c->x86_model <= 0xf ||
-	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f)) ||
-	   (c->x86 == 0x16 && (c->x86_model >= 0x10 && c->x86_model <= 0x25))) {
+	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f))) ||
+	   (c->x86 == 0x99 && (c->x86_model >= 0x10 && c->x86_model <= 0x25))) {
 		fam15h_power_attrs[n++] = &dev_attr_power1_input.attr;
 		pr_info("fam15h_power: x86 == 0x15 && x86_model == %#x in %s.\n"
 		"Setting power1_input attributes as our fam15h_power_attrs now.\n",
@@ -458,7 +464,12 @@ static int fam15h_power_init_data(struct pci_dev *f4,
 	u64 tmp;
 	int ret;
 
-	pci_read_config_dword(f4, REG_PROCESSOR_TDP, &val);
+#ifdef CONFIG_X86_PS4
+	pci_bus_read_config_dword(f4->bus, PCI_DEVFN(PCI_SLOT(f4->devfn), 5),
+				REG_PROCESSOR_TDP, &val); //on PS4s, the REG processor TDP seems to live on function 5 though?
+#else
+	pci_read_config_dword(f4, REG_PROCESSOR_TDP, &val); //pci_dev points to function 4, as this func owns the fam15h_power driver
+#endif
 	pr_info("fam15h_power: REG_PROCESSOR_TDP raw value = %#x in %s.\n", val, __func__);
 	data->base_tdp = val >> 16;
 	pr_info("fam15h_power: Set power_data->base_tdp = %#x in %s.\n", data->base_tdp, __func__);
