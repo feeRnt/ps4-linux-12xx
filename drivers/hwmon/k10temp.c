@@ -441,24 +441,31 @@ static int k10temp_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	if (boot_cpu_data.x86 == 0x17 &&
 	    strstr(boot_cpu_data.x86_model_id, AMD_I3255_STR)) {
+		pr_info("k10temp: x86 == 0x17 && AMD_Industrial3255 in %s.\n", __func__);
 		data->disp_negative = true;
 	}
 
 	data->is_zen = cpu_feature_enabled(X86_FEATURE_ZEN);
 	if (data->is_zen) {
+		pr_info("k10temp: is_zen in %s.\n", __func__);
 		data->temp_adjust_mask = ZEN_CUR_TEMP_RANGE_SEL_MASK;
 		data->read_tempreg = read_tempreg_nb_zen;
 	} else if (boot_cpu_data.x86 == 0x15 &&
 	    ((boot_cpu_data.x86_model & 0xf0) == 0x60 ||
 	     (boot_cpu_data.x86_model & 0xf0) == 0x70)) {
+		pr_info("k10temp: x86 = 0x15 && x86_model = %#x in %s; reading nb_f15.\n", 
+				boot_cpu_data.x86_model, __func__); //read actual model instead of grouping;
 		data->read_htcreg = read_htcreg_nb_f15;
 		data->read_tempreg = read_tempreg_nb_f15;
 	} else {
+		pr_info("k10temp: x86 != 0x15 && data->!is_zen in %s; reading pci htcreg.\n",
+				__func__);
 		data->read_htcreg = read_htcreg_pci;
 		data->read_tempreg = read_tempreg_pci;
 	}
 
 	if (boot_cpu_data.x86 == 0x17 || boot_cpu_data.x86 == 0x18) {
+		pr_info("k10temp: x86 = %#x in %s.\n", boot_cpu_data.x86, __func__);
 		switch (boot_cpu_data.x86_model) {
 		case 0x1:	/* Zen */
 		case 0x8:	/* Zen+ */
@@ -481,6 +488,7 @@ static int k10temp_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 			break;
 		}
 	} else if (boot_cpu_data.x86 == 0x19) {
+		pr_info("k10temp: x86 = 0x19 in %s.\n", __func__);
 		switch (boot_cpu_data.x86_model) {
 		case 0x0 ... 0x1:	/* Zen3 SP3/TR */
 		case 0x8:		/* Zen3 TR Chagall */

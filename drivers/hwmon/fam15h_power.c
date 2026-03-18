@@ -79,12 +79,15 @@ static ssize_t power1_input_show(struct device *dev,
 
 	pci_bus_read_config_dword(f4->bus, PCI_DEVFN(PCI_SLOT(f4->devfn), 5),
 				  REG_TDP_RUNNING_AVERAGE, &val);
+	pr_info("fam15h_power: REG_TDP_RUNNING_AVERAGE raw value = %#x in %s.\n",
+			val, __func__);
 
 	/*
 	 * On Carrizo and later platforms, TdpRunAvgAccCap bit field
 	 * is extended to 4:31 from 4:25.
 	 */
 	if (is_carrizo_or_later()) {
+		pr_info("fam15h_power: is_carrizo_or_later hit! In %s.\n", __func__); //shouldn't be
 		running_avg_capture = val >> 4;
 		running_avg_capture = sign_extend32(running_avg_capture, 27);
 	} else {
@@ -92,25 +95,38 @@ static ssize_t power1_input_show(struct device *dev,
 		running_avg_capture = sign_extend32(running_avg_capture, 21);
 	}
 
+	pr_info("fam15h_power: Current running_avg_capture = %d in %s .\n",
+			running_avg_capture, __func__);
 	running_avg_range = (val & 0xf) + 1;
+
+	pr_info("fam15h_power: Current running_avg_range = %d in %s .\n",
+			running_avg_range, __func__);
 
 	pci_bus_read_config_dword(f4->bus, PCI_DEVFN(PCI_SLOT(f4->devfn), 5),
 				  REG_TDP_LIMIT3, &val);
+	pr_info("fam15h_power: REG_TDP_LIMIT3 raw value in = %#x in %s.\n",
+			val, __func__);
 
 	/*
 	 * On Carrizo and later platforms, ApmTdpLimit bit field
 	 * is extended to 16:31 from 16:28.
 	 */
-	if (is_carrizo_or_later())
+	if (is_carrizo_or_later()) {
 		tdp_limit = val >> 16;
+		pr_info("fam15h_power: is_carrizo_or_later hit! In %s.\n", __func__); //shouldn't be
+	}
 	else
 		tdp_limit = (val >> 16) & 0x1fff;
+
+	pr_info("fam15h_power: Current tdp_limit= %u in %s .\n",
+			tdp_limit, __func__);
 
 	curr_pwr_watts = ((u64)(tdp_limit +
 				data->base_tdp)) << running_avg_range;
 	curr_pwr_watts -= running_avg_capture;
 	curr_pwr_watts *= data->tdp_to_watts;
 
+	pr_info("fam15h_power: curr_pwr_watts = %llu in %s.\n", (unsigned long long)curr_pwr_watts, __func__);
 	/*
 	 * Convert to microWatt
 	 *
@@ -142,9 +158,15 @@ static void do_read_registers_on_cu(void *_data)
 	 * is compute unit id.
 	 */
 	cu = topology_core_id(smp_processor_id());
+	pr_info("fam15h_power: Current cu = %d in %s.\n", cu, __func__);
 
 	rdmsrl_safe(MSR_F15H_CU_PWR_ACCUMULATOR, &data->cu_acc_power[cu]);
+	pr_info("fam15h_power: Set cu = %d's acc_power to %llu in %s.\n",
+			cu, (unsigned long long)(data->cu_acc_power[cu]), __func__);
+
 	rdmsrl_safe(MSR_F15H_PTSC, &data->cpu_sw_pwr_ptsc[cu]);
+	pr_info("fam15h_power: Set cu = %d's sw_pwr_ptsc to %llu in %s.\n",
+			cu, (unsigned long long)(data->cpu_sw_pwr_ptsc[cu]), __func__);
 
 	data->cu_on[cu] = 1;
 }
@@ -160,8 +182,10 @@ static int read_registers(struct fam15h_power_data *data)
 	int ret, cpu;
 
 	ret = zalloc_cpumask_var(&mask, GFP_KERNEL);
-	if (!ret)
+	if (!ret) {
+		pr_info("fam15h_power: returning ENOMEM!\n");
 		return -ENOMEM;
+	}
 
 	memset(data->cu_on, 0, sizeof(int) * MAX_CUS);
 
@@ -178,15 +202,21 @@ static int read_registers(struct fam15h_power_data *data)
 	for_each_online_cpu(cpu) {
 		this_core = topology_core_id(cpu);
 
-		if (this_core == core)
-			continue;
+		pr_info("fam15h_power: iter cpu=%d, this_core=%d, core=%d\n", cpu, this_core, core);
 
+		if (this_core == core) {
+			pr_info("fam15h_power: skip cpu=%d (duplicate core)\n", cpu);
+			continue;
+		}
 		core = this_core;
 
+		pr_info("fam15h_power: Accepting cpu=%d and its sisters for mask in %s\n",
+				cpu, __func__);
 		/* get any CPU on this compute unit */
 		cpumask_set_cpu(cpumask_any(topology_sibling_cpumask(cpu)), mask);
 	}
 
+	pr_info("fam15h_power: read_registers_on_cu on cpu=%d\n", cpu);
 	on_each_cpu_mask(mask, do_read_registers_on_cu, data, true);
 
 	cpus_read_unlock();
@@ -294,12 +324,18 @@ static int fam15h_power_init_attrs(struct pci_dev *pdev,
 
 	if (c->x86 == 0x15 &&
 	    (c->x86_model <= 0xf ||
-	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f)))
+	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f))) {
 		n += 1;
+		pr_info("fam15h_power: x86 == 0x15 && x86_model == %#x in %s.\n",
+				c->x86_model, __func__);
+	}
 
 	/* check if processor supports accumulated power */
-	if (boot_cpu_has(X86_FEATURE_ACC_POWER))
+	if (boot_cpu_has(X86_FEATURE_ACC_POWER)) {
 		n += 2;
+		pr_info("fam15h_power: boot_cpu_has accumulated power feature in %s.\n",
+				__func__);
+	}
 
 	fam15h_power_attrs = devm_kcalloc(&pdev->dev, n,
 					  sizeof(*fam15h_power_attrs),
@@ -308,20 +344,27 @@ static int fam15h_power_init_attrs(struct pci_dev *pdev,
 	if (!fam15h_power_attrs)
 		return -ENOMEM;
 
-	n = 0;
+	n = 0; //why are we setting this to 0? what on Earth? Memory shortage test??
 	fam15h_power_attrs[n++] = &dev_attr_power1_crit.attr;
 	if (c->x86 == 0x15 &&
 	    (c->x86_model <= 0xf ||
-	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f)))
+	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f))) {
 		fam15h_power_attrs[n++] = &dev_attr_power1_input.attr;
+		pr_info("fam15h_power: x86 == 0x15 && x86_model == %#x in %s.\n"
+		"Setting power1_input attributes as our fam15h_power_attrs now.\n",
+		c->x86_model, __func__);
+	}
 
 	if (boot_cpu_has(X86_FEATURE_ACC_POWER)) {
 		fam15h_power_attrs[n++] = &dev_attr_power1_average.attr;
 		fam15h_power_attrs[n++] = &dev_attr_power1_average_interval.attr;
+		pr_info("fam15h_power: boot_cpu_has accumulated power feature in %s.\n",
+		__func__);
 	}
 
 	data->group.attrs = fam15h_power_attrs;
 
+	pr_info("fam15h_power: Returning 0 in in %s.\n", __func__);
 	return 0;
 }
 
@@ -356,8 +399,16 @@ static void tweak_runavg_range(struct pci_dev *pdev)
 	 * let this quirk apply only to the current version of the
 	 * northbridge, since future versions may change the behavior
 	 */
-	if (!pci_match_id(affected_device, pdev))
+	// we just return here; we're not the affected device
+	//maybe need to be ?? PS4's is AMD_16H_M41H_F4 & F3(temp)
+	if (!pci_match_id(affected_device, pdev)) {
+		pr_info("fam15h_power: Returning from %s; did not match quirk affected device.\n",
+				__func__);
 		return;
+	}
+	pr_info("fam15h_power: Continuing in %s; check me!\n",
+				__func__);
+
 
 	pci_bus_read_config_dword(pdev->bus,
 		PCI_DEVFN(PCI_SLOT(pdev->devfn), 5),
@@ -390,13 +441,17 @@ static int fam15h_power_init_data(struct pci_dev *f4,
 	int ret;
 
 	pci_read_config_dword(f4, REG_PROCESSOR_TDP, &val);
+	pr_info("fam15h_power: REG_PROCESSOR_TDP raw value = %#x in %s.\n", val, __func__);
 	data->base_tdp = val >> 16;
+	pr_info("fam15h_power: Set power_data->base_tdp = %#x in %s.\n", data->base_tdp, __func__);
 	tmp = val & 0xffff;
 
 	pci_bus_read_config_dword(f4->bus, PCI_DEVFN(PCI_SLOT(f4->devfn), 5),
 				  REG_TDP_LIMIT3, &val);
+	pr_info("fam15h_power: REG_TDP_LIMIT3 raw value from fn5 = %#x in %s.\n", val, __func__);
 
 	data->tdp_to_watts = ((val & 0x3ff) << 6) | ((val >> 10) & 0x3f);
+	pr_info("fam15h_power: Set power_data->tdp_to_watts = %#x in %s.\n", data->tdp_to_watts, __func__);
 	tmp *= data->tdp_to_watts;
 
 	/* result not allowed to be >= 256W */
@@ -404,18 +459,24 @@ static int fam15h_power_init_data(struct pci_dev *f4,
 		dev_warn(&f4->dev,
 			 "Bogus value for ProcessorPwrWatts (processor_pwr_watts>=%u)\n",
 			 (unsigned int) (tmp >> 16));
+	
+	pr_info("fam15h_power: Current Wattage = %u in %s.\n", (unsigned int) (tmp >> 16), __func__);
 
 	/* convert to microWatt */
 	data->processor_pwr_watts = (tmp * 15625) >> 10;
 
 	ret = fam15h_power_init_attrs(f4, data);
-	if (ret)
+	if (ret) {
+		pr_info("fam15h_power: return = %d from fam15h_power_init_attrs; exiting function.\n");
 		return ret;
-
+	}
 
 	/* CPUID Fn8000_0007:EDX[12] indicates to support accumulated power */
-	if (!boot_cpu_has(X86_FEATURE_ACC_POWER))
+	if (!boot_cpu_has(X86_FEATURE_ACC_POWER)) {
+		pr_info("fam15h_power: !boot_cpu_has accumulated power feature in %s, returning 0.\n",
+				__func__);
 		return 0;
+	}
 
 	/*
 	 * determine the ratio of the compute unit power accumulator
@@ -429,6 +490,7 @@ static int fam15h_power_init_data(struct pci_dev *f4,
 		return -ENODEV;
 	}
 
+	pr_info("fam15h_power: Setting power_data->max_cu_acc_power to %u in %s.\n", int, __func__);
 	data->max_cu_acc_power = tmp;
 
 	/*
@@ -457,16 +519,22 @@ static int fam15h_power_probe(struct pci_dev *pdev,
 	 */
 	tweak_runavg_range(pdev);
 
-	if (!should_load_on_this_node(pdev))
+	if (!should_load_on_this_node(pdev)) {
+		pr_info("fam15h_power: Returning ENODEV in %s.\n", __func__);
 		return -ENODEV;
+	}
 
 	data = devm_kzalloc(dev, sizeof(struct fam15h_power_data), GFP_KERNEL);
-	if (!data)
+	if (!data) {
+		pr_info("fam15h_power: Returning ENOMEM in %s.\n", __func__);
 		return -ENOMEM;
+	}
 
 	ret = fam15h_power_init_data(pdev, data);
-	if (ret)
+	if (ret) {
+		pr_info("fam15h_power: Return as expected from fam15h_power_init; exiting func.\n");
 		return ret;
+	}
 
 	data->pdev = pdev;
 
