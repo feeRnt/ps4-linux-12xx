@@ -501,7 +501,8 @@ static int fam15h_power_init_data(struct pci_dev *f4,
 		return -ENODEV;
 	}
 
-	pr_info("fam15h_power: Setting power_data->max_cu_acc_power to %u in %s.\n", int, __func__);
+	pr_info("fam15h_power: Setting power_data->max_cu_acc_power to %llu in %s.\n",
+			(unsigned long long)tmp, __func__);
 	data->max_cu_acc_power = tmp;
 
 	/*
