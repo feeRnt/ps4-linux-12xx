@@ -333,9 +333,12 @@ static int fam15h_power_init_attrs(struct pci_dev *pdev,
 	struct attribute **fam15h_power_attrs;
 	struct cpuinfo_x86 *c = &boot_cpu_data;
 
+	/* PS4 Phat/Liverpool Family is 0x16, and models seem to start from 0x10; selected 0x25 as somewhat
+	 * arbitrary end point*/
 	if (c->x86 == 0x15 &&
 	    (c->x86_model <= 0xf ||
-	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f))) {
+	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f)) ||
+	   (c->x86 == 0x16 && (c->x86_model >= 0x10 && c->x86_model <= 0x25))) {
 		n += 1;
 		pr_info("fam15h_power: x86 == 0x15 && x86_model == %#x in %s.\n",
 				c->x86_model, __func__);
@@ -355,11 +358,15 @@ static int fam15h_power_init_attrs(struct pci_dev *pdev,
 	if (!fam15h_power_attrs)
 		return -ENOMEM;
 
-	n = 0; //why are we setting this to 0? what on Earth? Memory shortage test??
+	n = 0; //why are we setting this to 0? what on Earth? Memory shortage test?? Oh the kcalloc
 	fam15h_power_attrs[n++] = &dev_attr_power1_crit.attr;
+
+	/* We can't rely on REG_PROCESSOR_TDP only, as that seems non existent on PS4 Liverpool (0x16).
+	 * Rely on power1_input functions to get the missing values */
 	if (c->x86 == 0x15 &&
 	    (c->x86_model <= 0xf ||
-	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f))) {
+	     (c->x86_model >= 0x60 && c->x86_model <= 0x7f)) ||
+	   (c->x86 == 0x16 && (c->x86_model >= 0x10 && c->x86_model <= 0x25))) {
 		fam15h_power_attrs[n++] = &dev_attr_power1_input.attr;
 		pr_info("fam15h_power: x86 == 0x15 && x86_model == %#x in %s.\n"
 		"Setting power1_input attributes as our fam15h_power_attrs now.\n",
