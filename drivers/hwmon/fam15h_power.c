@@ -32,8 +32,19 @@ MODULE_LICENSE("GPL");
 #define REG_PROCESSOR_TDP		0x1b8
 
 /* D18F5 */
+/* On PS4 AMD Liverpool Systems with Jaguar Architecture,
+ * the TDP_RUNNING_AVERAGE and TDP_LIMIT3 seem to be offset
+ * by one 16 byte row for some reason, for PCI function 5.
+ * They also are not very correctly aligned.. Maybe this is not right */
+#ifdef CONFIG_X86_PS4
+#define REG_TDP_RUNNING_AVERAGE		0xf0
+#define REG_TDP_LIMIT3			0xf4
+
+#else
+
 #define REG_TDP_RUNNING_AVERAGE		0xe0
 #define REG_TDP_LIMIT3			0xe8
+#endif
 
 #define FAM15H_MIN_NUM_ATTRS		2
 #define FAM15H_NUM_GROUPS		2
