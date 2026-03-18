@@ -303,7 +303,7 @@ int apcie_icc_cmd(u8 major, u16 minor, const void *data, u16 length,
 	mutex_unlock(&icc_mutex);
 	return ret;
 }
-EXPORT_SYMBOL_GPL(apcie_icc_cmd);
+EXPORT_SYMBOL(apcie_icc_cmd);
 
 __maybe_unused void resetUsbPort(void)
 {
