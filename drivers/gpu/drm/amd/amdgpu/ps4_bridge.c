@@ -32,6 +32,7 @@
 #include <asm/ps4.h>
 
 #include <drm/drm_crtc.h>
+#include <drm/drm_probe_helper.h>
 #include <drm/drm_crtc_helper.h>
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_edid.h>
@@ -755,9 +756,10 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *amdgpu_dig_connector = amdgpu_connector->con_priv;
+	int dpcd_ret;
 
 	amdgpu_dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
-	amdgpu_atombios_dp_get_dpcd(amdgpu_connector);
+	dpcd_ret = amdgpu_atombios_dp_get_dpcd(amdgpu_connector);
 
 	mutex_lock(&mn_bridge->mutex);
 	cq_init(&mn_bridge->cq, 4);
@@ -770,9 +772,16 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 	reg = mn_bridge->cq.reply.databuf[3];
 	mutex_unlock(&mn_bridge->mutex);
 
-	DRM_DEBUG_KMS("TMONREG=0x%02x\n", reg);
+	DRM_DEBUG_KMS("TMONREG=0x%02x dpcd_ret=%d\n", reg, dpcd_ret);
 
-	if (reg & TMONREG_HPD)
+	/*
+	 * TMONREG_HPD latches high on first connection and is never cleared
+	 * by the Aeolia ICC proxy when the cable is unplugged. Use the DPCD
+	 * AUX transaction result as the authoritative connection indicator:
+	 * DPCD fails immediately with no cable (no DP receiver to respond),
+	 * so it is a reliable live signal unlike the latched HPD bit.
+	 */
+	if ((reg & TMONREG_HPD) && dpcd_ret == 0)
 		return connector_status_connected;
 	else
 		return connector_status_disconnected;
@@ -824,17 +833,22 @@ int ps4_bridge_register(struct drm_connector *connector,
 	mn_bridge->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
 
-	// TODO (ps4patches): This seems to be the new way of adding bridges
-	drm_bridge_add(&mn_bridge->bridge);
+	/*
+	 * Enable DRM connection polling. Without HPD interrupts from Aeolia,
+	 * polling is the only way the kernel will call detect() automatically
+	 * and trigger a modeset when the cable is replugged.
+	 */
+	connector->polled = DRM_CONNECTOR_POLL_CONNECT |
+			    DRM_CONNECTOR_POLL_DISCONNECT;
 
-	//ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
-	
-	// Allow the bridge to create its own connectors with last parameter = 0.
+	drm_bridge_add(&mn_bridge->bridge);
 	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
 	if (ret) {
 		DRM_ERROR("Failed to initialize bridge with drm\n");
 		return -EINVAL;
 	}
+
+	drm_kms_helper_poll_enable(connector->dev);
 
 	return 0;
 }
