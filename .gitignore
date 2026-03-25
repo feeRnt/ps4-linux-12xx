@@ -13,6 +13,11 @@
 .*
 *.a
 *.asn1.[ch]
+out/
+vmlinux.unstripped
+*.o
+*.a
+*.ko
 *.bin
 *.bz2
 *.c.[012]*.*

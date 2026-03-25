@@ -212,6 +212,19 @@ fi
 if [[ "$DO_BUILD" == "1" ]]; then
     scripts/config --enable CONFIG_LTO_CLANG_THIN
     scripts/config --disable CONFIG_LOCALVERSION_AUTO
+    # ── 0005-crypto.patch ────────────────────────────────────────────────
+    # AES-NI glue rebuilt — must be built-in, not module
+    scripts/config --enable  CONFIG_CRYPTO_AES_NI_INTEL
+    # dm-verity now selects CRYPTO_LIB_SHA256 — be explicit
+    scripts/config --enable  CONFIG_CRYPTO_LIB_SHA256
+    # ── 0009-sched-ext.patch ─────────────────────────────────────────────
+    # scx_bpf_dsq_peek is a BTF kfunc — SCHED_EXT must be =y not =m
+    scripts/config --enable  CONFIG_SCHED_EXT
+    scripts/config --enable  CONFIG_BPF_SYSCALL
+    scripts/config --enable  CONFIG_BPF_JIT
+    scripts/config --enable  CONFIG_BPF_JIT_DEFAULT_ON
+    # BTF required for KF_RCU_PROTECTED kfunc resolution at verifier time
+    scripts/config --enable  CONFIG_DEBUG_INFO_BTF
 
     if [[ "$PROFILE" == "server" ]]; then
         echo -e "\e[1;34m[*]\e[0m Applying server profile kernel config..."
