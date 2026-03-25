@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
-# build_bzimage.sh — Local PS4-Linux bzImage builder
-# Run from the root of ps4-linux-12xx/ on the 6.18.18-Strawberry branch
+
+# Usage:
+#   ./build.sh
+#     → Interactive menu.
+#   ./build.sh --option N
+#     → Non-interactive: N=1 (build), 2 (fetch), 3 (both), etc.
+#   ./build.sh --option N use=Server
+#     → Non-interactive, force build profile to "server" or "general" (case-insensitive).
+#   ./build.sh --option 7
+#     → Show/switch build profile non-interactively.
 
 set -euo pipefail
 
-# ── Config ────────────────────────────────────────────────────────────────────
 OUTPUT_DIR="${PWD}/out"
 FIRMWARE_DIR="${PWD}/extra_firmware"
 BASE_URL="https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main"
@@ -13,10 +20,59 @@ export KCFLAGS="-march=btver2 -mtune=btver2 -O3"
 export KAFLAGS="-march=btver2 -mtune=btver2 -O3"
 export HOSTCFLAGS="-Wno-error=incompatible-pointer-types-discards-qualifiers"
 
-# ── Interactive UI ─────────────────────────────────────────────────────────────
+PROFILE="server"
+
 JOBS=$(nproc)
 MAX_JOBS=$(nproc)
 
+# Parse optional build profile argument: use=Server or use=General
+if [[ $# -ge 3 && "$3" =~ ^use= ]]; then
+    PROFILE_ARG="${3#use=}"
+    if [[ "${PROFILE_ARG,,}" == "server" ]]; then
+        PROFILE="server"
+    elif [[ "${PROFILE_ARG,,}" == "general" ]]; then
+        PROFILE="general"
+    else
+        echo "Unknown build profile: ${PROFILE_ARG}. Valid: Server, General"
+        exit 1
+    fi
+fi
+
+if [[ $# -ge 2 && "$1" == "--option" ]]; then
+    CHOICE="$2"
+    case "$CHOICE" in
+        1) DO_BUILD=1; DO_FETCH=0 ;;
+        2) DO_BUILD=0; DO_FETCH=1 ;;
+        3) DO_BUILD=1; DO_FETCH=1 ;;
+        4|5|6)
+            echo "--option $CHOICE is not supported in non-interactive mode."
+            exit 1
+            ;;
+        7)
+            echo "Current build profile: ${PROFILE}"
+            echo "Switch profile? (y/n): "
+            read -r SWITCH
+            if [[ "$SWITCH" =~ ^[Yy]$ ]]; then
+                if [[ "$PROFILE" == "server" ]]; then
+                    PROFILE="general"
+                else
+                    PROFILE="server"
+                fi
+                echo "Profile switched to: ${PROFILE}"
+            fi
+            exit 0
+            ;;
+        *)
+            echo "Invalid --option argument: $CHOICE"
+            exit 1
+            ;;
+    esac
+    SKIP_MENU=1
+else
+    SKIP_MENU=0
+fi
+
+if [[ "$SKIP_MENU" == "0" ]]; then
 while true; do
     clear
     echo -e "\e[1;35m╔══════════════════════════════════════════════════╗\e[0m"
@@ -26,10 +82,12 @@ while true; do
     echo -e "\e[1;35m║\e[0m \e[1;32m2)\e[0m Fetch firmware blobs                          \e[1;35m║\e[0m"
     echo -e "\e[1;35m║\e[0m \e[1;32m3)\e[0m Both (fetch + build)                          \e[1;35m║\e[0m"
     echo -e "\e[1;35m║\e[0m \e[1;32m4)\e[0m Threads to use: \e[1;33m$(printf "%-29s" "${JOBS} / ${MAX_JOBS}")\e[0m \e[1;35m║\e[0m"
+    echo -e "\e[1;35m║\e[0m \e[1;32m6)\e[0m Build profile: \e[1;33m${PROFILE}\e[0m$(printf "%-22s" "")\e[1;35m║\e[0m"
     echo -e "\e[1;35m║\e[0m \e[1;31m5)\e[0m Quit                                          \e[1;35m║\e[0m"
+    echo -e "\e[1;35m║\e[0m \e[1;36m7)\e[0m Show/switch build profile                      \e[1;35m║\e[0m"
     echo -e "\e[1;35m╚══════════════════════════════════════════════════╝\e[0m"
     echo ""
-    read -p "Select option [1-5]: " CHOICE
+    read -p "Select option [1-7]: " CHOICE
 
     case "$CHOICE" in
         1) DO_BUILD=1; DO_FETCH=0; break ;;
@@ -45,11 +103,41 @@ while true; do
             fi
             ;;
         5) echo "Exiting."; exit 0 ;;
+        6)
+            echo ""
+            echo "Select build profile:"
+            echo "  1) Server (max throughput, headless)"
+            echo "  2) General Use (desktop latency tweaks)"
+            read -p "Profile [1-2]: " PROFILE_CHOICE
+            if [[ "$PROFILE_CHOICE" == "1" ]]; then
+                PROFILE="server"
+            elif [[ "$PROFILE_CHOICE" == "2" ]]; then
+                PROFILE="general"
+            else
+                echo -e "\e[1;31m[!] Invalid input.\e[0m Press enter to continue."
+                read -r
+            fi
+            ;;
+        7)
+            echo ""
+            echo "Current build profile: ${PROFILE}"
+            echo "Switch profile? (y/n): "
+            read -r SWITCH
+            if [[ "$SWITCH" =~ ^[Yy]$ ]]; then
+                if [[ "$PROFILE" == "server" ]]; then
+                    PROFILE="general"
+                else
+                    PROFILE="server"
+                fi
+                echo "Profile switched to: ${PROFILE}"
+                sleep 1
+            fi
+            ;;
         *) echo -e "\e[1;31m[!] Invalid option.\e[0m"; sleep 1 ;;
     esac
 done
+fi
 
-# Initialize make arguments *after* the user has finalized the job count
 MAKE_OPTS=(
     -j"${JOBS}"
     LLVM=1
@@ -57,7 +145,6 @@ MAKE_OPTS=(
     HOSTCFLAGS="${HOSTCFLAGS}"
 )
 
-# ── Sanity checks ─────────────────────────────────────────────────────────────
 if [[ ! -f Makefile ]] || ! grep -q "KERNELRELEASE" Makefile 2>/dev/null; then
     echo -e "\e[1;31mERROR:\e[0m Run this from the kernel source root (ps4-linux-12xx/)." >&2
     exit 1
@@ -73,7 +160,6 @@ if [[ ! -f .config ]]; then
     fi
 fi
 
-# ── Firmware fetch logic ───────────────────────────────────────────────────────
 if [[ "$DO_FETCH" == "1" ]]; then
     CONFIG_LINE=$(grep -E '^CONFIG_EXTRA_FIRMWARE=' .config 2>/dev/null || true)
     if [[ -z "${CONFIG_LINE}" ]]; then
@@ -123,19 +209,37 @@ if [[ "$DO_FETCH" == "1" ]]; then
     fi
 fi
 
-# ── Build ─────────────────────────────────────────────────────────────────────
 if [[ "$DO_BUILD" == "1" ]]; then
-    # Base optimizations
     scripts/config --enable CONFIG_LTO_CLANG_THIN
     scripts/config --disable CONFIG_LOCALVERSION_AUTO
 
-    # Explicitly enable custom features (Polly removed for stability)
-    echo -e "\e[1;34m[*]\e[0m Enabling BORE Scheduler, Reflex Governor, and BBR..."
-    scripts/config --enable CONFIG_CPU_FREQ_GOV_REFLEX
-    scripts/config --enable CONFIG_TCP_CONG_BBR
-    scripts/config --enable CONFIG_SCHED_BORE
+    if [[ "$PROFILE" == "server" ]]; then
+        echo -e "\e[1;34m[*]\e[0m Applying server profile kernel config..."
+        scripts/config --disable CONFIG_SCHED_BORE
+        scripts/config --disable CONFIG_CPU_FREQ_GOV_REFLEX
+        scripts/config --enable CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE
+        scripts/config --enable CONFIG_CPU_FREQ_GOV_PERFORMANCE
+        scripts/config --disable CONFIG_CPU_FREQ_DEFAULT_GOV_SCHEDUTIL
+        scripts/config --disable CONFIG_CPU_FREQ_GOV_SCHEDUTIL
+        scripts/config --enable CONFIG_HZ_250
+        scripts/config --set-val CONFIG_HZ 250
+        scripts/config --disable CONFIG_PREEMPT
+        scripts/config --enable CONFIG_PREEMPT_VOLUNTARY
+        scripts/config --disable CONFIG_PREEMPT_NONE
+    else
+        echo -e "\e[1;34m[*]\e[0m Applying general use profile kernel config..."
+        scripts/config --enable CONFIG_SCHED_BORE
+        scripts/config --enable CONFIG_CPU_FREQ_GOV_REFLEX
+        scripts/config --enable CONFIG_CPU_FREQ_DEFAULT_GOV_SCHEDUTIL
+        scripts/config --enable CONFIG_CPU_FREQ_GOV_SCHEDUTIL
+        scripts/config --disable CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE
+        scripts/config --enable CONFIG_HZ_1000
+        scripts/config --set-val CONFIG_HZ 1000
+        scripts/config --enable CONFIG_PREEMPT
+        scripts/config --disable CONFIG_PREEMPT_VOLUNTARY
+        scripts/config --disable CONFIG_PREEMPT_NONE
+    fi
 
-    # Point firmware dir at local extra_firmware/
     if [[ -d "${FIRMWARE_DIR}" ]] && [[ -n "$(ls -A "${FIRMWARE_DIR}" 2>/dev/null)" ]]; then
         echo -e "\e[1;34m[*]\e[0m Setting CONFIG_EXTRA_FIRMWARE_DIR=${FIRMWARE_DIR}"
         scripts/config --set-str CONFIG_EXTRA_FIRMWARE_DIR "${FIRMWARE_DIR}"
