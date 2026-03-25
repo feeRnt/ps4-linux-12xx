@@ -50,12 +50,11 @@ jobs:
         uses: actions/cache/restore@v4
         id: cache-restore-workspace
         with:
-          path: ${{ github.workspace }}/kernel-source-host
+          path: kernel-source-host
           key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}-ThinLTO
 
       - name: Check and make kernel-source-host directory
         run: | 
-          cd ${{ github.workspace }}
           if [ ! -d kernel-source-host ]; then
             mkdir kernel-source-host
           fi
@@ -63,8 +62,7 @@ jobs:
       - name: Check if repo was previously cloned
         id: check_repo
         run: |
-          cd ${{ github.workspace }}/kernel-source-host
-          if [ -d .git ]; then
+          if [ -d "kernel-source-host/.git" ]; then
             echo "exists=true" >> $GITHUB_OUTPUT
           else
             echo "exists=false" >> $GITHUB_OUTPUT
@@ -75,23 +73,21 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 1
-          path: ${{ github.workspace }}/kernel-source-host
+          path: kernel-source-host
           ref: ${{ github.ref }}
 
       - name: Update ps4-linux-12xx repo if it exists
         if: steps.check_repo.outputs.exists == 'true'
-        uses: actions/checkout@v4
-        with:
-          path: ${{ github.workspace }}/kernel-source-host
-          repository: ${{ github.repository }}
-          ref: ${{ github.ref }}
-          fetch-depth: 1
-          token: ${{ github.token }}
-          persist-credentials: false
-          clean: false
+        run: |
+          cd kernel-source-host
+          git config --global --add safe.directory ${{ github.workspace }}/kernel-source-host
+          git remote set-url origin https://github.com/${{ github.repository }}
+          git fetch --depth 1 origin ${{ github.ref }}
+          git reset --hard FETCH_HEAD
+          git clean -fdx
 
       - name: Move .github directory to workspace
-        run: mv ${{ github.workspace }}/kernel-source-host/.github ${{ github.workspace }}/.github || true
+        run: mv kernel-source-host/.github ./.github || true
       
       - name: Build Docker image with cache
         run: |
@@ -145,15 +141,15 @@ jobs:
 
       - name: Read Artifact Name
         id: read-artifact
-        working-directory: ${{ github.workspace }}/kernel-source-host
+        working-directory: kernel-source-host
         run: |
           echo "pkg_name=kernel.tar.gz" >> $GITHUB_OUTPUT
 
       - name: Upload kernel image to github actions artifacts
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ steps.read-artifact.outputs.pkg_name }}
-          path: ${{ github.workspace }}/kernel-source-host/${{ steps.read-artifact.outputs.pkg_name }}
+          path: kernel-source-host/${{ steps.read-artifact.outputs.pkg_name }}
           archive: false
 
       - name: Delete Cache of Github Workspace
@@ -167,5 +163,5 @@ jobs:
         uses: actions/cache/save@v4
         if: steps.compile-kernel-step.outputs.compile-kernel-complete
         with:
-          path: ${{ github.workspace }}/kernel-source-host
+          path: kernel-source-host
           key: ${{ steps.cache-restore-workspace.outputs.cache-primary-key }}
