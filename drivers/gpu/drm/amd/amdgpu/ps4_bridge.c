@@ -690,14 +690,14 @@ static void ps4_bridge_post_disable(struct drm_bridge *bridge)
 // Check if this actually works.
 
 /* 1 - 640x480@60Hz */
-static const struct drm_display_mode mode_480p __maybe_unused = {
+static const struct drm_display_mode mode_480p = {
 	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 		 752, 800, 0, 480, 490, 492, 525, 0,
 		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
 };
 /* 4 - 1280x720@60Hz */
-static const struct drm_display_mode mode_720p __maybe_unused = {
+static const struct drm_display_mode mode_720p = {
 	DRM_MODE("1280x720", DRM_MODE_TYPE_DRIVER, 74250, 1280, 1390,
 		 1430, 1650, 0, 720, 725, 730, 750, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
@@ -737,10 +737,11 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	newmode = drm_mode_duplicate(dev, &mode_1080p120);
 	drm_mode_probed_add(connector, newmode);
 
-	//newmode = drm_mode_duplicate(dev, &mode_720p);
-	//drm_mode_probed_add(connector, newmode);
-	//newmode = drm_mode_duplicate(dev, &mode_480p);
-	//drm_mode_probed_add(connector, newmode);
+	newmode = drm_mode_duplicate(dev, &mode_720p);
+	drm_mode_probed_add(connector, newmode);
+
+	newmode = drm_mode_duplicate(dev, &mode_480p);
+	drm_mode_probed_add(connector, newmode);
 
 	drm_connector_update_edid_property(connector, NULL);
 
@@ -784,8 +785,7 @@ enum drm_mode_status ps4_bridge_mode_valid(struct drm_connector *connector,
 	int vic = drm_match_cea_mode(mode);
 
 	/* Allow anything that we can match up to a VIC (CEA modes) */
-	if (!vic || (vic != 16 && vic != 4 && vic != 63)) {
-	// Might need to disable 63 (1920x1080-120Hz)
+	if (!vic || (vic != 63 && vic != 16 && vic != 4 && vic != 1)) {
 
 	/*
 	if (!vic || (vic != 16 && vic != 4)) {
