@@ -48,7 +48,7 @@ MODULE_LICENSE("GPL");
 
 #else
 
-#define REG_TDP_RUNNING_AVERAGE		0xe0
+#define REG_TDP_RUNNING_AVERAGE		0xe0 /* This is merely the power scan interval */
 #define REG_TDP_LIMIT3			0xe8
 #endif
 
@@ -63,9 +63,9 @@ MODULE_LICENSE("GPL");
 
 struct fam15h_power_data {
 	struct pci_dev *pdev;
-	unsigned int tdp_to_watts; //Multiplication factor
-	unsigned int base_tdp; //REG_PROCESSOR_TDP
-	unsigned int processor_pwr_watts; //Max power?
+	unsigned int tdp_to_watts; // Multiplication factor
+	unsigned int base_tdp; // REG_PROCESSOR_TDP
+	unsigned int processor_pwr_watts; // Crit/Max power
 	unsigned int cpu_pwr_sample_ratio;
 	const struct attribute_group *groups[FAM15H_NUM_GROUPS];
 	struct attribute_group group;
@@ -108,8 +108,8 @@ static ssize_t power1_input_show(struct device *dev,
 		running_avg_capture = val >> 4;
 		running_avg_capture = sign_extend32(running_avg_capture, 27);
 	} else {
-		running_avg_capture = (val >> 4) & 0x3fffff;
-		running_avg_capture = sign_extend32(running_avg_capture, 21);
+		running_avg_capture = (val >> 4) & 0x3fffff; // does not change our value
+		running_avg_capture = sign_extend32(running_avg_capture, 21); // does not change our value
 	}
 
 	pr_info("fam15h_power: Current running_avg_capture = %d in %s .\n",
@@ -133,7 +133,7 @@ static ssize_t power1_input_show(struct device *dev,
 		pr_info("fam15h_power: is_carrizo_or_later hit! In %s.\n", __func__); //shouldn't be
 	}
 	else
-		tdp_limit = (val >> 16) & 0x1fff;
+		tdp_limit = (val >> 16) & 0x1fff; // doesn't change our value
 
 	pr_info("fam15h_power: Current tdp_limit= %u in %s .\n",
 			tdp_limit, __func__);
