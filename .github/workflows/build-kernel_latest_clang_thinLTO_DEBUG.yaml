@@ -60,7 +60,8 @@ jobs:
       # this doesn't need to be done before the caching part, but doing it anyway.
       # Downloading the cache can either happen before or after.
 
-
+      - name: Test Dockerfile Presence before Docker Cache
+        run: stat **/Dockerfile
       # TODO: Either manually restore, delete, save dockerx caches like we did with the workspace cache
       # OR
       # Pin a specific Docker Base OS Image Digest, so that the caches are never invalidated.
@@ -89,6 +90,9 @@ jobs:
 
           restore-keys: |
             ${{ runner.os }}-docker-
+
+      - name: Test Dockerfile Presence after Docker Cache
+        run: stat **/Dockerfile
       
       # Proper cache handling and overwriting; for build artifacts. Based on:
       #1: https://github.com/actions/cache/issues/342#issuecomment-1363953531 (original. ulterzlw)
@@ -561,7 +565,9 @@ jobs:
           # Warning, this will also save the bulit artifacts themselves (the kernel.tar.gz)
           # We can remove those tar.gzs by uncommenting the above run block, or by having a conditional delete every 10 compiles or so.
           # Additionally by deleting the caches entirely from gh or web-interface.
-      
+
+      - name: Test Dockerfile Presence before Post-Docker Cache
+        run: stat **/Dockerfile
 
 # Some yaml facts.
  # Even if your indentation or other errors are further down
