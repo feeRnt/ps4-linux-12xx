@@ -61,7 +61,9 @@ jobs:
       # Downloading the cache can either happen before or after.
 
       - name: Test Dockerfile Presence before Docker Cache
-        run: stat **/Dockerfile
+        run: |
+          set +e
+          stat **/Dockerfile
       # TODO: Either manually restore, delete, save dockerx caches like we did with the workspace cache
       # OR
       # Pin a specific Docker Base OS Image Digest, so that the caches are never invalidated.
@@ -92,7 +94,9 @@ jobs:
             ${{ runner.os }}-docker-
 
       - name: Test Dockerfile Presence after Docker Cache
-        run: stat **/Dockerfile
+        run: |
+          set +e
+          stat **/Dockerfile
       
       # Proper cache handling and overwriting; for build artifacts. Based on:
       #1: https://github.com/actions/cache/issues/342#issuecomment-1363953531 (original. ulterzlw)
@@ -567,7 +571,9 @@ jobs:
           # Additionally by deleting the caches entirely from gh or web-interface.
 
       - name: Test Dockerfile Presence before Post-Docker Cache
-        run: stat **/Dockerfile
+        run: |
+          set +e
+          stat **/Dockerfile
 
 # Some yaml facts.
  # Even if your indentation or other errors are further down
