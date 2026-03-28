@@ -789,7 +789,5 @@ int radeon_ps4_bridge_register(struct drm_connector *connector,
 		return -EINVAL;
 	}
 
-	drm_kms_helper_poll_enable(connector->dev);
-
 	return 0;
 }
