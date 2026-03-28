@@ -113,7 +113,7 @@
 /* ============================================================
  * Fan Threshold Limits
  * ============================================================ */
-#define PS4_FAN_THRESH_MIN_C            45
+#define PS4_FAN_THRESH_MIN_C            20
 #define PS4_FAN_THRESH_MAX_C            85
 #define PS4_FAN_THRESH_DEFAULT_C        79    /* hardware power-on default */
 
