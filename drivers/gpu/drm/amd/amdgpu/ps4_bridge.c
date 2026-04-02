@@ -40,6 +40,7 @@
 #include <drm/drm_bridge.h>
 #include <drm/drm_encoder.h>
 
+#include <linux/err.h>
 #include <linux/i2c.h>
 #include <linux/i2c-algo-bit.h>
 
@@ -167,9 +168,7 @@ struct ps4_bridge {
 
 /* this should really be taken care of by the connector, but that is currently
  * contained/owned by radeon_connector so just use a global for now */
-static struct ps4_bridge g_bridge = {
-	.mutex = __MUTEX_INITIALIZER(g_bridge.mutex)
-};
+static struct ps4_bridge *g_bridge;
 
 /* Function prototype declarations, to fix compilation warnings */
 void ps4_bridge_mode_set(struct drm_bridge *bridge,
@@ -312,6 +311,12 @@ static inline struct ps4_bridge *
 		bridge_to_ps4_bridge(struct drm_bridge *bridge)
 {
 	return container_of(bridge, struct ps4_bridge, bridge);
+}
+
+static void ps4_bridge_clear_global(void *data)
+{
+	if (g_bridge == data)
+		g_bridge = NULL;
 }
 
 void ps4_bridge_mode_set(struct drm_bridge *bridge,
@@ -751,12 +756,14 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 		bool force)
 {
-	struct ps4_bridge *mn_bridge = &g_bridge;
-	u8 reg;
-
+	struct ps4_bridge *mn_bridge = g_bridge;
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *amdgpu_dig_connector = amdgpu_connector->con_priv;
 	int dpcd_ret;
+	u8 reg;
+
+	if (!mn_bridge)
+		return connector_status_disconnected;
 
 	amdgpu_dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
 	dpcd_ret = amdgpu_atombios_dp_get_dpcd(amdgpu_connector);
@@ -825,13 +832,32 @@ static struct drm_bridge_funcs ps4_bridge_funcs = {
 int ps4_bridge_register(struct drm_connector *connector,
 			     struct drm_encoder *encoder)
 {
+	struct device *dev = connector->dev->dev;
 	int ret;
-	struct ps4_bridge *mn_bridge = &g_bridge;
+	struct ps4_bridge *mn_bridge;
+
+	if (g_bridge) {
+		if (g_bridge->connector == connector && g_bridge->encoder == encoder)
+			return 0;
+
+		DRM_ERROR("PS4 bridge already registered for a different connector\n");
+		return -EBUSY;
+	}
+
+	mn_bridge = devm_drm_bridge_alloc(dev, struct ps4_bridge, bridge,
+					      &ps4_bridge_funcs);
+	if (IS_ERR(mn_bridge))
+		return PTR_ERR(mn_bridge);
+
+	ret = devm_add_action_or_reset(dev, ps4_bridge_clear_global, mn_bridge);
+	if (ret)
+		return ret;
+
+	mutex_init(&mn_bridge->mutex);
 
 	mn_bridge->encoder = encoder;
 	mn_bridge->connector = connector;
 	mn_bridge->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
-	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
 
 	/*
 	 * Enable DRM connection polling. Without HPD interrupts from Aeolia,
@@ -841,12 +867,17 @@ int ps4_bridge_register(struct drm_connector *connector,
 	connector->polled = DRM_CONNECTOR_POLL_CONNECT |
 			    DRM_CONNECTOR_POLL_DISCONNECT;
 
-	drm_bridge_add(&mn_bridge->bridge);
+	ret = devm_drm_bridge_add(dev, &mn_bridge->bridge);
+	if (ret)
+		return ret;
+
 	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
 	if (ret) {
 		DRM_ERROR("Failed to initialize bridge with drm\n");
-		return -EINVAL;
+		return ret;
 	}
+
+	g_bridge = mn_bridge;
 
 	return 0;
 }
