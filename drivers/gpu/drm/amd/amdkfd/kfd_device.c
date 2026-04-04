@@ -291,6 +291,12 @@ struct kfd_dev *kgd2kfd_probe(struct amdgpu_device *adev, bool vf)
 		else if (!vf)
 			f2g = &gfx_v7_kfd2kgd;
 		break;
+	case CHIP_LIVERPOOL:
+	case CHIP_GLADIUS:
+		gfx_target_version = 70001;
+		if (!vf)
+			f2g = &gfx_v7_kfd2kgd;
+		break;
 #endif
 	case CHIP_TONGA:
 		gfx_target_version = 80002;
