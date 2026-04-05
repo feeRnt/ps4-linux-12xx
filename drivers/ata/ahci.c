@@ -618,15 +618,13 @@ static const struct pci_device_id ahci_pci_tbl[] = {
 	/* Enmotus */
 	{ PCI_DEVICE(0x1c44, 0x8000), board_ahci },
 
-<<<<<<< HEAD
 	/* Loongson */
 	{ PCI_VDEVICE(LOONGSON, 0x7a08), board_ahci },
-=======
+
 	/* Sony (PS4) */
 	{ PCI_VDEVICE(SONY, PCI_DEVICE_ID_SONY_AEOLIA_AHCI), board_ahci },
 	{ PCI_VDEVICE(SONY, PCI_DEVICE_ID_SONY_BELIZE_AHCI), board_ahci },
 	{ PCI_VDEVICE(SONY, PCI_DEVICE_ID_SONY_BAIKAL_AHCI), board_ahci },
->>>>>>> f5ac1ebabd (ps4baikalpatches)
 
 	/* Generic, PCI class code for AHCI */
 	{ PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID, PCI_ANY_ID,
@@ -1767,14 +1765,11 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 			ahci_pci_bar = AHCI_PCI_BAR_CAVIUM;
 		if (pdev->device == 0xa084)
 			ahci_pci_bar = AHCI_PCI_BAR_CAVIUM_GEN5;
-<<<<<<< HEAD
 	} else if (pdev->vendor == PCI_VENDOR_ID_LOONGSON) {
 		if (pdev->device == 0x7a08)
 			ahci_pci_bar = AHCI_PCI_BAR_LOONGSON;
-=======
-	else if (pdev->vendor == PCI_VENDOR_ID_SONY && pdev->device == PCI_DEVICE_ID_SONY_BAIKAL_AHCI)
-			ahci_pci_bar = AHCI_PCI_BAR0_BAIKAL;			
->>>>>>> f5ac1ebabd (ps4baikalpatches)
+		else if (pdev->vendor == PCI_VENDOR_ID_SONY && pdev->device == PCI_DEVICE_ID_SONY_BAIKAL_AHCI)
+			ahci_pci_bar = AHCI_PCI_BAR0_BAIKAL;	// Notice the incorrect assignment.
 	}
 
 	/* acquire resources */
