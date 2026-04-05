@@ -577,7 +577,7 @@ config X86_PS4
 	depends on X86_64
 	depends on X86_EXTENDED_PLATFORM
 	depends on PCI
-	---help---
+	help
 	  Select to include support for the Sony PlayStation 4 game console.
 
 config X86_VSMP
