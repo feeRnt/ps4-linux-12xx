@@ -116,7 +116,7 @@ config USB_XHCI_TEGRA
 config USB_XHCI_AEOLIA
 	tristate "xHCI support for Sony PS4 (Aeolia)"
 	depends on X86_PS4
-	---help---
+	help
 	  Say 'Y' to enable the support for the xHCI host controller
 	  found in the Sony PlayStation 4.
 
