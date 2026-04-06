@@ -416,6 +416,8 @@ int amdgpu_atombios_dp_get_panel_mode(struct drm_encoder *encoder,
 void amdgpu_atombios_dp_set_link_config(struct drm_connector *connector,
 				 const struct drm_display_mode *mode)
 {
+	struct drm_device *dev = connector->dev;
+	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
 	struct amdgpu_connector_atom_dig *dig_connector;
 	int ret;
@@ -434,6 +436,11 @@ void amdgpu_atombios_dp_set_link_config(struct drm_connector *connector,
 			dig_connector->dp_clock = 0;
 			dig_connector->dp_lane_count = 0;
 		}
+		if (adev->asic_type == CHIP_LIVERPOOL ||
+		    adev->asic_type == CHIP_GLADIUS)
+			DRM_DEBUG_KMS("ps4 dp link config: ret=%d mode_clock=%d lanes=%u clock=%u sink_type=%d\n",
+				      ret, mode->clock, dig_connector->dp_lane_count,
+				      dig_connector->dp_clock, dig_connector->dp_sink_type);
 	}
 }
 

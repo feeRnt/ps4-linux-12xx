@@ -1550,11 +1550,16 @@ static int
 amdgpu_connector_late_register(struct drm_connector *connector)
 {
 	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
+	struct amdgpu_device *adev = drm_to_adev(connector->dev);
 	int r = 0;
 
 	if (amdgpu_connector->ddc_bus->has_aux) {
 		amdgpu_connector->ddc_bus->aux.dev = amdgpu_connector->base.kdev;
 		r = drm_dp_aux_register(&amdgpu_connector->ddc_bus->aux);
+		if (!r &&
+		    (adev->asic_type == CHIP_LIVERPOOL ||
+		     adev->asic_type == CHIP_GLADIUS))
+			connector->ddc = &amdgpu_connector->ddc_bus->aux.ddc;
 	}
 
 	return r;
@@ -1758,9 +1763,9 @@ amdgpu_connector_add(struct amdgpu_device *adev,
 				drm_connector_helper_add(&amdgpu_connector->base,
 						 &amdgpu_connector_dp_helper_funcs);
 			} else {
-				drm_connector_init(dev, &amdgpu_connector->base, 
-						&amdgpu_ps4_dp_connector_funcs, 
-						connector_type);
+				drm_connector_init_with_ddc(dev, &amdgpu_connector->base,
+						&amdgpu_ps4_dp_connector_funcs,
+						connector_type, ddc);
 
 				drm_connector_helper_add(&amdgpu_connector->base,
 						&amdgpu_ps4_dp_connector_helper_funcs);

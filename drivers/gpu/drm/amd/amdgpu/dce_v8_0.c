@@ -2540,10 +2540,23 @@ static int dce_v8_0_crtc_mode_set(struct drm_crtc *crtc,
 				  struct drm_display_mode *adjusted_mode,
 				  int x, int y, struct drm_framebuffer *old_fb)
 {
+	struct drm_device *dev = crtc->dev;
+	struct amdgpu_device *adev = drm_to_adev(dev);
 	struct amdgpu_crtc *amdgpu_crtc = to_amdgpu_crtc(crtc);
 
-	if (!amdgpu_crtc->adjusted_clock)
+	if (!amdgpu_crtc->adjusted_clock) {
+		if (adev->asic_type == CHIP_LIVERPOOL ||
+		    adev->asic_type == CHIP_GLADIUS)
+			DRM_ERROR("ps4 crtc mode_set: adjusted_clock=0 for %s (%d kHz)\n",
+				  adjusted_mode->name, adjusted_mode->clock);
 		return -EINVAL;
+	}
+
+	if (adev->asic_type == CHIP_LIVERPOOL ||
+	    adev->asic_type == CHIP_GLADIUS)
+		DRM_DEBUG_KMS("ps4 crtc mode_set: %s clock=%d adjusted=%u pll=%d\n",
+			      adjusted_mode->name, adjusted_mode->clock,
+			      amdgpu_crtc->adjusted_clock, amdgpu_crtc->pll_id);
 
 	amdgpu_atombios_crtc_set_pll(crtc, adjusted_mode);
 	amdgpu_atombios_crtc_set_dtd_timing(crtc, adjusted_mode);
