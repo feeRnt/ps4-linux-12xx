@@ -196,6 +196,7 @@ jobs:
         with:
           name: ${{ steps.read-artifact.outputs.pkg_name }}
           path: kernel-source-host/${{ steps.read-artifact.outputs.pkg_name }}
+          archive: false
 
       - name: Delete Cache of Github Workspace
         env:
