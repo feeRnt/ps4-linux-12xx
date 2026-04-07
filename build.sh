@@ -248,6 +248,7 @@ if [[ "$DO_FETCH" == "1" ]]; then
 
             if [[ -n "${FIRMWARE_URL_FALLBACK}" ]]; then
                 FIRMWARE_URL="${FIRMWARE_URL_FALLBACK}"
+                echo -e '  \e[1;33m[!] Using non-default firmware for '${blob}'!\n  Using commit from '${FIRMWARE_URL}''
             fi
 
             if curl -fsSL --retry 3 --retry-delay 2 "${FIRMWARE_URL}/${blob}" -o "${dest}"; then
