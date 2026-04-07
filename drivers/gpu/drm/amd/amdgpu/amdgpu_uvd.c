@@ -327,9 +327,9 @@ int amdgpu_uvd_sw_init(struct amdgpu_device *adev)
 	for (j = 0; j < adev->uvd.num_uvd_inst; j++) {
 		if (adev->uvd.harvest_config & (1 << j))
 			continue;
-		// Force UVD firmware BO into GTT only (PS4 hardware cannot access VRAM base > 34 bits)
 		r = amdgpu_bo_create_kernel(adev, bo_size, PAGE_SIZE,
-					    AMDGPU_GEM_DOMAIN_GTT, // Only GTT, not VRAM
+					    AMDGPU_GEM_DOMAIN_VRAM |
+					    AMDGPU_GEM_DOMAIN_GTT,
 					    &adev->uvd.inst[j].vcpu_bo,
 					    &adev->uvd.inst[j].gpu_addr,
 					    &adev->uvd.inst[j].cpu_addr);
