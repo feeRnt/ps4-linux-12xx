@@ -65,28 +65,30 @@ RUN DEBIAN_FRONTEND=noninteractive TZ=Etc/UTC apt-get install gcc-11 libgcc-11-d
 #OpenSSL 2.1 needed for Linux kernel version 5.15.
 #Without gcc-11 (or older), you will probably get compilation errors
 
-FROM install-deps2 AS install-extra-firmware
-
-RUN <<"EOF"
-mkdir -p /lib/firmware/mrvl
-cd /lib/firmware/mrvl
-wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin
-wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin?id=f87c5b8dd547bcb434d5296ead3748241810c1d8
-# We need an older firmware version from ~2013-2016 for Aeolias' 8797 SDIO Chip, ideally the one that's used on the PS4 OS.
-# This version is the closest to that we have (besides the one packed in Orbis Torus (WiFi+BT) firmware).
-
-mkdir -p /lib/firmware/mediatek
-cd /lib/firmware/mediatek
-wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7668pr2h.bin
-
-#### Extra firmware that are / might be needed for kernel compilation. 
-EOF
+# No longer needed with build.sh checks and firmware blobs contained in repo itself
+# FROM install-deps2 AS install-extra-firmware
+#
+# RUN <<"EOF"
+# mkdir -p /lib/firmware/mrvl
+# cd /lib/firmware/mrvl
+# wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin
+# wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin?id=f87c5b8dd547bcb434d5296ead3748241810c1d8
+# mv "sd8797_uapsta.bin?id=f87c5b8dd547bcb434d5296ead3748241810c1d8" sd8797_uapsta.bin # Weird fw name from kernel.org
+# # We need an older firmware version from ~2013-2016 for Aeolias' 8797 SDIO Chip, ideally the one that's used on the PS4 OS.
+# # This version is the closest to that we have (besides the one packed in Orbis Torus (WiFi+BT) firmware).
+#
+# mkdir -p /lib/firmware/mediatek
+# cd /lib/firmware/mediatek
+# wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7668pr2h.bin
+#
+# #### Extra firmware that are / might be needed for kernel compilation.
+# EOF
 # Wget code snippet from https://github.com/TigerClips1
-
+#
 # Clone the Linux kernel source . . . This fails to cache as expected.
 # A slight change of git clone invalidates the whole kernel source
 # directory cache. So used custom caching mecahnism in github.yaml
-FROM install-extra-firmware AS prepare-kernel-source
+FROM install-deps2 AS prepare-kernel-source
 
 RUN mkdir -p /container/workspace/kernel-source-container
 WORKDIR /container/workspace/kernel-source-container
