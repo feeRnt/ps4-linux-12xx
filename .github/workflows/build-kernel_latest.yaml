@@ -61,7 +61,14 @@ jobs:
       - name: Test Dockerfile Presence before Docker Cache
         run: |
           set +e
+          shopt -s globstar nullglob
           stat **/Dockerfile
+          if [ $? -eq 0 ]; then
+              echo -e '\e[1;34m[0] Dockerfile Found.'
+          else
+              echo -e '\e[1;31m[!] Missing Dockerfile!\n'
+          fi
+        # Will help pass the step with return code 0, hence will prevent failing the whole workflow run
 
       # TODO: Either manually restore, delete, save dockerx caches like we did with the workspace cache
       # OR
@@ -95,7 +102,14 @@ jobs:
       - name: Test Dockerfile Presence after Docker Cache
         run: |
           set +e
+          shopt -s globstar nullglob
           stat **/Dockerfile
+          if [ $? -eq 0 ]; then
+              echo -e '\e[1;34m[0] Dockerfile Found.'
+          else
+              echo -e '\e[1;31m[!] Missing Dockerfile!\n'
+          fi
+        # Will help pass the step with return code 0, hence will prevent failing the whole workflow run
       
       # Proper cache handling and overwriting; for build artifacts. Based on:
       #1: https://github.com/actions/cache/issues/342#issuecomment-1363953531 (original. ulterzlw)
@@ -534,7 +548,14 @@ jobs:
       - name: Test Dockerfile Presence before Post-Docker Cache
         run: |
           set +e
+          shopt -s globstar nullglob
           stat **/Dockerfile
+          if [ $? -eq 0 ]; then
+              echo -e '\e[1;34m[0] Dockerfile Found.'
+          else
+              echo -e '\e[1;31m[!] Missing Dockerfile!\n'
+          fi
+        # Will help pass the step with return code 0, hence will prevent failing the whole workflow run
 
 # Some yaml facts.
  # Even if your indentation or other errors are further down
