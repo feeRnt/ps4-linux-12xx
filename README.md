@@ -196,6 +196,27 @@ Pull requests/code contributions are always welcome.
 <br>
 
 ---
+## Licensing
+
+### Firmware and Drivers Notice
+
+This repository includes non-GPL firmware/cfg blobs under extra_firmware/,
+
+These files (e.g. Marvell and MediaTek firmware) are distributed under
+their respective vendor licenses and are not covered by the GPL.
+
+See extra_firmware/README.license for details.
+
+
+There is an additional Dual BSD 3 & GPL 2 License for the MediaTek wireless driver in wireless/mediatek/mt76x8/**
+
+See drivers/net/wireless/mediatek/mt76x8/README.license for details.
+
+-- The rest of the repository and code is under the same terms as the Linux Kernel, GPLv2, unless noted otherwise --
+
+<br>
+
+---
 ## Documentation, Guides and the PS4 Linux Future (As of December 2025)
 
 While many of the bugs and issues prevalent in PS4 Linux kernels, and PS4 Linux in general have been fixed over the years, many of them still exist, and are seldom worked on.  
