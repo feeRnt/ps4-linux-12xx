@@ -192,7 +192,7 @@ jobs:
           echo "pkg_name=${ARTIFACT_NAME}" >> "$GITHUB_OUTPUT"
 
       - name: Upload kernel image to github actions artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ steps.read-artifact.outputs.pkg_name }}
           path: kernel-source-host/${{ steps.read-artifact.outputs.pkg_name }}
