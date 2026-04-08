@@ -1,0 +1,36 @@
+Firmware licensing
+==================
+
+The firmware and configuration blobs in this directory
+(e.g. Marvell and MediaTek) are not covered by the
+GNU General Public License.
+
+These files are binary firmware provided by hardware vendors and
+are distributed under their respective licenses.
+
+Where available, license information is taken from the upstream
+linux-firmware repository:
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
+
+In cases where no explicit license file is present, the firmware
+is assumed to be redistributable, but may not permit modification.
+
+===================
+
+For the firmware under mrvl/ (currently empty), see LICENCE.Marvell
+
+===================
+
+For the firmware under mediatek/ (currently empty), see LICENCE.mediatek
+
+
+For the MediaTek 7668 firmware and cfg files under ./
+licensing terms are provided by the original vendor (MediaTek)
+and are typically "redistributable firmware" licenses.
+
+Please inquire the original repository by Khadas and ZTE
+https://github.com/khadas/android_hardware_wifi_mtk_drivers_mt7668/
+for the proper licensing, though it is not likely far off from
+LICENCE.mediatek.
+
+

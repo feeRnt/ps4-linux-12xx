@@ -343,6 +343,28 @@ Attempts at using the display EDID information from your monitor, to use in Linu
 <p align="center">Enjoy your Linux-Station!</p>
 
 ---
+
+<br>
+
+---
+## Licensing
+
+### Firmware and Drivers Notice
+
+This repository includes non-GPL firmware/cfg blobs under extra_firmware/,
+
+These files (e.g. Marvell and MediaTek firmware) are distributed under
+their respective vendor licenses and are not covered by the GPL.
+
+See extra_firmware/README.license for details.
+
+
+There is an additional Dual BSD 3 & GPL 2 License for the MediaTek wireless driver in wireless/mediatek/mt76x8/**
+
+See drivers/net/wireless/mediatek/mt76x8/README.license for details.
+
+-- The rest of the repository and code is under the same terms as the Linux Kernel, GPLv2, unless noted otherwise --
+
 <br>
 
 Generic Linux Kernel Documentation
