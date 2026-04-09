@@ -2470,8 +2470,8 @@ static int cik_common_early_init(struct amdgpu_ip_block *ip_block)
 				AMD_CG_SUPPORT_SDMA_MGCG |
 				AMD_CG_SUPPORT_SDMA_LS |
 				AMD_CG_SUPPORT_BIF_LS |
-				AMD_CG_SUPPORT_VCE_MGCG |
-				AMD_CG_SUPPORT_UVD_MGCG |
+				//AMD_CG_SUPPORT_VCE_MGCG |
+				//AMD_CG_SUPPORT_UVD_MGCG |
 				AMD_CG_SUPPORT_HDP_LS |
 				AMD_CG_SUPPORT_HDP_MGCG;
 			adev->pg_flags =
@@ -2685,8 +2685,8 @@ int cik_set_ip_blocks(struct amdgpu_device *adev)
 			amdgpu_device_ip_block_add(adev, &dce_v8_1_ip_block);
 		amdgpu_device_ip_block_add(adev, &gfx_v7_1_ip_block);
 		amdgpu_device_ip_block_add(adev, &cik_sdma_ip_block);
-		//amdgpu_device_ip_block_add(adev, &uvd_v4_2_ip_block); /* These two were	*/
-		//amdgpu_device_ip_block_add(adev, &vce_v2_0_ip_block); /* disabled. Let's c */
+		amdgpu_device_ip_block_add(adev, &uvd_v4_2_ip_block); /* These two were	*/
+		amdgpu_device_ip_block_add(adev, &vce_v2_0_ip_block); /* disabled. Let's c */
 		break;
 	case CHIP_GLADIUS:
 		amdgpu_device_ip_block_add(adev, &cik_common_ip_block);
