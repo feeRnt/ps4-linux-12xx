@@ -405,7 +405,8 @@ static int gmc_v7_0_mc_init(struct amdgpu_device *adev)
 #ifdef CONFIG_DRM_AMDGPU_CIK
 		case CHIP_LIVERPOOL:
 		case CHIP_GLADIUS:
-			adev->gmc.gart_size = 512ULL << 20;
+			adev->gmc.gart_size = 1024ULL << 20; // some ps4patch set this to 512 MB, but this might break UVD with bonaire firmware
+		/* orignal fail0verflow patches don't have hard set value, but it sets to 1024 MB or eq. to VRAM (whichever larger) - part of AMD code */
 			break;
 		case CHIP_BONAIRE: /* UVD, VCE do not support GPUVM */
 		case CHIP_HAWAII:  /* UVD, VCE do not support GPUVM */
