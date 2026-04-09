@@ -21,7 +21,7 @@ OUTPUT_DIR="${PWD}/out"
 FIRMWARE_DIR="${PWD}/extra_firmware"
 FIRMWARE_URL_BASE="https://gitlab.com/kernel-firmware/linux-firmware/-/raw/main"
 declare -A FIRMWARE_URL_OVERRIDES
-FIRMWARE_URL_OVERRIDES["mrvl/sd8797_uapsta.bin"]="f87c5b8dd547bcb434d5296ead3748241810c1d8"
+#FIRMWARE_URL_OVERRIDES["mrvl/sd8797_uapsta.bin"]="f87c5b8dd547bcb434d5296ead3748241810c1d8" #sucks too
 # We need an older firmware version from ~2013-2016 for Aeolias' 8797 SDIO Chip, ideally the one that's used on the PS4 OS.
 # This version is the closest to that we have (besides the one packed in Orbis Torus (WiFi+BT) firmware).
 
