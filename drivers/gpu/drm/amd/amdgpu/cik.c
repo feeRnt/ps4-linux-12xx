@@ -2470,20 +2470,20 @@ static int cik_common_early_init(struct amdgpu_ip_block *ip_block)
 				AMD_CG_SUPPORT_SDMA_MGCG |
 				AMD_CG_SUPPORT_SDMA_LS |
 				AMD_CG_SUPPORT_BIF_LS |
-				//AMD_CG_SUPPORT_VCE_MGCG |
-				//AMD_CG_SUPPORT_UVD_MGCG |
+				AMD_CG_SUPPORT_VCE_MGCG |
+				AMD_CG_SUPPORT_UVD_MGCG |
 				AMD_CG_SUPPORT_HDP_LS |
 				AMD_CG_SUPPORT_HDP_MGCG;
 			adev->pg_flags =
 				/*AMD_PG_SUPPORT_GFX_PG |
 				  AMD_PG_SUPPORT_GFX_SMG |*/
-				/*AMD_PG_SUPPORT_UVD |
-				  AMD_PG_SUPPORT_VCE |*/
+				  AMD_PG_SUPPORT_UVD |
+				  AMD_PG_SUPPORT_VCE;
 				/*AMD_PG_SUPPORT_CP |
 				  AMD_PG_SUPPORT_GDS |
 				  AMD_PG_SUPPORT_RLC_SMU_HS |
 				  AMD_PG_SUPPORT_SAMU |*/
-				  0;
+				  //0;
 			adev->external_rev_id = adev->rev_id + 0x61;
 			break;
 
