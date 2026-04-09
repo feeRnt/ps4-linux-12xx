@@ -2347,7 +2347,7 @@ static int amdgpu_pci_probe(struct pci_dev *pdev,
 #ifdef CONFIG_DRM_AMDGPU_CIK
 		if (!amdgpu_cik_support) {
 			dev_info(&pdev->dev,
-				 "CIK support provided by radeon.\n");
+				 "CIK support provided by radeon.\n"); // Tests if radeon should be used I Guess. No need for Liverpool
 			dev_info(&pdev->dev,
 				 "Use radeon.cik_support=0 amdgpu.cik_support=1 to override.\n"
 				);
