@@ -2108,7 +2108,7 @@ static void cik_program_aspm(struct amdgpu_device *adev)
 
 			orig = data = RREG32_PCIE(ixPCIE_LC_LINK_WIDTH_CNTL);
 			data &= ~PCIE_LC_LINK_WIDTH_CNTL__LC_DYN_LANES_PWR_STATE_MASK;
-			data |= ~(3 << PCIE_LC_LINK_WIDTH_CNTL__LC_DYN_LANES_PWR_STATE__SHIFT);
+			data |= (3 << PCIE_LC_LINK_WIDTH_CNTL__LC_DYN_LANES_PWR_STATE__SHIFT);
 			if (orig != data)
 				WREG32_PCIE(ixPCIE_LC_LINK_WIDTH_CNTL, data);
 
@@ -2190,6 +2190,58 @@ static void cik_program_aspm(struct amdgpu_device *adev)
 			}
 		}
 	}
+}
+
+static void cik_program_aspm_ps4(struct amdgpu_device *adev)
+{
+	u32 data, orig;
+
+	if (pci_is_root_bus(adev->pdev->bus))
+		return;
+
+	/*
+	 * Liverpool/Gladius are console APUs. Favor deterministic latency over
+	 * PCIe/BIF low-power entry and autonomous link-management behavior.
+	 * goyim machine
+	 */
+	orig = data = RREG32_PCIE(ixPCIE_LC_CNTL);
+	data &= ~(PCIE_LC_CNTL__LC_L0S_INACTIVITY_MASK |
+		  PCIE_LC_CNTL__LC_L1_INACTIVITY_MASK);
+	data |= PCIE_LC_CNTL__LC_PMI_TO_L1_DIS_MASK;
+	if (orig != data)
+		WREG32_PCIE(ixPCIE_LC_CNTL, data);
+
+	orig = data = RREG32_PCIE(ixPCIE_LC_CNTL2);
+	data &= ~(PCIE_LC_CNTL2__LC_ALLOW_PDWN_IN_L1_MASK |
+		  PCIE_LC_CNTL2__LC_ALLOW_PDWN_IN_L23_MASK);
+	if (orig != data)
+		WREG32_PCIE(ixPCIE_LC_CNTL2, data);
+
+	orig = data = RREG32_PCIE(ixPCIE_CNTL2);
+	data &= ~(PCIE_CNTL2__SLV_MEM_LS_EN_MASK |
+		  PCIE_CNTL2__SLV_MEM_AGGRESSIVE_LS_EN_MASK |
+		  PCIE_CNTL2__MST_MEM_LS_EN_MASK |
+		  PCIE_CNTL2__REPLAY_MEM_LS_EN_MASK |
+		  PCIE_CNTL2__SLV_MEM_SD_EN_MASK |
+		  PCIE_CNTL2__SLV_MEM_AGGRESSIVE_SD_EN_MASK |
+		  PCIE_CNTL2__MST_MEM_SD_EN_MASK |
+		  PCIE_CNTL2__REPLAY_MEM_SD_EN_MASK);
+	if (orig != data)
+		WREG32_PCIE(ixPCIE_CNTL2, data);
+
+	/* wsp */
+	orig = data = RREG32_PCIE(ixPCIE_LC_LINK_WIDTH_CNTL);
+	data &= ~PCIE_LC_LINK_WIDTH_CNTL__LC_DYN_LANES_PWR_STATE_MASK;
+	if (orig != data)
+		WREG32_PCIE(ixPCIE_LC_LINK_WIDTH_CNTL, data);
+
+	orig = data = RREG32_PCIE(ixPCIE_LC_SPEED_CNTL);
+	data |= PCIE_LC_SPEED_CNTL__LC_AUTO_RECOVERY_DIS_MASK;
+	data &= ~PCIE_LC_SPEED_CNTL__LC_MULT_UPSTREAM_AUTO_SPD_CHNG_EN_MASK;
+	data &= ~PCIE_LC_SPEED_CNTL__LC_INIT_SPEED_NEG_IN_L0s_EN_MASK;
+	data &= ~PCIE_LC_SPEED_CNTL__LC_INIT_SPEED_NEG_IN_L1_EN_MASK;
+	if (orig != data)
+		WREG32_PCIE(ixPCIE_LC_SPEED_CNTL, data);
 }
 
 static uint32_t cik_get_rev_id(struct amdgpu_device *adev)
@@ -2465,10 +2517,8 @@ static int cik_common_early_init(struct amdgpu_ip_block *ip_block)
 				AMD_CG_SUPPORT_GFX_CP_LS |
 				AMD_CG_SUPPORT_SDMA_MGCG |
 				AMD_CG_SUPPORT_SDMA_LS |
-				AMD_CG_SUPPORT_BIF_LS |
 				AMD_CG_SUPPORT_VCE_MGCG |
 				AMD_CG_SUPPORT_UVD_MGCG |
-				AMD_CG_SUPPORT_HDP_LS |
 				AMD_CG_SUPPORT_HDP_MGCG;
 			adev->pg_flags =
 				/*AMD_PG_SUPPORT_GFX_PG |
@@ -2494,10 +2544,8 @@ static int cik_common_early_init(struct amdgpu_ip_block *ip_block)
 				AMD_CG_SUPPORT_GFX_CP_LS |
 				AMD_CG_SUPPORT_SDMA_MGCG |
 				AMD_CG_SUPPORT_SDMA_LS |
-				AMD_CG_SUPPORT_BIF_LS |
 				AMD_CG_SUPPORT_VCE_MGCG |
 				AMD_CG_SUPPORT_UVD_MGCG |
-				AMD_CG_SUPPORT_HDP_LS |
 				AMD_CG_SUPPORT_HDP_MGCG;
 			adev->pg_flags =
 				/*AMD_PG_SUPPORT_GFX_PG |
@@ -2527,8 +2575,12 @@ static int cik_common_hw_init(struct amdgpu_ip_block *ip_block)
 	cik_init_golden_registers(adev);
 	/* enable pcie gen2/3 link */
 	cik_pcie_gen3_enable(adev);
-	/* enable aspm */
-	cik_program_aspm(adev);
+	/* Use a PS4-specific low-latency PCIe policy for Liverpool/Gladius. negrai pardavimui */
+	if (adev->asic_type == CHIP_LIVERPOOL ||
+	    adev->asic_type == CHIP_GLADIUS)
+		cik_program_aspm_ps4(adev);
+	else
+		cik_program_aspm(adev);
 
 	if (adev->asic_type == CHIP_LIVERPOOL ||
 	    adev->asic_type == CHIP_GLADIUS)

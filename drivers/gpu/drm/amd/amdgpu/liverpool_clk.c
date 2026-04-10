@@ -133,6 +133,7 @@ int liverpool_clk_force_max(struct amdgpu_device *adev)
 	u32 startup_did, current_did;
 	u32 spll_pdiva, spll_fbdiv;
 	u32 cntl, status;
+	bool expected_done_tog;
 	int i;
 
 	spll_fuses = RREG32_SMC(GCK_SPLL_FUSES);
@@ -197,11 +198,12 @@ int liverpool_clk_force_max(struct amdgpu_device *adev)
 	cntl |= (LIVERPOOL_TARGET_SCLK_DID << SCLK_DIRCNTL_DIV_SHIFT) & SCLK_DIRCNTL_DIV_MASK;
 	cntl |= SCLK_DIRCNTL_EN;
 	cntl ^= SCLK_DIRCNTL_TOG;
+	expected_done_tog = !!(cntl & SCLK_DIRCNTL_TOG);
 	WREG32_SMC(CG_SCLK_CNTL, cntl);
 
 	for (i = 0; i < LIVERPOOL_CLK_TIMEOUT_ITER; i++) {
 		status = RREG32_SMC(CG_SCLK_STATUS);
-		if (status & (SCLK_DIRCNTL_DONE_TOG | SCLK_FORCE_STATUS_DONE))
+		if (!!(status & SCLK_DIRCNTL_DONE_TOG) == expected_done_tog)
 			break;
 		udelay(LIVERPOOL_CLK_TIMEOUT_US);
 	}
