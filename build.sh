@@ -202,14 +202,13 @@ if [[ ! -f Makefile ]] || ! grep -q "KERNELRELEASE" Makefile 2>/dev/null; then
     exit 1
 fi
 
-if [[ ! -f .config ]]; then
-    if [[ -f config ]]; then
-        echo -e "\e[1;34m[*]\e[0m Moving 'config' -> '.config'"
-        mv config .config
-    else
-        echo -e "\e[1;31mERROR:\e[0m No .config found." >&2
-        exit 1
-    fi
+# if [[ ! -f .config ]]; then  # We need to update the config file even if .config exists from a prev. cached build
+if [[ -f config ]]; then
+    echo -e "\e[1;34m[*]\e[0m Moving 'config' -> '.config'"
+    mv config .config
+else
+    echo -e "\e[1;31mERROR:\e[0m No .config found." >&2
+    exit 1
 fi
 
 if [[ "$DO_FETCH" == "1" ]]; then
