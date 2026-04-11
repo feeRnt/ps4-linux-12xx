@@ -90,6 +90,19 @@ config DMI_SYSFS
 config DMI_SCAN_MACHINE_NON_EFI_FALLBACK
 	bool
 
+config PS4_DMI_SPOOF
+	bool "PlayStation 4 DMI spoof fallback"
+	depends on DMI && ACPI && X86
+	help
+	  Enable a PlayStation 4-specific DMI fallback when SMBIOS is
+	  present but the DMI strings are blank or malformed.
+
+	  This uses PS4 ACPI OEM identity to confirm the machine is a
+	  PlayStation 4, then injects static fallback strings into
+	  dmi_ident[] from the dmi_scan.c error path.
+
+	  Say Y if this kernel is intended to boot on PS4 hardware.
+
 config ISCSI_IBFT_FIND
 	bool "iSCSI Boot Firmware Table Attributes"
 	depends on X86 && ISCSI_IBFT

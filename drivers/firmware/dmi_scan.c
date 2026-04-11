@@ -11,6 +11,8 @@
 #include <asm/dmi.h>
 #include <linux/unaligned.h>
 
+#include "ps4-dmi.h"
+
 #ifndef SMBIOS_ENTRY_POINT_SCAN_START
 #define SMBIOS_ENTRY_POINT_SCAN_START 0xF0000
 #endif
@@ -759,6 +761,15 @@ static void __init dmi_scan_machine(void)
 	}
  error:
 	pr_info("DMI not present or invalid.\n");
+
+#ifdef CONFIG_PS4_DMI_SPOOF
+	if (ps4_dmi_is_ps4()) {
+		dmi_available = 1;
+		ps4_dmi_populate(dmi_ident);
+		dmi_format_ids(dmi_ids_string, sizeof(dmi_ids_string));
+		return;
+	}
+#endif
 }
 
 static __ro_after_init BIN_ATTR_SIMPLE_ADMIN_RO(smbios_entry_point);
