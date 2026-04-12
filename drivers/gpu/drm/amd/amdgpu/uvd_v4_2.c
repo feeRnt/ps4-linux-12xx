@@ -57,6 +57,7 @@ static void uvd_v4_2_set_dcm(struct amdgpu_device *adev,
  */
 static uint64_t uvd_v4_2_ring_get_rptr(struct amdgpu_ring *ring)
 {
+    //pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	return RREG32(mmUVD_RBC_RB_RPTR);
@@ -71,6 +72,7 @@ static uint64_t uvd_v4_2_ring_get_rptr(struct amdgpu_ring *ring)
  */
 static uint64_t uvd_v4_2_ring_get_wptr(struct amdgpu_ring *ring)
 {
+    //pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	return RREG32(mmUVD_RBC_RB_WPTR);
@@ -85,6 +87,7 @@ static uint64_t uvd_v4_2_ring_get_wptr(struct amdgpu_ring *ring)
  */
 static void uvd_v4_2_ring_set_wptr(struct amdgpu_ring *ring)
 {
+    //pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_device *adev = ring->adev;
 
 	WREG32(mmUVD_RBC_RB_WPTR, lower_32_bits(ring->wptr));
@@ -92,6 +95,7 @@ static void uvd_v4_2_ring_set_wptr(struct amdgpu_ring *ring)
 
 static int uvd_v4_2_early_init(struct amdgpu_ip_block *ip_block)
 {
+    pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_device *adev = ip_block->adev;
 	adev->uvd.num_uvd_inst = 1;
 
@@ -103,6 +107,7 @@ static int uvd_v4_2_early_init(struct amdgpu_ip_block *ip_block)
 
 static int uvd_v4_2_sw_init(struct amdgpu_ip_block *ip_block)
 {
+    pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_ring *ring;
 	struct amdgpu_device *adev = ip_block->adev;
 	int r;
@@ -132,6 +137,7 @@ static int uvd_v4_2_sw_init(struct amdgpu_ip_block *ip_block)
 
 static int uvd_v4_2_sw_fini(struct amdgpu_ip_block *ip_block)
 {
+    pr_info("uvd_v4_2: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = ip_block->adev;
 
@@ -153,6 +159,7 @@ static void uvd_v4_2_enable_mgcg(struct amdgpu_device *adev,
  */
 static int uvd_v4_2_hw_init(struct amdgpu_ip_block *ip_block)
 {
+    pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_device *adev = ip_block->adev;
 	struct amdgpu_ring *ring = &adev->uvd.inst->ring;
 	uint32_t tmp;
@@ -208,18 +215,22 @@ done:
  */
 static int uvd_v4_2_hw_fini(struct amdgpu_ip_block *ip_block)
 {
+    pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_device *adev = ip_block->adev;
 
 	cancel_delayed_work_sync(&adev->uvd.idle_work);
 
-	if (RREG32(mmUVD_STATUS) != 0)
+	if (RREG32(mmUVD_STATUS) != 0) {
+		pr_info("uvd_v4_2: STATUS != 0. Stopping uvd.\n");
 		uvd_v4_2_stop(adev);
+	}
 
 	return 0;
 }
 
 static int uvd_v4_2_prepare_suspend(struct amdgpu_ip_block *ip_block)
 {
+    pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_device *adev = ip_block->adev;
 
 	return amdgpu_uvd_prepare_suspend(adev);
@@ -227,6 +238,7 @@ static int uvd_v4_2_prepare_suspend(struct amdgpu_ip_block *ip_block)
 
 static int uvd_v4_2_suspend(struct amdgpu_ip_block *ip_block)
 {
+    pr_info("uvd_v4_2: called %s\n", __func__);
 	int r;
 	struct amdgpu_device *adev = ip_block->adev;
 
@@ -263,6 +275,7 @@ static int uvd_v4_2_suspend(struct amdgpu_ip_block *ip_block)
 
 static int uvd_v4_2_resume(struct amdgpu_ip_block *ip_block)
 {
+    pr_info("uvd_v4_2: called %s\n", __func__);
 	int r;
 
 	r = amdgpu_uvd_resume(ip_block->adev);
@@ -281,6 +294,7 @@ static int uvd_v4_2_resume(struct amdgpu_ip_block *ip_block)
  */
 static int uvd_v4_2_start(struct amdgpu_device *adev)
 {
+    pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_ring *ring = &adev->uvd.inst->ring;
 	uint32_t rb_bufsz;
 	int i, j, r;
@@ -317,6 +331,8 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	WREG32(mmUVD_LMI_CTRL, 0x203108);
 
 	tmp = RREG32(mmUVD_MPC_CNTL);
+	pr_info("uvd_v4_2: mmUVD_MPC_CNTL through RREG32 = %08x\n", tmp);
+
 	WREG32(mmUVD_MPC_CNTL, tmp | 0x10);
 
 	WREG32(mmUVD_MPC_SET_MUXA0, 0x40c2040);
@@ -329,6 +345,7 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	uvd_v4_2_mc_resume(adev);
 
 	tmp = RREG32_UVD_CTX(ixUVD_LMI_CACHE_CTRL);
+	pr_info("uvd_v4_2: ixUVD_LMI_CACHE_CTRL through RREG32 = %08x\n", tmp);
 	WREG32_UVD_CTX(ixUVD_LMI_CACHE_CTRL, tmp & (~0x10));
 
 	/* enable UMC */
@@ -351,6 +368,7 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 			mdelay(10);
 		}
 		r = 0;
+		pr_info("uvd_v4_2: mmUVD_STATUS through RREG32 after test = %08x\n", (unsigned int)status);
 		if (status & 2)
 			break;
 
@@ -409,6 +427,7 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
  */
 static void uvd_v4_2_stop(struct amdgpu_device *adev)
 {
+    pr_info("uvd_v4_2: called %s\n", __func__);
 	uint32_t i, j;
 	uint32_t status;
 
@@ -417,24 +436,36 @@ static void uvd_v4_2_stop(struct amdgpu_device *adev)
 	for (i = 0; i < 10; ++i) {
 		for (j = 0; j < 100; ++j) {
 			status = RREG32(mmUVD_STATUS);
-			if (status & 2)
+			if (status & 2) {
+				pr_info("uvd_v4_2: UVD stop status reached in %s!\n", __func__);
 				break;
+			}
 			mdelay(1);
 		}
-		if (status & 2)
+		if (status & 2) {
+			pr_info("uvd_v4_2: UVD stop status was reached in %s!\n", __func__);
 			break;
+		}
 	}
+	
+	pr_info("uvd_v4_2: UVD stop test done. Make sure you got a response!\n");
 
 	for (i = 0; i < 10; ++i) {
 		for (j = 0; j < 100; ++j) {
 			status = RREG32(mmUVD_LMI_STATUS);
-			if (status & 0xf)
+			if (status & 0xf) {
+				pr_info("uvd_v4_2: UVD LMI stop status reached in %s!\n", __func__);
 				break;
+			}
 			mdelay(1);
 		}
-		if (status & 0xf)
+		if (status & 0xf) {
+			pr_info("uvd_v4_2: UVD LMI stop status was reached in %s!\n", __func__);
 			break;
+		}
 	}
+
+	pr_info("uvd_v4_2: UVD LMI stop test done. Make sure you got a response!\n");
 
 	/* Stall UMC and register bus before resetting VCPU */
 	WREG32_P(mmUVD_LMI_CTRL2, 1 << 8, ~(1 << 8));
@@ -442,13 +473,18 @@ static void uvd_v4_2_stop(struct amdgpu_device *adev)
 	for (i = 0; i < 10; ++i) {
 		for (j = 0; j < 100; ++j) {
 			status = RREG32(mmUVD_LMI_STATUS);
-			if (status & 0x240)
+			if (status & 0x240) {
+				pr_info("uvd_v4_2: UVD LMI desired status was reached in %s!\n", __func__);
 				break;
+			}
 			mdelay(1);
 		}
-		if (status & 0x240)
+		if (status & 0x240) {
+			pr_info("uvd_v4_2: UVD LMI desired status was reached in %s!\n", __func__);
 			break;
+		}
 	}
+	pr_info("uvd_v4_2: UVD LMI desired status test done. Make sure you got a response!\n");
 
 	WREG32_P(0x3D49, 0, ~(1 << 2));
 
@@ -477,6 +513,7 @@ static void uvd_v4_2_stop(struct amdgpu_device *adev)
 static void uvd_v4_2_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				     unsigned flags)
 {
+	//pr_info("uvd_v4_2: called %s\n", __func__);
 	WARN_ON(flags & AMDGPU_FENCE_FLAG_64BIT);
 
 	amdgpu_ring_write(ring, PACKET0(mmUVD_CONTEXT_ID, 0));
@@ -509,6 +546,7 @@ static int uvd_v4_2_ring_test_ring(struct amdgpu_ring *ring)
 	uint32_t tmp = 0;
 	unsigned i;
 	int r;
+	pr_info("uvd_v4_2: called %s\n", __func__);
 
 	WREG32(mmUVD_CONTEXT_ID, 0xCAFEDEAD);
 	r = amdgpu_ring_alloc(ring, 3);
@@ -520,6 +558,7 @@ static int uvd_v4_2_ring_test_ring(struct amdgpu_ring *ring)
 	amdgpu_ring_commit(ring);
 	for (i = 0; i < adev->usec_timeout; i++) {
 		tmp = RREG32(mmUVD_CONTEXT_ID);
+		pr_info("uvd_v4_2: mmUVD_CONTEXT_ID through RREG32 after field write = %08x\n", (unsigned int)tmp);
 		if (tmp == 0xDEADBEEF)
 			break;
 		udelay(1);
@@ -546,6 +585,7 @@ static void uvd_v4_2_ring_emit_ib(struct amdgpu_ring *ring,
 				  struct amdgpu_ib *ib,
 				  uint32_t flags)
 {
+	pr_info("uvd_v4_2: called %s\n", __func__);
 	amdgpu_ring_write(ring, PACKET0(mmUVD_RBC_IB_BASE, 0));
 	amdgpu_ring_write(ring, ib->gpu_addr);
 	amdgpu_ring_write(ring, PACKET0(mmUVD_RBC_IB_SIZE, 0));
@@ -554,6 +594,7 @@ static void uvd_v4_2_ring_emit_ib(struct amdgpu_ring *ring,
 
 static void uvd_v4_2_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
 {
+	pr_info("uvd_v4_2: called %s\n", __func__);
 	int i;
 
 	WARN_ON(ring->wptr % 2 || count % 2);
@@ -573,11 +614,13 @@ static void uvd_v4_2_ring_insert_nop(struct amdgpu_ring *ring, uint32_t count)
  */
 static void uvd_v4_2_mc_resume(struct amdgpu_device *adev)
 {
+	pr_info("uvd_v4_2: called %s\n", __func__);
 	uint64_t addr;
 	uint32_t size;
 
+	// Basically pure hardcoding
 	/* program the VCPU memory controller bits 0-27 */
-	addr = (adev->uvd.inst->gpu_addr + AMDGPU_UVD_FIRMWARE_OFFSET) >> 3;
+	addr = (adev->uvd.inst->gpu_addr + AMDGPU_UVD_FIRMWARE_OFFSET) >> 3; //is this right - offset = 256? 
 	size = AMDGPU_UVD_FIRMWARE_SIZE(adev) >> 3;
 	WREG32(mmUVD_VCPU_CACHE_OFFSET0, addr);
 	WREG32(mmUVD_VCPU_CACHE_SIZE0, size);
@@ -609,6 +652,7 @@ static void uvd_v4_2_mc_resume(struct amdgpu_device *adev)
 static void uvd_v4_2_enable_mgcg(struct amdgpu_device *adev,
 				 bool enable)
 {
+	pr_info("uvd_v4_2: called %s\n", __func__);
 	u32 orig, data;
 
 	if (enable && (adev->cg_flags & AMD_CG_SUPPORT_UVD_MGCG)) {
@@ -635,11 +679,13 @@ static void uvd_v4_2_enable_mgcg(struct amdgpu_device *adev,
 static void uvd_v4_2_set_dcm(struct amdgpu_device *adev,
 			     bool sw_mode)
 {
+	pr_info("uvd_v4_2: called %s\n", __func__);
 	u32 tmp, tmp2;
 
 	WREG32_FIELD(UVD_CGC_GATE, REGS, 0);
 
 	tmp = RREG32(mmUVD_CGC_CTRL);
+	pr_info("uvd_v4_2: mmUVD_CGC_CTRL through RREG32 after field write = %08x\n", (unsigned int)tmp);
 	tmp &= ~(UVD_CGC_CTRL__CLK_OFF_DELAY_MASK | UVD_CGC_CTRL__CLK_GATE_DLY_TIMER_MASK);
 	tmp |= UVD_CGC_CTRL__DYN_CLOCK_MODE_MASK |
 		(1 << UVD_CGC_CTRL__CLK_GATE_DLY_TIMER__SHIFT) |
@@ -661,6 +707,7 @@ static void uvd_v4_2_set_dcm(struct amdgpu_device *adev,
 
 static bool uvd_v4_2_is_idle(struct amdgpu_ip_block *ip_block)
 {
+	pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_device *adev = ip_block->adev;
 
 	return !(RREG32(mmSRBM_STATUS) & SRBM_STATUS__UVD_BUSY_MASK);
@@ -668,6 +715,7 @@ static bool uvd_v4_2_is_idle(struct amdgpu_ip_block *ip_block)
 
 static int uvd_v4_2_wait_for_idle(struct amdgpu_ip_block *ip_block)
 {
+	//pr_info("uvd_v4_2: called %s\n", __func__);
 	unsigned i;
 	struct amdgpu_device *adev = ip_block->adev;
 
@@ -680,6 +728,7 @@ static int uvd_v4_2_wait_for_idle(struct amdgpu_ip_block *ip_block)
 
 static int uvd_v4_2_soft_reset(struct amdgpu_ip_block *ip_block)
 {
+	pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_device *adev = ip_block->adev;
 
 	uvd_v4_2_stop(adev);
@@ -696,6 +745,7 @@ static int uvd_v4_2_set_interrupt_state(struct amdgpu_device *adev,
 					unsigned type,
 					enum amdgpu_interrupt_state state)
 {
+    //pr_info("uvd_v4_2: called %s\n", __func__);
 	// TODO
 	return 0;
 }
@@ -704,6 +754,7 @@ static int uvd_v4_2_process_interrupt(struct amdgpu_device *adev,
 				      struct amdgpu_irq_src *source,
 				      struct amdgpu_iv_entry *entry)
 {
+	//pr_info("uvd_v4_2: called %s\n", __func__);
 	DRM_DEBUG("IH: UVD TRAP\n");
 	amdgpu_fence_process(&adev->uvd.inst->ring);
 	return 0;
@@ -712,6 +763,7 @@ static int uvd_v4_2_process_interrupt(struct amdgpu_device *adev,
 static int uvd_v4_2_set_clockgating_state(struct amdgpu_ip_block *ip_block,
 					  enum amd_clockgating_state state)
 {
+    //pr_info("uvd_v4_2: called %s\n", __func__); //stub
 	return 0;
 }
 
@@ -725,12 +777,18 @@ static int uvd_v4_2_set_powergating_state(struct amdgpu_ip_block *ip_block,
 	 * revisit this when there is a cleaner line between
 	 * the smc and the hw blocks
 	 */
+	pr_info("uvd_v4_2: called %s\n", __func__);
 	struct amdgpu_device *adev = ip_block->adev;
+
+	//amdgpu_rreg_t rreg_print; // just use unint32 for stupid pointer conversion things
+	uint32_t rreg_print;
 
 	if (state == AMD_PG_STATE_GATE) {
 		uvd_v4_2_stop(adev);
 		if (adev->pg_flags & AMD_PG_SUPPORT_UVD && !adev->pm.dpm_enabled) {
-			if (!(RREG32_SMC(ixCURRENT_PG_STATUS) &
+			rreg_print = RREG32_SMC(ixCURRENT_PG_STATUS);
+			pr_info("uvd_v4_2: ixCURRENT_PG_STATUS through RREG32_SMC after uvd_stop = %08x\n", (unsigned int)rreg_print);
+			if (!(rreg_print &
 				CURRENT_PG_STATUS__UVD_PG_STATUS_MASK)) {
 				WREG32(mmUVD_PGFSM_CONFIG, (UVD_PGFSM_CONFIG__UVD_PGFSM_FSM_ADDR_MASK   |
 							UVD_PGFSM_CONFIG__UVD_PGFSM_POWER_DOWN_MASK |
@@ -741,8 +799,12 @@ static int uvd_v4_2_set_powergating_state(struct amdgpu_ip_block *ip_block,
 		return 0;
 	} else {
 		if (adev->pg_flags & AMD_PG_SUPPORT_UVD && !adev->pm.dpm_enabled) {
-			if (RREG32_SMC(ixCURRENT_PG_STATUS) &
+
+			rreg_print = RREG32_SMC(ixCURRENT_PG_STATUS);
+			pr_info("uvd_v4_2: ixCURRENT_PG_STATUS through RREG32_SMC = %08x\n", (unsigned int)rreg_print);
+			if (rreg_print &
 				CURRENT_PG_STATUS__UVD_PG_STATUS_MASK) {
+				pr_info("uvd_v4_2: ixCURRENT_PG_STATUS has UVD_PG_STATUS_MASK\n");
 				WREG32(mmUVD_PGFSM_CONFIG, (UVD_PGFSM_CONFIG__UVD_PGFSM_FSM_ADDR_MASK   |
 						UVD_PGFSM_CONFIG__UVD_PGFSM_POWER_UP_MASK |
 						UVD_PGFSM_CONFIG__UVD_PGFSM_P1_SELECT_MASK));
@@ -794,6 +856,7 @@ static const struct amdgpu_ring_funcs uvd_v4_2_ring_funcs = {
 
 static void uvd_v4_2_set_ring_funcs(struct amdgpu_device *adev)
 {
+	//pr_info("uvd_v4_2: called %s\n", __func__);
 	adev->uvd.inst->ring.funcs = &uvd_v4_2_ring_funcs;
 }
 
@@ -804,6 +867,7 @@ static const struct amdgpu_irq_src_funcs uvd_v4_2_irq_funcs = {
 
 static void uvd_v4_2_set_irq_funcs(struct amdgpu_device *adev)
 {
+	//pr_info("uvd_v4_2: called %s\n", __func__);
 	adev->uvd.inst->irq.num_types = 1;
 	adev->uvd.inst->irq.funcs = &uvd_v4_2_irq_funcs;
 }
