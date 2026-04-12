@@ -400,11 +400,12 @@ jobs:
           echo "localversion=$localversion" >> $GITHUB_OUTPUT
 
       - name: Upload kernel image to github actions artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: kernel_${{ steps.kernel-version-env.outputs.localversion }}
           path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}.tar.gz
           # This path is the github actiions root
+          archive: false
 
       # - name: Delete the kernel image artifact from workspace
       #  run: |
