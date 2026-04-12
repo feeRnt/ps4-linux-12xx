@@ -558,9 +558,13 @@ static int uvd_v4_2_ring_test_ring(struct amdgpu_ring *ring)
 	amdgpu_ring_commit(ring);
 	for (i = 0; i < adev->usec_timeout; i++) {
 		tmp = RREG32(mmUVD_CONTEXT_ID);
-		pr_info("uvd_v4_2: mmUVD_CONTEXT_ID through RREG32 after field write = %08x\n", (unsigned int)tmp);
-		if (tmp == 0xDEADBEEF)
+		//pr_info("uvd_v4_2: mmUVD_CONTEXT_ID through RREG32 after ring write = %08x\n", (unsigned int)tmp);
+		// This stays as cafedead... ring_write function didn't work or the log spam prevents it from passing (timeout). 
+		// Probably the latter as this is new symptom. At least wreg works!
+		if (tmp == 0xDEADBEEF) {
+			pr_info("uvd_v4_2: mmUVD_CONTEXT_ID through RREG32 after ring write has returned deadbeef! Breaking out.\n");
 			break;
+		}
 		udelay(1);
 	}
 
