@@ -11,15 +11,13 @@
 DEFINE_STATIC_KEY_TRUE(sched_bore_key);
 u8   __read_mostly sched_bore                   = 1;
 /*
- * PS4/Jaguar is latency-sensitive but not rich in single-thread throughput.
- * Favor being a little more forgiving to medium-running game threads so
- * BORE still helps interactivity without over-penalizing steady workers.
+ * PS4/Jaguar tuning: react faster to sudden bursts to cut gaming stutter.
  */
 u8   __read_mostly sched_burst_inherit_type     = 1;
-u8   __read_mostly sched_burst_smoothness       = 2;
-u8   __read_mostly sched_burst_penalty_offset   = 25;
-uint __read_mostly sched_burst_penalty_scale    = 1280;
-uint __read_mostly sched_burst_cache_lifetime   = 30000000;
+u8   __read_mostly sched_burst_smoothness       = 1;
+u8   __read_mostly sched_burst_penalty_offset   = 22;
+uint __read_mostly sched_burst_penalty_scale    = 1536;
+uint __read_mostly sched_burst_cache_lifetime   = 75000000;
 static u32 __read_mostly scaled_tolerance;
 static int __maybe_unused maxval_prio    =   39;
 static int __maybe_unused maxval_6_bits  =   63;
