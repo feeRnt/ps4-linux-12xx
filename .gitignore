@@ -71,7 +71,8 @@ modules.order
 /modules.builtin
 /modules.builtin.modinfo
 /modules.nsdeps
-
+vmlinux.unstripped
+out/
 #
 # RPM spec file (make rpm-pkg)
 #
