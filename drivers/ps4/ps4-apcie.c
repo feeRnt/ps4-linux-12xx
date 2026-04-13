@@ -152,16 +152,18 @@ static struct irq_chip apcie_msi_controller = {
 	.irq_ack = irq_chip_ack_parent,
 	.irq_set_affinity = msi_domain_set_affinity,
 	.irq_retrigger = irq_chip_retrigger_hierarchy,
-	.irq_compose_msi_msg = irq_msi_compose_msg,
+	.irq_compose_msi_msg = x86_vector_msi_compose_msg,
 	.irq_write_msi_msg = apcie_msi_write_msg,
 	.flags = IRQCHIP_SKIP_SET_WAKE,
 };
 
+/* No longer needed
 static irq_hw_number_t apcie_msi_get_hwirq(struct msi_domain_info *info,
 					  msi_alloc_info_t *arg)
 {
-	return arg->msi_hwirq;
-}
+	//return arg->msi_hwirq; changed after -- 3b9c1d377d67072d1d8a2373b4969103cca00dab
+	return arg->hwirq;
+}*/
 
 static int apcie_msi_init(struct irq_domain *domain,
 			 struct msi_domain_info *info, unsigned int virq,
@@ -184,7 +186,7 @@ static void apcie_msi_free(struct irq_domain *domain,
 }
 
 static struct msi_domain_ops apcie_msi_domain_ops = {
-	.get_hwirq	= apcie_msi_get_hwirq,
+	//.get_hwirq	= apcie_msi_get_hwirq,
 	.msi_init	= apcie_msi_init,
 	.msi_free	= apcie_msi_free,
 };
@@ -208,9 +210,11 @@ struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 	apcie_msi_domain_info.chip_data = (void *)sc;
 
 	init_irq_alloc_info(&info, NULL);
-	info.type = X86_IRQ_ALLOC_TYPE_MSI;
-	info.msi_dev = sc->pdev;
-	parent = irq_remapping_get_ir_irq_domain(&info);
+	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
+	//info.msi_dev = sc->pdev; -- removed after 3b9c1d377d67072d1d8a2373b4969103cca00dab
+	//TODO: Add descriptor
+
+	parent = irq_remapping_get_irq_domain(&info);
 	if (parent == NULL) {
 		parent = x86_vector_domain;
 	} else {
@@ -218,7 +222,8 @@ struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 		apcie_msi_controller.name = "IR-Aeolia-MSI";
 	}
 
-	return msi_create_irq_domain(NULL, &apcie_msi_domain_info, parent);
+	//return msi_create_irq_domain(NULL, &apcie_msi_domain_info, parent);
+	return msi_create_irq_domain(NULL, &apcie_msi_domain_info, x86_vector_domain); //maybe we need this now
 }
 
 static int apcie_is_compatible_device(struct pci_dev *dev)
@@ -259,21 +264,24 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	}
 
 	init_irq_alloc_info(&info, NULL);
-	info.type = X86_IRQ_ALLOC_TYPE_MSI;
+	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 	/* IRQs "come from" function 4 as far as the IOMMU/system see */
-	info.msi_dev = sc->pdev;
+	//info.msi_dev = sc->pdev; -- removed after 3b9c1d377d67072d1d8a2373b4969103cca00dab
+	//TODO: Add descriptor
+
 	/* Our hwirq number is function << 8 plus subfunction.
 	 * Subfunction is usually 0 and implicitly increments per hwirq,
 	 * but can also be 0xff to indicate that this is a shared IRQ. */
-	info.msi_hwirq = PCI_FUNC(dev->devfn) << 8;
-
+	//info.msi_hwirq = PCI_FUNC(dev->devfn) << 8; // -- removed after 3b9c1d377d67072d1d8a2373b4969103cca00dab
+	info.hwirq = PCI_FUNC(dev->devfn) << 8; //TODO: Ok?
 	dev_dbg(&dev->dev, "apcie_assign_irqs(%d)\n", nvec);
 
 #ifndef QEMU_HACK_NO_IOMMU
 	info.flags = X86_IRQ_ALLOC_CONTIGUOUS_VECTORS;
 	if (!(apcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 		nvec = 1;
-		info.msi_hwirq |= 0xff; /* Shared IRQ for all subfunctions */
+		//info.msi_hwirq |= 0xff; /* Shared IRQ for all subfunctions */
+		info.hwirq |= 0xff; /* Shared IRQ for all subfunctions */
 	}
 #endif
 

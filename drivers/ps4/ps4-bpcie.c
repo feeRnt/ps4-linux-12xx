@@ -29,7 +29,7 @@ static const int subfuncs_per_func[BAIKAL_NUM_FUNCS] = {
 	2, 1, 1, 1, 31, 2, 3, 3
 };
 
-static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc);
+//static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc); -- removed in 9006c133a422f474d7d8e10a8baae179f70c22f5
 
 /*static inline */u32 glue_read32(struct bpcie_dev *sc, u32 offset) {
 	return ioread32(sc->bar2 + offset);
@@ -197,16 +197,19 @@ static struct irq_chip bpcie_msi_controller = {
 	.irq_ack = irq_chip_ack_parent,
 	.irq_set_affinity = msi_domain_set_affinity,
 	.irq_retrigger = irq_chip_retrigger_hierarchy,
-	.irq_compose_msi_msg = irq_msi_compose_msg,
+	.irq_compose_msi_msg = x86_vector_msi_compose_msg,
 	.irq_write_msi_msg = bpcie_msi_write_msg,
 	.flags = IRQCHIP_SKIP_SET_WAKE,
 };
 
+/* No longer needed with -- 9006c133a422f474d7d8e10a8baae179f70c22f5 -- use the universal funcs in drivers/pci/msi.c etc.
 static irq_hw_number_t bpcie_msi_get_hwirq(struct msi_domain_info *info,
 					  msi_alloc_info_t *arg)
 {
-	return arg->msi_hwirq;
+	//return arg->msi_hwirq;
+	return arg->hwirq;
 }
+*/
 
 static void bpcie_handle_edge_irq(struct irq_desc *desc)
 {
@@ -290,10 +293,10 @@ static int bpcie_msi_prepare(struct irq_domain *domain, struct device *dev,
 }
 
 static struct msi_domain_ops bpcie_msi_domain_ops = {
-	.get_hwirq	= bpcie_msi_get_hwirq,
+	//.get_hwirq	= bpcie_msi_get_hwirq,
 	.msi_init	= bpcie_msi_init,
 	.msi_free	= bpcie_msi_free,
-	.set_desc	= bpcie_msi_domain_set_desc,
+	//.set_desc	= bpcie_msi_domain_set_desc,
 	.msi_prepare = bpcie_msi_prepare,
 };
 
@@ -304,28 +307,33 @@ static struct msi_domain_info bpcie_msi_domain_info = {
 	.handler	= bpcie_handle_edge_irq/*handle_edge_irq*/,
 };
 
+// TODO: ADD REFERENCE TO THIS FROM SOMEWHERE
 static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 				    struct msi_desc *desc)
 {
 	struct pci_dev *dev = msi_desc_to_pci_dev(desc);
-	arg->type = X86_IRQ_ALLOC_TYPE_MSI;
+	arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 	//IRQs "come from" function 4 as far as the IOMMU/system see
 	unsigned int sc_devfn;
 	struct pci_dev *sc_dev;
 	sc_devfn = (dev->devfn & ~7) | BAIKAL_FUNC_ID_PCIE;
 	sc_dev = pci_get_slot(dev->bus, sc_devfn);
-	arg->msi_dev = sc_dev;
+	//arg->msi_dev = sc_dev; // removed after 
+	arg->desc = desc;
+
 	pci_dev_put(sc_dev);
 	//Our hwirq number is (slot << 8) | (func << 5) plus subfunction.
 	// Subfunction is usually 0 and implicitly increments per hwirq,
 	//but can also be 0xff to indicate that this is a shared IRQ. 
-	arg->msi_hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5);
+	//arg->msi_hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5); //this is info. for Aeolia.
+	arg->hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5);
 
 	#ifndef QEMU_HACK_NO_IOMMU
 		arg->flags = X86_IRQ_ALLOC_CONTIGUOUS_VECTORS;
 		if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 			//desk->nvec = desk->nvec_used = 1;
-			arg->msi_hwirq |= 0x1F; // Shared IRQ for all subfunctions
+			//arg->msi_hwirq |= 0x1F; // Shared IRQ for all subfunctions
+			arg->hwirq |= 0x1F; // Shared IRQ for all subfunctions
 		}
 	#endif
 }
@@ -344,9 +352,11 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	bpcie_msi_domain_info.chip_data = (void *)sc;
 
 	init_irq_alloc_info(&info, NULL);
-	info.type = X86_IRQ_ALLOC_TYPE_MSI;
-	info.msi_dev = pdev;
-	parent = irq_remapping_get_ir_irq_domain(&info);
+	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
+	//info.msi_dev = pdev;
+	//TODO: Add desc
+	//parent = irq_remapping_get_ir_irq_domain(&info);
+	parent = irq_remapping_get_irq_domain(&info);
 	if (parent == NULL) {
 		parent = x86_vector_domain;
 	} else {
@@ -355,7 +365,10 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	}
 
 	struct irq_domain *d;
-	d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, parent);
+	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, parent); // changed in: 6b15ffa07dc325f4e4dd98c877bfa970202c378b
+	d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, x86_vector_domain); // I think it should be vector domain now;
+	// remember that parent is just irq_domain struct pointer originaly, then irq_remapping_get_irq_domain returns plat
+	// specific domain, which are::: ---
 	if (d != NULL)
 		dev_set_msi_domain(&pdev->dev, d);
 	else
@@ -400,6 +413,7 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 	if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 		nvec = 1;
 		//info.msi_hwirq |= 0xff; // Shared IRQ for all subfunctions
+		info.hwirq |= 0xff; // Shared IRQ for all subfunctions
 	}
 #endif
 	if (dev->msi_enabled)
