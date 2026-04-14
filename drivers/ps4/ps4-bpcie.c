@@ -71,7 +71,8 @@ static void bpcie_msi_unmask(struct irq_data *data)
 	struct pci_dev *pdev = msi_desc_to_pci_dev(desc);
 	int msi_allocated = desc->nvec_used;
 	int msi_msgnum = pci_msi_vec_count(pdev);
-	u32 msi_mask = desc->masked; //(1LL << msi_msgnum) - 1;
+	//u32 msi_mask = desc->masked; //(1LL << msi_msgnum) - 1;
+	u32 msi_mask = desc->pci.msi_mask; //(1LL << msi_msgnum) - 1;
 
 	/*
 	if ( msi_alloc > 0 )
@@ -107,9 +108,11 @@ static void bpcie_msi_unmask(struct irq_data *data)
 
 	dev_dbg(data->common->msi_desc->dev, "bpcie_msi_unmask(msi_mask=0x%X, msi_allocated=0x%X)\n", msi_mask, msi_allocated);
 	//msi_mask = 0;
-	pci_write_config_dword(pdev, desc->mask_pos,
+	//pci_write_config_dword(pdev, desc->mask_pos, //moved
+	pci_write_config_dword(pdev, desc->pci.mask_pos,
 			       msi_mask);
-	desc->masked = msi_mask;
+	//desc->masked = msi_mask;
+	desc->pci.msi_mask = msi_mask; //renamed
 
 	//this code equals msi_mask = 0;
 }
@@ -122,7 +125,8 @@ static void bpcie_msi_mask(struct irq_data *data)
 	u8 subfunc = get_subfunc(data->hwirq);
 	struct msi_desc *desc = irq_data_get_msi_desc(data);
 	struct pci_dev *pdev = msi_desc_to_pci_dev(desc);
-	u32 msi_mask = desc->masked;
+	//u32 msi_mask = desc->masked;
+	u32 msi_mask = desc->pci.msi_mask;
 	u32 msi_allocated = desc->nvec_used; //pci_msi_vec_count(msi_desc_to_pci_dev(desc)); 32 for bpcie glue
 	
 	if ( msi_allocated > 0 )
@@ -160,9 +164,11 @@ static void bpcie_msi_mask(struct irq_data *data)
 	
 	dev_dbg(data->common->msi_desc->dev, "bpcie_msi_mask(msi_mask=0x%X, msi_allocated=0x%X)\n", msi_mask, msi_allocated);
 	//msi_mask = 0;
-	pci_write_config_dword(pdev, desc->mask_pos,
+	//pci_write_config_dword(pdev, desc->mask_pos,
+	pci_write_config_dword(pdev, desc->pci.mask_pos,
 			       msi_mask);
-	desc->masked = msi_mask;
+	//desc->masked = msi_mask;
+	desc->pci.msi_mask = msi_mask;
 	//TODO: disable ht. See apcie_bpcie_msi_ht_disable_and_bpcie_set_msi_mask
 
 	//this code equals msi_mask = 0xFFFFFFFF;
@@ -200,6 +206,8 @@ static struct irq_chip bpcie_msi_controller = {
 	.irq_compose_msi_msg = x86_vector_msi_compose_msg,
 	.irq_write_msi_msg = bpcie_msi_write_msg,
 	.flags = IRQCHIP_SKIP_SET_WAKE,
+		// | IRQCHIP_AFFINITY_PRE_STARTUP, (was added in ff363f480e5997051dd1de949121ffda3b753741, but it's not necessary
+		// and might break Baikal. Works on Aeolia though)
 };
 
 /* No longer needed with -- 9006c133a422f474d7d8e10a8baae179f70c22f5 -- use the universal funcs in drivers/pci/msi.c etc.
@@ -363,10 +371,11 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 		bpcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
 		bpcie_msi_controller.name = "IR-Baikal-MSI";
 	}
-
+	//fn = irq_domain_alloc_named_id_fwnode(hpet_msi_controller.name, id); maybe this would be good to have now
 	struct irq_domain *d;
 	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, parent); // changed in: 6b15ffa07dc325f4e4dd98c877bfa970202c378b
 	d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, x86_vector_domain); // I think it should be vector domain now;
+											// MAYBE NOT. hpet uses parent.
 	// remember that parent is just irq_domain struct pointer originaly, then irq_remapping_get_irq_domain returns plat
 	// specific domain, which are::: ---
 	if (d != NULL)
