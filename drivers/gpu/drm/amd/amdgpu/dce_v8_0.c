@@ -2633,7 +2633,7 @@ static int dce_v8_0_crtc_init(struct amdgpu_device *adev, int index)
 		amdgpu_crtc->max_cursor_height = CIK_CURSOR_HEIGHT;
 		adev_to_drm(adev)->mode_config.cursor_width = amdgpu_crtc->max_cursor_width;
 		adev_to_drm(adev)->mode_config.cursor_height = amdgpu_crtc->max_cursor_height;
-
+	}
 	amdgpu_crtc->crtc_offset = crtc_offsets[amdgpu_crtc->crtc_id];
 
 	amdgpu_crtc->pll_id = ATOM_PPLL_INVALID;
