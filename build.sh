@@ -293,13 +293,37 @@ if [[ "$DO_BUILD" == "1" ]]; then
     # PS4 firmware
     scripts/config --enable  CONFIG_PS4_DMI_SPOOF
 
-    # Memory management
+    # Memory management / cgroup base
+    scripts/config --enable  CONFIG_CGROUPS
+    scripts/config --enable  CONFIG_MEMCG
+    scripts/config --enable  CONFIG_BLK_CGROUP
+    scripts/config --enable  CONFIG_CGROUP_WRITEBACK
+    scripts/config --enable  CONFIG_CGROUP_SCHED
+    scripts/config --enable  CONFIG_FAIR_GROUP_SCHED
+    scripts/config --disable CONFIG_RT_GROUP_SCHED
+    scripts/config --enable  CONFIG_CFS_BANDWIDTH
+    scripts/config --enable  CONFIG_CGROUP_PIDS
     scripts/config --enable  CONFIG_LRU_GEN
     scripts/config --enable  CONFIG_LRU_GEN_ENABLED
     scripts/config --enable  CONFIG_LRU_GEN_STATS
     scripts/config --enable  CONFIG_TRANSPARENT_HUGEPAGE
     scripts/config --enable  CONFIG_SLUB_CPU_PARTIAL
     scripts/config --enable  CONFIG_CGROUP_DMEM
+    scripts/config --enable  CONFIG_CGROUP_FREEZER
+    scripts/config --enable  CONFIG_CPUSETS
+    scripts/config --enable  CONFIG_CGROUP_DEVICE
+    scripts/config --enable  CONFIG_CGROUP_CPUACCT
+    scripts/config --enable  CONFIG_CGROUP_MISC
+    scripts/config --enable  CONFIG_CGROUP_BPF
+
+    # Namespace support needed by most cgroup/container userspace
+    scripts/config --enable  CONFIG_NAMESPACES
+    scripts/config --enable  CONFIG_UTS_NS
+    scripts/config --enable  CONFIG_TIME_NS
+    scripts/config --enable  CONFIG_IPC_NS
+    scripts/config --enable  CONFIG_USER_NS
+    scripts/config --enable  CONFIG_PID_NS
+    scripts/config --enable  CONFIG_NET_NS
 
     scripts/config --disable CONFIG_ZSWAP_COMPRESSOR_DEFAULT_LZO
     scripts/config --enable  CONFIG_ZSWAP_COMPRESSOR_DEFAULT_ZSTD
@@ -426,13 +450,6 @@ if [[ "$DO_BUILD" == "1" ]]; then
         scripts/config --enable  CONFIG_PREEMPT_VOLUNTARY
         scripts/config --disable CONFIG_PREEMPT_NONE
 
-        scripts/config --enable  CONFIG_MEMCG
-        scripts/config --enable  CONFIG_CGROUP_SCHED
-        scripts/config --enable  CONFIG_CGROUP_DMEM
-        scripts/config --enable  CONFIG_FAIR_GROUP_SCHED
-        scripts/config --disable CONFIG_RT_GROUP_SCHED
-        scripts/config --enable  CONFIG_CFS_BANDWIDTH
-
         scripts/config --enable  CONFIG_PSI
         scripts/config --enable  CONFIG_PSI_DEFAULT_DISABLED
 
@@ -466,12 +483,6 @@ if [[ "$DO_BUILD" == "1" ]]; then
         echo -e "\e[1;34m[*]\e[0m Applying general/gaming profile..."
 
         scripts/config --disable CONFIG_CPU_MITIGATIONS
-
-        scripts/config --disable CONFIG_MEMCG
-        scripts/config --disable CONFIG_CGROUP_SCHED
-        scripts/config --disable CONFIG_FAIR_GROUP_SCHED
-        scripts/config --enable  CONFIG_RT_GROUP_SCHED
-        scripts/config --disable CONFIG_CFS_BANDWIDTH
 
         scripts/config --enable  CONFIG_SCHED_BORE
         scripts/config --set-val CONFIG_MIN_BASE_SLICE_NS 2000000
