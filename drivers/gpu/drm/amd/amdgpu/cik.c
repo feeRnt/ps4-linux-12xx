@@ -2507,16 +2507,17 @@ static int cik_common_early_init(struct amdgpu_ip_block *ip_block)
 			adev->external_rev_id = adev->rev_id + 0xa1;
 		break;
 		case CHIP_LIVERPOOL:
+			/*
+			 * Favor sustained throughput and wake latency on PS4 over
+			 * deeper GFX/SDMA low-power states. Keep the lighter
+			 * clock-gating paths, but leave the LS paths disabled.
+			 */
 			adev->cg_flags =
 				AMD_CG_SUPPORT_GFX_MGCG |
-				AMD_CG_SUPPORT_GFX_MGLS |
 				/*AMD_CG_SUPPORT_GFX_CGCG |*/
 				AMD_CG_SUPPORT_GFX_CGLS |
 				AMD_CG_SUPPORT_GFX_CGTS |
-				AMD_CG_SUPPORT_GFX_CGTS_LS |
-				AMD_CG_SUPPORT_GFX_CP_LS |
 				AMD_CG_SUPPORT_SDMA_MGCG |
-				AMD_CG_SUPPORT_SDMA_LS |
 				AMD_CG_SUPPORT_VCE_MGCG |
 				AMD_CG_SUPPORT_UVD_MGCG |
 				AMD_CG_SUPPORT_HDP_MGCG;
@@ -2534,16 +2535,17 @@ static int cik_common_early_init(struct amdgpu_ip_block *ip_block)
 			break;
 
 		case CHIP_GLADIUS:
+			/*
+			 * Same latency-oriented policy as Liverpool: avoid the
+			 * deeper sleep states that can add wakeup overhead while
+			 * keeping the regular clock-gating paths enabled.
+			 */
 			adev->cg_flags =
 				AMD_CG_SUPPORT_GFX_MGCG |
-				AMD_CG_SUPPORT_GFX_MGLS |
 				AMD_CG_SUPPORT_GFX_CGCG |
 				AMD_CG_SUPPORT_GFX_CGLS |
 				AMD_CG_SUPPORT_GFX_CGTS |
-				AMD_CG_SUPPORT_GFX_CGTS_LS |
-				AMD_CG_SUPPORT_GFX_CP_LS |
 				AMD_CG_SUPPORT_SDMA_MGCG |
-				AMD_CG_SUPPORT_SDMA_LS |
 				AMD_CG_SUPPORT_VCE_MGCG |
 				AMD_CG_SUPPORT_UVD_MGCG |
 				AMD_CG_SUPPORT_HDP_MGCG;
