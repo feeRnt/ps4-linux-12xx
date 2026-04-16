@@ -2008,7 +2008,247 @@ static void ahci_remove_one(struct pci_dev *pdev)
 }
 
 #ifdef CONFIG_X86_PS4
-void bpcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr)
+void belize_pcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr)
+{
+	int i;
+	u32 v;
+	u32 v2;
+	bool is_phy_gen_3;
+	unsigned int trace_length;
+
+  	dev_info(dev, "Belize SATA PHY init\n");
+
+	for (i = 0; i < 100; i++) {
+		udelay(10000);
+	}
+
+ 	//step 1
+  	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x81);
+
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffff00) | 1);
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xa5);
+
+	//step 2
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+
+	if (ctlr->dev_id == 0x90ca104d || ctlr->dev_id == 0x909f104d || ctlr->dev_id == 0x90d9104d) {
+		is_phy_gen_3 = false;
+		bpcie_ahci_write(ctlr->r_mem, 0x17c, v & 0xfffff3ff);
+	} else {
+		u32 v2 = bpcie_ahci_read(ctlr->r_mem, 0);
+	  	if ((v2 & 0xf00000) != 0x300000) {
+	    		bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff3ff) | 0x400);
+	    		is_phy_gen_3 = false;
+	  	} else {
+	    		 dev_info(dev,"PHY SET GEN3\n");
+	    		 bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff3ff) | 0x800);
+	    		 is_phy_gen_3 = true;
+	  	}
+	}
+
+	//--- step 3 ---
+	if (ctlr->trace_len == 0) {
+	  	trace_length = 6;
+	} else {
+	  	trace_length = ctlr->trace_len & 0x1f;
+	  	if (trace_length >= 0x13) {
+	    		trace_length = 6;
+	  	}
+	}
+
+	dev_info(dev,"Belize SATA PHY Trace length : %d\n",trace_length);
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xa3);
+
+	//--- step 4 ---
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff3ff) | 0x800);
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xd0);
+
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff800) | 0x441);
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xe1);
+
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffff8f) | 0x60);
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xd0);
+
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffff3fff) | 0x8000);
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xf1);
+
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff3ff) | 0x400);
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x48);
+
+	//--- step 5 ---
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, 0x62d8);
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xe);
+
+	//--- step 6 ---
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, v & 0xffffdfff);
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8d);
+
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 1);
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8f);
+
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 1);
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x91);
+
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 1);
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8d);
+
+	//--- step 7 ---
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	if (trace_length >= 0xe) {
+		bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 0x28);
+	} else {
+		if (trace_length < 0xb) {
+	    		bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 8);
+	  	} else {
+	    		bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 0x10);
+	  	}
+	}
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8f);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 0x12);
+
+	//--- step 8 ---
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x91);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	if (trace_length < 5) {
+		bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 0x24);
+	} else {
+	  	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc1) | 0x2a);
+	}
+
+	//--- step 9 ---
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xff);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, 1);
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x97);
+
+	//--- step 10 ---
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	if (is_phy_gen_3) {
+		bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffff80) | 0xd3);
+	} else {
+	  	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffff80) | 0xee);
+	}
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x95);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffff00) | 0xee);
+
+	//--- step 11 ---
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xff);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, 0);
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8d);
+
+	//--- step 12 ---
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	if (trace_length < 0xe) {
+		bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff87f) | 0x900);
+	} else {
+		bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff87f) | 0xe00);
+	}
+
+	//--- step 13 ---
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8f);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff07f) | 0x900);
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x91);
+
+	//--- step 14 ---
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	if (is_phy_gen_3) {
+		bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff87f) | 0xd00);
+	} else {
+		bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xfffff87f) | 0xe80);
+	}
+
+	//--- step 15 ---
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 200);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, v & 0xffffefff);
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 10);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, v & 0xffffefff);
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x82);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 0x1000);
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xc9);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 0x1000);
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x84);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffffffc0) | 0xc);
+
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8d);
+
+	//--- step 16 ---
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	v = v & 0xffff0fff;
+	if (trace_length < 0xe) {
+		bpcie_ahci_write(ctlr->r_mem, 0x17c, v | 0x8000);
+	} else {
+		bpcie_ahci_write(ctlr->r_mem, 0x17c, v);
+	}
+
+	//--- step 17 ---
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0x8f);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+	bpcie_ahci_write(ctlr->r_mem, 0x17c, (v & 0xffff0fff) | 0x8000);
+
+	//--- step 18 ---
+	bpcie_ahci_write(ctlr->r_mem, 0xa0, 0);
+	v = bpcie_ahci_read(ctlr->r_mem, 0xa4);
+	bpcie_ahci_write(ctlr->r_mem, 0xa4, v | 0x40);
+
+	//--- step 19 ---
+	if (ctlr->dev_id != 0x909f104d && ctlr->dev_id != 0x90ca104d && ctlr->dev_id != 0x90d9104d) {
+		v2 = 0x73000000;
+	} else {
+		v2 = 0x30000000;
+	}
+
+	//--- step 20 ---
+	bpcie_ahci_write(ctlr->r_mem, 0xa0, 4);
+	v = bpcie_ahci_read(ctlr->r_mem, 0xa4);
+	bpcie_ahci_write(ctlr->r_mem, 0xa4, (v & 0x88ffffff) | v2);
+
+	//--- step 21 ---
+	v = bpcie_ahci_read(ctlr->r_mem, 0xa4);
+
+	//--- step 22 ---
+	for (i = 0; i < 100; i++) {
+		udelay(10000);
+	}
+
+	//--- step 23 ---
+	bpcie_ahci_write(ctlr->r_mem, 0x178, 0xf9);
+	v = bpcie_ahci_read(ctlr->r_mem, 0x17c);
+
+	if (is_phy_gen_3) {
+		dev_info(dev,"Align 90=0x%02x\n",v & 0x7f);
+	}
+	//done!
+}
+
+void baikal_pcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr)
 {
   struct ahci_controller *ctlr_; // r15
   __int64 v6; // rax
@@ -3747,7 +3987,7 @@ LABEL_220:
     goto LABEL_220;
   __outdword((unsigned __int16)v254, v255);
 }
-EXPORT_SYMBOL_GPL(bpcie_sata_phy_init);
+EXPORT_SYMBOL_GPL(baikal_pcie_sata_phy_init);
 #endif
 
 
