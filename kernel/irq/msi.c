@@ -71,7 +71,7 @@ static inline int msi_sysfs_create_group(struct device *dev);
  *
  * Return: pointer to allocated &msi_desc on success or %NULL on failure
  */
-static struct msi_desc *msi_alloc_desc(struct device *dev, int nvec,
+struct msi_desc *msi_alloc_desc(struct device *dev, int nvec,
 				       const struct irq_affinity_desc *affinity)
 {
 	struct msi_desc *desc = kzalloc(sizeof(*desc), GFP_KERNEL);
