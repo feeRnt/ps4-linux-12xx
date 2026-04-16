@@ -186,8 +186,21 @@ static void apcie_msi_free(struct irq_domain *domain,
 	pr_devel("apcie_msi_free(%d)\n", virq);
 }
 
+static void apcie_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc)
+{
+	arg->desc = desc;
+	struct pci_dev* device = msi_desc_to_pci_dev(desc);
+
+	arg->hwirq = PCI_FUNC(device->devfn) << 8;
+
+#ifndef QEMU_HACK_NO_IOMMU
+	arg->hwirq |= 0xFF;
+#endif
+}
+
 static struct msi_domain_ops apcie_msi_domain_ops = {
 	//.get_hwirq	= apcie_msi_get_hwirq,
+	.set_desc	= apcie_set_desc,
 	.msi_init	= apcie_msi_init,
 	.msi_free	= apcie_msi_free,
 };
@@ -201,8 +214,11 @@ static struct msi_domain_info apcie_msi_domain_info = {
 
 struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 {
-	struct irq_domain *parent;
-	struct irq_alloc_info info;
+	struct irq_domain *domain *parent;
+	struct fwnode_handle *fn;
+	struct irq_fwspec fwspec;
+
+	//struct irq_alloc_info info; no longer assign irqs at domain creation, but rather desc creation/assign_irqs
 
 	sc_dbg("apcie_create_irq_domain\n");
 	if (x86_vector_domain == NULL)
@@ -210,21 +226,46 @@ struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 
 	apcie_msi_domain_info.chip_data = (void *)sc;
 
-	init_irq_alloc_info(&info, NULL);
-	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
+	/* init_irq_alloc_info(&info, NULL);
+	 * info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI; */ // assign per device now
+
 	//info.msi_dev = sc->pdev; -- removed after 3b9c1d377d67072d1d8a2373b4969103cca00dab
 	//TODO: Add descriptor
+	
+	fn = irq_domain_alloc_named_id_fwnode(apcie_msi_controller.name, pci_dev_id(sc->pdev));
+	if (!fn) {
+		return NULL;
+	}
+	
+	sc_dbg("devid = %d\n", pci_dev_id(sc->pdev));
 
-	parent = irq_remapping_get_irq_domain(&info);
-	if (parent == NULL) {
+	fwspec.fwnode = fn;
+	fwspec.param_count = 1;
+
+	// It should be correct to put the pci device id in here
+	fwspec.param[0] = pci_dev_id(sc->pdev);
+
+	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // we use a fake fw match to get PS4 parent. crashniels' code
+
+	if (!parent) {
+		sc_dbg("No parent found during irq_domain search; assigning x86_vector_domain!"\n);
 		parent = x86_vector_domain;
-	} else {
+	} else if (parent == x86_vector_domain) {
+		sc_dbg("fake parent: x86_vector_domain; will break things \n");
+	}	
 		apcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
 		apcie_msi_controller.name = "IR-Aeolia-MSI";
 	}
 
-	//return msi_create_irq_domain(NULL, &apcie_msi_domain_info, parent);
-	return msi_create_irq_domain(NULL, &apcie_msi_domain_info, x86_vector_domain); //maybe we need this now
+	domain = msi_create_irq_domain(NULL, &apcie_msi_domain_info, parent);
+	//return msi_create_irq_domain(NULL, &apcie_msi_domain_info, x86_vector_domain); //maybe we need this now; no- we don't
+
+	if (!domain) {
+		irq_domain_free_fwnode(fn);
+		pr_warn("Failed to initialize Aeolia-MSI irqdomain.\n");
+	}
+
+	return domain;
 }
 
 static int apcie_is_compatible_device(struct pci_dev *dev)
@@ -274,21 +315,28 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	 * Subfunction is usually 0 and implicitly increments per hwirq,
 	 * but can also be 0xff to indicate that this is a shared IRQ. */
 	//info.msi_hwirq = PCI_FUNC(dev->devfn) << 8; // -- removed after 3b9c1d377d67072d1d8a2373b4969103cca00dab
-	info.hwirq = PCI_FUNC(dev->devfn) << 8; //TODO: Ok?
+	info.hwirq = PCI_FUNC(dev->devfn) << 8;
 	dev_dbg(&dev->dev, "apcie_assign_irqs(%d)\n", nvec);
 
 #ifndef QEMU_HACK_NO_IOMMU
 	info.flags = X86_IRQ_ALLOC_CONTIGUOUS_VECTORS;
 	if (!(apcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
-		nvec = 1;
+		nvec = 1; // number of vectors
 		//info.msi_hwirq |= 0xff; /* Shared IRQ for all subfunctions */
 		info.hwirq |= 0xff; /* Shared IRQ for all subfunctions */
 	}
 #endif
+	desc = msi_alloc_desc(bare_dev, nvec, NULL);
 
+	info.desc = desc;
+	info.data = sc;
+	
+	dev_info(&dev->dev, "apcie_assign_irqs(%d) (%ld)\n", nvec, info.hwirq);
+	
 	ret = irq_domain_alloc_irqs(sc->irqdomain, nvec, NUMA_NO_NODE, &info);
 	if (ret >= 0) {
 		dev->irq = ret;
+		desc->irq = ret;
 		ret = nvec;
 	}
 
