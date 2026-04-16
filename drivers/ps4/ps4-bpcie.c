@@ -11,6 +11,8 @@
 #include <asm/irqdomain.h>
 #include <asm/irq_remapping.h>
 
+#include "../pci/msi/msi.h"
+
 #include <asm/msi.h>
 
 #include <asm/ps4.h>
@@ -359,12 +361,14 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 
 	bpcie_msi_domain_info.chip_data = (void *)sc;
 
-	init_irq_alloc_info(&info, NULL);
-	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
+	//init_irq_alloc_info(&info, NULL);		//  ""
+	//info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI; // removed after fwspec
+
 	//info.msi_dev = pdev;
 	//TODO: Add desc
 	//parent = irq_remapping_get_ir_irq_domain(&info);
-	parent = irq_remapping_get_irq_domain(&info);
+	
+	//parent = irq_remapping_get_irq_domain(&info); // removed after fwspec
 	if (parent == NULL) {
 		parent = x86_vector_domain;
 	} else {
