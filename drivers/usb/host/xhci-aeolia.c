@@ -177,7 +177,7 @@ static int ahci_init_one(struct pci_dev *pdev)
 	resource_size_t		rsrc_start;
 	resource_size_t		rsrc_len;
 
-	printf("xhci-aeolia: ENTER ahci_init_one\n");
+	dev_dbg(&pdev->dev, "xhci-aeolia: ENTER ahci_init_one\n");
 
 	WARN_ON((int)ATA_MAX_QUEUE > AHCI_MAX_CMDS);
 
@@ -402,7 +402,7 @@ static int xhci_aeolia_probe(struct pci_dev *dev, const struct pci_device_id *id
 	}
 
 	if (dma_set_mask(&dev->dev, DMA_BIT_MASK(31)) ||
-		dma_set_coherent_mask(&dev-dev, DMA_BIT_MASK(31))) {
+		dma_set_coherent_mask(&dev->dev, DMA_BIT_MASK(31))) {
 		return -ENODEV;
 		/* dev is the pointer to struct pci_dev here; I'm not fixing it to *pdev now :D */
 	}

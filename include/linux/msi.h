@@ -691,4 +691,8 @@ static inline struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev)
 static inline void pci_write_msi_msg(unsigned int irq, struct msi_msg *msg) { }
 #endif /* !CONFIG_PCI_MSI */
 
+/* Declared for PS4 APCIe/BPCIe use */
+extern struct msi_desc *msi_alloc_desc(struct device *dev, int nvec,
+					const struct irq_affinity_desc *affinity);
+
 #endif /* LINUX_MSI_H */
