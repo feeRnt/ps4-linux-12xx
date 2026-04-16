@@ -4925,8 +4925,8 @@ static int sky2_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	pci_set_master(pdev);
 #ifdef CONFIG_X86_PS4
 	if (pdev->vendor == PCI_VENDOR_ID_SONY) {
-		if (pci_set_dma_mask(pdev, DMA_BIT_MASK(31)) < 0 ||
-		    pci_set_consistent_dma_mask(pdev, DMA_BIT_MASK(31)) < 0) {
+		if (dma_set_mask(&pdev->dev, DMA_BIT_MASK(31)) < 0 ||
+-                   dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(31)) < 0) {
 			dev_err(&pdev->dev, "no usable DMA configuration\n");
 			goto err_out_free_regions;
 		}
