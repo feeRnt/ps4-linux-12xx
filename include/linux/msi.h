@@ -476,11 +476,17 @@ struct irq_domain *pci_msi_create_irq_domain(struct fwnode_handle *fwnode,
 u32 pci_msi_domain_get_msi_rid(struct irq_domain *domain, struct pci_dev *pdev);
 struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev);
 bool pci_dev_has_special_msi_domain(struct pci_dev *pdev);
+
+
 #else
 static inline struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev)
 {
 	return NULL;
 }
 #endif /* CONFIG_PCI_MSI_IRQ_DOMAIN */
+
+/* Declared for PS4 APCIe/BPCIe use */
+extern struct msi_desc *msi_alloc_desc(struct device *dev, int nvec,
+					const struct irq_affinity_desc *affinity);
 
 #endif /* LINUX_MSI_H */

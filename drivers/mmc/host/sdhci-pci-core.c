@@ -357,7 +357,7 @@ static int aeolia_enable_dma(struct sdhci_pci_slot *slot)
 	if (dma_set_mask(&slot->chip->pdev->dev, DMA_BIT_MASK(31))) {
 		return -EINVAL;
 	}
-	if (dma_set_coherent_mask(&slot->chip->pdev, DMA_BIT_MASK(31))) {
+	if (dma_set_coherent_mask(&slot->chip->pdev->dev, DMA_BIT_MASK(31))) {
 		return -EINVAL;
 	}
 
