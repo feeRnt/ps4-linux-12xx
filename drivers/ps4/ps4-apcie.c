@@ -11,8 +11,10 @@
 #include <asm/irqdomain.h>
 #include <asm/irq_remapping.h>
 
-#include <asm/msi.h>
+//#include "../pci/msi/msi.h" //provided in linux/msi,irqdomain
 
+#include <asm/msi.h>
+#include <asm/apic.h>
 #include <asm/ps4.h>
 
 #include "aeolia.h"
@@ -214,7 +216,7 @@ static struct msi_domain_info apcie_msi_domain_info = {
 
 struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 {
-	struct irq_domain *domain *parent;
+	struct irq_domain *domain, *parent;
 	struct fwnode_handle *fn;
 	struct irq_fwspec fwspec;
 
@@ -248,11 +250,11 @@ struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // we use a fake fw match to get PS4 parent. crashniels' code
 
 	if (!parent) {
-		sc_dbg("No parent found during irq_domain search; assigning x86_vector_domain!"\n);
+		sc_dbg("No parent found during irq_domain search; assigning x86_vector_domain!\n");
 		parent = x86_vector_domain;
 	} else if (parent == x86_vector_domain) {
-		sc_dbg("fake parent: x86_vector_domain; will break things \n");
-	}	
+		sc_dbg("fake parent: x86_vector_domain; will break things.\n");
+	} else {	
 		apcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
 		apcie_msi_controller.name = "IR-Aeolia-MSI";
 	}
@@ -290,6 +292,9 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	struct apcie_dev *sc;
 	struct irq_alloc_info info;
 
+	struct msi_desc *desc;
+	struct device* bare_dev = &sc->pdev->dev;
+	
 	sc_devfn = (dev->devfn & ~7) | AEOLIA_FUNC_ID_PCIE;
 	sc_dev = pci_get_slot(dev->bus, sc_devfn);
 
@@ -309,7 +314,7 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 	/* IRQs "come from" function 4 as far as the IOMMU/system see */
 	//info.msi_dev = sc->pdev; -- removed after 3b9c1d377d67072d1d8a2373b4969103cca00dab
-	//TODO: Add descriptor
+	info.devid = pci_dev_id(sc->pdev);
 
 	/* Our hwirq number is function << 8 plus subfunction.
 	 * Subfunction is usually 0 and implicitly increments per hwirq,

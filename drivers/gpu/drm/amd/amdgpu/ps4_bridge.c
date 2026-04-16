@@ -400,7 +400,8 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
 	struct drm_connector *connector = mn_bridge->connector;
 	struct drm_device *dev = connector->dev;
-	struct pci_dev *pdev = dev->pdev;
+	//struct pci_dev *pdev = dev->pdev;
+	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	u8 dp[3];
 	DRM_DEBUG("Enable PS4_BRIDGE_ENABLE\n");
 	if (!mn_bridge->mode) {
@@ -688,21 +689,21 @@ static const struct drm_display_mode mode_480p __maybe_unused = {
 	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 		 752, 800, 0, 480, 490, 492, 525, 0,
 		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
-	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
+	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
 };
 /* 4 - 1280x720@60Hz */
 static const struct drm_display_mode mode_720p __maybe_unused = {
 	DRM_MODE("1280x720", DRM_MODE_TYPE_DRIVER, 74250, 1280, 1390,
 		 1430, 1650, 0, 720, 725, 730, 750, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
-	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
+	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
 /* 16 - 1920x1080@60Hz */
 static const struct drm_display_mode mode_1080p = {
 	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED, 148500, 1920, 2008,
 		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
-	.vrefresh = 60, .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
+	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
 
 int ps4_bridge_get_modes(struct drm_connector *connector)
@@ -769,7 +770,7 @@ int ps4_bridge_mode_valid(struct drm_connector *connector,
 	return MODE_OK;
 }
 
-static int ps4_bridge_attach(struct drm_bridge *bridge)
+static int ps4_bridge_attach(struct drm_bridge *bridge, enum drm_bridge_attach_flags)
 {
 	/* struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge); */
 
@@ -800,23 +801,20 @@ int ps4_bridge_register(struct drm_connector *connector,
 	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
 
 	// TODO (ps4patches): This seems to be the new way of adding bridges
-	//drm_bridge_add(&mn_bridge->bridge);
-	//Seems like no driver really implemented it in this version of the kernel
-	/* Edit: It is not needed for proper functionality */
+	// though amdgpu was not using this at 6.0; might be unnecessary
+	drm_bridge_add(&mn_bridge->bridge);
 
-	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL);
+	//ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL);
 
 	// Allow the bridge to create its own connectors with last parameter = 0.
-	//ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
-	// Not yet introduced in this version of the kernel... This modification is from
-	// v5.15.15
+	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
 
 	if (ret) {
 		DRM_ERROR("Failed to initialize bridge with drm\n");
 		return -EINVAL;
 	}
 
-	encoder->bridge = &mn_bridge->bridge;
+	//encoder->bridge = &mn_bridge->bridge; // encoder no longer has bridge elem
 
 	return 0;
 }
