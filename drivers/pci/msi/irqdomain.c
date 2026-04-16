@@ -38,7 +38,7 @@ void pci_msi_teardown_msi_irqs(struct pci_dev *dev)
  * @msg:	Pointer to the message
  */
 
-/* Declared static for PS4 APCIe/BPCIe use */
+/* Declared non-static for PS4 APCIe/BPCIe use */
 void pci_msi_domain_write_msg(struct irq_data *irq_data, struct msi_msg *msg)
 {
 	struct msi_desc *desc = irq_data_get_msi_desc(irq_data);

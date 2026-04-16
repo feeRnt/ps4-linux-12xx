@@ -11,7 +11,7 @@
 #include <asm/irqdomain.h>
 #include <asm/irq_remapping.h>
 
-#include "../pci/msi/msi.h"
+//#include "../pci/msi/msi.h" //provided in linux/msi,irqdomain
 
 #include <asm/msi.h>
 #include <asm/apic.h>
@@ -449,13 +449,15 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 		goto fail;
 	}
 
+	//info.devid = pci_dev_id(sc->pdev); never in Baikal code, but was put in Aeolia/Belize
+	
 	dev_dbg(&dev->dev, "bpcie_assign_irqs(%d)\n", nvec);
 
 #ifndef QEMU_HACK_NO_IOMMU
 	if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 		nvec = 1;
 		//info.msi_hwirq |= 0xff; // Shared IRQ for all subfunctions
-		info.hwirq |= 0xff; // Shared IRQ for all subfunctions
+		//info.hwirq |= 0xff; // Shared IRQ for all subfunctions
 	}
 #endif
 	if (dev->msi_enabled)
