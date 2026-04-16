@@ -481,6 +481,7 @@ static inline int ahci_nr_ports(u32 cap)
 	  struct f_resource *r_mem;
 	  //struct rman sc_iomem;
 	  //struct ahci_controller_irq irqs[16];
+	  u32 trace_len; //for direct use for Belizes (= 6)
 	  u32 caps;
 	  u32 caps2;
 	  u32 capsem;
@@ -495,7 +496,8 @@ static inline int ahci_nr_ports(u32 cap)
 	  //struct mtx em_mtx;
 	  void *apcie_bpcie_buffer;
 	};
-	void bpcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr);
+	void belize_pcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr);
+	void baikal_pcie_sata_phy_init(struct device *dev, struct ahci_controller *ctlr);
 	static inline u32 __indword(u32 port) {return 0;}
 	static inline void __outdword(u32 port, u32 val) {}
 

@@ -171,7 +171,7 @@ drm_encoder_disable(struct drm_encoder *encoder)
 {
 	const struct drm_encoder_helper_funcs *encoder_funcs = encoder->helper_private;
 	struct drm_bridge* bridge = drm_bridge_chain_get_first_bridge(encoder);
-	
+
 	if (!encoder_funcs)
 		return;
 
