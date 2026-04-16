@@ -36,7 +36,9 @@ void pci_msi_teardown_msi_irqs(struct pci_dev *dev)
  * @irq_data:	Pointer to interrupt data of the MSI interrupt
  * @msg:	Pointer to the message
  */
-static void pci_msi_domain_write_msg(struct irq_data *irq_data, struct msi_msg *msg)
+
+/* Declared static for PS4 APCIe/BPCIe use */
+void pci_msi_domain_write_msg(struct irq_data *irq_data, struct msi_msg *msg)
 {
 	struct msi_desc *desc = irq_data_get_msi_desc(irq_data);
 
