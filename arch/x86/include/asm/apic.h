@@ -557,6 +557,11 @@ static inline void apic_smt_update(void) { }
 struct msi_msg;
 struct irq_cfg;
 
+/* for use by PS4 Aeolia/Baikal PCIe msi: */
+extern void  x86_vector_msi_compose_msg(struct irq_data *data,
+					struct msi_msg *msg);
+/* End of PS4 Part */
+
 extern void __irq_msi_compose_msg(struct irq_cfg *cfg, struct msi_msg *msg,
 				  bool dmar);
 
