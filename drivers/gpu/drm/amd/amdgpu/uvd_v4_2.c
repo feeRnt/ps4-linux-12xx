@@ -547,6 +547,7 @@ static int uvd_v4_2_ring_test_ring(struct amdgpu_ring *ring)
 	unsigned i;
 	int r;
 	pr_info("uvd_v4_2: called %s\n", __func__);
+	// Make this more like cik_sdma ring test
 
 	WREG32(mmUVD_CONTEXT_ID, 0xCAFEDEAD);
 	r = amdgpu_ring_alloc(ring, 3);
