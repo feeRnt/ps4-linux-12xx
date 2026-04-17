@@ -61,6 +61,7 @@ struct abpcie_dev {
 	void __iomem *bar2;
 	void __iomem *bar4;
 
+	int8_t irq_map[100];
 	int nvec;
 	int serial_line[2];
 	struct abpcie_icc_dev icc;
