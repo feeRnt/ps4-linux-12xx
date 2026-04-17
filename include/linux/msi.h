@@ -467,6 +467,10 @@ int platform_msi_device_domain_alloc(struct irq_domain *domain, unsigned int vir
 void platform_msi_device_domain_free(struct irq_domain *domain, unsigned int virq,
 				     unsigned int nvec);
 void *platform_msi_get_host_data(struct irq_domain *domain);
+
+/* Declared for PS4 APCIe/BPCIe use */
+struct msi_desc *msi_alloc_desc(struct device *dev, int nvec,
+					const struct irq_affinity_desc *affinity);
 #endif /* CONFIG_GENERIC_MSI_IRQ_DOMAIN */
 
 #ifdef CONFIG_PCI_MSI_IRQ_DOMAIN
@@ -477,6 +481,8 @@ u32 pci_msi_domain_get_msi_rid(struct irq_domain *domain, struct pci_dev *pdev);
 struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev);
 bool pci_dev_has_special_msi_domain(struct pci_dev *pdev);
 
+/* PS4 use */
+void pci_msi_domain_write_msg(struct irq_data *irq_data, struct msi_msg *msg);
 
 #else
 static inline struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev)
@@ -484,9 +490,4 @@ static inline struct irq_domain *pci_msi_get_device_domain(struct pci_dev *pdev)
 	return NULL;
 }
 #endif /* CONFIG_PCI_MSI_IRQ_DOMAIN */
-
-/* Declared for PS4 APCIe/BPCIe use */
-extern struct msi_desc *msi_alloc_desc(struct device *dev, int nvec,
-					const struct irq_affinity_desc *affinity);
-
 #endif /* LINUX_MSI_H */
