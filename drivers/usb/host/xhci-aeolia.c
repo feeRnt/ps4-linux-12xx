@@ -407,12 +407,13 @@ static int xhci_aeolia_probe(struct pci_dev *dev, const struct pci_device_id *id
 		/* dev is the pointer to struct pci_dev here; I'm not fixing it to *pdev now :D */
 	}
 
-	retval = ahci_init_one(dev);
-	dev_dbg(&dev->dev, "ahci_init_one returned %d", retval);
-
-	if (!bus_master) {
-		pci_set_master(dev);
-		bus_master = true;
+	if (dev->device == PCI_DEVICE_ID_SONY_BELIZE_XHCI || dev->device == PCI_DEVICE_ID_SONY_BAIKAL_XHCI) {
+		retval = ahci_init_one(dev);
+		dev_dbg(&dev->dev, "ahci_init_one returned %d", retval);
+		if (!bus_master) {
+			pci_set_master(dev);
+			bus_master = true;
+		}
 	}
 
 	for (idx = 0; idx < NR_DEVICES; idx++) {
