@@ -52,17 +52,27 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 
 	// This is part of the Aeolia pcie device, but it's too early to
 	// do this in a driver.
-	emc_timer = ioremap(EMC_TIMER_BASE, 0x100);
+	emc_timer = ioremap(EMC_TIMER_BASE, 0x100); //TODO: replace with early_ioremap
 	if (!emc_timer)
 		goto fail;
 
 	// reset/start the timer
-	emctimer_write32(EMC_TIMER_ON_OFF, emctimer_read32(EMC_TIMER_ON_OFF) & 0xFFFFFFC8 | 0x32);
+	/* if Aeolia/Belize : */
+	emctimer_write32(0x84, emctimer_read32(0x84) & (~0x01));
+	/* if Baikal : */
+	//emctimer_write32(EMC_TIMER_ON_OFF, emctimer_read32(EMC_TIMER_ON_OFF) & 0xFFFFFFC8 | 0x32);
+
 	// udelay is not calibrated yet, so this is likely wildly off, but good
 	// enough to work.
 	udelay(300);
-	emctimer_write32(EMC_TIMER_RESET_VALUE, emctimer_read32(EMC_TIMER_RESET_VALUE) & 0xFFFFFFE0 | 0x10);
-	emctimer_write32(EMC_TIMER_ON_OFF, emctimer_read32(EMC_TIMER_ON_OFF) | 0x33);
+
+	/* if Aeolia/Belize : */
+	emctimer_write32(0x00, emctimer_read32(0x00) | 0x01);
+	emctimer_write32(0x84, emctimer_read32(0x84) | 0x01);
+
+	/* if Baikal : */
+	//emctimer_write32(EMC_TIMER_RESET_VALUE, emctimer_read32(EMC_TIMER_RESET_VALUE) & 0xFFFFFFE0 | 0x10);
+	//emctimer_write32(EMC_TIMER_ON_OFF, emctimer_read32(EMC_TIMER_ON_OFF) | 0x33);
 
 	t1 = emctimer_read();
 	tsc1 = tsc2 = rdtsc();
@@ -95,7 +105,7 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 	pr_info("Calibrated TSC frequency: %ld kHz\n", ret);
 fail:
 	if (emc_timer) {
-		iounmap(emc_timer);
+		iounmap(emc_timer); // TODO: replace with early_iounmap(emc_timer, 0x100); (the mapping-size=0x100 should be explicit in early_iounmap)
 		emc_timer = NULL;
 	}
 	return ret;
