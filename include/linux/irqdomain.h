@@ -353,9 +353,6 @@ static inline struct irq_domain *irq_domain_add_linear(struct device_node *of_no
 	return __irq_domain_add(of_node_to_fwnode(of_node), size, size, 0, ops, host_data);
 }
 
-/* PS4 use */
-extern void pci_msi_domain_write_msg(struct irq_data *irq_data, struct msi_msg *msg);
-
 #ifdef CONFIG_IRQ_DOMAIN_NOMAP
 static inline struct irq_domain *irq_domain_add_nomap(struct device_node *of_node,
 					 unsigned int max_irq,
