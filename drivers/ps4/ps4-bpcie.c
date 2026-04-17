@@ -635,7 +635,7 @@ static int bpcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 	if ((ret = bpcie_icc_init(sc)) < 0)
 		goto remove_uart;
 
-	bpcie_initialized = true;
+	bpcie_initialized = true; //should only run when probe function runs, which should only run on Baikal devices
 	return 0;
 
 remove_uart:
@@ -703,7 +703,7 @@ MODULE_DEVICE_TABLE(pci, bpcie_pci_tbl);
 
 static struct pci_driver bpcie_driver = {
 	.name		= "baikal_pcie",
-	.id_table	= bpcie_pci_tbl,
+	.id_table	= bpcie_pci_tbl, //should prevent use by Aeolia or Belizes
 	.probe		= bpcie_probe,
 	.remove		= bpcie_remove,
 #ifdef CONFIG_PM

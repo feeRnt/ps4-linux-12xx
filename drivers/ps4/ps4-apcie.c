@@ -557,12 +557,12 @@ static int apcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 
 	if ((ret = apcie_glue_init(sc)) < 0)
 		goto free_bars;
-	if ((ret = apcie_uart_init(sc)) < 0)
-		goto remove_glue;
+	//if ((ret = apcie_uart_init(sc)) < 0)
+	//	goto remove_glue; // Maybe (apparently) this dies; remove for now
 	if ((ret = apcie_icc_init(sc)) < 0)
 		goto remove_uart;
 
-	apcie_initialized = true;
+	apcie_initialized = true; //should only run when probe function runs, which should only run on Aeolia/Belize devices
 	return 0;
 
 remove_uart:
@@ -631,7 +631,7 @@ MODULE_DEVICE_TABLE(pci, apcie_pci_tbl);
 
 static struct pci_driver apcie_driver = {
 	.name		= "aeolia_pcie",
-	.id_table	= apcie_pci_tbl,
+	.id_table	= apcie_pci_tbl, //should prevent use by Baikals
 	.probe		= apcie_probe,
 	.remove		= apcie_remove,
 #ifdef CONFIG_PM
