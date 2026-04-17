@@ -24,7 +24,7 @@
 #include <asm/io_apic.h>
 #include <asm/io.h>
 #include <asm/i8259.h>
-#include <asm/apb_timer.h>
+//#include <asm/apb_timer.h>
 #include <asm/reboot.h>
 #include <asm/msr.h>
 #include <asm/ps4.h>
