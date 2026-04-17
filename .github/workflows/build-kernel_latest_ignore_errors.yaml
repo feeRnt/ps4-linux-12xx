@@ -7,7 +7,7 @@ name: "Compile PS4-Linux Kernel-12xx; Ignore Errors Version: Latest"
 on:
   # Allows you to run this workflow manually from the Github Actions tab
   workflow_dispatch:
-  push:
+  #push:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -101,7 +101,7 @@ jobs:
         with:
           path: ${{ github.workspace }}/kernel-source-host
           #key:  ${{ env.cache-workspace-restore-key }}
-          key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}-GCC-11
+          key: ${{ env.CACHE_WORKSPACE_RESTORE_KEY }}-GCC-11-ignore_errors
           # Use 1 key per LTO-ness. They're only about ~500-800 MB, and without this concurrent builds get confused
       
       - name: Check and make kernel-source-host directory
@@ -366,7 +366,7 @@ jobs:
           export GCE_PKG_DIR=${PWD}/gce/${localversion}/pkg
           export GCE_INSTALL_DIR=${PWD}/gce/${localversion}/install
           export GCE_BUILD_DIR=${PWD}/gce/${localversion}/build
-          export KERNEL_PKG=kernel-${localversion}_GCC-11.tar.gz
+          export KERNEL_PKG=kernel-${localversion}_GCC-11-ignore_errors.tar.gz
 
           export KCFLAGS="-march=btver2 -mtune=btver2 -O3"
           export KAFLAGS="-march=btver2 -mtune=btver2 -O3"
@@ -424,7 +424,7 @@ jobs:
           echo "Copying used .config to $GCE_INSTALL_DIR/.config. . ."
           cp .config "$GCE_INSTALL_DIR/.config"
           cd ${GCE_INSTALL_DIR}
-          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion"_GCC-11.tar.gz boot/bzImage lib/modules/* .config --owner=0 --group=0
+          tar -cvzf /container/workspace/kernel-source-container/kernel_"$localversion"_GCC-11-ignore_errors.tar.gz boot/bzImage lib/modules/* .config --owner=0 --group=0
           # I assume it'll never package the kernel, unless the compile succeeds, since -e is set
 
           ## GCE = Google Compute Engine, adapted from 
@@ -464,8 +464,8 @@ jobs:
       - name: Upload kernel image to github actions artifacts
         uses: actions/upload-artifact@v7
         with:
-          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_GCC-11
-          path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}_GCC-11.tar.gz
+          name: kernel_${{ steps.kernel-version-env.outputs.localversion }}_GCC-11-ignore_errors
+          path: ${{ github.workspace }}/kernel-source-host/kernel_${{ steps.kernel-version-env.outputs.localversion }}_GCC-11-ignore_errors.tar.gz
           # This path is the github actions root
           archive: false
 
