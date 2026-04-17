@@ -550,6 +550,8 @@ static inline void apic_smt_update(void) { }
 struct msi_msg;
 struct irq_cfg;
 
+extern void x86_vector_msi_compose_msg(struct irq_data *data, // for PS4 APCIe use
+				       struct msi_msg *msg);
 extern void __irq_msi_compose_msg(struct irq_cfg *cfg, struct msi_msg *msg,
 				  bool dmar);
 
