@@ -52,7 +52,8 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 
 	// This is part of the Aeolia pcie device, but it's too early to
 	// do this in a driver.
-	emc_timer = ioremap(EMC_TIMER_BASE, 0x100); //TODO: replace with early_ioremap
+	//emc_timer = ioremap(EMC_TIMER_BASE, 0x100); //replaced with early_ioremap for early mmapping, maybe needed on newer kernels
+	emc_timer = early_ioremap(EMC_TIMER_BASE, 0x100);
 	if (!emc_timer)
 		goto fail;
 
@@ -105,7 +106,8 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 	pr_info("Calibrated TSC frequency: %ld kHz\n", ret);
 fail:
 	if (emc_timer) {
-		iounmap(emc_timer); // TODO: replace with early_iounmap(emc_timer, 0x100); (the mapping-size=0x100 should be explicit in early_iounmap)
+		//iounmap(emc_timer); // replaced with early_iounmap(emc_timer, 0x100); (the mapping-size=0x100 should be explicit in early_iounmap)
+		early_iounmap(emc_timer, 0x100);
 		emc_timer = NULL;
 	}
 	return ret;
