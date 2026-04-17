@@ -147,6 +147,32 @@ static void apcie_msi_calc_mask(struct irq_data *data) {
 	}
 }
 
+
+static void apcie_irq_msi_compose_msg(struct irq_data *data,
+				       struct msi_msg *msg)
+{
+	struct irq_cfg *cfg __maybe_unused = irqd_cfg(data);
+
+	memset(msg, 0, sizeof(*msg));
+	msg->address_hi = X86_MSI_BASE_ADDRESS_HIGH;
+	msg->address_lo = 0xfee00000;// Just do it like this for now
+
+	// I know this is absolute horseshit, but it matches a known working kernel
+	{
+		struct apcie_dev *sc = data->chip_data;
+		int i;
+		msg->data = data->irq - 1;
+		if (sc) {
+			for (i = 0; i < 100; i++) {
+				if (sc->irq_map[i] == data->irq) {
+					msg->data = i;
+					break;
+				}
+			}
+		}
+	}
+}
+
 static struct irq_chip apcie_msi_controller = {
 	.name = "Aeolia-MSI",
 	.irq_unmask = apcie_msi_unmask,
@@ -154,7 +180,8 @@ static struct irq_chip apcie_msi_controller = {
 	.irq_ack = irq_chip_ack_parent,
 	.irq_set_affinity = msi_domain_set_affinity,
 	.irq_retrigger = irq_chip_retrigger_hierarchy,
-	.irq_compose_msi_msg = x86_vector_msi_compose_msg,
+	//.irq_compose_msi_msg = x86_vector_msi_compose_msg,
+	.irq_compose_msi_msg = apcie_irq_msi_compose_msg,
 	.irq_write_msi_msg = apcie_msi_write_msg,
 	.flags = IRQCHIP_SKIP_SET_WAKE,
 	// | IRQCHIP_AFFINITY_PRE_STARTUP, //is probably extra
@@ -179,6 +206,19 @@ static int apcie_msi_init(struct irq_domain *domain,
 	irq_domain_set_info(domain, virq, hwirq, info->chip, info->chip_data,
 			    handle_edge_irq, NULL, "edge");
 	apcie_msi_calc_mask(data);
+
+	/* virq in irq_map eintragen */
+	struct apcie_dev *sc = info->chip_data;
+	if (sc) {
+		int i;
+		for (i = 0; i < 100; i++) {
+			if (sc->irq_map[i] == -1) {
+				sc->irq_map[i] = virq;
+				break;
+			}
+		}
+	}
+
 	return 0;
 }
 
