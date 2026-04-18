@@ -2691,6 +2691,7 @@ int pci_scan_slot(struct pci_bus *bus, int devfn)
 			 */
 			if (!hypervisor_isolated_pci_functions())
 				break;  // We don't know if this somehow breaks on Baikal as a hypervisor
+					// No, it should return !false = true, and hence break when fn=0. In the past, we started from fn>0 anyhow
 		}
 		fn = next_fn(bus, dev, fn);
 	} while (fn >= 0);
