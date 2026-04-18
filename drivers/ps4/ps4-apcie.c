@@ -245,6 +245,7 @@ static struct msi_domain_ops apcie_msi_domain_ops = {
 	.set_desc	= apcie_set_desc,
 	.msi_init	= apcie_msi_init,
 	.msi_free	= apcie_msi_free,
+	// we can add .match, and .select functions for matching a fwnode as we wish; maybe we should
 };
 
 static struct msi_domain_info apcie_msi_domain_info = {
