@@ -394,6 +394,8 @@ static int xhci_aeolia_probe(struct pci_dev *dev, const struct pci_device_id *id
 	if (dev->device == PCI_DEVICE_ID_SONY_BAIKAL_XHCI) {
 		axhci->nr_irqs = retval = pci_alloc_irq_vectors(dev, NR_DEVICES, INT_MAX,
 				PCI_IRQ_MSIX | PCI_IRQ_MSI);//apcie_assign_irqs(dev, NR_DEVICES);
+	/* returns: return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags,
+					      NULL); */
 	} else {
 		axhci->nr_irqs = retval = apcie_assign_irqs(dev, NR_DEVICES);
 	}
