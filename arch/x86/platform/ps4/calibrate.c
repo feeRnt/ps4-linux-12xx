@@ -58,7 +58,7 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 		goto fail;
 
 	// reset/start the timer
-	/* if Aeolia/Belize : */
+	/* if Aeolia/Belize : */ // Try reading both Aeolia and Baikal base addresses, and establish is_aeolia_emc or is_baikal_emc from the readouts
 	emctimer_write32(0x84, emctimer_read32(0x84) & (~0x01));
 	/* if Baikal : */
 	//emctimer_write32(EMC_TIMER_ON_OFF, emctimer_read32(EMC_TIMER_ON_OFF) & 0xFFFFFFC8 | 0x32);
