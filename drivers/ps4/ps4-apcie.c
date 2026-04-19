@@ -332,10 +332,10 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	struct pci_dev *sc_dev;
 	struct apcie_dev *sc;
 	struct irq_alloc_info info;
-
-	struct msi_desc *desc;
-	struct device* bare_dev = &sc->pdev->dev;
 	
+	struct msi_desc *desc;
+	struct device* bare_dev;
+
 	sc_devfn = (dev->devfn & ~7) | AEOLIA_FUNC_ID_PCIE;
 	sc_dev = pci_get_slot(dev->bus, sc_devfn);
 
@@ -356,6 +356,9 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	/* IRQs "come from" function 4 as far as the IOMMU/system see */
 	//info.msi_dev = sc->pdev; -- removed after 3b9c1d377d67072d1d8a2373b4969103cca00dab
 	info.devid = pci_dev_id(sc->pdev);
+
+	bare_dev = &sc->pdev->dev; // sc is modified after the start of the function, so put the assignment here;
+				   // Grr what a mistake
 
 	/* Our hwirq number is function << 8 plus subfunction.
 	 * Subfunction is usually 0 and implicitly increments per hwirq,
