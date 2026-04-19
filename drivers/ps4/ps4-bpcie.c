@@ -405,7 +405,13 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	}
 	
 	// d = domain
-	d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, parent); // changed in: 6b15ffa07dc325f4e4dd98c877bfa970202c378b
+
+	d = pci_msi_create_irq_domain(fn, &bpcie_msi_domain_info, parent); // We should need non-nulls now since we use fn's:::
+	/* struct irq_domain *pci_msi_create_irq_domain(struct fwnode_handle *fwnode,
+					     struct msi_domain_info *info,
+					     struct irq_domain *parent) { */
+
+	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, parent); // changed in: 6b15ffa07dc325f4e4dd98c877bfa970202c378b
 	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, x86_vector_domain); // I think it should be vector domain now;
 											// MAYBE NOT. hpet uses parent. Yeah, use parent.
 	// remember that parent is just irq_domain struct pointer originaly, then irq_remapping_get_irq_domain (now irq_find_matching_fwspec) returns plat
