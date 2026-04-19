@@ -1966,11 +1966,12 @@ int sdhci_pci_enable_dma(struct sdhci_host *host)
 	}
 
 	pci_set_master(pdev);
-
+/* PS4-specfic */
+#ifdef CONFIG_X86_PS4
  	if (slot->chip->fixes && slot->chip->fixes->enable_dma) {
  		return slot->chip->fixes->enable_dma(slot);
  	}
-
+#endif
 	return 0;
 }
 
@@ -2065,14 +2066,24 @@ static const struct dev_pm_ops sdhci_pci_pm_ops = {
  *                                                                           *
 \*****************************************************************************/
 
+#ifdef CONFIG_X86_PS4
 static struct sdhci_pci_slot *sdhci_pci_probe_slot(
 	struct pci_dev *pdev, struct sdhci_pci_chip *chip,
 	int slotno)
+#else
+static struct sdhci_pci_slot *sdhci_pci_probe_slot(
+	struct pci_dev *pdev, struct sdhci_pci_chip *chip, int first_bar,
+	int slotno)
+#endif
 {
 	struct sdhci_pci_slot *slot;
 	struct sdhci_host *host;
+#ifdef CONFIG_X86_PS4
 	int ret, bar = chip->first_bar + slotno;
-	//int ret, bar = first_bar + slotno;
+#else
+	int ret, bar = first_bar + slotno;
+#endif
+	/* we might have some Belize check missing here, not sure */
 	size_t priv_size = chip->fixes ? chip->fixes->priv_size : 0;
 
 	if (!(pci_resource_flags(pdev, bar) & IORESOURCE_MEM)) {
@@ -2268,7 +2279,9 @@ static int sdhci_pci_probe(struct pci_dev *pdev,
 		chip->allow_runtime_pm = chip->fixes->allow_runtime_pm;
 	}
 	chip->num_slots = slots;
+#ifdef CONFIG_X86_PS4
 	chip->first_bar = first_bar;
+#endif
 	chip->pm_retune = true;
 	chip->rpm_retune = true;
 
@@ -2283,8 +2296,11 @@ static int sdhci_pci_probe(struct pci_dev *pdev,
 	slots = chip->num_slots;	/* Quirk may have changed this */
 
 	for (i = 0; i < slots; i++) {
+#ifdef CONFIG_X86_PS4
 		slot = sdhci_pci_probe_slot(pdev, chip, i);
-		//slot = sdhci_pci_probe_slot(pdev, chip, first_bar, i);
+#else
+		slot = sdhci_pci_probe_slot(pdev, chip, first_bar, i);
+#endif
 		if (IS_ERR(slot)) {
 			for (i--; i >= 0; i--)
 				sdhci_pci_remove_slot(chip->slots[i]);
