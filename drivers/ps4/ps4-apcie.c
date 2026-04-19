@@ -300,7 +300,9 @@ struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 		apcie_msi_controller.name = "IR-Aeolia-MSI";
 	}
 
-	domain = msi_create_irq_domain(NULL, &apcie_msi_domain_info, parent);
+	domain = msi_create_irq_domain(fn, &apcie_msi_domain_info, parent); // this is needed now with ptr to fwspec, since we use fwspecs.
+	/* Check kernel/irq/msi.c */
+	//domain = msi_create_irq_domain(NULL, &apcie_msi_domain_info, parent);
 	//return msi_create_irq_domain(NULL, &apcie_msi_domain_info, x86_vector_domain); //maybe we need this now; no- we don't
 
 	if (!domain) {
