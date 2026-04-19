@@ -354,11 +354,13 @@ static int aeolia_probe(struct sdhci_pci_chip *chip)
 
 static int aeolia_probe_slot(struct sdhci_pci_slot *slot)
 {
+	int err;
+
 	if (slot->chip->pdev->device == PCI_DEVICE_ID_SONY_BAIKAL_SDHCI) {
-		int err = pci_alloc_irq_vectors(slot->chip->pdev, 1, INT_MAX,
+		err = pci_alloc_irq_vectors(slot->chip->pdev, 1, INT_MAX,
 			PCI_IRQ_MSIX | PCI_IRQ_MSI);//apcie_assign_irqs(slot->chip->pdev, 1);
 	} else { /* Aeolia and Belize work with this */
-		int err = apcie_assign_irqs(slot->chip->pdev, 1);
+		err = apcie_assign_irqs(slot->chip->pdev, 1);
 	}
 
 	if (err <= 0) {
