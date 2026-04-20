@@ -1008,13 +1008,19 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 	present = !!(reg & TMONREG_MONITOR_PRESENT);
 	active = present && reg != TMONREG_MONITOR_POWERED_OFF;
 
-	if (active) {
-		if (dig_connector)
-			dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
+	/*
+	 * Belize can raise TMONREG monitor-present before the bridge AUX/DPCD
+	 * side is actually ready. Treat a successful DPCD read as the
+	 * authoritative "sink is ready" signal so we don't start link training
+	 * against a half-awake bridge and trip clock recovery failures.
+	 */
+	if (dig_connector)
+		dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
 
-		if (amdgpu_connector->ddc_bus && amdgpu_connector->ddc_bus->has_aux)
-			dpcd_ret = amdgpu_atombios_dp_get_dpcd(amdgpu_connector);
-	} else if (dig_connector) {
+	if (amdgpu_connector->ddc_bus && amdgpu_connector->ddc_bus->has_aux)
+		dpcd_ret = amdgpu_atombios_dp_get_dpcd(amdgpu_connector);
+
+	if (dpcd_ret != 0 && dig_connector) {
 		dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_NONE;
 		dig_connector->dp_lane_count = 0;
 		dig_connector->dp_clock = 0;
@@ -1025,10 +1031,14 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 		      dig_connector ? dig_connector->dp_lane_count : 0,
 		      dig_connector ? dig_connector->dp_clock : 0);
 
-	if (active)
+	if (dpcd_ret == 0)
 		return connector_status_connected;
-	else
-		return connector_status_disconnected;
+
+	if (!amdgpu_connector->ddc_bus || !amdgpu_connector->ddc_bus->has_aux)
+		return active ? connector_status_connected :
+			connector_status_disconnected;
+
+	return connector_status_disconnected;
 }
 
 enum drm_mode_status ps4_bridge_mode_valid(struct drm_connector *connector,
