@@ -18,32 +18,42 @@ valeryy (no Github - contributed to PS4 Baikal southbridges),
 
 For a more detailed credits section, check out [this page](https://dionkill.github.io/ps4-linux-tutorial/ending.html#kernel-developers).
 
-This fork aimed to make the internal WiFi+Bluetooth modules on specific PlayStation models with the Marvell 88w8897 combo card (internal codename Torus 2) functional, as they typically error out on the default kernels.
+This fork originally aimed to make the internal WiFi+Bluetooth modules on specific PlayStation 4 models with the Marvell 88w8897 combo card (internal codename Torus 2) functional, as they typically error out on default kernels.
 
-Over time, I also managed to fix the common blackscreen at GUI login issue on newer kernels, and added support for various miscellaneous components such as the MT7668 WiFi and BT chip on certain consoles.  
-The branch names are meant to be descriptive and provide an idea, but they're far from perfect!
+Over time it grew into a broader PS4-focused kernel tree covering graphics hotplug and bridge handling, HDMI audio, GPU clocking, thermal and LED control, firmware quirks, and newer desktop/container-oriented config paths.
+The active branch in this repo is now `7.0-Clean`; older `5.4`, `5.15`, and `6.15` branches are still kept around as known-good reference points for some consoles.
 
-Merging all the main fixes into a few distinct branches is a WIP.
+<br>
+
+-------
+## Current Status (`7.0-Clean`)
+
+- `7.0-Clean` is the rolling PS4-focused Linux 7.0 branch in this repository.
+- Graphics and display work now includes custom PS4 bridge and encoder patches, HDMI hotplug detection fixes via AUX/DPCD polling, a DPCD-readiness gate to avoid premature link training, 1080p120 mode re-added for testing, PS4 PCIe ASPM and clock-state tuning, a Liverpool/Gladius SCLK force driver, and deeper GFX/SDMA low-power states disabled for steadier sustained performance on PS4.
+- HDMI audio on Liverpool-based systems is fixed by enabling IEC958 on the relevant R6xx converters during init.
+- PS4 platform support now includes an Aeolia/Belize front-panel LED driver with optional thermal mode, an Aeolia/Belize fan threshold and RPM `hwmon` driver, a lower minimum fan threshold, a PS4 DMI spoof fallback helper, `/dev/ps4-mesa-lock` for Mesa/kernel compatibility checks, and the missing extra firmware blobs in-tree.
+- Networking and runtime work now includes the Aeolia `sky2` interrupt-storm fix, which also fixes the associated reported runaway memory-leak symptom seen on affected systems, plus BORE scheduler support with PS4/Jaguar tuning, dmem/TTM VRAM protection tiers, and cgroup plus namespace support for modern userspace.
+- Build and forward-port maintenance now includes the Strawberry builder with `Server` and `General` profiles, ThinLTO or FullLTO selection, `mt76x8` build fixes for newer kernels, the `ps4_bridge` attach callback fix for newer DRM APIs, and General-profile `DMI` / `fw_cfg` sysfs support for desktop userspace compatibility.
 
 <br>
 
 -------
 ## Console Models and Southbridge
 
-While the CUH-1216/1215 models are definitively known to have the Torus 2 models with probelmatic WiFi, along with some 11xx models with similar WiFi issues, here is a list of consoles reported working without any hiccups from the kernels in this repo:
+While the CUH-1216/1215 models are definitively known to have the Torus 2 models with problematic WiFi, along with some 11xx models with similar WiFi issues, here is a list of consoles reported working without any hiccups from the kernels in this repo:
 
 | Console Model | Variation | WiFi+BT Chip Present | Compatible Kernel (Patched) |
 |---|---|---| --- |
 | CUH-1216(A/B) | Phat - Belize B0 | Marvell 88w8897 (Torus 2) | *6.15.4, 5.15.15* |
 | CUH-1215(A/B) | Phat - Belize | Marvell 88w8897 (Torus 2) | *6.15.4, 5.15.15*  |
-CUH-1003  | Phat  - Aeolia | ? | *6.15.4; [probably non-built in firmware version](#builtin-fw-anchor)* |
-CUH-1004A | Phat - Aeolia | Marvell 88w8797 (Torus 1) | *6.15.4; [non-built in firmware version](#builtin-fw-anchor)* |
-CUH-1116A | Phat - Aeolia | ? | *6.15.4* |
-CUH-2215B | Slim - Baikal | ? | *5.4.247* |
-CUH-2216A | Slim - Baikal B1 | MediaTek 7668 | *5.4.247* |
-CUH-2216A | Slim - Belize | MediaTek 7668 | *5.15.15* |
-CUH-7116B | Pro - Baikal B1 | ? | *5.4.247* |
-CUH-7202B | Pro - Baikal | ? | *5.4.247* |
+| CUH-1003  | Phat  - Aeolia | ? | *6.15.4; [probably non-built in firmware version](#builtin-fw-anchor)* |
+| CUH-1004A | Phat - Aeolia | Marvell 88w8797 (Torus 1) | *6.15.4; [non-built in firmware version](#builtin-fw-anchor)* |
+| CUH-1116A | Phat - Aeolia | ? | *6.15.4* |
+| CUH-2215B | Slim - Baikal | ? | *5.4.247* |
+| CUH-2216A | Slim - Baikal B1 | MediaTek 7668 | *5.4.247* |
+| CUH-2216A | Slim - Belize | MediaTek 7668 | *5.15.15* |
+| CUH-7116B | Pro - Baikal B1 | ? | *5.4.247* |
+| CUH-7202B | Pro - Baikal | ? | *5.4.247* |
 
 ```
 [A and B are just hard-drive specification: 500 GB vs 1000GB].
@@ -59,6 +69,8 @@ sourced from the initramfs. For these, each affected kernel release has a "no-bu
 version for best functionality. See the releases page of the referring kernels for more
 information.]
 <br>
+
+- Note: the table above is conservative and mostly reflects confirmed reports from the older release branches. `7.0-Clean` is newer rolling work and is still being validated model-by-model.
 
 - TODO: Add a list with all supported console models, their southbridges, and their compatible kernels.
 
@@ -96,85 +108,71 @@ Hard work paid off!
 ----
 ## Branches
 
-There are different branches that you can select on the repo,    
-`x_old__ps4-linux-5.15.y` and `x_old__ps4-linux-5.15.y-conservative2` are branches with excessive debug logs, that helped me pinpoint the issue on the whole MMC stack. Due to the logging, it is not advisable to use those kernel branches.    
+`7.0-Clean` is the active branch and where current PS4 platform work lands first.
 
-The other "x_experimental__" or "x_exp__" prefixed branches were made for debugging & testing a particular subsystem or problem in the kernel, and are not advised to be used.  
-They are only kept for further future experiment, archive or study only.  
+Older branches are still useful as historical references or fallback kernels:
 
-\- \- For example, the `x_experimental__5.15.15-fix-baikal` branch is non-functional.
-Kernel 5.15 is not reported to be working on any Baikal console, but it's kept for testing only.
+- `5.15.15-belize`: clean WiFi, blackscreen, and misc. fixes for Belize southbridges.
+- `5.15.189-belize`: later 5.15-based Belize branch, but not maintained as heavily as `5.15.15-belize`.
+- `5.4.247-baikal-dfaus`: 5.4-based Baikal branch with blackscreen fixes and MT7668 support, based on DFAUS' source.
+- `6.15.4-aeolia-belize-crashniels`: 6.15-based Aeolia/Belize branch based on crashniels' source.
 
-\
-The `5.15.15-aeolia-belize` is a branch without the PS4 patches from codedwrench's **Baikal** branch.    
-It still runs as intended on a Belize (no blackscreen fix yet), but you will get bad errors. Should be used for testing only.
+Debug and experimental branches are still present, but should not be treated as release kernels:
 
-However, it probably runs on Aeolia models, unlike the \*-belize -only branches. (Not tested yet)
-
-----
-
-The main release branches are:    
-- `5.15.15-belize` : The clean WiFi, Blackscreen & other misc. fixes' branch for Kernel version 5.15.15 on Belize southbridges.  
-This is the primary branch of the repo.   
-
-- `5.15.189-belize` : The clean WiFi & Blackscreen fix branch for Kernel version 5.15.189 on Belize southbridges.  
-(Not as well maintained as 5.15.15)
-
-- `5.4.247-baikal-dfaus`: A branch for version 5.4.247 with fixed blackscreen and MT7668 support for Baikal southbridges.    
-Based on DFAUS' source.
-
-- `6.15.4-aeolia-belize-crashniels` : The clean WiFi, Blackscreen & other misc. fixes' branch for Kernel version 6.15.4, on Aeolia/Belize southbridges.    
-Based on crashniels' source.
+- `x_old__ps4-linux-5.15.y` and `x_old__ps4-linux-5.15.y-conservative2` contain excessive debug logging from earlier WiFi/MMC investigation work.
+- `x_experimental__*` and `x_exp__*` branches are kept for subsystem testing, regression hunting, or archival reference only.
+- `x_experimental__5.15.15-fix-baikal` is an example of a non-release test branch and is not considered working.
+- `5.15.15-aeolia-belize` intentionally omits parts of the Baikal patchset and is kept for testing only.
 
 <br>
 
 ---
 ## Compile and Build
 
-To compile any of these branches, you can simply fork the repo, go to the Actions tab and run the Workflow file for `build-kernel_latest.yaml` for a particular branch.
+The current workflow is centered around `build.sh` ("Strawberry Builder") and the consolidated GitHub Actions workflow `.github/workflows/build-kernel_latest.yaml`.
 
-Or if you would like to build locally, just clone the repo for your desired branch and run the necessary commands:
+GitHub Actions:
+
+- Run `build-kernel_latest.yaml` from the Actions tab.
+- Pick `profile=Server` or `profile=General`.
+- Pick `lto=ThinLTO` or `lto=FullLTO`.
+
+Profile summary:
+
+- `Server`: headless/services oriented, `PREEMPT_VOLUNTARY`, performance governor, container/netfilter stack kept enabled.
+- `General`: desktop/gaming oriented, full `PREEMPT`, BORE enabled, schedutil/reflex path, cgroup and namespace support enabled, `DMI`/`fw_cfg` sysfs enabled, and netfilter stack stripped.
+
+Local build:
 ```bash
-
-git clone https://github.com/feeRnt/ps4-linux-12xx --branch <desired-branch-name> --depth=3
-#keep a low depth to save on space
+git clone https://github.com/feeRnt/ps4-linux-12xx --branch 7.0-Clean --depth=3
+# Keep a low depth to save space.
 
 cd ps4-linux-12xx
-echo "Copying necessary extra firmware to /lib/firmware"
-sudo cp -ri extra_firmware/* /lib/firmware
 
-sudo mkdir /lib/firmware/mrvl
-wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin \
-&& sudo mv -i sd8897_uapsta.bin /lib/firmware/mrvl
+# Fetch required firmware into extra_firmware/ and build with the
+# General profile using ThinLTO.
+./build.sh --option 3 use=General lto=ThinLTO
 
-wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin \
-&& sudo mv -i sd8797_uapsta.bin /lib/firmware/mrvl
+# Example: build a Server-profile kernel with FullLTO.
+./build.sh --option 3 use=Server lto=FullLTO
+```
 
+The builder will:
 
-sudo mkdir /lib/firmware/mediatek
-wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mediatek/mt7668pr2h.bin \
-&& sudo mv -i mt7668pr2h.bin /lib/firmware/mediatek
+- move `config` to `.config` automatically if needed;
+- fetch every blob listed in `CONFIG_EXTRA_FIRMWARE` into `extra_firmware/`;
+- apply the selected profile and LTO settings;
+- build `bzImage` with LLVM;
+- write outputs to `out/` (`bzImage`, `.config`, `artifact_name.txt`).
 
+If you need a more manual path, you can still do:
 
-## Rename .config file
-
+```bash
 mv config .config
-
-export MAKE_OPTS="-j`nproc` \
-              HOSTCC=gcc-11 \
-              CC=gcc-11"
-# gcc-11 is ideal for compiling the 5.4 & 5.15.y kernels, and can build 6.15.y too
-# Otherwise you will have many typecheck and compile errors compiling the older kernels
-make ${MAKE_OPTS} olddefconfig
-make ${MAKE_OPTS} prepare
-echo "making kernel. . ."
-make ${MAKE_OPTS}
-echo "making modules . . ."
-make ${MAKE_OPTS} modules
-echo "installing kernel . . ."
-make ${MAKE_OPTS} install
-echo "installing modules . . ."
-make ${MAKE_OPTS} modules_install
+make -j"$(nproc)" LLVM=1 olddefconfig
+make -j"$(nproc)" LLVM=1 prepare
+make -j"$(nproc)" LLVM=1 bzImage
+make -j"$(nproc)" LLVM=1 modules
 ```
 
 <br>
