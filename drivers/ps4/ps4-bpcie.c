@@ -208,8 +208,8 @@ static struct irq_chip bpcie_msi_controller = {
 	.irq_retrigger = irq_chip_retrigger_hierarchy,
 	.irq_compose_msi_msg = x86_vector_msi_compose_msg,
 	.irq_write_msi_msg = bpcie_msi_write_msg,
-	.flags = IRQCHIP_SKIP_SET_WAKE,
-		// | IRQCHIP_AFFINITY_PRE_STARTUP, (was added in ff363f480e5997051dd1de949121ffda3b753741, but it's not necessary
+	.flags = IRQCHIP_SKIP_SET_WAKE |
+		 IRQCHIP_AFFINITY_PRE_STARTUP // (was added in ff363f480e5997051dd1de949121ffda3b753741, but it's not necessary. But maybe it is???
 		// and might break Baikal. Works on Aeolia though)
 };
 
