@@ -213,16 +213,15 @@ static struct irq_chip bpcie_msi_controller = {
 		// and might break Baikal. Works on Aeolia though)
 };
 
-/* No longer needed with -- 9006c133a422f474d7d8e10a8baae179f70c22f5 -- use the universal funcs in kernel/irq/msi.c etc.
+/* No longer needed with -- 9006c133a422f474d7d8e10a8baae179f70c22f5 -- can use the universal funcs in kernel/irq/msi.c etc.
  * which also just returns arg->hwirq */
-/**
+/* But keep this here in case upstream version changes */
 static irq_hw_number_t bpcie_msi_get_hwirq(struct msi_domain_info *info,
 					  msi_alloc_info_t *arg)
 {
 	//return arg->msi_hwirq;
 	return arg->hwirq;
 }
-**/
 
 static void bpcie_handle_edge_irq(struct irq_desc *desc)
 {
@@ -306,7 +305,7 @@ static int bpcie_msi_prepare(struct irq_domain *domain, struct device *dev,
 }
 
 static struct msi_domain_ops bpcie_msi_domain_ops = {
-	//.get_hwirq	= bpcie_msi_get_hwirq,
+	.get_hwirq	= bpcie_msi_get_hwirq,
 	.msi_init	= bpcie_msi_init,
 	.msi_free	= bpcie_msi_free,
 	.set_desc	= bpcie_msi_domain_set_desc,
