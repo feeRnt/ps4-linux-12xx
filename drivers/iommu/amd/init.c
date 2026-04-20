@@ -3095,10 +3095,10 @@ static int __init early_amd_iommu_init(void)
 	/* Disable any previously enabled IOMMUs */
 	if (!is_kdump_kernel() || amd_iommu_disabled)
 		disable_iommus();
-/*
+#ifndef CONFIG_X86_PS4
 	if (amd_iommu_irq_remap)
 		amd_iommu_irq_remap = check_ioapic_information();
-*/
+#endif
 	if (amd_iommu_irq_remap) {
 		struct amd_iommu_pci_seg *pci_seg;
 		/*
