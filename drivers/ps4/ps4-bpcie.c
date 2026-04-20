@@ -401,6 +401,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	} else {
 		bpcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
 		bpcie_msi_controller.name = "IR-Baikal-MSI";
+		sc_dbg("Matching FWSpec Parent found! Switched to IR-Baikal-MSI from Baikal-MSI.\n");
 	}
 	
 	// d = domain
