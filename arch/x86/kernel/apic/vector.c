@@ -676,6 +676,25 @@ int x86_fwspec_is_hpet(struct irq_fwspec *fwspec)
 	return 0;
 }
 
+int x86_fwspec_is_aeolia(struct irq_fwspec *fwspec)
+{
+	if (is_fwnode_irqchip(fwspec->fwnode)) {
+		const char *fwname = fwnode_get_name(fwspec->fwnode);
+		return fwname && !strncmp(fwname, "Aeolia-MSI", 10); // IRQ_chip name; not domain/parent. Is this maybe needed before IR- Selection?
+	}
+	return 0;
+}
+
+int x86_fwspec_is_baikal(struct irq_fwspec *fwspec)
+{
+	if (is_fwnode_irqchip(fwspec->fwnode)) {
+		const char *fwname = fwnode_get_name(fwspec->fwnode);
+		return fwname && !strncmp(fwname, "Baikal-MSI", 10); // TODO: We haven't tested fwspec matching like this for Baikal. Needs testing.
+								     // Not working without it though.
+	}
+	return 0;
+}
+
 static int x86_vector_select(struct irq_domain *d, struct irq_fwspec *fwspec,
 			     enum irq_domain_bus_token bus_token)
 {
@@ -687,7 +706,7 @@ static int x86_vector_select(struct irq_domain *d, struct irq_fwspec *fwspec,
 	if (apic->apic_id_valid(32768))
 		return 0;
 
-	return x86_fwspec_is_ioapic(fwspec) || x86_fwspec_is_hpet(fwspec);
+	return x86_fwspec_is_ioapic(fwspec) || x86_fwspec_is_hpet(fwspec) || x86_fwspec_is_aeolia(fwspec) || x86_fwspec_is_baikal(fwspec);
 }
 
 static const struct irq_domain_ops x86_vector_domain_ops = {
