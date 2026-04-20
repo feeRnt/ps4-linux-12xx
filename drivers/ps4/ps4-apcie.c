@@ -288,8 +288,8 @@ struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 	// It should be correct to put the pci device id in here
 	fwspec.param[0] = pci_dev_id(sc->pdev);
 
-	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // we use a fake fw match to get PS4 parent. crashniels' code
-
+	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // we use a not-so-fake fw match to get PS4 parent.
+								    // codedwrench and crashniels' code
 	if (!parent) {
 		sc_dbg("No parent found during irq_domain search; assigning x86_vector_domain!\n");
 		parent = x86_vector_domain;
@@ -298,6 +298,7 @@ struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 	} else {	
 		apcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
 		apcie_msi_controller.name = "IR-Aeolia-MSI";
+		sc_dbg("Matching FWSpec Parent found! Switched to IR-Aeolia-MSI from Aeolia-MSI.\n");
 	}
 
 	domain = msi_create_irq_domain(fn, &apcie_msi_domain_info, parent); // this is needed now with ptr to fwspec, since we use fwspecs.
