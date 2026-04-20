@@ -187,13 +187,13 @@ static struct irq_chip apcie_msi_controller = {
 	// | IRQCHIP_AFFINITY_PRE_STARTUP, //is probably extra
 };
 
-/* No longer needed
+// Keep this here in case upstream version gets changed
 static irq_hw_number_t apcie_msi_get_hwirq(struct msi_domain_info *info,
 					  msi_alloc_info_t *arg)
 {
 	//return arg->msi_hwirq; changed after -- 3b9c1d377d67072d1d8a2373b4969103cca00dab
 	return arg->hwirq;
-}*/
+}
 
 static int apcie_msi_init(struct irq_domain *domain,
 			 struct msi_domain_info *info, unsigned int virq,
@@ -241,7 +241,7 @@ static void apcie_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc)
 }
 
 static struct msi_domain_ops apcie_msi_domain_ops = {
-	//.get_hwirq	= apcie_msi_get_hwirq,
+	.get_hwirq	= apcie_msi_get_hwirq,
 	.set_desc	= apcie_set_desc,
 	.msi_init	= apcie_msi_init,
 	.msi_free	= apcie_msi_free,
