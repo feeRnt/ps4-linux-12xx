@@ -183,8 +183,8 @@ static struct irq_chip apcie_msi_controller = {
 	//.irq_compose_msi_msg = x86_vector_msi_compose_msg,
 	.irq_compose_msi_msg = apcie_irq_msi_compose_msg,
 	.irq_write_msi_msg = apcie_msi_write_msg,
-	.flags = IRQCHIP_SKIP_SET_WAKE,
-	// | IRQCHIP_AFFINITY_PRE_STARTUP, //is probably extra
+	.flags = IRQCHIP_SKIP_SET_WAKE |
+		 IRQCHIP_AFFINITY_PRE_STARTUP, //is probably extra; but maybe it's needed??? See 826da771291fc25a428e871f9e7fb465e390f852
 };
 
 // Keep this here in case upstream version gets changed
