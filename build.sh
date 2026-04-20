@@ -484,6 +484,11 @@ if [[ "$DO_BUILD" == "1" ]]; then
 
         scripts/config --disable CONFIG_CPU_MITIGATIONS
 
+        # Desktop userspace compatibility
+        scripts/config --enable  CONFIG_DMIID
+        scripts/config --enable  CONFIG_DMI_SYSFS
+        scripts/config --enable  CONFIG_FW_CFG_SYSFS
+
         scripts/config --enable  CONFIG_SCHED_BORE
         scripts/config --set-val CONFIG_MIN_BASE_SLICE_NS 2000000
 
