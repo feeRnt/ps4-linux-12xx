@@ -43,7 +43,7 @@ static const char * const ps4_strings[DMI_STRING_MAX] = {
 	
 	[DMI_PRODUCT_NAME]       = "NeverGonna 4",
 	[DMI_PRODUCT_VERSION]    = "CUH-GIVEYOUUP",
-	[DMI_PRODUCT_SERIAL]     = "MARCANANDDUDES"
+	[DMI_PRODUCT_SERIAL]     = "MARCANANDDUDES",
 	[DMI_PRODUCT_SKU]        = "sku1489666",
 	[DMI_PRODUCT_FAMILY]     = "PlayStation",
 
@@ -62,7 +62,7 @@ static const char * const ps4_strings[DMI_STRING_MAX] = {
 	[DMI_CHASSIS_TYPE]       = "3",
 	[DMI_CHASSIS_ASSET_TAG]  = "",
 	[DMI_CHASSIS_SERIAL]     = "",
-	[DMI_CHASSIS_VERSION]    = "",
+	[DMI_CHASSIS_VERSION]    = ""
 };
 
 void __init ps4_dmi_populate(const char *ident[DMI_STRING_MAX])
