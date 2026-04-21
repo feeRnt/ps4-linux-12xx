@@ -317,6 +317,7 @@ static struct msi_domain_info bpcie_msi_domain_info = {
 	.ops		= &bpcie_msi_domain_ops,
 	.chip		= &bpcie_msi_controller,
 	.handler	= bpcie_handle_edge_irq/*handle_edge_irq*/,
+	//.handler_name	= "edge", // TODO: Maybe this is needed? Exists for Aeolia.
 };
 
 // while descriptor code was standardized, we just still use non-standard stuff;
