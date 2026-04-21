@@ -253,6 +253,7 @@ static struct msi_domain_info apcie_msi_domain_info = {
 	.ops		= &apcie_msi_domain_ops,
 	.chip		= &apcie_msi_controller,
 	.handler	= handle_edge_irq,
+	.handler_name	= "edge",
 };
 
 struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
