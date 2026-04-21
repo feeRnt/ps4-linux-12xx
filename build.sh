@@ -388,7 +388,7 @@ if [[ "$DO_BUILD" == "1" ]]; then
     scripts/config --disable CONFIG_KASAN
     scripts/config --disable CONFIG_FTRACE
     scripts/config --disable CONFIG_SCHED_DEBUG
-    scripts/config --disable CONFIG_DEBUG_FS
+    scripts/config --enable CONFIG_DEBUG_FS
 
     # Mitigation / hardening trims
     scripts/config --disable CONFIG_CPU_MITIGATIONS
