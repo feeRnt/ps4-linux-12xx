@@ -144,7 +144,7 @@ Profile summary:
 
 Local build:
 ```bash
-git clone https://github.com/feeRnt/ps4-linux-12xx --branch 7.0-Clean --depth=3
+git clone https://github.com/rmuxnet/ps4-linux-12xx --branch 7.0-Clean --depth=3
 # Keep a low depth to save space.
 
 cd ps4-linux-12xx
@@ -180,7 +180,7 @@ make -j"$(nproc)" LLVM=1 modules
 ---
 ## Releases and Downloads
 
-To get some pre-compiled kernels, go to the [releases section](https://github.com/feeRnt/ps4-linux-12xx/releases), and choose a kernel (bzImage) based on your needed version.
+To get some pre-compiled kernels, go to the [releases section](https://github.com/rmuxnet/ps4-linux-12xx/releases), and choose a kernel (bzImage) based on your needed version.
 
 Please read the boldened out and highlighted text, as they contain some information that might be useful for a particular release. It's very wordy, that needs to be fixed!!
 
