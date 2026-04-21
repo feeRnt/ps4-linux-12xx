@@ -7,7 +7,7 @@ on:
       profile:
         description: "Build Profile"
         required: true
-        default: "Server"
+        default: "General"
         type: choice
         options:
           - Server
@@ -21,8 +21,8 @@ on:
           - ThinLTO
           - FullLTO
   push:
-    tags:
-      - "v*"
+    #tags:
+      #- "v*"
 
 jobs:
   build:
