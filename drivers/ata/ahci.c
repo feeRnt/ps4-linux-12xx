@@ -1600,13 +1600,14 @@ static int ahci_init_msi(struct pci_dev *pdev, unsigned int n_ports,
 			struct ahci_host_priv *hpriv)
 {
 	int nvec;
-/*
+
 #ifdef CONFIG_X86_PS4
-	if (pdev->vendor == PCI_VENDOR_ID_SONY) {
-			return apcie_assign_irqs(pdev, n_ports);
+	if ((pdev->vendor == PCI_VENDOR_ID_SONY)  &&
+	    (pdev->device != PCI_DEVICE_ID_SONY_BAIKAL_AHCI)) {
+		return apcie_assign_irqs(pdev, n_ports);
 	}
 #endif
-*/
+
 	if (hpriv->flags & AHCI_HFLAG_NO_MSI)
 		return -ENODEV;
 
