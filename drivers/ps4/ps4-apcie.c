@@ -372,7 +372,8 @@ int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 	dev_dbg(&dev->dev, "apcie_assign_irqs(%d)\n", nvec);
 
 #ifndef QEMU_HACK_NO_IOMMU
-	info.flags = X86_IRQ_ALLOC_CONTIGUOUS_VECTORS;
+	// info.flags = X86_IRQ_ALLOC_CONTIGUOUS_VECTORS; // This was removed in d474d92d70250d43e7ce0c7cb8623f31ee7c40f6
+	// Shouldn't be needed anymore
 	if (!(apcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 		nvec = 1; // number of vectors
 		//info.msi_hwirq |= 0xff; /* Shared IRQ for all subfunctions */
