@@ -345,7 +345,8 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	arg->hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5);
 
 	#ifndef QEMU_HACK_NO_IOMMU
-		arg->flags = X86_IRQ_ALLOC_CONTIGUOUS_VECTORS;
+		// info.flags = X86_IRQ_ALLOC_CONTIGUOUS_VECTORS; // This was removed in d474d92d70250d43e7ce0c7cb8623f31ee7c40f6
+		// Shouldn't be needed anymore
 		if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 			//desk->nvec = desk->nvec_used = 1;
 			//arg->msi_hwirq |= 0x1F; // Shared IRQ for all subfunctions
