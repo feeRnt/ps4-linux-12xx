@@ -357,7 +357,7 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev *pdev)//similar to native_setup_msi_irqs (now, ~6.0, hpet_create_irq_domain)
 {
 	struct irq_domain *d, *parent;
-	//struct irq_alloc_info info; //no longer needed
+	struct irq_alloc_info info; //no longer needed from Linux <= 6.2; check comment in ps4-apcie.c
 
 	struct fwnode_handle *fn;
 	struct irq_fwspec fwspec;
@@ -370,8 +370,8 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 
 	bpcie_msi_domain_info.chip_data = (void *)sc;
 
-	//init_irq_alloc_info(&info, NULL);		//  ""
-	//info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI; // removed after fwspec
+	init_irq_alloc_info(&info, NULL);		//  ""
+	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI; // removed after fwspec, starting from 6.2
 
 	//info.msi_dev = pdev; // removed
 

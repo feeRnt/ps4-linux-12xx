@@ -262,7 +262,10 @@ struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 	struct fwnode_handle *fn;
 	struct irq_fwspec fwspec;
 
-	//struct irq_alloc_info info; no longer assign irqs at domain creation, but rather desc creation/assign_irqs
+	struct irq_alloc_info info;
+	/* ^^^ From Linux >= ~6.2, no longer assign irqs info at domain creation, but rather desc creation/assign_irqs
+	 * For some reason, even on PS4 Linux 5.15.15, we followed most of this new per device IRQ domain hierarchy,
+	 * but it's hard to follow all the custom implementations and fixups on that work by codedwrench. */
 
 	sc_dbg("apcie_create_irq_domain\n");
 	if (x86_vector_domain == NULL)
@@ -270,8 +273,8 @@ struct irq_domain *apcie_create_irq_domain(struct apcie_dev *sc)
 
 	apcie_msi_domain_info.chip_data = (void *)sc;
 
-	/* init_irq_alloc_info(&info, NULL);
-	 * info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI; */ // assign per device now
+	init_irq_alloc_info(&info, NULL);
+	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI; // assign per device starting from Linux 6.2
 
 	//info.msi_dev = sc->pdev; -- removed after 3b9c1d377d67072d1d8a2373b4969103cca00dab
 	//TODO: Add descriptor
