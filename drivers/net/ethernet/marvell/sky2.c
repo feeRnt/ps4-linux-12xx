@@ -5017,6 +5017,9 @@ static int sky2_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto err_out_free_pci;
 	}
 
+	/*if (disable_msi == -1)
+		disable_msi = !!dmi_check_system(msi_blacklist);*/
+
 #ifdef CONFIG_X86_PS4
        if (pdev->vendor == PCI_VENDOR_ID_SONY &&
            apcie_assign_irqs(pdev, 1) > 0) {
