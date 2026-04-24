@@ -4021,8 +4021,8 @@ bool amdgpu_device_asic_has_dc_support(enum amd_asic_type asic_type)
 	case CHIP_KAVERI:
 	case CHIP_KABINI:
 	case CHIP_MULLINS:
-	/*case CHIP_LIVERPOOL:
-	case CHIP_GLADIUS:*/ // 6.15 had these two added
+	case CHIP_LIVERPOOL:
+	case CHIP_GLADIUS:// 6.15 had these two added
 		/*
 		 * We have systems in the wild with these ASICs that require
 		 * VGA support which is not supported with DC.
@@ -7075,6 +7075,8 @@ bool amdgpu_device_has_display_hardware(struct amdgpu_device *adev)
 	case CHIP_KAVERI:
 	case CHIP_KABINI:
 	case CHIP_MULLINS:
+	case CHIP_LIVERPOOL:
+	case CHIP_GLADIUS:
 #endif
 	case CHIP_TONGA:
 	case CHIP_FIJI:
