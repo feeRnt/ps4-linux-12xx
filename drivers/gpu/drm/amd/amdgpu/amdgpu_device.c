@@ -116,9 +116,9 @@ const char *amdgpu_asic_name[] = {
 	"BONAIRE",
 	"KAVERI",
 	"KABINI",
+	"HAWAII",
 	"LIVERPOOL",
 	"GLADIUS",
-	"HAWAII",
 	"MULLINS",
 	"TOPAZ",
 	"TONGA",
@@ -4022,7 +4022,7 @@ bool amdgpu_device_asic_has_dc_support(enum amd_asic_type asic_type)
 	case CHIP_KABINI:
 	case CHIP_MULLINS:
 	case CHIP_LIVERPOOL:
-	case CHIP_GLADIUS:// 6.15 had these two added
+	case CHIP_GLADIUS:
 		/*
 		 * We have systems in the wild with these ASICs that require
 		 * VGA support which is not supported with DC.

@@ -170,11 +170,11 @@ static void
 drm_encoder_disable(struct drm_encoder *encoder)
 {
 	const struct drm_encoder_helper_funcs *encoder_funcs = encoder->helper_private;
-	struct drm_bridge* bridge = drm_bridge_chain_get_first_bridge(encoder);
 
 	if (!encoder_funcs)
 		return;
 
+	struct drm_bridge* bridge = drm_bridge_chain_get_first_bridge(encoder);
 	drm_bridge_chain_disable(bridge);
 
 	if (encoder_funcs->disable)
@@ -298,7 +298,6 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 	bool saved_enabled;
 	struct drm_encoder *encoder;
 	bool ret = true;
-	struct drm_bridge* bridge = drm_bridge_chain_get_first_bridge(encoder);
 
 	drm_WARN_ON(dev, drm_drv_uses_atomic_modeset(dev));
 
@@ -340,9 +339,9 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 		if (!encoder_funcs)
 			continue;
 
+		struct drm_bridge* bridge = drm_bridge_chain_get_first_bridge(encoder);
 		ret = drm_bridge_chain_mode_fixup(bridge,
-				mode, adjusted_mode);
-
+					    mode, adjusted_mode);
 		if (!ret) {
 			DRM_DEBUG_KMS("Bridge fixup failed\n");
 			goto done;
@@ -381,6 +380,7 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 		if (!encoder_funcs)
 			continue;
 
+		struct drm_bridge* bridge = drm_bridge_chain_get_first_bridge(encoder);
 		drm_bridge_chain_disable(bridge);
 
 		/* Disable the encoders as the first thing we do. */
@@ -415,6 +415,7 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 		if (encoder_funcs->mode_set)
 			encoder_funcs->mode_set(encoder, mode, adjusted_mode);
 
+		struct drm_bridge* bridge = drm_bridge_chain_get_first_bridge(encoder);
 		drm_bridge_chain_mode_set(bridge, mode, adjusted_mode);
 	}
 
@@ -430,6 +431,7 @@ bool drm_crtc_helper_set_mode(struct drm_crtc *crtc,
 		if (!encoder_funcs)
 			continue;
 
+		struct drm_bridge* bridge = drm_bridge_chain_get_first_bridge(encoder);
 		drm_bridge_chain_pre_enable(bridge);
 
 		if (encoder_funcs->commit)

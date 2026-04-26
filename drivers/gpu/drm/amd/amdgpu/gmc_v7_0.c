@@ -686,6 +686,7 @@ static int gmc_v7_0_gart_enable(struct amdgpu_device *adev)
 			WREG32(mmVM_CONTEXT8_PAGE_TABLE_BASE_ADDR + i - 8,
 			       table_addr >> 12);
 	}
+
 	if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS) {
 		for (i = 2; i < 8; i++) {
 			WREG32(mmVM_CONTEXT0_PAGE_TABLE_START_ADDR + i, 0);
@@ -698,6 +699,7 @@ static int gmc_v7_0_gart_enable(struct amdgpu_device *adev)
 			       adev->vm_manager.max_pfn - 1);
 		}
 	}
+
 	/* enable context1-15 */
 	WREG32(mmVM_CONTEXT1_PROTECTION_FAULT_DEFAULT_ADDR,
 	       (u32)(adev->dummy_page_addr >> 12));
@@ -1060,6 +1062,10 @@ static int gmc_v7_0_sw_init(struct amdgpu_ip_block *ip_block)
 	if (r)
 		return r;
 
+
+	dev_info(adev->dev, "Done gart\n");
+
+
 	/*
 	 * number of VMs
 	 * VMID 0 is reserved for System
@@ -1084,6 +1090,8 @@ static int gmc_v7_0_sw_init(struct amdgpu_ip_block *ip_block)
 	if (!adev->gmc.vm_fault_info)
 		return -ENOMEM;
 	atomic_set(&adev->gmc.vm_fault_info_updated, 0);
+
+	dev_info(adev->dev, "Done init\n");
 
 	return 0;
 }

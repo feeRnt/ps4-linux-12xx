@@ -680,7 +680,7 @@ int cik_sdma_ring_test(struct radeon_device *rdev,
 
 	if (rdev->family == CHIP_LIVERPOOL) {
 		/* SDMA_OPCODE_WRITE is broken on Liverpool when used in the
-		 * ring (works in IBs) */
+	 	 * ring (works in IBs) */
 		radeon_ring_write(ring, SDMA_PACKET(SDMA_OPCODE_CONSTANT_FILL, 0,
 						    SDMA_CONSTANT_FILL_EXTRA_SIZE(2)));
 		radeon_ring_write(ring, lower_32_bits(gpu_addr));

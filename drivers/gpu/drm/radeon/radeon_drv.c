@@ -49,6 +49,11 @@
 #include <drm/radeon_drm.h>
 
 #include "radeon_drv.h"
+
+#ifdef CONFIG_X86_PS4
+#include <asm/ps4.h>
+#endif
+
 #include "radeon.h"
 #include "radeon_kms.h"
 #include "radeon_ttm.h"
@@ -302,6 +307,16 @@ static int radeon_pci_probe(struct pci_dev *pdev,
 	if (ret)
 		return ret;
 
+	#ifdef CONFIG_X86_PS4
+	/* On the PS4 (Liverpool graphics) we have a hard dependency on the
+	 * Aeolia driver to set up the HDMI encoder which is connected to it,
+	 * so defer probe until it is ready. This test passes if this isn't
+	 * a PS4 (returns -ENODEV).
+	 */
+	if (apcie_status() == 0)
+		return -EPROBE_DEFER;
+	#endif
+	
 	rdev = devm_drm_dev_alloc(&pdev->dev, &kms_driver, typeof(*rdev), ddev);
 	if (IS_ERR(rdev))
 		return PTR_ERR(rdev);

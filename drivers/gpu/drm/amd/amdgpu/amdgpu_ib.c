@@ -377,9 +377,6 @@ int amdgpu_ib_ring_tests(struct amdgpu_device *adev)
 	long tmo_gfx, tmo_mm;
 	int r, ret = 0;
 	unsigned int i;
-#ifdef CONFIG_X86_PS4
-	int num_rings_var;
-#endif
 
 	tmo_mm = tmo_gfx = AMDGPU_IB_TEST_TIMEOUT;
 	if (amdgpu_sriov_vf(adev)) {
@@ -402,18 +399,12 @@ int amdgpu_ib_ring_tests(struct amdgpu_device *adev)
 		tmo_gfx = AMDGPU_IB_TEST_GFX_XGMI_TIMEOUT;
 	}
 
-#ifdef CONFIG_X86_PS4
-	if (adev->asic_type == CHIP_LIVERPOOL) {
-		num_rings_var = 1; /* For some reason we only test one ring on 6.15 and 5.15 ps4 code. It was not in 4.19 fail0verflow or ps3itaTeam patches,
-				    * nor in 5.4 Baikal code. I don't know when it was introduced. We don't even know if it's needed 'still':
-				    * "//TODO test if this is needed now" */
-	} else {
-		num_rings_var = adev->num_rings;
-	}
-	for (i = 0; i < num_rings_var; ++i) {
-#else
+	#ifdef CONFIG_X86_PS4
+	//TODO test if this is needed now
+	for (i = 0; i < 1 /*adev->num_rings*/; ++i) {
+	#else
 	for (i = 0; i < adev->num_rings; ++i) {
-#endif
+	#endif
 		struct amdgpu_ring *ring = adev->rings[i];
 		long tmo;
 

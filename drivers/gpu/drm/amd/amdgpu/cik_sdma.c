@@ -70,6 +70,7 @@ MODULE_FIRMWARE("amdgpu/liverpool_sdma.bin");
 MODULE_FIRMWARE("amdgpu/liverpool_sdma1.bin");
 MODULE_FIRMWARE("amdgpu/gladius_sdma.bin");
 MODULE_FIRMWARE("amdgpu/gladius_sdma1.bin");
+
 u32 amdgpu_cik_gpu_check_soft_reset(struct amdgpu_device *adev);
 
 
@@ -765,6 +766,7 @@ static void cik_sdma_vm_write_pte(struct amdgpu_ib *ib, uint64_t pe,
 				  uint32_t incr)
 {
 	unsigned ndw = count * 2;
+
 	ib->ptr[ib->length_dw++] = SDMA_PACKET(SDMA_OPCODE_WRITE,
 		SDMA_WRITE_SUB_OPCODE_LINEAR, 0);
 	ib->ptr[ib->length_dw++] = lower_32_bits(pe);

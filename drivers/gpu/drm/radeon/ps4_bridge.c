@@ -15,20 +15,6 @@
 // TODO (ps4patches): Make functions atomic,
 //  https://lore.kernel.org/linux-arm-kernel/20211020181901.2114645-5-sam@ravnborg.org/
 
-/*
- * Forward-ported patches from https://github.com/rancido,
- * 		            in https://github.com/Ps3itaTeam/ps4-linux/
- * Maybe the problem is no one is putting a "Copyright"
- * in their files ... We don't know who introduced what change or where,
- * since there is often no centralized repository.. Patches thrown around
- * everywhere.
- * But that goes against the whole nature of tinkery/RE work..?
- * But does it really? No.
- *
- * 
- * Copyright: .....
- *
-*/
 #include <asm/ps4.h>
 
 #include <drm/drm_crtc.h>
@@ -36,6 +22,7 @@
 #include <drm/drm_atomic_helper.h>
 #include <drm/drm_edid.h>
 
+#include <linux/pci.h>
 #include <drm/drm_bridge.h>
 #include <drm/drm_encoder.h>
 
@@ -43,9 +30,8 @@
 #include <linux/i2c-algo-bit.h>
 
 
-#include "amdgpu.h"
-#include "amdgpu_mode.h"
-#include "atombios_dp.h"
+#include "radeon.h"
+#include "radeon_mode.h"
 #include "ObjectID.h"
 
 #define CMD_READ	1, 1
@@ -154,7 +140,7 @@ struct i2c_cmdqueue {
 	struct i2c_cmd_hdr *cmd;
 };
 
-struct ps4_bridge {
+struct radeon_ps4_bridge {
 	struct drm_connector *connector;
 	struct drm_encoder *encoder;
 	struct drm_bridge bridge;
@@ -166,26 +152,9 @@ struct ps4_bridge {
 
 /* this should really be taken care of by the connector, but that is currently
  * contained/owned by radeon_connector so just use a global for now */
-static struct ps4_bridge g_bridge = {
+static struct radeon_ps4_bridge g_bridge = {
 	.mutex = __MUTEX_INITIALIZER(g_bridge.mutex)
 };
-
-/* Function prototype declarations, to fix compilation warnings */
-void ps4_bridge_mode_set(struct drm_bridge *bridge,
-			 const struct drm_display_mode *mode,
-			 const struct drm_display_mode *adjusted_mode);
-
-int ps4_bridge_get_modes(struct drm_connector *connector);
-
-enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
-		bool force);
-
-enum drm_mode_status ps4_bridge_mode_valid(struct drm_connector *connector,
-				  const struct drm_display_mode *mode);
-
-int ps4_bridge_register(struct drm_connector *connector,
-			     struct drm_encoder *encoder);
-
 
 static void cq_init(struct i2c_cmdqueue *q, u8 code)
 {
@@ -278,7 +247,7 @@ static void cq_mask(struct i2c_cmdqueue *q, u16 addr, u8 value, u8 mask)
 	*q->p++ = mask;
 }
 
-#if 0
+#if 1
 static void cq_delay(struct i2c_cmdqueue *q, u16 time)
 {
 	cq_cmd(q, CMD_DELAY);
@@ -307,17 +276,17 @@ static void cq_wait_clear(struct i2c_cmdqueue *q, u16 addr, u8 mask)
 	*q->p++ = mask;
 }
 
-static inline struct ps4_bridge *
-		bridge_to_ps4_bridge(struct drm_bridge *bridge)
+static inline struct radeon_ps4_bridge *
+		bridge_to_radeon_ps4_bridge(struct drm_bridge *bridge)
 {
-	return container_of(bridge, struct ps4_bridge, bridge);
+	return container_of(bridge, struct radeon_ps4_bridge, bridge);
 }
 
-void ps4_bridge_mode_set(struct drm_bridge *bridge,
-			 const struct drm_display_mode *mode,
-			 const struct drm_display_mode *adjusted_mode)
+void radeon_ps4_bridge_mode_set(struct drm_bridge *bridge,
+			      const struct drm_display_mode *mode,
+			      const struct drm_display_mode *adjusted_mode)
 {
-	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
+	struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge);
 
 	/* This gets called before pre_enable/enable, so we just stash
 	 * the vic ID for later */
@@ -325,14 +294,15 @@ void ps4_bridge_mode_set(struct drm_bridge *bridge,
 	DRM_DEBUG_KMS("vic mode: %d\n", mn_bridge->mode);
 	if (!mn_bridge->mode) {
 		DRM_ERROR("attempted to set non-CEA mode\n");
+		DRM_ERROR("vic mode: %d\n", mn_bridge->mode);
 	}
 }
 
-static void ps4_bridge_pre_enable(struct drm_bridge *bridge)
+static void radeon_ps4_bridge_pre_enable(struct drm_bridge *bridge)
 {
-	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
-	DRM_DEBUG_KMS("ps4_bridge_pre_enable\n");
-	DRM_DEBUG("Enable ps4_bridge_pre_enable\n");
+	struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge);
+	DRM_DEBUG_KMS("radeon_ps4_bridge_pre_enable\n");
+	DRM_DEBUG("Enable radeon_ps4_bridge_pre_enable\n");
 	mutex_lock(&mn_bridge->mutex);
 	cq_init(&mn_bridge->cq, 4);
 
@@ -397,15 +367,14 @@ static void ps4_bridge_pre_enable(struct drm_bridge *bridge)
 	mutex_unlock(&mn_bridge->mutex);
 }
 
-static void ps4_bridge_enable(struct drm_bridge *bridge)
+static void radeon_ps4_bridge_enable(struct drm_bridge *bridge)
 {
-	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
+	struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge);
 	struct drm_connector *connector = mn_bridge->connector;
 	struct drm_device *dev = connector->dev;
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 	u8 dp[3];
 
-	DRM_DEBUG("Enable PS4_BRIDGE_ENABLE\n");
 	if (!mn_bridge->mode) {
 		DRM_ERROR("mode not available\n");
 		return;
@@ -416,7 +385,7 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		return;
 	}
 
-	DRM_DEBUG_KMS("ps4_bridge_enable (mode: %d)\n", mn_bridge->mode);
+	DRM_DEBUG_KMS("radeon_ps4_bridge_enable (mode: %d)\n", mn_bridge->mode);
 
 	/* Here come the dragons */
 
@@ -555,12 +524,9 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_mask(&mn_bridge->cq, 0x1e00, 0x00, 0x21);
 		cq_mask(&mn_bridge->cq, 0x1e02, 0x00, 0x70);
 		// 03 08 01 01 00  2c 01 00
-		//rancido has no delay here vvv
-		//cq_delay(&mn_bridge->cq, 0x012c);
+		cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x00);
-
-		//rancido has no delay here vvv
-		//cq_delay(&mn_bridge->cq, 0x0032);
+		cq_delay(&mn_bridge->cq, 0x0032);
 		cq_writereg(&mn_bridge->cq, 0x7402, 0x1c);
 		cq_writereg(&mn_bridge->cq, 0x6020, 0x04);
 		cq_writereg(&mn_bridge->cq, TSYSCTRL, TSYSCTRL_HDMI);
@@ -603,8 +569,7 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 		cq_wait_set(&mn_bridge->cq, 0x10f6, 0x80);
 		cq_mask(&mn_bridge->cq, 0x7226, 0x00, 0x80);
 		cq_mask(&mn_bridge->cq, 0x7228, 0x00, 0xFF);
-		// rancido has no delay here vvv
-		//cq_delay(&mn_bridge->cq, 0x012c);
+		cq_delay(&mn_bridge->cq, 0x012c);
 		cq_writereg(&mn_bridge->cq, 0x7204, 0x40);
 		cq_wait_clear(&mn_bridge->cq, 0x7204, 0x40);
 		cq_writereg(&mn_bridge->cq, 0x7a8b, 0x05);
@@ -662,10 +627,10 @@ static void ps4_bridge_enable(struct drm_bridge *bridge)
 
 }
 
-static void ps4_bridge_disable(struct drm_bridge *bridge)
+static void radeon_ps4_bridge_disable(struct drm_bridge *bridge)
 {
-	struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge);
-	DRM_DEBUG_KMS("ps4_bridge_disable\n");
+	struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge);
+	DRM_DEBUG_KMS("radeon_ps4_bridge_disable\n");
 
 	mutex_lock(&mn_bridge->mutex);
 	cq_init(&mn_bridge->cq, 4);
@@ -677,27 +642,24 @@ static void ps4_bridge_disable(struct drm_bridge *bridge)
 	mutex_unlock(&mn_bridge->mutex);
 }
 
-static void ps4_bridge_post_disable(struct drm_bridge *bridge)
+static void radeon_ps4_bridge_post_disable(struct drm_bridge *bridge)
 {
-	/* struct ps4_bridge *mn_bridge = bridge_to_mn864729(bridge); */
-	DRM_DEBUG_KMS("ps4_bridge_post_disable\n");
+	/* struct radeon_ps4_bridge *mn_bridge = bridge_to_mn864729(bridge); */
+	DRM_DEBUG_KMS("radeon_ps4_bridge_post_disable\n");
 }
 
 /* Hardcoded modes, since we don't really know how to do custom modes yet.
  * Other CEA modes *should* work (and are allowed if externally added) */
 
-// TODO (ps4patches): Apparently the vrefresh option is calculated on the fly now
-// Check if this actually works.
-
 /* 1 - 640x480@60Hz */
-static const struct drm_display_mode mode_480p __maybe_unused = {
+static const struct drm_display_mode mode_480p = {
 	DRM_MODE("640x480", DRM_MODE_TYPE_DRIVER, 25175, 640, 656,
 		 752, 800, 0, 480, 490, 492, 525, 0,
 		 DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_4_3
 };
 /* 4 - 1280x720@60Hz */
-static const struct drm_display_mode mode_720p __maybe_unused = {
+static const struct drm_display_mode mode_720p = {
 	DRM_MODE("1280x720", DRM_MODE_TYPE_DRIVER, 74250, 1280, 1390,
 		 1430, 1650, 0, 720, 725, 730, 750, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
@@ -705,36 +667,19 @@ static const struct drm_display_mode mode_720p __maybe_unused = {
 };
 /* 16 - 1920x1080@60Hz */
 static const struct drm_display_mode mode_1080p = {
-	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED, 148500, 1920, 2008,
+	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 148500, 1920, 2008,
 		 2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
 		 DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
 	.picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
 };
-/* Having a 120Hz modeline causes incorrect mode selection
- * by GUI / Display Manager, causing a 60Hz monitor to try
- * with a 120Hz mode - leading to a blackscreen.
- * Only fix seems to be having a xorg.conf in /usr/share/X11/xorg.conf.d/
- *
- * Try setting a TYPE_PREFFERED mode
- */
-/* 63 - 1920x1080@120Hz */
-static const struct drm_display_mode mode_1080p120 = {
-	DRM_MODE("1920x1080", DRM_MODE_TYPE_DRIVER, 297000, 1920, 2008,
-			2052, 2200, 0, 1080, 1084, 1089, 1125, 0,
-		   DRM_MODE_FLAG_PHSYNC | DRM_MODE_FLAG_PVSYNC),
-	  .picture_aspect_ratio = HDMI_PICTURE_ASPECT_16_9
-};
 
-int ps4_bridge_get_modes(struct drm_connector *connector)
+int radeon_ps4_bridge_get_modes(struct drm_connector *connector)
 {
 	struct drm_device *dev = connector->dev;
 	struct drm_display_mode *newmode;
-	pr_debug("ps4_bridge_get_modes\n");
+	pr_info("radeon_ps4_bridge_get_modes\n");
 
 	newmode = drm_mode_duplicate(dev, &mode_1080p);
-	drm_mode_probed_add(connector, newmode);
-
-	newmode = drm_mode_duplicate(dev, &mode_1080p120);
 	drm_mode_probed_add(connector, newmode);
 
 	//newmode = drm_mode_duplicate(dev, &mode_720p);
@@ -747,17 +692,17 @@ int ps4_bridge_get_modes(struct drm_connector *connector)
 	return 0;
 }
 
-enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
+enum drm_connector_status radeon_ps4_bridge_detect(struct drm_connector *connector,
 		bool force)
 {
-	struct ps4_bridge *mn_bridge = &g_bridge;
+	struct radeon_ps4_bridge *mn_bridge = &g_bridge;
 	u8 reg;
 
-	struct amdgpu_connector *amdgpu_connector = to_amdgpu_connector(connector);
-	struct amdgpu_connector_atom_dig *amdgpu_dig_connector = amdgpu_connector->con_priv;
+	struct radeon_connector *radeon_connector = to_radeon_connector(connector);
+	struct radeon_connector_atom_dig *radeon_dig_connector = radeon_connector->con_priv;
 
-	amdgpu_dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
-	amdgpu_atombios_dp_get_dpcd(amdgpu_connector);
+	radeon_dig_connector->dp_sink_type = CONNECTOR_OBJECT_ID_DISPLAYPORT;
+	radeon_dp_getdpcd(radeon_connector);
 
 	mutex_lock(&mn_bridge->mutex);
 	cq_init(&mn_bridge->cq, 4);
@@ -778,58 +723,52 @@ enum drm_connector_status ps4_bridge_detect(struct drm_connector *connector,
 		return connector_status_disconnected;
 }
 
-enum drm_mode_status ps4_bridge_mode_valid(struct drm_connector *connector,
-				  const struct drm_display_mode *mode)
+int radeon_ps4_bridge_mode_valid(struct drm_connector *connector,
+				  struct drm_display_mode *mode)
 {
 	int vic = drm_match_cea_mode(mode);
 
 	/* Allow anything that we can match up to a VIC (CEA modes) */
-	if (!vic || (vic != 16 && vic != 4 && vic != 63)) {
-	// Might need to disable 63 (1920x1080-120Hz)
-
-	/*
 	if (!vic || (vic != 16 && vic != 4)) {
-	*/
 		return MODE_BAD;
 	}
+
 	return MODE_OK;
 }
 
-static int ps4_bridge_attach(struct drm_bridge *bridge,
-			     enum drm_bridge_attach_flags flags)
+static int radeon_ps4_bridge_attach(struct drm_bridge *bridge,
+				    enum drm_bridge_attach_flags flags)
 {
-	/* struct ps4_bridge *mn_bridge = bridge_to_ps4_bridge(bridge); */
+	/* struct radeon_ps4_bridge *mn_bridge = bridge_to_radeon_ps4_bridge(bridge); */
 
 	return 0;
 }
 
-static struct drm_bridge_funcs ps4_bridge_funcs = {
-	.pre_enable = ps4_bridge_pre_enable,
-	.enable = ps4_bridge_enable,
-	.disable = ps4_bridge_disable,
-	.post_disable = ps4_bridge_post_disable,
-	.attach = ps4_bridge_attach,
-	.mode_set = ps4_bridge_mode_set,
+static struct drm_bridge_funcs radeon_ps4_bridge_funcs = {
+	.pre_enable = radeon_ps4_bridge_pre_enable,
+	.enable = radeon_ps4_bridge_enable,
+	.disable = radeon_ps4_bridge_disable,
+	.post_disable = radeon_ps4_bridge_post_disable,
+	.attach = radeon_ps4_bridge_attach,
+	.mode_set = radeon_ps4_bridge_mode_set
 };
 
-int ps4_bridge_register(struct drm_connector *connector,
+int radeon_ps4_bridge_register(struct drm_connector *connector,
 			     struct drm_encoder *encoder)
 {
 	int ret;
-	struct ps4_bridge *mn_bridge = &g_bridge;
+	struct radeon_ps4_bridge *mn_bridge = &g_bridge;
+	//struct drm_device *dev = connector->dev;
 
 	mn_bridge->encoder = encoder;
 	mn_bridge->connector = connector;
 	mn_bridge->bridge.type = DRM_MODE_CONNECTOR_HDMIA;
-	mn_bridge->bridge.funcs = &ps4_bridge_funcs;
+	mn_bridge->bridge.funcs = &radeon_ps4_bridge_funcs;
 
 	// TODO (ps4patches): This seems to be the new way of adding bridges
 	drm_bridge_add(&mn_bridge->bridge);
 
-	//ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
-	
-	// Allow the bridge to create its own connectors with last parameter = 0.
-	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, 0);
+	ret = drm_bridge_attach(mn_bridge->encoder, &mn_bridge->bridge, NULL, DRM_BRIDGE_ATTACH_NO_CONNECTOR);
 	if (ret) {
 		DRM_ERROR("Failed to initialize bridge with drm\n");
 		return -EINVAL;

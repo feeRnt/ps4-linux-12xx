@@ -247,6 +247,8 @@ int pm_init(struct packet_manager *pm, struct device_queue_manager *dqm)
 	switch (dqm->dev->adev->asic_type) {
 	case CHIP_KAVERI:
 	case CHIP_HAWAII:
+	case CHIP_LIVERPOOL:
+	case CHIP_GLADIUS:
 		/* PM4 packet structures on CIK are the same as on VI */
 	case CHIP_CARRIZO:
 	case CHIP_TONGA:
