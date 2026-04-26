@@ -575,7 +575,7 @@ static struct pci_driver xhci_aeolia_driver = {
 	/* suspend and resume implemented later 
 
 	.shutdown = 	usb_hcd_platform_shutdown, */
-	.shutdown = 	usb_hcd_pci_shutdown,
+	//.shutdown = 	usb_hcd_pci_shutdown,
 	.shutdown = 	xhci_hcd_pci_shutdown,
 #ifdef CONFIG_PM_SLEEP
 	.driver = {
