@@ -569,8 +569,9 @@ static int apcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 		goto free_bars;
 	//if ((ret = apcie_uart_init(sc)) < 0)
 	//	goto remove_glue; // Maybe (apparently) this dies; remove for now
+	//	goto remove_uart; // TODO: shouldn't it be remove_uart instead of remove_glue?
 	if ((ret = apcie_icc_init(sc)) < 0)
-		goto remove_uart;
+		goto remove_glue; //6.15.4 has remove_glue here, but old 5.4 has remove_uart
 
 	apcie_initialized = true; //should only run when probe function runs, which should only run on Aeolia/Belize devices
 	return 0;
