@@ -2844,7 +2844,8 @@ static int dce_v8_0_hw_init(struct amdgpu_ip_block *ip_block)
 	dce_v8_0_hpd_init(adev);
 
 	for (i = 0; i < adev->mode_info.audio.num_pins; i++) {
-		dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], false);
+		// TODO (ps4patches): In original patches original disable was still here
+		// Maybe that is still needed
 		if (adev->asic_type == CHIP_LIVERPOOL || adev->asic_type == CHIP_GLADIUS)
 			dce_v8_0_audio_enable(adev, &adev->mode_info.audio.pin[i], true);
 		else
