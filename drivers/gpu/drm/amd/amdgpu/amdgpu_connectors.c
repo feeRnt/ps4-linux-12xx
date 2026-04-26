@@ -1567,6 +1567,7 @@ static const struct drm_connector_funcs amdgpu_ps4_dp_connector_funcs = {
 	//.set_property = amdgpu_connector_set_property,
 	.destroy = amdgpu_connector_destroy,
 	.force = amdgpu_connector_dvi_force,
+	.late_register = amdgpu_connector_late_register,
 };
 #endif
 static const struct drm_connector_funcs amdgpu_connector_edp_funcs = {
