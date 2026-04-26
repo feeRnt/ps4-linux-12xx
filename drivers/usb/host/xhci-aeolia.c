@@ -145,8 +145,6 @@ static void xhci_aeolia_remove_one(struct pci_dev *dev, int index)
                iounmap(hcd->regs);
        	}
 	usb_put_hcd(hcd);
-	iounmap(hcd->regs);
-	usb_put_hcd(hcd);
 
 	axhci->hcd[index] = NULL;
 }
