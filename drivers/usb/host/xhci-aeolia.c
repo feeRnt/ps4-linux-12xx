@@ -401,6 +401,9 @@ static int xhci_aeolia_probe(struct pci_dev *dev, const struct pci_device_id *id
 		goto free_axhci;
 	}
 
+	if(dev->device == PCI_DEVICE_ID_SONY_AEOLIA_XHCI) { //6.15 has this for != Belize, but 5.4 doesn't have it, so keeping it for Aeolia only
+		pci_set_master(dev);
+
 	if (dma_set_mask(&dev->dev, DMA_BIT_MASK(31)) ||
 		dma_set_coherent_mask(&dev->dev, DMA_BIT_MASK(31))) {
 		return -ENODEV;
