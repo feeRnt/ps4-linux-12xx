@@ -50,31 +50,86 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 	u32 t1, t2;
 	u64 tsc1, tsc2;
 
+	u32 readout;
+	bool is_aeolia_emc = false;
+	bool is_baikal_emc = false;
+
 	// This is part of the Aeolia pcie device, but it's too early to
 	// do this in a driver.
+
+	/* TODO: just read BPCIE_base from Belize for now and see what it returns */
+	emc_timer = early_ioremap(BPCIE_EMC_TIMER_BASE, 0x100);
+	if (!emc_timer)
+		goto fail;
+	readout = emctimer_read32(0); // read 32 bits from Baikal EMC base address
+	pr_info("ps4-calibrate: emctimer_read32(EMC_TIMER_BASE + 0) = %08x\n", readout); // TODO: Remove when done checking values
+	early_iounmap(emc_timer, 0x100);
+	emc_timer = NULL;
+	/* ------------- */
+
 	//emc_timer = ioremap(EMC_TIMER_BASE, 0x100); //replaced with early_ioremap for early mmapping, maybe needed on newer kernels
 	emc_timer = early_ioremap(EMC_TIMER_BASE, 0x100);
+
 	if (!emc_timer)
 		goto fail;
 
+	/* Try reading both Aeolia and Baikal base addresses, and establish is_aeolia_emc or is_baikal_emc from the readouts */
+	readout = emctimer_read32(0); // read 32 bits from Aeolia EMC base address
+	/* if (readout == "TODO: Aeolia/Belize Identifier") {
+		is_aeolia_emc = true;
+		goto aeolia_emc_init;
+	}*/
+	pr_info("ps4-calibrate: emctimer_read32(EMC_TIMER_BASE + 0) = %08x\n", readout); // TODO: Remove when done checking values
+	goto aeolia_emc_init; // TODO: remove this when done with these tests
+
+	// if Aeolia timer returns non-identifying value, assume Baikal
+	if (emc_timer) {
+		early_iounmap(emc_timer, 0x100);
+		emc_timer = NULL;
+	}
+
+	emc_timer = early_ioremap(BPCIE_EMC_TIMER_BASE, 0x100);
+
+	if (!emc_timer)
+		goto fail;
+
+	readout = emctimer_read32(0); // read 32 bits from Baikal EMC base address
+	/* if (readout == "TODO: Baikal Identifier") {
+		is_baikal_emc = true;
+		goto baikal_emc_init;
+	}*/
+	pr_info("ps4-calibrate: emctimer_read32(EMC_TIMER_BASE + 0) = %08x\n", readout); // TODO: Remove when done checking values
+
+	if (is_aeolia_emc == false && is_baikal_emc == false) {
+		pr_err("ps4-calibrate: Could not identify Southbridge EMC at early_setup. Returning ENODEV.\n");
+		return -ENODEV;
+	}
+
+aeolia_emc_init:
 	// reset/start the timer
-	/* if Aeolia/Belize : */ // Try reading both Aeolia and Baikal base addresses, and establish is_aeolia_emc or is_baikal_emc from the readouts
-	emctimer_write32(0x84, emctimer_read32(0x84) & (~0x01));
-	/* if Baikal : */
-	//emctimer_write32(EMC_TIMER_ON_OFF, emctimer_read32(EMC_TIMER_ON_OFF) & 0xFFFFFFC8 | 0x32);
+	emctimer_write32(EMC_TIMER_ON_OFF, emctimer_read32(EMC_TIMER_ON_OFF) & (~0x01));
 
 	// udelay is not calibrated yet, so this is likely wildly off, but good
 	// enough to work.
 	udelay(300);
 
-	/* if Aeolia/Belize : */
 	emctimer_write32(0x00, emctimer_read32(0x00) | 0x01);
-	emctimer_write32(0x84, emctimer_read32(0x84) | 0x01);
+	emctimer_write32(EMC_TIMER_ON_OFF, emctimer_read32(EMC_TIMER_ON_OFF) | 0x01);
+	goto common_emc_init;
 
-	/* if Baikal : */
-	//emctimer_write32(EMC_TIMER_RESET_VALUE, emctimer_read32(EMC_TIMER_RESET_VALUE) & 0xFFFFFFE0 | 0x10);
-	//emctimer_write32(EMC_TIMER_ON_OFF, emctimer_read32(EMC_TIMER_ON_OFF) | 0x33);
+baikal_emc_init:
+	// reset/start the timer
+	//emctimer_write32(BPCIE_EMC_TIMER_ON_OFF, emctimer_read32(BPCIE_EMC_TIMER_ON_OFF) & 0xFFFFFFC8 | 0x32);
 
+	// udelay is not calibrated yet, so this is likely wildly off, but good
+	// enough to work.
+	udelay(300);
+
+	//emctimer_write32(BPCIE_EMC_TIMER_RESET_VALUE, emctimer_read32(BPCIE_EMC_TIMER_RESET_VALUE) & 0xFFFFFFE0 | 0x10);
+	//emctimer_write32(BPCIE_EMC_TIMER_ON_OFF, emctimer_read32(BPCIE_EMC_TIMER_ON_OFF) | 0x33);
+	goto common_emc_init;
+
+common_emc_init:
 	t1 = emctimer_read();
 	tsc1 = tsc2 = rdtsc();
 

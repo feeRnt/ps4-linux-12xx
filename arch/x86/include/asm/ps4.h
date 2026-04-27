@@ -14,23 +14,26 @@
 #include <linux/irqdomain.h>
 
 #define PS4_DEFAULT_TSC_FREQ 1594000000
-#define EMC_TIMER_BASE 0xd0281000 // -- Aeolia/Belize
-#define EMC_TIMER_VALUE 0x28 // -- Aeolia/Belize
 
-#define BPCIE_BAR4_ADDR 0xc9000000 // Baikal PCIe BAR 4 address
+/* Aeolia/Belize */
+#define EMC_TIMER_BASE 0xd0281000
+#define EMC_TIMER_VALUE 0x28
+#define EMC_TIMER_ON_OFF 0x84
+
 
 /* ifdef CONFIG_X86_PS4_BAIKAL -- TODO: move these defines to extern variables, and assign in platform/ps4.c */
 /* Baikal */
 
-//#define EMC_TIMER_BASE (BPCIE_BAR4_ADDR + 0x9000) //BAR4 + 0x9000, seems this is not HPET timer -- Baikal WDT
-#define EMC_TIMER_NO(x) 0x10 * x //timer 0 or timer 1
-#define EMC_TIMER_NO_VALUE(x) EMC_TIMER_NO(x) + 0x18 //timer 0 and timer 1
-#define EMC_TIMER_PERIOD  EMC_TIMER_BASE + 0x04 //period0 (DWORD)
-#define EMC_TIMER_PERIOD1  EMC_TIMER_BASE + 0x10 //period1 (DWORD & 0xFFFFFFFE)
+#define BPCIE_BAR4_ADDR 0xc9000000 // Baikal PCIe BAR 4 address
+#define BPCIE_EMC_TIMER_BASE (BPCIE_BAR4_ADDR + 0x9000) //BAR4 + 0x9000, seems this is not HPET timer -- Baikal WDT
+#define BPCIE_EMC_TIMER_NO(x) 0x10 * x //timer 0 or timer 1
+#define BPCIE_EMC_TIMER_NO_VALUE(x) BPCIE_EMC_TIMER_NO(x) + 0x18 //timer 0 and timer 1
+#define BPCIE_EMC_TIMER_PERIOD  BPCIE_EMC_TIMER_BASE + 0x04 //period0 (DWORD)
+#define BPCIE_EMC_TIMER_PERIOD1  BPCIE_EMC_TIMER_BASE + 0x10 //period1 (DWORD & 0xFFFFFFFE)
 /* frequency in Hz = ((unsigned __int64)(period >> 1) + 1000000000000000LL) / period; */
-//#define EMC_TIMER_VALUE EMC_TIMER_NO_VALUE(0)
-#define EMC_TIMER_ON_OFF EMC_TIMER_NO(0) + 0x10
-#define EMC_TIMER_RESET_VALUE EMC_TIMER_NO(0) + 0x14
+#define BPCIE_EMC_TIMER_VALUE BPCIE_EMC_TIMER_NO_VALUE(0)
+#define BPCIE_EMC_TIMER_ON_OFF BPCIE_EMC_TIMER_NO(0) + 0x10
+#define BPCIE_EMC_TIMER_RESET_VALUE BPCIE_EMC_TIMER_NO(0) + 0x14
 
 
 extern unsigned long ps4_calibrate_tsc(void);
