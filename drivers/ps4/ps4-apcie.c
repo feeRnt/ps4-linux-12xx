@@ -148,7 +148,7 @@ static void apcie_msi_calc_mask(struct irq_data *data) {
 }
 
 
-static void apcie_irq_msi_compose_msg(struct irq_data *data,
+static void __maybe_unused apcie_irq_msi_compose_msg(struct irq_data *data,
 				       struct msi_msg *msg)
 {
 	struct irq_cfg *cfg __maybe_unused = irqd_cfg(data);
@@ -180,8 +180,8 @@ static struct irq_chip apcie_msi_controller = {
 	.irq_ack = irq_chip_ack_parent,
 	.irq_set_affinity = msi_domain_set_affinity,
 	.irq_retrigger = irq_chip_retrigger_hierarchy,
-	//.irq_compose_msi_msg = x86_vector_msi_compose_msg,
-	.irq_compose_msi_msg = apcie_irq_msi_compose_msg,
+	.irq_compose_msi_msg = x86_vector_msi_compose_msg,
+	//.irq_compose_msi_msg = apcie_irq_msi_compose_msg,
 	.irq_write_msi_msg = apcie_msi_write_msg,
 	.flags = IRQCHIP_SKIP_SET_WAKE |
 		 IRQCHIP_AFFINITY_PRE_STARTUP, //is probably extra; but maybe it's needed??? See 826da771291fc25a428e871f9e7fb465e390f852
@@ -208,7 +208,7 @@ static int apcie_msi_init(struct irq_domain *domain,
 	apcie_msi_calc_mask(data);
 
 	/* virq in irq_map eintragen */
-	struct apcie_dev *sc = info->chip_data;
+	/*struct apcie_dev *sc = info->chip_data;
 	if (sc) {
 		int i;
 		for (i = 0; i < 100; i++) {
@@ -217,7 +217,7 @@ static int apcie_msi_init(struct irq_domain *domain,
 				break;
 			}
 		}
-	}
+	} */
 
 	return 0;
 }
@@ -549,7 +549,7 @@ static int apcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 		goto disable_dev;
 	}
 	sc->pdev = dev;
-	memset(sc->irq_map, -1, sizeof(sc->irq_map));
+	//memset(sc->irq_map, -1, sizeof(sc->irq_map));
 	pci_set_drvdata(dev, sc);
 
 	// eMMC ... unused?
