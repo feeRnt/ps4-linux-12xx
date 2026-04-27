@@ -57,32 +57,32 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 	// This is part of the Aeolia pcie device, but it's too early to
 	// do this in a driver.
 
-	/* TODO: just read BPCIE_base from Belize for now and see what it returns */
+	// With at least one Belize, this does not crash the system. We don't know if the same happens on Baikal, but we don't need to.
+	// Just test with Baikal PCIE EMC base first, then switch to Belize.
 	emc_timer = early_ioremap(BPCIE_EMC_TIMER_BASE, 0x100);
 	if (!emc_timer)
 		goto fail;
-	readout = emctimer_read32(0); // read 32 bits from Baikal EMC base address
-	pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + 0) = %08x\n", readout); // TODO: Remove when done checking values
-	readout = emctimer_read32(BPCIE_EMC_TIMER_ON_OFF); // read 32 bits from Baikal EMC On/Off address
-	pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + BPCIE_EMC_TIMER_ON_OFF) = %08x\n", readout); // TODO: Remove when done checking values
+	//readout = emctimer_read32(0); // read 32 bits from Baikal EMC base address --- Returns 0xffffffff on CUH-1216 Belize B0(0x20200)
+	//pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + 0) = %08x\n", readout);
+	//readout = emctimer_read32(BPCIE_EMC_TIMER_ON_OFF); // read 32 bits from Baikal EMC On/Off address --- Returns 0xffffffff on CUH-1216 Belize B0(0x20200)
+	//pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + BPCIE_EMC_TIMER_ON_OFF) = %08x\n", readout);
 	early_iounmap(emc_timer, 0x100);
 	emc_timer = NULL;
-	/* ------------- */
 
 	//emc_timer = ioremap(EMC_TIMER_BASE, 0x100); //replaced with early_ioremap for early mmapping, maybe needed on newer kernels
-	emc_timer = early_ioremap(EMC_TIMER_BASE, 0x100);
+	emc_timer = early_ioremap(EMC_TIMER_BASE, 0x100); // TODO: change this to Baikal base
 
 	if (!emc_timer)
 		goto fail;
 
 	/* Try reading both Aeolia and Baikal base addresses, and establish is_aeolia_emc or is_baikal_emc from the readouts */
 	readout = emctimer_read32(0); // read 32 bits from Aeolia EMC base address
-	/* if (readout == "TODO: Aeolia/Belize Identifier") {
-		is_aeolia_emc = true;
-		goto aeolia_emc_init;
+	/* if (readout != 0xffffffff") {
+		is_baikal_emc = true;
+		goto baikal_emc_init;
 	}*/
 	pr_info("ps4-calibrate: emctimer_read32(EMC_TIMER_BASE + 0) = %08x\n", readout); // TODO: Remove when done checking values
-	readout = emctimer_read32(EMC_TIMER_ON_OFF); // read 32 bits from Baikal EMC On/Off address
+	readout = emctimer_read32(EMC_TIMER_ON_OFF); // read 32 bits from Aeolia EMC On/Off address
 	pr_info("ps4-calibrate: emctimer_read32(EMC_TIMER_BASE + EMC_TIMER_ON_OFF) = %08x\n", readout); // TODO: Remove when done checking values
 	goto aeolia_emc_init; // TODO: remove this when done with these tests
 
@@ -92,15 +92,15 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 		emc_timer = NULL;
 	}
 
-	emc_timer = early_ioremap(BPCIE_EMC_TIMER_BASE, 0x100);
+	emc_timer = early_ioremap(BPCIE_EMC_TIMER_BASE, 0x100); // TODO: change this to Aeolia base
 
 	if (!emc_timer)
 		goto fail;
 
 	readout = emctimer_read32(0); // read 32 bits from Baikal EMC base address
-	/* if (readout == "TODO: Baikal Identifier") {
-		is_baikal_emc = true;
-		goto baikal_emc_init;
+	/* if (readout != 0xffffffff) {
+		is_aeolia_emc = true;
+		goto is_aeolia_emc;
 	}*/
 	pr_info("ps4-calibrate: emctimer_read32(EMC_TIMER_BASE + 0) = %08x\n", readout); // TODO: Remove when done checking values
 
