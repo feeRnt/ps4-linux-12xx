@@ -62,7 +62,9 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 	if (!emc_timer)
 		goto fail;
 	readout = emctimer_read32(0); // read 32 bits from Baikal EMC base address
-	pr_info("ps4-calibrate: emctimer_read32(EMC_TIMER_BASE + 0) = %08x\n", readout); // TODO: Remove when done checking values
+	pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + 0) = %08x\n", readout); // TODO: Remove when done checking values
+	readout = emctimer_read32(BPCIE_EMC_TIMER_ON_OFF); // read 32 bits from Baikal EMC On/Off address
+	pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + BPCIE_EMC_TIMER_ON_OFF) = %08x\n", readout); // TODO: Remove when done checking values
 	early_iounmap(emc_timer, 0x100);
 	emc_timer = NULL;
 	/* ------------- */
@@ -80,6 +82,8 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 		goto aeolia_emc_init;
 	}*/
 	pr_info("ps4-calibrate: emctimer_read32(EMC_TIMER_BASE + 0) = %08x\n", readout); // TODO: Remove when done checking values
+	readout = emctimer_read32(EMC_TIMER_ON_OFF); // read 32 bits from Baikal EMC On/Off address
+	pr_info("ps4-calibrate: emctimer_read32(EMC_TIMER_BASE + EMC_TIMER_ON_OFF) = %08x\n", readout); // TODO: Remove when done checking values
 	goto aeolia_emc_init; // TODO: remove this when done with these tests
 
 	// if Aeolia timer returns non-identifying value, assume Baikal
