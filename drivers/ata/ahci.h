@@ -43,6 +43,7 @@ enum {
 	AHCI_MAX_SG		= 168, /* hardware max is 64K */
 	//AHCI_DMA_BOUNDARY	= /*0xffffffff*/0xB7FFFFFFLL, // I guess Baikal needs this? Add a check in ahci.c to change the value of .dma_boundary if bkal
 	AHCI_DMA_BOUNDARY	= 0xffffffff,
+	BAIKAL_AHCI_DMA_BOUNDARY = 0xB7FFFFFFLL,
 	AHCI_MAX_CMDS		= 32,
 	AHCI_CMD_SZ		= 32,
 	AHCI_CMD_SLOT_SZ	= AHCI_MAX_CMDS * AHCI_CMD_SZ,

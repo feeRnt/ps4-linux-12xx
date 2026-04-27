@@ -1894,6 +1894,8 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	int n_ports, i, rc;
 	int ahci_pci_bar = AHCI_PCI_BAR_STANDARD;
 
+	struct scsi_host_template sht = ahci_sht; // for Baikal use
+
 	WARN_ON((int)ATA_MAX_QUEUE > AHCI_MAX_CMDS);
 #ifdef CONFIG_X86_PS4
 	/* This will return negative on non-PS4 platforms */
@@ -2138,7 +2140,17 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	pci_set_master(pdev);
 
-	rc = ahci_host_activate(host, &ahci_sht);
+	/* PS4 Baikals seem to need a custom DMA Boundary (TODO: Maybe this is breaking Blu-ray for Baikals) */
+	if (pdev->device == PCI_DEVICE_ID_SONY_BAIKAL_AHCI) {
+		sht.dma_boundary = BAIKAL_AHCI_DMA_BOUNDARY;
+		pr_err("ahci: Using non-standard DMA boundary (%016lx) for Baikal AHCI.\n",
+				sht.dma_boundary);
+	} else {
+		pr_info("ahci: Using standard DMA boundary(%016lx) for AHCI.\n",
+				sht.dma_boundary);
+	}
+
+	rc = ahci_host_activate(host, &sht);
 	if (rc)
 		goto err_rm_sysfs_file;
 
