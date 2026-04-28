@@ -66,6 +66,8 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 	//pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + 0) = %08x\n", readout);
 	//readout = emctimer_read32(BPCIE_EMC_TIMER_ON_OFF); // read 32 bits from Baikal EMC On/Off address --- Returns 0xffffffff on CUH-1216 Belize B0(0x20200)
 	//pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + BPCIE_EMC_TIMER_ON_OFF) = %08x\n", readout);
+	goto baikal_emc_init;
+
 	early_iounmap(emc_timer, 0x100);
 	emc_timer = NULL;
 
@@ -123,14 +125,14 @@ aeolia_emc_init:
 
 baikal_emc_init:
 	// reset/start the timer
-	//emctimer_write32(BPCIE_EMC_TIMER_ON_OFF, emctimer_read32(BPCIE_EMC_TIMER_ON_OFF) & 0xFFFFFFC8 | 0x32);
+	emctimer_write32(BPCIE_EMC_TIMER_ON_OFF, emctimer_read32(BPCIE_EMC_TIMER_ON_OFF) & 0xFFFFFFC8 | 0x32);
 
 	// udelay is not calibrated yet, so this is likely wildly off, but good
 	// enough to work.
 	udelay(300);
 
-	//emctimer_write32(BPCIE_EMC_TIMER_RESET_VALUE, emctimer_read32(BPCIE_EMC_TIMER_RESET_VALUE) & 0xFFFFFFE0 | 0x10);
-	//emctimer_write32(BPCIE_EMC_TIMER_ON_OFF, emctimer_read32(BPCIE_EMC_TIMER_ON_OFF) | 0x33);
+	emctimer_write32(BPCIE_EMC_TIMER_RESET_VALUE, emctimer_read32(BPCIE_EMC_TIMER_RESET_VALUE) & 0xFFFFFFE0 | 0x10);
+	emctimer_write32(BPCIE_EMC_TIMER_ON_OFF, emctimer_read32(BPCIE_EMC_TIMER_ON_OFF) | 0x33);
 	goto common_emc_init;
 
 common_emc_init:
