@@ -418,6 +418,18 @@ extern const struct attribute_group *ahci_sdev_groups[];
 	.tag_alloc_policy_rr	= true,					\
 	.sdev_configure		= ata_scsi_sdev_configure
 
+/* Just for the custom DMA boundary */
+#define BAIKAL_AHCI_SHT(drv_name)					\
+	__ATA_BASE_SHT(drv_name),					\
+	.can_queue		= AHCI_MAX_CMDS,			\
+	.sg_tablesize		= AHCI_MAX_SG,				\
+	.dma_boundary		= BAIKAL_AHCI_DMA_BOUNDARY,		\
+	.shost_groups		= ahci_shost_groups,			\
+	.sdev_groups		= ahci_sdev_groups,			\
+	.change_queue_depth     = ata_scsi_change_queue_depth,		\
+	.tag_alloc_policy_rr	= true,					\
+	.sdev_configure		= ata_scsi_sdev_configure
+
 extern struct ata_port_operations ahci_ops;
 extern struct ata_port_operations ahci_platform_ops;
 extern struct ata_port_operations ahci_pmp_retry_srst_ops;
