@@ -20,6 +20,7 @@
 #include "aeolia.h"
 
 /* #define QEMU_HACK_NO_IOMMU */
+//#define APCIE_CUSTOM_IRQ_COMPOSE
 
 /* Number of implemented MSI registers per function */
 static const int subfuncs_per_func[AEOLIA_NUM_FUNCS] = {
@@ -148,7 +149,7 @@ static void apcie_msi_calc_mask(struct irq_data *data) {
 }
 
 
-static void apcie_irq_msi_compose_msg(struct irq_data *data,
+static void __maybe_unused apcie_irq_msi_compose_msg(struct irq_data *data,
 				       struct msi_msg *msg)
 {
 	struct irq_cfg *cfg __maybe_unused = irqd_cfg(data);
@@ -170,10 +171,20 @@ static void apcie_irq_msi_compose_msg(struct irq_data *data,
 				}
 			}
 		} else	{
-		pr_info("bpcie_irq_msi_compose_msg SC null\n");
+		pr_info("apcie_irq_msi_compose_msg SC null\n");
 		//msg->data = data->irq - 1;
 		}
 	}
+}
+
+static void apcie_dmar_msi_compose_msg(struct irq_data *data, struct msi_msg *msg)
+{
+	/* this is just x86_vector_msi_compose_msg but with dmar (DMA remap) = true instead of false.
+	 * should allow using the high address bits of a compose msg for extracting the IR destid,
+	 * and is used when there is an IOMMU/Interrupt-Remapping present (like AMD-Vi), and is being used.
+	 * This decision-making was put behind an (x2apic_enabled()) in the past, but now it's
+	 * behind this dmar boolean*/
+	__irq_msi_compose_msg(irqd_cfg(data), msg, true);
 }
 
 static struct irq_chip apcie_msi_controller = {
@@ -184,7 +195,8 @@ static struct irq_chip apcie_msi_controller = {
 	.irq_set_affinity = msi_domain_set_affinity,
 	.irq_retrigger = irq_chip_retrigger_hierarchy,
 	//.irq_compose_msi_msg = x86_vector_msi_compose_msg,
-	.irq_compose_msi_msg = apcie_irq_msi_compose_msg,
+	.irq_compose_msi_msg = apcie_dmar_msi_compose_msg,
+	//.irq_compose_msi_msg = apcie_irq_msi_compose_msg,
 	.irq_write_msi_msg = apcie_msi_write_msg,
 	.flags = IRQCHIP_SKIP_SET_WAKE |
 		 IRQCHIP_AFFINITY_PRE_STARTUP, //is probably extra; but maybe it's needed??? See 826da771291fc25a428e871f9e7fb465e390f852
@@ -210,6 +222,7 @@ static int apcie_msi_init(struct irq_domain *domain,
 			    handle_edge_irq, NULL, "edge");
 	apcie_msi_calc_mask(data);
 
+#ifdef APCIE_CUSTOM_IRQ_COMPOSE
 	/* virq in irq_map eintragen */
 	struct apcie_dev *sc = info->chip_data;
 	if (sc) {
@@ -221,6 +234,7 @@ static int apcie_msi_init(struct irq_domain *domain,
 			}
 		}
 	}
+#endif
 
 	return 0;
 }
@@ -552,7 +566,9 @@ static int apcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 		goto disable_dev;
 	}
 	sc->pdev = dev;
+#ifdef APCIE_CUSTOM_IRQ_COMPOSE
 	memset(sc->irq_map, -1, sizeof(sc->irq_map));
+#endif
 	pci_set_drvdata(dev, sc);
 
 	// eMMC ... unused?
