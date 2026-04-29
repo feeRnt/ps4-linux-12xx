@@ -31,7 +31,7 @@ static const int subfuncs_per_func[BAIKAL_NUM_FUNCS] = {
 	2, 1, 1, 1, 31, 2, 3, 3
 };
 
-static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc); // generally custom domain_set_desc's
+static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg, struct msi_desc *desc); // generally custom domain_set_desc's were
 										     // removed in 9006c133a422f474d7d8e10a8baae179f70c22f5
 
 /*static inline */u32 glue_read32(struct bpcie_dev *sc, u32 offset) {
@@ -317,7 +317,7 @@ static struct msi_domain_info bpcie_msi_domain_info = {
 	.ops		= &bpcie_msi_domain_ops,
 	.chip		= &bpcie_msi_controller,
 	.handler	= bpcie_handle_edge_irq/*handle_edge_irq*/,
-	//.handler_name	= "edge", // TODO: Maybe this is needed? Exists for Aeolia.
+	.handler_name	= "edge", /* Seems important now; though there is a function to set it in x86/kernel/apic/msi.c */
 };
 
 // while descriptor code was standardized, we just still use non-standard stuff;
@@ -406,8 +406,6 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 		sc_dbg("Matching FWSpec Parent found! Switched to IR-Baikal-MSI from Baikal-MSI.\n");
 	}
 	
-	// d = domain
-
 	d = pci_msi_create_irq_domain(fn, &bpcie_msi_domain_info, parent); // We should need non-nulls now since we use fn's:::
 	/* struct irq_domain *pci_msi_create_irq_domain(struct fwnode_handle *fwnode,
 					     struct msi_domain_info *info,
@@ -419,10 +417,11 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	// remember that parent is just irq_domain struct pointer originaly, then irq_remapping_get_irq_domain (now irq_find_matching_fwspec) returns plat
 	// specific domain/parent, which are::: ---
 	if (d != NULL)
-		dev_set_msi_domain(&pdev->dev, d); // for some reason this is missing in 6.15-baikal code; seems important.
+		dev_set_msi_domain(&pdev->dev, d); /* for some reason this is missing in 6.15-baikal code; seems important.
+						    ((Only does dev->msi.domain = d; ifdef CONFIG_GENERIC_MSI_IRQ {which is on for PS4})) */
 	else {
 		dev_err(&pdev->dev, "bpcie: failed to create irq domain\n");
-		// irq_domain_free_fwnode(fn); // we should probably have this; exists for Aeolia/Belize
+		irq_domain_free_fwnode(fn); // Was missing in original-bpcie.c, but in apcie.c
 	}
 	return d;
 }
