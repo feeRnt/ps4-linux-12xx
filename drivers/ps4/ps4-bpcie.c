@@ -637,10 +637,11 @@ static int bpcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 
 	if ((ret = bpcie_glue_init(sc)) < 0)
 		goto free_bars;
-	if ((ret = bpcie_uart_init(sc)) < 0)
-		goto remove_glue;
+	/* if ((ret = bpcie_uart_init(sc)) < 0)
+		goto remove_glue; */ // Maybe this is dead too like Aeolia/Belize on newer Kernels? tty should still be accessible with uart from kernel boot params
 	if ((ret = bpcie_icc_init(sc)) < 0)
-		goto remove_uart;
+		//goto remove_uart;
+		goto remove_glue;
 
 	bpcie_initialized = true; //should only run when probe function runs, which should only run on Baikal devices
 	return 0;
@@ -667,7 +668,7 @@ static void bpcie_remove(struct pci_dev *dev) {
 	sc = pci_get_drvdata(dev);
 
 	bpcie_icc_remove(sc);
-	bpcie_uart_remove(sc);
+	//bpcie_uart_remove(sc);
 	bpcie_glue_remove(sc);
 
 	if (sc->bar0)
@@ -686,7 +687,7 @@ static int bpcie_suspend(struct pci_dev *dev, pm_message_t state) {
 	sc = pci_get_drvdata(dev);
 
 	bpcie_icc_suspend(sc, state);
-	bpcie_uart_suspend(sc, state);
+	//bpcie_uart_suspend(sc, state);
 	bpcie_glue_suspend(sc, state);
 	return 0;
 }
@@ -697,7 +698,7 @@ static int bpcie_resume(struct pci_dev *dev) {
 
 	bpcie_icc_resume(sc);
 	bpcie_glue_resume(sc);
-	bpcie_uart_resume(sc);
+	//bpcie_uart_resume(sc);
 	return 0;
 }
 #endif
