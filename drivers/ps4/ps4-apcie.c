@@ -169,6 +169,9 @@ static void apcie_irq_msi_compose_msg(struct irq_data *data,
 					break;
 				}
 			}
+		} else	{
+		pr_info("bpcie_irq_msi_compose_msg SC null\n");
+		//msg->data = data->irq - 1;
 		}
 	}
 }

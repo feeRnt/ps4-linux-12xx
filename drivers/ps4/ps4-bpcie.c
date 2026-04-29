@@ -199,6 +199,35 @@ static void bpcie_msi_calc_mask(struct irq_data *data) {
 	*/
 }
 
+static void bpcie_irq_msi_compose_msg(struct irq_data *data,
+				       struct msi_msg *msg)
+{
+	struct irq_cfg *cfg __maybe_unused = irqd_cfg(data);
+	if (!cfg)
+		pr_err("ps4-bpcie: irq_cfg is NULL in %s!\n", cfg);
+
+	memset(msg, 0, sizeof(*msg));
+	msg->address_hi = X86_MSI_BASE_ADDRESS_HIGH;
+	msg->address_lo = 0xfee00000;// Just do it like this for now
+
+	{
+		struct bpcie_dev *sc = data->chip_data;
+		int i;
+		msg->data = data->irq - 1;
+		if (sc) {
+			for (i = 0; i < 100; i++) {
+				if (sc->irq_map[i] == data->irq) {
+					msg->data = i;
+					break;
+				}
+			}
+		} else	{
+		pr_info("bpcie_irq_msi_compose_msg SC null\n");
+		//msg->data = data->irq - 1;
+		}
+	}
+}
+
 static struct irq_chip bpcie_msi_controller = {
 	.name = "Baikal-MSI",
 	.irq_unmask = bpcie_msi_unmask,
@@ -206,7 +235,8 @@ static struct irq_chip bpcie_msi_controller = {
 	.irq_ack = irq_chip_ack_parent,
 	.irq_set_affinity = msi_domain_set_affinity,
 	.irq_retrigger = irq_chip_retrigger_hierarchy,
-	.irq_compose_msi_msg = x86_vector_msi_compose_msg,
+	//.irq_compose_msi_msg = x86_vector_msi_compose_msg,
+	.irq_compose_msi_msg = bpcie_irq_msi_compose_msg,
 	.irq_write_msi_msg = bpcie_msi_write_msg,
 	.flags = IRQCHIP_SKIP_SET_WAKE |
 		 IRQCHIP_AFFINITY_PRE_STARTUP // (was added in ff363f480e5997051dd1de949121ffda3b753741, but it's not necessary. But maybe it is???
@@ -288,6 +318,18 @@ static int bpcie_msi_init(struct irq_domain *domain,
 	irq_domain_set_info(domain, virq, hwirq, info->chip, info->chip_data,
 			bpcie_handle_edge_irq/*handle_edge_irq*/, NULL, "edge");
 	//bpcie_msi_calc_mask(data);
+
+	/* virq in irq_map eintragen */
+	struct bpcie_dev *sc = info->chip_data;
+	if (sc) {
+		int i;
+		for (i = 0; i < 100; i++) {
+			if (sc->irq_map[i] == -1) {
+				sc->irq_map[i] = virq;
+				break;
+			}
+		}
+	}
 	return 0;
 }
 
@@ -620,6 +662,7 @@ static int bpcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 		goto disable_dev;
 	}
 	sc->pdev = dev;
+	memset(sc->irq_map, -1, sizeof(sc->irq_map));
 	pci_set_drvdata(dev, sc);
 
 	// eMMC ... unused?
