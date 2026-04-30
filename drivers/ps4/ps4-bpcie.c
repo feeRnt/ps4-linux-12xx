@@ -61,15 +61,17 @@ static void bpcie_msi_write_msg(struct irq_data *data, struct msi_msg *msg)
 	dev_dbg(data->common->msi_desc->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
 	       msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc);
 
-	pci_msi_domain_write_msg(data, msg);
+	pci_msi_domain_write_msg(data, msg); //check this -- looks fine
 }
 
 static void bpcie_msi_unmask(struct irq_data *data)
 {
 	pci_msi_unmask_irq(data);
 	return;
+
+	/* Unused code :: */
 	struct bpcie_dev *sc = data->chip_data;
-	u8 subfunc = get_subfunc(data->hwirq);//data->hwirq & 0xff;
+	u8 subfunc = get_subfunc(data->hwirq);//data->hwirq & 0xff; // actually rets -- hwirq & 0x1f --
 	struct msi_desc *desc = irq_data_get_msi_desc(data);
 	struct pci_dev *pdev = msi_desc_to_pci_dev(desc);
 	int msi_allocated = desc->nvec_used;
@@ -124,6 +126,8 @@ static void bpcie_msi_mask(struct irq_data *data)
 {
 	pci_msi_mask_irq(data);
 	return;
+
+	/* Unused code: */
 	struct bpcie_dev *sc = data->chip_data;
 	u8 subfunc = get_subfunc(data->hwirq);
 	struct msi_desc *desc = irq_data_get_msi_desc(data);
@@ -177,9 +181,10 @@ static void bpcie_msi_mask(struct irq_data *data)
 	//this code equals msi_mask = 0xFFFFFFFF;
 }
 
+/* Unused function: */
 static void bpcie_msi_calc_mask(struct irq_data *data) {
 	//struct bpcie_dev *sc = data->chip_data;
-	u8 subfunc = get_subfunc(data->hwirq);//data->hwirq & 0xff;
+	u8 subfunc = get_subfunc(data->hwirq);//data->hwirq & 0xff; // hwirq & 0x1f
 	data->mask = 1 << subfunc;
 	dev_dbg(data->common->msi_desc->dev, "bpcie_msi_calc_mask(0x%X)\n", data->mask);
 	
@@ -199,12 +204,13 @@ static void bpcie_msi_calc_mask(struct irq_data *data) {
 	*/
 }
 
+// in working 6.15 Aeolia/Belize style
 static void bpcie_irq_msi_compose_msg(struct irq_data *data,
 				       struct msi_msg *msg)
 {
 	struct irq_cfg *cfg __maybe_unused = irqd_cfg(data);
 	if (!cfg)
-		pr_err("ps4-bpcie: irq_cfg is NULL in %s!\n", cfg);
+		pr_err("ps4-bpcie: irq_cfg is NULL in %s!\n", __func__);
 
 	memset(msg, 0, sizeof(*msg));
 	msg->address_hi = X86_MSI_BASE_ADDRESS_HIGH;
@@ -383,7 +389,7 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	//Our hwirq number is (slot << 8) | (func << 5) plus subfunction.
 	// Subfunction is usually 0 and implicitly increments per hwirq,
 	//but can also be 0xff to indicate that this is a shared IRQ. 
-	//arg->msi_hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5); //this is info. for Aeolia.
+	//arg->msi_hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5); //this is info. for Aeolia. --- This comment is magic. don't read it
 	arg->hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5);
 
 	#ifndef QEMU_HACK_NO_IOMMU
@@ -449,7 +455,8 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	}
 	
 	d = pci_msi_create_irq_domain(fn, &bpcie_msi_domain_info, parent); // We should need non-nulls now since we use fn's:::
-	/* struct irq_domain *pci_msi_create_irq_domain(struct fwnode_handle *fwnode,
+	/* crashniels 6.15-baikal use msi_create_irq_domain, but that's basically the pci variant lacking a few info flags in the msi_domain_info
+	 * struct irq_domain *pci_msi_create_irq_domain(struct fwnode_handle *fwnode,
 					     struct msi_domain_info *info,
 					     struct irq_domain *parent) { */
 
@@ -482,6 +489,10 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 	unsigned int sc_devfn;
 	struct pci_dev *sc_dev;
 	struct bpcie_dev *sc;
+	struct irq_alloc_info info;
+
+	struct msi_desc *desc;
+	struct device* bare_dev;
 
 	sc_devfn = (dev->devfn & ~7) | BAIKAL_FUNC_ID_PCIE;
 	sc_dev = pci_get_slot(dev->bus, sc_devfn);
@@ -498,23 +509,46 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 		goto fail;
 	}
 
-	//info.devid = pci_dev_id(sc->pdev); never in Baikal code, but was put in Aeolia/Belize
-	
-	dev_dbg(&dev->dev, "bpcie_assign_irqs(%d)\n", nvec);
+	/* Sort of manual init info */
+	init_irq_alloc_info(&info, NULL);
+	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 
+	info.devid = pci_dev_id(sc->pdev);
+
+	bare_dev = &sc->pdev->dev;
+
+	info.hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5);
+	dev_dbg(&dev->dev, "bpcie_assign_irqs(%d)\n", nvec);
 #ifndef QEMU_HACK_NO_IOMMU
 	if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 		nvec = 1;
 		//info.msi_hwirq |= 0xff; // Shared IRQ for all subfunctions
-		//info.hwirq |= 0xff; // Shared IRQ for all subfunctions
+		//info.hwirq |= 0xff; // Shared IRQ for all subfunctions // TODO: why not have 0x1f?
 	}
 #endif
-	if (dev->msi_enabled)
+	desc = msi_alloc_desc(bare_dev, nvec, NULL);
+
+	info.desc = desc;
+	info.data = sc;
+	dev_info(&dev->dev, "bpcie_assign_irqs(%d) (%ld)\n", nvec, info.hwirq);
+
+	if (dev->msi_enabled) {
+		pr_warn("ps4-bpcie: msi_enabled already for device: %d. Returning old nvec. MAKE SURE IF YOU WANT THIS\n");// maybe disable this test
 		ret = nvec;
+	}
 	else
 		ret = pci_alloc_irq_vectors(dev, 1, nvec, PCI_IRQ_MSI);
+	// Wait... We basically never even call this bpcie_assign_irqs_function.........................
+	/*
+	ret = irq_domain_alloc_irqs(sc->irqdomain, nvec, NUMA_NO_NODE, &info);
+	if (ret >= 0) {
+		dev->irq = ret;
+		desc->irq = ret;
+		ret = nvec;
+	}
+	*/
 
-fail:
+fail: // Not actually a fail condition; we get here at the end of the func.
 	dev_dbg(&dev->dev, "bpcie_assign_irqs returning %d\n", ret);
 	if (sc_dev)
 		pci_dev_put(sc_dev);
