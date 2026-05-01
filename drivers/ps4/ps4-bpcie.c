@@ -205,7 +205,7 @@ static void bpcie_msi_calc_mask(struct irq_data *data) {
 }
 
 // in working 6.15 Aeolia/Belize style
-static void bpcie_irq_msi_compose_msg(struct irq_data *data,
+static void __maybe_unused bpcie_irq_msi_compose_msg(struct irq_data *data,
 				       struct msi_msg *msg)
 {
 	struct irq_cfg *cfg __maybe_unused = irqd_cfg(data);
@@ -241,8 +241,8 @@ static struct irq_chip bpcie_msi_controller = {
 	.irq_ack = irq_chip_ack_parent,
 	.irq_set_affinity = msi_domain_set_affinity,
 	.irq_retrigger = irq_chip_retrigger_hierarchy,
-	//.irq_compose_msi_msg = x86_vector_msi_compose_msg,
-	.irq_compose_msi_msg = bpcie_irq_msi_compose_msg,
+	.irq_compose_msi_msg = x86_vector_msi_compose_msg,
+	//.irq_compose_msi_msg = bpcie_irq_msi_compose_msg,
 	.irq_write_msi_msg = bpcie_msi_write_msg,
 	.flags = IRQCHIP_SKIP_SET_WAKE |
 		 IRQCHIP_AFFINITY_PRE_STARTUP // (was added in ff363f480e5997051dd1de949121ffda3b753741, but it's not necessary. But maybe it is???
@@ -326,7 +326,7 @@ static int bpcie_msi_init(struct irq_domain *domain,
 	//bpcie_msi_calc_mask(data);
 
 	/* virq in irq_map eintragen */
-	struct bpcie_dev *sc = info->chip_data;
+	/*struct bpcie_dev *sc = info->chip_data;
 	if (sc) {
 		int i;
 		for (i = 0; i < 100; i++) {
@@ -335,7 +335,7 @@ static int bpcie_msi_init(struct irq_domain *domain,
 				break;
 			}
 		}
-	}
+	}*/
 	return 0;
 }
 
@@ -713,7 +713,7 @@ static int bpcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 		goto disable_dev;
 	}
 	sc->pdev = dev;
-	memset(sc->irq_map, -1, sizeof(sc->irq_map));
+	/*memset(sc->irq_map, -1, sizeof(sc->irq_map));*/
 	pci_set_drvdata(dev, sc);
 
 	// eMMC ... unused?
