@@ -713,7 +713,7 @@ static int x86_vector_select(struct irq_domain *d, struct irq_fwspec *fwspec,
 	if (apic_id_valid(32768))
 		return 0;
 
-	return x86_fwspec_is_ioapic(fwspec) || x86_fwspec_is_hpet(fwspec) || x86_fwspec_is_aeolia(fwspec) || x86_fwspec_is_baikal(fwspec);
+	return x86_fwspec_is_ioapic(fwspec) || x86_fwspec_is_hpet(fwspec) || x86_fwspec_is_aeolia(fwspec)/*|| x86_fwspec_is_baikal(fwspec)*/;
 }
 
 static const struct irq_domain_ops x86_vector_domain_ops = {
