@@ -62,11 +62,13 @@ static __init unsigned long ps4_measure_tsc_freq(void)
 	emc_timer = early_ioremap(BPCIE_EMC_TIMER_BASE, 0x100);
 	if (!emc_timer)
 		goto fail;
-	//readout = emctimer_read32(0); // read 32 bits from Baikal EMC base address --- Returns 0xffffffff on CUH-1216 Belize B0(0x20200)
-	//pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + 0) = %08x\n", readout);
-	//readout = emctimer_read32(BPCIE_EMC_TIMER_ON_OFF); // read 32 bits from Baikal EMC On/Off address --- Returns 0xffffffff on CUH-1216 Belize B0(0x20200)
-	//pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + BPCIE_EMC_TIMER_ON_OFF) = %08x\n", readout);
-	goto baikal_emc_init;
+	readout = emctimer_read32(0); // read 32 bits from Baikal EMC base address --- Returns 0xffffffff on CUH-1216 Belize B0(0x20200)
+	pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + 0) = %08x\n", readout);
+	readout = emctimer_read32(BPCIE_EMC_TIMER_ON_OFF); // read 32 bits from Baikal EMC On/Off address --- Returns 0xffffffff on CUH-1216 Belize B0(0x20200)
+	pr_info("ps4-calibrate: emctimer_read32(BPCIE_EMC_TIMER_BASE + BPCIE_EMC_TIMER_ON_OFF) = %08x\n", readout);
+	if (readout != 0xffffffff) {
+		goto baikal_emc_init;
+	}
 
 	early_iounmap(emc_timer, 0x100);
 	emc_timer = NULL;
