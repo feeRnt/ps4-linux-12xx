@@ -348,23 +348,24 @@ static void bpcie_msi_free(struct irq_domain *domain,
 static int bpcie_msi_prepare(struct irq_domain *domain, struct device *dev,
 				  int nvec, msi_alloc_info_t *arg)
 {
-	/*memset(arg, 0, sizeof(*arg));
-	return 0;*/ // This was the old stub -- it's the kernel default stub for kernel/irq/msi.c
-	init_irq_alloc_info(arg, NULL);
+	memset(arg, 0, sizeof(*arg));
+	return 0; // This was the old stub -- it's the kernel default stub for kernel/irq/msi.c
+	//init_irq_alloc_info(arg, NULL);
 
-	if (to_pci_dev(dev)->msix_enabled)
+	/* if (to_pci_dev(dev)->msix_enabled)
 		arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSIX;
-	else {
-		arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
-		pr_info("ps4-bpcie: Assigning X86_IRQ_ALLOC_TYPE_PCI_MSI in %s.\n", __func__);
-	}
-	return 0;
+	else { */ // we don't use MSI-X
+	//arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
+	//pr_info("ps4-bpcie: Assigning X86_IRQ_ALLOC_TYPE_PCI_MSI in %s.\n", __func__);
+	//}
+	//return 0;
+
 	/* Based on pci_msi_prepare of arch/x86/kernel/apic/msi.c,
 	 * since we don't have an init_irq_alloc_info at alloc_domain anymore,
 	 * and also since we don't use bpcie_assign_irqs but pci_alloc_irq_vectors,
 	 * which does not assign the alloc_info type nor init it.
 
-	 * This function should be called msi_domain_prepare_irqs in kernel/irq/msi.c */
+	 * This function should be called by msi_domain_prepare_irqs in kernel/irq/msi.c */
 }
 
 static struct msi_domain_ops bpcie_msi_domain_ops = {
@@ -372,7 +373,7 @@ static struct msi_domain_ops bpcie_msi_domain_ops = {
 	.msi_init	= bpcie_msi_init,
 	.msi_free	= bpcie_msi_free,
 	.set_desc	= bpcie_msi_domain_set_desc,
-	.msi_prepare = bpcie_msi_prepare,
+	.msi_prepare	= bpcie_msi_prepare,
 };
 
 static struct msi_domain_info bpcie_msi_domain_info = {
@@ -421,7 +422,8 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev *pdev)//similar to native_setup_msi_irqs (now, ~6.0, hpet_create_irq_domain)
 {
 	struct irq_domain *d, *parent;
-	//struct irq_alloc_info info; //no longer needed
+	struct irq_alloc_info info; //no longer needed -- OR IS IT?
+	// Re-add now for testing
 
 	struct fwnode_handle *fn;
 	struct irq_fwspec fwspec;
@@ -434,8 +436,8 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 
 	bpcie_msi_domain_info.chip_data = (void *)sc;
 
-	//init_irq_alloc_info(&info, NULL);		//  ""
-	//info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI; // removed after fwspec
+	init_irq_alloc_info(&info, NULL);		//  ""
+	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI; // was removed in Aeolia after fwspec
 
 	//info.msi_dev = pdev; // removed
 
@@ -504,10 +506,10 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 	unsigned int sc_devfn;
 	struct pci_dev *sc_dev;
 	struct bpcie_dev *sc;
-	struct irq_alloc_info info;
+	/* struct irq_alloc_info info;
 
 	struct msi_desc *desc;
-	struct device* bare_dev;
+	struct device* bare_dev; */
 
 	sc_devfn = (dev->devfn & ~7) | BAIKAL_FUNC_ID_PCIE;
 	sc_dev = pci_get_slot(dev->bus, sc_devfn);
@@ -525,14 +527,14 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 	}
 
 	/* Sort of manual init info */
-	init_irq_alloc_info(&info, NULL);
+	/*init_irq_alloc_info(&info, NULL);
 	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 
 	info.devid = pci_dev_id(sc->pdev);
 
 	bare_dev = &sc->pdev->dev;
 
-	info.hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5);
+	info.hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5); */
 	dev_dbg(&dev->dev, "bpcie_assign_irqs(%d)\n", nvec);
 #ifndef QEMU_HACK_NO_IOMMU
 	if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
@@ -541,11 +543,11 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 		//info.hwirq |= 0xff; // Shared IRQ for all subfunctions // TODO: why not have 0x1f?
 	}
 #endif
-	desc = msi_alloc_desc(bare_dev, nvec, NULL);
+	/*desc = msi_alloc_desc(bare_dev, nvec, NULL);
 
 	info.desc = desc;
 	info.data = sc;
-	dev_info(&dev->dev, "bpcie_assign_irqs(%d) (%ld)\n", nvec, info.hwirq);
+	dev_info(&dev->dev, "bpcie_assign_irqs(%d) (%ld)\n", nvec, info.hwirq);*/
 
 	if (dev->msi_enabled) {
 		pr_warn("ps4-bpcie: msi_enabled already for device: %d. Returning old nvec. MAKE SURE IF YOU WANT THIS\n");// maybe disable this test
