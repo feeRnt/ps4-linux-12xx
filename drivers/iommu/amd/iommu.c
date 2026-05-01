@@ -3821,8 +3821,8 @@ static int irq_remapping_select(struct irq_domain *d, struct irq_fwspec *fwspec,
 		devid = get_hpet_devid(fwspec->param[0]);
 	else if (x86_fwspec_is_aeolia(fwspec))
 		devid = fwspec->param[0]; // We have manually assigned devid to param 0 in apcie
-	else if (x86_fwspec_is_baikal(fwspec))
-		devid = fwspec->param[0]; // TODO: Baikal IOMMU FWSpec has not been tested before like this. Needs to be tested, but does NOT work without it.
+	/*else if (x86_fwspec_is_baikal(fwspec))
+		devid = fwspec->param[0];*/ // TODO: Baikal IOMMU FWSpec has not been tested before like this. Needs to be tested, but does NOT work without it.
 
 	if (devid < 0)
 		return 0;
