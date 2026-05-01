@@ -141,7 +141,7 @@ static const struct pci_device_id sky2_id_table[] = {
 	{ PCI_DEVICE(PCI_VENDOR_ID_MARVELL, 0x4382) }, /* 88E8079 */
 	{ PCI_DEVICE(PCI_VENDOR_ID_SONY, PCI_DEVICE_ID_SONY_AEOLIA_GBE) },
 	{ PCI_DEVICE(PCI_VENDOR_ID_SONY, PCI_DEVICE_ID_SONY_BELIZE_GBE) },
-	//{ PCI_DEVICE(PCI_VENDOR_ID_SONY, PCI_DEVICE_ID_SONY_BAIKAL_GBE) },
+	//{ PCI_DEVICE(PCI_VENDOR_ID_SONY, PCI_DEVICE_ID_SONY_BAIKAL_GBE) }, //TODO: Figure out lack of ethernet support on Baikal eventually
 	{ 0 }
 };
 
@@ -5022,7 +5022,7 @@ static int sky2_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 #ifdef CONFIG_X86_PS4
        if (pdev->vendor == PCI_VENDOR_ID_SONY &&
-           apcie_assign_irqs(pdev, 1) > 0) {
+           apcie_assign_irqs(pdev, 1) > 0) { //TODO: When we switch on ethernet for Baikal, we'll probably need this to be pci_alloc_irq_vectors
                err = sky2_test_msi(hw);
                if (err) {
                        apcie_free_irqs(pdev->irq, 1);
