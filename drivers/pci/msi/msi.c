@@ -436,7 +436,7 @@ int __pci_enable_msi_range(struct pci_dev *dev, int minvec, int maxvec,
 	if (!pci_msi_domain_supports(dev, 0, ALLOW_LEGACY))
 		return -ENOTSUPP;
 
-	nvec = pci_msi_vec_count(dev);
+	nvec = pci_msi_vec_count(dev); // TODO: we are breaking here ---
 	if (nvec < 0)
 		return nvec;
 	if (nvec < minvec)
@@ -490,9 +490,10 @@ int pci_msi_vec_count(struct pci_dev *dev)
 	if (!dev->msi_cap)
 		return -EINVAL;
 
-	pci_read_config_word(dev, dev->msi_cap + PCI_MSI_FLAGS, &msgctl);
+	pci_read_config_word(dev, dev->msi_cap + PCI_MSI_FLAGS, &msgctl); // TODO: failing here
 	ret = 1 << FIELD_GET(PCI_MSI_FLAGS_QMASK, msgctl);
 
+	pr_err("pci-msi: Calculated %d vectors in %s.\n", ret, __func__);
 	return ret;
 }
 EXPORT_SYMBOL(pci_msi_vec_count);

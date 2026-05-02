@@ -694,10 +694,13 @@ int x86_fwspec_is_aeolia(struct irq_fwspec *fwspec)
 
 int x86_fwspec_is_baikal(struct irq_fwspec *fwspec)
 {
+	int ret;
 	if (is_fwnode_irqchip(fwspec->fwnode)) {
 		const char *fwname = fwnode_get_name(fwspec->fwnode);
-		return fwname && !strncmp(fwname, "Baikal-MSI", 10); // TODO: We haven't tested fwspec matching like this for Baikal. Needs testing.
-								     // Not working without it though.
+		ret = fwname && !strncmp(fwname, "Baikal-MSI", 10); // TODO: We haven't tested fwspec matching like this for Baikal. Needs testing.
+								     // Probably not working without it though.
+		pr_err("apic-vector: %s: fwname matched? %d (1 = true; 0 = false). Returning it.\n", __func__, ret);
+		return ret;
 	}
 	return 0;
 }
