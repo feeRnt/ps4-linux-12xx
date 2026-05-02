@@ -244,9 +244,9 @@ static struct irq_chip bpcie_msi_controller = {
 	.irq_compose_msi_msg = x86_vector_msi_compose_msg,
 	//.irq_compose_msi_msg = bpcie_irq_msi_compose_msg,
 	.irq_write_msi_msg = bpcie_msi_write_msg,
-	.flags = IRQCHIP_SKIP_SET_WAKE |
-		 IRQCHIP_AFFINITY_PRE_STARTUP // (was added in ff363f480e5997051dd1de949121ffda3b753741, but it's not necessary. But maybe it is???
-		// and might break Baikal. Works on Aeolia though)
+	.flags = IRQCHIP_SKIP_SET_WAKE | IRQCHIP_AFFINITY_PRE_STARTUP,
+	/* (was added in ff363f480e5997051dd1de949121ffda3b753741, but it's not necessary. But maybe it is???
+	 * and might break Baikal. Works on Aeolia though) */
 };
 
 /* No longer needed with -- 9006c133a422f474d7d8e10a8baae179f70c22f5 -- can use the universal funcs in kernel/irq/msi.c etc.
@@ -397,7 +397,8 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	sc_devfn = (dev->devfn & ~7) | BAIKAL_FUNC_ID_PCIE;
 	sc_dev = pci_get_slot(dev->bus, sc_devfn);
 	//arg->msi_dev = sc_dev; // removed after a certain commit
-	
+
+	// arg->devid does not exist either
 	arg->desc = desc; // assign desc... removed in 6.15 for some reason? Seems breakworthy to remove
 			  // Since this is .set_desc function, we should reliably set descs ourselves.
 
@@ -422,8 +423,8 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev *pdev)//similar to native_setup_msi_irqs (now, ~6.0, hpet_create_irq_domain)
 {
 	struct irq_domain *d, *parent;
-	struct irq_alloc_info info; //no longer needed -- OR IS IT?
-	// Re-add now for testing
+
+	/* struct irq_alloc_info info; */ //no longer needed -- OR IS IT?
 
 	struct fwnode_handle *fn;
 	struct irq_fwspec fwspec;
@@ -436,27 +437,35 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 
 	bpcie_msi_domain_info.chip_data = (void *)sc;
 
-	init_irq_alloc_info(&info, NULL);		//  ""
+	/* init_irq_alloc_info(&info, NULL);		//  ""
 	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI; // was removed in Aeolia after fwspec
 
-	//info.msi_dev = pdev; // removed
+	//info.msi_dev = pdev; // original style; removed from Linux
+
+	//info.devid = pci_dev_id(sc->pdev);	// (14.4); Aeolia-style
+	//info.devid = pci_dev_id(pdev);	// (14.x); Baikal style? */
 
 	//parent = irq_remapping_get_ir_irq_domain(&info); //removed after irq_remapping_get_irq_domain
 	
 	//parent = irq_remapping_get_irq_domain(&info); // removed after fwspec
 	
-	fn = irq_domain_alloc_named_id_fwnode(bpcie_msi_controller.name, pci_dev_id(sc->pdev));
+	//fn = irq_domain_alloc_named_id_fwnode(bpcie_msi_controller.name, pci_dev_id(sc->pdev));
+	/* this pattern used in Aeolia will allocate only one domain for pci function (14.4). That's fine for Aeolia
+	 * but not Baikal where we have one domain for each pci function in 14.x. */
+
+	sc_info("allocating fwnode for name=%s devid=%d\n", bpcie_msi_controller.name, pci_dev_id(pdev));
+	fn = irq_domain_alloc_named_id_fwnode(bpcie_msi_controller.name, pci_dev_id(pdev)); // per pdev
 	if (!fn) {
+		sc_err("failed to allocate named fwnode, returning NULL.\n");
 		return NULL;
 	}
-
-	sc_dbg("devid = %d\n", pci_dev_id(sc->pdev));
 
 	fwspec.fwnode = fn;
 	fwspec.param_count = 1;
 
 	// It should be correct to put the pci device id in here
-	fwspec.param[0] = pci_dev_id(sc->pdev);
+	// fwspec.param[0] = pci_dev_id(sc->pdev); // (14.4); Aeolia-style
+	fwspec.param[0] = pci_dev_id(pdev);	   // (14.x); Baikal style?
 
 	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY);
 
@@ -471,17 +480,19 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 		sc_dbg("Matching FWSpec Parent found! Switched to IR-Baikal-MSI from Baikal-MSI.\n");
 	}
 	
+	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, parent); // changed in: 6b15ffa07dc325f4e4dd98c877bfa970202c378b
+	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, x86_vector_domain); // I think it should be vector domain now;
+											// MAYBE NOT. hpet uses parent. Yeah, use parent.
+	// remember that parent is just irq_domain struct pointer originaly, then irq_remapping_get_irq_domain (now irq_find_matching_fwspec) returns plat
+	// specific domain/parent, which are::: ---
+
 	d = pci_msi_create_irq_domain(fn, &bpcie_msi_domain_info, parent); // We should need non-nulls now since we use fn's:::
 	/* crashniels 6.15-baikal use msi_create_irq_domain, but that's basically the pci variant lacking a few info flags in the msi_domain_info
 	 * struct irq_domain *pci_msi_create_irq_domain(struct fwnode_handle *fwnode,
 					     struct msi_domain_info *info,
 					     struct irq_domain *parent) { */
 
-	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, parent); // changed in: 6b15ffa07dc325f4e4dd98c877bfa970202c378b
-	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, x86_vector_domain); // I think it should be vector domain now;
-											// MAYBE NOT. hpet uses parent. Yeah, use parent.
-	// remember that parent is just irq_domain struct pointer originaly, then irq_remapping_get_irq_domain (now irq_find_matching_fwspec) returns plat
-	// specific domain/parent, which are::: ---
+
 	if (d != NULL)
 		dev_set_msi_domain(&pdev->dev, d); /* for some reason this is missing in 6.15-baikal code; seems important.
 						    ((Only does dev->msi.domain = d; ifdef CONFIG_GENERIC_MSI_IRQ {which is on for PS4})) */
@@ -642,7 +653,7 @@ static int bpcie_glue_init(struct bpcie_dev *sc)
 	//sc->nvec = bpcie_assign_irqs(sc->pdev, BPCIE_NUM_SUBFUNC);
 	sc->nvec = pci_alloc_irq_vectors(sc->pdev, BPCIE_SUBFUNC_ICC+1, BPCIE_NUM_SUBFUNCS, PCI_IRQ_MSI);
 	if (sc->nvec <= 0) {
-		sc_err("Failed to assign IRQs");
+		sc_err("Failed to assign IRQs; error code: %d", sc->nvec);
 		bpcie_glue_remove(sc);
 		return -EIO;
 	}
