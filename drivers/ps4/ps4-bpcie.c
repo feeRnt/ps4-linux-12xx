@@ -348,17 +348,17 @@ static void bpcie_msi_free(struct irq_domain *domain,
 static int bpcie_msi_prepare(struct irq_domain *domain, struct device *dev,
 				  int nvec, msi_alloc_info_t *arg)
 {
-	memset(arg, 0, sizeof(*arg));
-	return 0; // This was the old stub -- it's the kernel default stub for kernel/irq/msi.c
-	//init_irq_alloc_info(arg, NULL);
+	//memset(arg, 0, sizeof(*arg));
+	//return 0; // This was the old stub -- it's the kernel default stub for kernel/irq/msi.c
+	init_irq_alloc_info(arg, NULL);
 
 	/* if (to_pci_dev(dev)->msix_enabled)
 		arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSIX;
 	else { */ // we don't use MSI-X
-	//arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
-	//pr_info("ps4-bpcie: Assigning X86_IRQ_ALLOC_TYPE_PCI_MSI in %s.\n", __func__);
+	arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
+	pr_info("ps4-bpcie: Assigning X86_IRQ_ALLOC_TYPE_PCI_MSI in %s.\n", __func__);
 	//}
-	//return 0;
+	return 0;
 
 	/* Based on pci_msi_prepare of arch/x86/kernel/apic/msi.c,
 	 * since we don't have an init_irq_alloc_info at alloc_domain anymore,
