@@ -55,8 +55,8 @@ static void bpcie_msi_write_msg(struct irq_data *data, struct msi_msg *msg)
 		return;
 	}
 
-	dev_info(data->common->msi_desc->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
-	       msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc);
+	//dev_info(data->common->msi_desc->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
+	//      msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc);
 
 	pci_msi_domain_write_msg(data, msg);
 }
@@ -326,6 +326,7 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 		if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 			//desk->nvec = desk->nvec_used = 1;
 			arg->msi_hwirq |= 0x1F; // Shared IRQ for all subfunctions
+			pr_info("ps4-bpcie: Using shared IRQ for all subfuncs due to missing flag\n");
 		}
 	#endif
 }
@@ -402,10 +403,13 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 	if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 		nvec = 1;
 		//info.msi_hwirq |= 0xff; // Shared IRQ for all subfunctions
+		pr_info("ps4-bpcie: Using shared IRQ for all subfuncs due to missing flag\n");
 	}
 #endif
-	if (dev->msi_enabled)
+	if (dev->msi_enabled) {
 		ret = nvec;
+		pr_info("ps4-bpcie: dev has-> msi_enabled; taking old number of vectors.\n");
+	}
 	else
 		ret = pci_alloc_irq_vectors(dev, 1, nvec, PCI_IRQ_MSI);
 
