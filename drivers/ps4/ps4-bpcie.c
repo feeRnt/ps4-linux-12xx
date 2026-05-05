@@ -205,7 +205,7 @@ static void bpcie_msi_calc_mask(struct irq_data *data) {
 }
 
 // in working 6.15 Aeolia/Belize style
-static void __maybe_unused bpcie_irq_msi_compose_msg(struct irq_data *data,
+static void bpcie_irq_msi_compose_msg(struct irq_data *data,
 				       struct msi_msg *msg)
 {
 	struct irq_cfg *cfg __maybe_unused = irqd_cfg(data);
@@ -241,8 +241,8 @@ static struct irq_chip bpcie_msi_controller = {
 	.irq_ack = irq_chip_ack_parent,
 	.irq_set_affinity = msi_domain_set_affinity,
 	.irq_retrigger = irq_chip_retrigger_hierarchy,
-	.irq_compose_msi_msg = x86_vector_msi_compose_msg,
-	//.irq_compose_msi_msg = bpcie_irq_msi_compose_msg,
+	//.irq_compose_msi_msg = x86_vector_msi_compose_msg,
+	.irq_compose_msi_msg = bpcie_irq_msi_compose_msg,
 	.irq_write_msi_msg = bpcie_msi_write_msg,
 	.flags = IRQCHIP_SKIP_SET_WAKE | IRQCHIP_AFFINITY_PRE_STARTUP,
 	/* (was added in ff363f480e5997051dd1de949121ffda3b753741, but it's not necessary. But maybe it is???
@@ -326,7 +326,7 @@ static int bpcie_msi_init(struct irq_domain *domain,
 	//bpcie_msi_calc_mask(data);
 
 	/* virq in irq_map eintragen */
-	/*struct bpcie_dev *sc = info->chip_data;
+	struct bpcie_dev *sc = info->chip_data;
 	if (sc) {
 		int i;
 		for (i = 0; i < 100; i++) {
@@ -335,7 +335,7 @@ static int bpcie_msi_init(struct irq_domain *domain,
 				break;
 			}
 		}
-	}*/
+	}
 	return 0;
 }
 
@@ -400,7 +400,7 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	if (!sc_dev) {
 		pr_err("ps4-bpcie: sc_dev slot not found! Kernel crash incoming?!\n"); // TODO: Fix this. Lol
 	}
-	arg->devid = pci_dev_id(sc_dev); // devid is always 14.4 -- IRQs seemingly originate from pci 14.4
+	arg->devid = pci_dev_id(sc_dev); // devid is always 14.4 -- 'IRQs "come from" function 4 [14.4] as far as the IOMMU/system see'
 	arg->desc = desc; // assign desc... removed in 6.15 for some reason? Seems breakworthy to remove
 			  // Since this is .set_desc function, we should reliably set descs ourselves.
 
@@ -455,7 +455,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	/* this pattern used in Aeolia will allocate only one domain for pci function (14.4). That's fine for Aeolia
 	 * but not Baikal where we have one domain for each pci function in 14.x. */
 
-	sc_info("allocating fwnode for name=%s devid=%d\n", bpcie_msi_controller.name, pci_dev_id(pdev));
+	sc_info("allocating fwnode for name=%s devid=%d\n", "Baikal-MSI", pci_dev_id(pdev));
 	//fn = irq_domain_alloc_named_id_fwnode(bpcie_msi_controller.name, pci_dev_id(pdev)); // per pdev; don't use since we update controller.name after match
 	fn = irq_domain_alloc_named_id_fwnode("Baikal-MSI", pci_dev_id(pdev)); // per pdev
 	if (!fn) {
@@ -731,7 +731,7 @@ static int bpcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 		goto disable_dev;
 	}
 	sc->pdev = dev;
-	/*memset(sc->irq_map, -1, sizeof(sc->irq_map));*/
+	memset(sc->irq_map, -1, sizeof(sc->irq_map));
 	pci_set_drvdata(dev, sc);
 
 	// eMMC ... unused?
