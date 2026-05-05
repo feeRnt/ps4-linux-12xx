@@ -58,7 +58,7 @@ static void bpcie_msi_write_msg(struct irq_data *data, struct msi_msg *msg)
 		return;
 	}
 
-	dev_dbg(data->common->msi_desc->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
+	dev_info(data->common->msi_desc->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
 	       msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc);
 
 	pci_msi_domain_write_msg(data, msg); //check this -- looks fine
@@ -111,7 +111,7 @@ static void bpcie_msi_unmask(struct irq_data *data)
 						: "eax", "ebx", "edx");
 	msi_mask = result;
 
-	dev_dbg(data->common->msi_desc->dev, "bpcie_msi_unmask(msi_mask=0x%X, msi_allocated=0x%X)\n", msi_mask, msi_allocated);
+	dev_info(data->common->msi_desc->dev, "bpcie_msi_unmask(msi_mask=0x%X, msi_allocated=0x%X)\n", msi_mask, msi_allocated);
 	//msi_mask = 0;
 	//pci_write_config_dword(pdev, desc->mask_pos, //moved
 	pci_write_config_dword(pdev, desc->pci.mask_pos,
@@ -169,7 +169,7 @@ static void bpcie_msi_mask(struct irq_data *data)
 		msi_mask = result;
     }
 	
-	dev_dbg(data->common->msi_desc->dev, "bpcie_msi_mask(msi_mask=0x%X, msi_allocated=0x%X)\n", msi_mask, msi_allocated);
+	dev_info(data->common->msi_desc->dev, "bpcie_msi_mask(msi_mask=0x%X, msi_allocated=0x%X)\n", msi_mask, msi_allocated);
 	//msi_mask = 0;
 	//pci_write_config_dword(pdev, desc->mask_pos,
 	pci_write_config_dword(pdev, desc->pci.mask_pos,
@@ -186,7 +186,7 @@ static void bpcie_msi_calc_mask(struct irq_data *data) {
 	//struct bpcie_dev *sc = data->chip_data;
 	u8 subfunc = get_subfunc(data->hwirq);//data->hwirq & 0xff; // hwirq & 0x1f
 	data->mask = 1 << subfunc;
-	dev_dbg(data->common->msi_desc->dev, "bpcie_msi_calc_mask(0x%X)\n", data->mask);
+	dev_info(data->common->msi_desc->dev, "bpcie_msi_calc_mask(0x%X)\n", data->mask);
 	
 	/*
   num_of_alloc_messages = ivars->cfg.msi.msi_alloc;
@@ -318,7 +318,7 @@ static int bpcie_msi_init(struct irq_domain *domain,
 			 irq_hw_number_t hwirq, msi_alloc_info_t *arg)
 {
 	struct irq_data *data;
-	pr_devel("bpcie_msi_init(%p, %p, %d, 0x%lx, %p)\n", domain, info, virq, hwirq, arg);
+	pr_info("bpcie_msi_init(%p, %p, %d, 0x%lx, %p)\n", domain, info, virq, hwirq, arg);
 
 	data = irq_domain_get_irq_data(domain, virq);
 	irq_domain_set_info(domain, virq, hwirq, info->chip, info->chip_data,
@@ -342,7 +342,7 @@ static int bpcie_msi_init(struct irq_domain *domain,
 static void bpcie_msi_free(struct irq_domain *domain,
 			  struct msi_domain_info *info, unsigned int virq)
 {
-	pr_devel("bpcie_msi_free(%d)\n", virq);
+	pr_info("bpcie_msi_free(%d)\n", virq);
 }
 
 static int bpcie_msi_prepare(struct irq_domain *domain, struct device *dev,
@@ -418,6 +418,7 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 			//desk->nvec = desk->nvec_used = 1;
 			//arg->msi_hwirq |= 0x1F; // Shared IRQ for all subfunctions
 			arg->hwirq |= 0x1F; // Shared IRQ for all subfunctions
+			pr_info("ps4-bpcie: Using shared IRQ for all subfuncs due to missing flag\n");
 		}
 	#endif
 }
@@ -431,7 +432,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	struct fwnode_handle *fn;
 	struct irq_fwspec fwspec;
 
-	dev_dbg(&pdev->dev, "bpcie_create_irq_domain\n");
+	dev_info(&pdev->dev, "bpcie_create_irq_domain\n");
 	if (x86_vector_domain == NULL) {
 		dev_err(&pdev->dev, "bpcie: x86_vector_domain is NULL\n");
 		return NULL;
@@ -474,14 +475,14 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // should return the same IR-Baikal-MSI parent for all domains?
 
 	if (!parent) {
-		sc_dbg("no parent, assigning x86_vector_domain; will break things!\n");
+		sc_info("no parent, assigning x86_vector_domain; will break things!\n");
 		parent = x86_vector_domain;
 	} else if (parent == x86_vector_domain) {
-		sc_dbg("x86_vector_domain found; wrong parent; will break!\n");
+		sc_info("x86_vector_domain found; wrong parent; will break!\n");
 	} else {
 		bpcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
 		bpcie_msi_controller.name = "IR-Baikal-MSI"; // TODO: rename controller only after all fwspecs have been assigned a parent
-		sc_dbg("Matching FWSpec Parent found! Switched to IR-Baikal-MSI from Baikal-MSI.\n");
+		sc_info("Matching FWSpec Parent found! Switched to IR-Baikal-MSI from Baikal-MSI.\n");
 	}
 	
 	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, parent); // changed in: 6b15ffa07dc325f4e4dd98c877bfa970202c378b
@@ -551,12 +552,13 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 	bare_dev = &sc->pdev->dev;
 
 	info.hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5); */
-	dev_dbg(&dev->dev, "bpcie_assign_irqs(%d)\n", nvec);
+	dev_info(&dev->dev, "bpcie_assign_irqs(%d)\n", nvec);
 #ifndef QEMU_HACK_NO_IOMMU
 	if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 		nvec = 1;
 		//info.msi_hwirq |= 0xff; // Shared IRQ for all subfunctions
 		//info.hwirq |= 0xff; // Shared IRQ for all subfunctions // TODO: why not have 0x1f?
+		pr_info("ps4-bpcie: Using shared IRQ for all subfuncs due to missing flag\n");
 	}
 #endif
 	/*desc = msi_alloc_desc(bare_dev, nvec, NULL);
@@ -582,7 +584,7 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 	*/
 
 fail: // Not actually a fail condition; we get here at the end of the func.
-	dev_dbg(&dev->dev, "bpcie_assign_irqs returning %d\n", ret);
+	dev_info(&dev->dev, "bpcie_assign_irqs returning %d\n", ret);
 	if (sc_dev)
 		pci_dev_put(sc_dev);
 	return ret;
@@ -664,7 +666,7 @@ static int bpcie_glue_init(struct bpcie_dev *sc)
 		bpcie_glue_remove(sc);
 		return -EIO;
 	}
-	sc_dbg("dev->irq=%d\n", sc->pdev->irq);
+	sc_info("dev->irq=%d\n", sc->pdev->irq);
 	
 	return 0;
 }
@@ -715,7 +717,7 @@ static int bpcie_probe(struct pci_dev *dev, const struct pci_device_id *id) {
 	struct bpcie_dev *sc;
 	int ret;
 
-	dev_dbg(&dev->dev, "bpcie_probe()\n");
+	dev_info(&dev->dev, "bpcie_probe()\n");
 
 	ret = pci_enable_device(dev);
 	if (ret) {
