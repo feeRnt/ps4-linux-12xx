@@ -1623,6 +1623,7 @@ unsigned int ata_exec_internal(struct ata_device *dev, struct ata_taskfile *tf,
 			ata_port_freeze(ap);
 			ata_dev_warn(dev, "qc timeout after %u msecs (cmd 0x%x)\n",
 				     timeout, command);
+			dump_stack(); // try to find caller. IRQ race condition?
 		}
 		spin_unlock_irqrestore(ap->lock, flags);
 	}
