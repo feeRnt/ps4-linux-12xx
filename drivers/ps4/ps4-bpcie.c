@@ -398,7 +398,7 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	sc_dev = pci_get_slot(dev->bus, sc_devfn); // = 14.4
 	//arg->msi_dev = sc_dev; // removed after a certain commit
 	if (!sc_dev) {
-		pr_err("ps4-bpcie: sc_dev slot not found! Kernel crash incoming?!\n");
+		pr_err("ps4-bpcie: sc_dev slot not found! Kernel crash incoming?!\n"); // TODO: Fix this. Lol
 	}
 	arg->devid = pci_dev_id(sc_dev); // devid is always 14.4 -- IRQs seemingly originate from pci 14.4
 	arg->desc = desc; // assign desc... removed in 6.15 for some reason? Seems breakworthy to remove
@@ -480,7 +480,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 		sc_dbg("x86_vector_domain found; wrong parent; will break!\n");
 	} else {
 		bpcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
-		bpcie_msi_controller.name = "IR-Baikal-MSI"; // TODO: rename controller only after all fwspces have been assigned a parent
+		bpcie_msi_controller.name = "IR-Baikal-MSI"; // TODO: rename controller only after all fwspecs have been assigned a parent
 		sc_dbg("Matching FWSpec Parent found! Switched to IR-Baikal-MSI from Baikal-MSI.\n");
 	}
 	
