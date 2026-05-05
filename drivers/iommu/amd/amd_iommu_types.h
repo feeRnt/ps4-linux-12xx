@@ -500,7 +500,7 @@ extern bool amdr_ivrs_remap_support;
 #define PCI_SBDF_TO_SEGID(sbdf)		(((sbdf) >> 16) & 0xffff)
 #define PCI_SBDF_TO_DEVID(sbdf)		((sbdf) & 0xffff)
 #define PCI_SEG_DEVID_TO_SBDF(seg, devid)	((((u32)(seg) & 0xffff) << 16) | \
-						 ((devid) & 0xffff))
+						 ((devid) & 0xffff)) // should be fine
 
 /* Make iterating over all pci segment easier */
 #define for_each_pci_segment(pci_seg) \

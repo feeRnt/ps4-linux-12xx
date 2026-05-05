@@ -717,6 +717,7 @@ static int x86_vector_select(struct irq_domain *d, struct irq_fwspec *fwspec,
 		return 0;
 
 	return x86_fwspec_is_ioapic(fwspec) || x86_fwspec_is_hpet(fwspec) || x86_fwspec_is_aeolia(fwspec) || x86_fwspec_is_baikal(fwspec);
+	// should succeed irq_find_matching_fwspec
 }
 
 static const struct irq_domain_ops x86_vector_domain_ops = {

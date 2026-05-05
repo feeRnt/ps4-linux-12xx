@@ -285,7 +285,7 @@ static inline int get_device_sbdf_id(struct device *dev)
 	int sbdf;
 
 	if (dev_is_pci(dev))
-		sbdf = get_pci_sbdf_id(to_pci_dev(dev));
+		sbdf = get_pci_sbdf_id(to_pci_dev(dev)); // should be fine
 	else
 		sbdf = get_acpihid_device_id(dev, NULL);
 

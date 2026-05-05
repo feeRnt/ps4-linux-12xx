@@ -395,10 +395,10 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	unsigned int sc_devfn;
 	struct pci_dev *sc_dev;
 	sc_devfn = (dev->devfn & ~7) | BAIKAL_FUNC_ID_PCIE;
-	sc_dev = pci_get_slot(dev->bus, sc_devfn);
+	sc_dev = pci_get_slot(dev->bus, sc_devfn); // = 14.4
 	//arg->msi_dev = sc_dev; // removed after a certain commit
 
-	// arg->devid does not exist either
+	arg->devid = pci_dev_id(sc_dev); // devid is always 14.4
 	arg->desc = desc; // assign desc... removed in 6.15 for some reason? Seems breakworthy to remove
 			  // Since this is .set_desc function, we should reliably set descs ourselves.
 
@@ -467,7 +467,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	// fwspec.param[0] = pci_dev_id(sc->pdev); // (14.4); Aeolia-style
 	fwspec.param[0] = pci_dev_id(pdev);	   // (14.x); Baikal style?
 
-	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY);
+	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // should return the same IR-Baikal-MSI parent for all domains?
 
 	if (!parent) {
 		sc_dbg("no parent, assigning x86_vector_domain; will break things!\n");
@@ -608,6 +608,8 @@ static void bpcie_create_irq_domains(struct bpcie_dev *sc) {
 	for (func = 0; func < BAIKAL_NUM_FUNCS; ++func) {
 		struct pci_dev * bpcie_pdev = get_bpcie_device(sc, func);
 		if (bpcie_pdev) {
+			// TODO: Should we really be creating 8 IRQ domains instead of just the 14.4 like how
+			// Aeolia does it?
 			struct irq_domain * domain = bpcie_create_irq_domain(sc, bpcie_pdev);
 			if (func == BAIKAL_FUNC_ID_PCIE) sc->irqdomain = domain;
 			pci_dev_put(bpcie_pdev);

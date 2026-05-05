@@ -142,9 +142,9 @@ static inline void *iommu_phys_to_virt(unsigned long paddr)
 static inline int get_pci_sbdf_id(struct pci_dev *pdev)
 {
 	int seg = pci_domain_nr(pdev->bus);
-	u16 devid = pci_dev_id(pdev);
+	u16 devid = pci_dev_id(pdev); // seems fine
 
-	return PCI_SEG_DEVID_TO_SBDF(seg, devid);
+	return PCI_SEG_DEVID_TO_SBDF(seg, devid); // should be fine
 }
 
 /*
