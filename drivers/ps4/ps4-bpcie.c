@@ -397,7 +397,9 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	sc_devfn = (dev->devfn & ~7) | BAIKAL_FUNC_ID_PCIE;
 	sc_dev = pci_get_slot(dev->bus, sc_devfn); // = 14.4
 	//arg->msi_dev = sc_dev; // removed after a certain commit
-
+	if (!sc_dev) {
+		pr_err("ps4-bpcie: sc_dev slot not found! Kernel crash incoming?!\n");
+	}
 	arg->devid = pci_dev_id(sc_dev); // devid is always 14.4 -- IRQs seemingly originate from pci 14.4
 	arg->desc = desc; // assign desc... removed in 6.15 for some reason? Seems breakworthy to remove
 			  // Since this is .set_desc function, we should reliably set descs ourselves.
@@ -454,7 +456,8 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	 * but not Baikal where we have one domain for each pci function in 14.x. */
 
 	sc_info("allocating fwnode for name=%s devid=%d\n", bpcie_msi_controller.name, pci_dev_id(pdev));
-	fn = irq_domain_alloc_named_id_fwnode(bpcie_msi_controller.name, pci_dev_id(pdev)); // per pdev
+	//fn = irq_domain_alloc_named_id_fwnode(bpcie_msi_controller.name, pci_dev_id(pdev)); // per pdev; don't use since we update controller.name after match
+	fn = irq_domain_alloc_named_id_fwnode("Baikal-MSI", pci_dev_id(pdev)); // per pdev
 	if (!fn) {
 		sc_err("failed to allocate named fwnode, returning NULL.\n");
 		return NULL;
@@ -466,7 +469,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	// It should be correct to put the pci device id in here
 	fwspec.param[0] = pci_dev_id(sc->pdev); // (14.4); Aeolia-style
 	//fwspec.param[0] = pci_dev_id(pdev);	   // (14.x); Baikal style? // the IR and irq_alloc_info MSI devids should match most likely.
-						   // It does not affect domain creation, but it's just used to find a matching IR for IOMMU
+						   // This does not affect domain creation, but it's just used to find a matching IR for IOMMU
 
 	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // should return the same IR-Baikal-MSI parent for all domains?
 
@@ -477,7 +480,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 		sc_dbg("x86_vector_domain found; wrong parent; will break!\n");
 	} else {
 		bpcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
-		bpcie_msi_controller.name = "IR-Baikal-MSI";
+		bpcie_msi_controller.name = "IR-Baikal-MSI"; // TODO: rename controller only after all fwspces have been assigned a parent
 		sc_dbg("Matching FWSpec Parent found! Switched to IR-Baikal-MSI from Baikal-MSI.\n");
 	}
 	
