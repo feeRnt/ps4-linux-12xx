@@ -221,6 +221,7 @@ static void bpcie_irq_msi_compose_msg(struct irq_data *data,
 		int i;
 		msg->data = data->irq - 1;
 		if (sc) {
+			pr_info("bpcie_irq_msi_compose_msg: irq=%d; searching irq_map, sc=%p\n", data->irq, sc);
 			for (i = 0; i < 100; i++) {
 				if (sc->irq_map[i] == data->irq) {
 					msg->data = i;
@@ -389,6 +390,7 @@ static struct msi_domain_info bpcie_msi_domain_info = {
 static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 				    struct msi_desc *desc)
 {
+	pr_info("ps4-bpcie: Called %s\n", __func__);
 	struct pci_dev *dev = msi_desc_to_pci_dev(desc);
 	arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 	//IRQs "come from" function 4 as far as the IOMMU/system see
@@ -411,16 +413,27 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	//arg->msi_hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5); //this is info. for Aeolia. --- This comment is magic. don't read it
 	arg->hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5);
 
-	#ifndef QEMU_HACK_NO_IOMMU
-		// info.flags = X86_IRQ_ALLOC_CONTIGUOUS_VECTORS; // This was removed in d474d92d70250d43e7ce0c7cb8623f31ee7c40f6
-		// Shouldn't be needed anymore
-		if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
-			//desk->nvec = desk->nvec_used = 1;
-			//arg->msi_hwirq |= 0x1F; // Shared IRQ for all subfunctions
-			arg->hwirq |= 0x1F; // Shared IRQ for all subfunctions
-			pr_info("ps4-bpcie: Using shared IRQ for all subfuncs due to missing flag\n");
-		}
-	#endif
+#ifndef QEMU_HACK_NO_IOMMU
+	// info.flags = X86_IRQ_ALLOC_CONTIGUOUS_VECTORS; // This was removed in d474d92d70250d43e7ce0c7cb8623f31ee7c40f6
+	// Shouldn't be needed anymore
+	if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
+		//desk->nvec = desk->nvec_used = 1;
+		//arg->msi_hwirq |= 0x1F; // Shared IRQ for all subfunctions
+		arg->hwirq |= 0x1F; // Shared IRQ for all subfunctions
+		pr_info("ps4-bpcie: Using shared IRQ for all subfuncs due to missing flag\n");
+	}
+#endif
+
+	/* Reassign the msi_alloc_info's descriptor's device to 14.4
+	 * because all interrupts come from the AEOLIA/BELIZE/BAIKAL PCIe chip (PCI 14.4)
+	 * Maybe this has an effect on IRQs being routed properly? Trying to fix:
+	 * [    3.262519] baikal_pcie 0000:00:14.4: AMD-Vi: Event logged [IO_PAGE_FAULT domain=0x0001 address=0xfdf8220000 flags=0x0008]*/
+
+	if (arg->desc->dev != &sc_dev->dev) {
+		pr_info("ps4-bpcie: Reassigning device 14.%u (devfn=%u) hwirq=0x%lx to 14.4\n",
+			PCI_FUNC(dev->devfn), dev->devfn, arg->hwirq);
+		arg->desc->dev = &sc_dev->dev;
+	}
 }
 
 struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev *pdev)//similar to native_setup_msi_irqs (now, ~6.0, hpet_create_irq_domain)
