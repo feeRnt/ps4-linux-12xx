@@ -342,6 +342,7 @@ static int ahci_init_one(struct pci_dev *pdev)
 	host_deactivate:
 	release_host:
 	unmap_registers:
+		axhci->host = NULL; // otherwise kernel OOPS from NULL pointer deref if port[i] is uninitialized? Not sure if this is the right fix
 		iounmap(hpriv->mmio);
 	release_mem_region:
 		//release_mem_region(rsrc_start, rsrc_len);
