@@ -351,15 +351,6 @@ static int bpcie_msi_prepare(struct irq_domain *domain, struct device *dev,
 {
 	//memset(arg, 0, sizeof(*arg));
 	//return 0; // This was the old stub -- it's the kernel default stub for kernel/irq/msi.c
-	init_irq_alloc_info(arg, NULL);
-
-	/* if (to_pci_dev(dev)->msix_enabled)
-		arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSIX;
-	else { */ // we don't use MSI-X
-	arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
-	pr_info("ps4-bpcie: Assigning X86_IRQ_ALLOC_TYPE_PCI_MSI in %s.\n", __func__);
-	//}
-	return 0;
 
 	/* Based on pci_msi_prepare of arch/x86/kernel/apic/msi.c,
 	 * since we don't have an init_irq_alloc_info at alloc_domain anymore,
@@ -367,6 +358,24 @@ static int bpcie_msi_prepare(struct irq_domain *domain, struct device *dev,
 	 * which does not assign the alloc_info type nor init it.
 
 	 * This function should be called by msi_domain_prepare_irqs in kernel/irq/msi.c */
+
+	struct pci_dev *pdev = NULL;
+	init_irq_alloc_info(arg, NULL);
+
+	/* if (to_pci_dev(dev)->msix_enabled)
+		arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSIX;
+	else { */ // we don't use MSI-X
+	arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
+
+	if (dev_is_pci(dev)) {
+		pdev = to_pci_dev(dev);
+	} else
+		pr_info("ps4-bpcie: non-PCI device in MSI prepare\n");
+
+	pr_info("ps4-bpcie: Assigning X86_IRQ_ALLOC_TYPE_PCI_MSI in %s, for device %d.%d\n",
+			__func__, pdev ? PCI_SLOT(pdev->devfn): 99, pdev ? PCI_FUNC(pdev->devfn) : 99);
+	return 0;
+	//}
 }
 
 static struct msi_domain_ops bpcie_msi_domain_ops = {
@@ -390,12 +399,14 @@ static struct msi_domain_info bpcie_msi_domain_info = {
 static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 				    struct msi_desc *desc)
 {
-	pr_info("ps4-bpcie: Called %s\n", __func__);
 	struct pci_dev *dev = msi_desc_to_pci_dev(desc);
 	arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 	//IRQs "come from" function 4 as far as the IOMMU/system see
 	unsigned int sc_devfn;
 	struct pci_dev *sc_dev;
+
+	pr_info("ps4-bpcie: Called %s\n", __func__);
+
 	sc_devfn = (dev->devfn & ~7) | BAIKAL_FUNC_ID_PCIE;
 	sc_dev = pci_get_slot(dev->bus, sc_devfn); // = 14.4
 	//arg->msi_dev = sc_dev; // removed after a certain commit
@@ -428,12 +439,14 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	 * because all interrupts come from the AEOLIA/BELIZE/BAIKAL PCIe chip (PCI 14.4)
 	 * Maybe this has an effect on IRQs being routed properly? Trying to fix:
 	 * [    3.262519] baikal_pcie 0000:00:14.4: AMD-Vi: Event logged [IO_PAGE_FAULT domain=0x0001 address=0xfdf8220000 flags=0x0008]*/
-
 	if (arg->desc->dev != &sc_dev->dev) {
 		pr_info("ps4-bpcie: Reassigning device 14.%u (devfn=%u) hwirq=0x%lx to 14.4\n",
 			PCI_FUNC(dev->devfn), dev->devfn, arg->hwirq);
-		arg->desc->dev = &sc_dev->dev;
+		arg->desc->dev = &sc_dev->dev; //basically the old arg->msi_dev = sc_dev, but this takes a device directly now (instead of pdev)
 	}
+
+	pr_info("ps4-bpcie: Finished setting descriptor for PCI device: %d.%d, using devid 14.4\n",
+			PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
 }
 
 struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev *pdev)//similar to native_setup_msi_irqs (now, ~6.0, hpet_create_irq_domain)
@@ -462,9 +475,9 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	//info.devid = pci_dev_id(pdev);	// (14.x); Baikal style? */
 
 	//parent = irq_remapping_get_ir_irq_domain(&info); //removed after irq_remapping_get_irq_domain
-	
+
 	//parent = irq_remapping_get_irq_domain(&info); // removed after fwspec
-	
+
 	//fn = irq_domain_alloc_named_id_fwnode(bpcie_msi_controller.name, pci_dev_id(sc->pdev));
 	/* this pattern used in Aeolia will allocate only one domain for pci function (14.4). That's fine for Aeolia
 	 * but not Baikal where we have one domain for each pci function in 14.x. */
@@ -497,7 +510,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 		bpcie_msi_controller.name = "IR-Baikal-MSI"; // TODO: rename controller only after all fwspecs have been assigned a parent
 		sc_info("Matching FWSpec Parent found! Switched to IR-Baikal-MSI from Baikal-MSI.\n");
 	}
-	
+
 	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, parent); // changed in: 6b15ffa07dc325f4e4dd98c877bfa970202c378b
 	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, x86_vector_domain); // I think it should be vector domain now;
 											// MAYBE NOT. hpet uses parent. Yeah, use parent.

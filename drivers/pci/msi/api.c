@@ -234,8 +234,13 @@ EXPORT_SYMBOL(pci_disable_msix);
 int pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
 			  unsigned int max_vecs, unsigned int flags)
 {
-	return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs,
-					      flags, NULL);
+	int ret;
+
+	ret = pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs,
+			flags, NULL);
+
+	pr_warn("pci_alloc_irq_vectors: Returning %d\n", ret);
+	return ret;
 }
 EXPORT_SYMBOL(pci_alloc_irq_vectors);
 
