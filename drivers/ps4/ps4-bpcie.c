@@ -413,7 +413,10 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	if (!sc_dev) {
 		pr_err("ps4-bpcie: sc_dev slot not found! Kernel crash incoming?!\n"); // TODO: Fix this. Lol
 	}
-	arg->devid = pci_dev_id(sc_dev); // devid is always 14.4 -- 'IRQs "come from" function 4 [14.4] as far as the IOMMU/system see'
+	//arg->devid = pci_dev_id(sc_dev); // Aeolia-style -- devid is always 14.4 -- 'IRQs "come from" function 4 [14.4] as far as the IOMMU/system see'
+					 // but Baikal also used this natively?
+	arg->devid = pci_dev_id(dev); //Baikal-style? 14.x. We probably shuoldn't do this but try anyway for now
+
 	arg->desc = desc; // assign desc... removed in 6.15 for some reason? Seems breakworthy to remove
 			  // Since this is .set_desc function, we should reliably set descs ourselves.
 
