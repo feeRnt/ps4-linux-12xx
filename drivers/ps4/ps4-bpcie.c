@@ -439,11 +439,15 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	 * because all interrupts come from the AEOLIA/BELIZE/BAIKAL PCIe chip (PCI 14.4)
 	 * Maybe this has an effect on IRQs being routed properly? Trying to fix:
 	 * [    3.262519] baikal_pcie 0000:00:14.4: AMD-Vi: Event logged [IO_PAGE_FAULT domain=0x0001 address=0xfdf8220000 flags=0x0008]*/
+	/*
 	if (arg->desc->dev != &sc_dev->dev) {
 		pr_info("ps4-bpcie: Reassigning device 14.%u (devfn=%u) hwirq=0x%lx to 14.4\n",
 			PCI_FUNC(dev->devfn), dev->devfn, arg->hwirq);
 		arg->desc->dev = &sc_dev->dev; //basically the old arg->msi_dev = sc_dev, but this takes a device directly now (instead of pdev)
-	}
+	}*/ // Seems to cause weird kernel panic errors:
+		/*[   17.568805] baikal_pcie 0000:00:14.4: icc: interrupted or timeout: ret = 0
+		 *[   17.575833] [drm:ps4_bridge_disable] *ERROR* icc i2c commandqueue failed: -110
+		 *[   17.583200] [drm:ps4_bridge_disable] *ERROR* Failed to disable bridge*/
 
 	pr_info("ps4-bpcie: Finished setting descriptor for PCI device: %d.%d, using devid 14.4\n",
 			PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
@@ -494,9 +498,13 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	fwspec.param_count = 1;
 
 	// It should be correct to put the pci device id in here
-	fwspec.param[0] = pci_dev_id(sc->pdev); // (14.4); Aeolia-style
-	//fwspec.param[0] = pci_dev_id(pdev);	   // (14.x); Baikal style? // the IR and irq_alloc_info MSI devids should match most likely.
-						   // This does not affect domain creation, but it's just used to find a matching IR for IOMMU
+	//fwspec.param[0] = pci_dev_id(sc->pdev); // (14.4); Aeolia-style
+	fwspec.param[0] = pci_dev_id(pdev);	   // (14.x); Baikal style? // the IR and irq_alloc_info MSI devids should match most likely.
+						   /* This does not affect domain creation, but it's just used to find a matching IR for IOMMU <--
+						    * maybe I was wrong about this statement: iommu = __rlookup_amd_iommu((devid >> 16), (devid & 0xffff));
+						    * devid is accessed as devid = fwspec.param[0] in IOMMU
+						    *
+						    * Will bad assumptions kill us all? */
 
 	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // should return the same IR-Baikal-MSI parent for all domains?
 
