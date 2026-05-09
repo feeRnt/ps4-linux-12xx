@@ -871,13 +871,16 @@ static void amd_iommu_report_page_fault(struct amd_iommu *iommu,
 		if (__ratelimit(&dev_data->rs)) {
 			pci_err(pdev, "Event logged [IO_PAGE_FAULT domain=0x%04x address=0x%llx flags=0x%04x]\n",
 				domain_id, address, flags);
+#ifdef CONFIG_X86_PS4
+			dump_stack(); //debug this for now
+#endif
 		}
 	} else {
 		pr_err_ratelimited("Event logged [IO_PAGE_FAULT device=%04x:%02x:%02x.%x domain=0x%04x address=0x%llx flags=0x%04x]\n",
 			iommu->pci_seg->id, PCI_BUS_NUM(devid), PCI_SLOT(devid), PCI_FUNC(devid),
 			domain_id, address, flags);
 #ifdef CONFIG_X86_PS4
-		dump_stack(); //debug this for now
+		dump_stack(); //debug this for now -- why did I add this here and not above? oxidative stress?
 #endif
 	}
 
