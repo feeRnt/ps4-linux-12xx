@@ -372,7 +372,7 @@ static int bpcie_msi_prepare(struct irq_domain *domain, struct device *dev,
 	} else
 		pr_info("ps4-bpcie: non-PCI device in MSI prepare\n");
 
-	pr_info("ps4-bpcie: Assigning X86_IRQ_ALLOC_TYPE_PCI_MSI in %s, for device %d.%d\n",
+	pr_info("ps4-bpcie: Assigning X86_IRQ_ALLOC_TYPE_PCI_MSI in %s, for device %02x.%x\n",
 			__func__, pdev ? PCI_SLOT(pdev->devfn): 99, pdev ? PCI_FUNC(pdev->devfn) : 99);
 	return 0;
 	//}
@@ -452,8 +452,8 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 		 *[   17.575833] [drm:ps4_bridge_disable] *ERROR* icc i2c commandqueue failed: -110
 		 *[   17.583200] [drm:ps4_bridge_disable] *ERROR* Failed to disable bridge*/
 
-	pr_info("ps4-bpcie: Finished setting descriptor for PCI device: %d.%d, using devid 14.4\n",
-			PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn));
+	pr_info("ps4-bpcie: Finished setting descriptor for PCI device: %02x.%x, using devid %d (%x)\n",
+			PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn), arg->devid, arg->devid);
 }
 
 struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev *pdev)//similar to native_setup_msi_irqs (now, ~6.0, hpet_create_irq_domain)
