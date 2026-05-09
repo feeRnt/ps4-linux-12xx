@@ -355,8 +355,12 @@ static int msi_capability_init(struct pci_dev *dev, int nvec,
 	int ret;
 
 	/* Reject multi-MSI early on irq domain enabled architectures */
-	if (nvec > 1 && !pci_msi_domain_supports(dev, MSI_FLAG_MULTI_PCI_MSI, ALLOW_LEGACY))
+	if (nvec > 1 && !pci_msi_domain_supports(dev, MSI_FLAG_MULTI_PCI_MSI, ALLOW_LEGACY)) {
+		pr_err("pci-msi: Rejecting multi-MSI early due to nvec > 1 and domain not supporting multi PCI MSI.\n");
+		// We should not be hitting this check due to hierarchical domain with default MSI_domain alloc ops, but log it anyway
 		return 1;
+	}
+	pr_info("pci-msi: Accepted multi-MSI in %s.\n", __func__);
 
 	/*
 	 * Disable MSI during setup in the hardware, but mark it enabled

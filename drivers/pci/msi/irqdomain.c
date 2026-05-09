@@ -352,9 +352,13 @@ bool pci_msi_domain_supports(struct pci_dev *pdev, unsigned int feature_mask,
 
 	domain = dev_get_msi_domain(&pdev->dev);
 
-	if (!domain || !irq_domain_is_hierarchy(domain)) {
-		if (IS_ENABLED(CONFIG_PCI_MSI_ARCH_FALLBACKS))
+	if (!domain || !irq_domain_is_hierarchy(domain)) { // we should be passing this hierarchy check with default MSI domain ops, but ensure it
+							   // /d2a463b297415ca6dd4d60bb1c867dd7c931587b -- relevant commit
+		if (IS_ENABLED(CONFIG_PCI_MSI_ARCH_FALLBACKS)) {
+			pr_warn("pci-irqdomain: PCI_MSI_ARCH_FALLBACKS enabled and !domain or !irq_domain_is_hierarchy, returning.\n");
 			return mode == ALLOW_LEGACY;
+		}
+		pr_warn("pci-irqdomain: !domain or !irq_domain_is_hierarchy, returning false in %s.\n", __func__);
 		return false;
 	}
 
@@ -374,7 +378,7 @@ bool pci_msi_domain_supports(struct pci_dev *pdev, unsigned int feature_mask,
 		 * per device domain because the parent is never
 		 * expanding the PCI/MSI functionality.
 		 */
-		supported = domain->msi_parent_ops->supported_flags;
+		supported = domain->msi_parent_ops->supported_flags; //check this
 	}
 
 	return (supported & feature_mask) == feature_mask;
