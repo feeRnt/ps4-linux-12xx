@@ -14,7 +14,8 @@ valeryy (no Github - contributed to PS4 Baikal southbridges),
 [crashniels](https://github.com/crashniels/linux/),     
 [saya](https://www.youtube.com/channel/UCc20KAcPCj9Ut8IQF3umSjg),    
 [whitehax0r](https://github.com/whitehax0r/ps4-linux-baikal),    
-[DFAUS](https://github.com/DFAUS-git/ps4-baikal-5.4.247-kernel) -- and others.
+[DFAUS](https://github.com/DFAUS-git/ps4-baikal-5.4.247-kernel)  
+[rmuxnet](https:/github.com/rmuxnet/ps4-linux-12xx) -- and others.
 
 For a more detailed credits section, check out [this page](https://dionkill.github.io/ps4-linux-tutorial/ending.html#kernel-developers).
 
@@ -121,8 +122,7 @@ However, it probably runs on Aeolia models, unlike the \*-belize -only branches.
 ----
 
 The main release branches are:    
-- `5.15.15-belize` : The clean WiFi, Blackscreen & other misc. fixes' branch for Kernel version 5.15.15 on Belize southbridges.  
-This is the primary branch of the repo.   
+- `5.15.15-belize` : The clean WiFi, Blackscreen & other misc. fixes' branch for Kernel version 5.15.15 on Belize southbridges.   
 
 - `5.15.189-belize` : The clean WiFi & Blackscreen fix branch for Kernel version 5.15.189 on Belize southbridges.  
 (Not as well maintained as 5.15.15)
@@ -131,7 +131,8 @@ This is the primary branch of the repo.
 Based on DFAUS' source.
 
 - `6.15.4-aeolia-belize-crashniels` : The clean WiFi, Blackscreen & other misc. fixes' branch for Kernel version 6.15.4, on Aeolia/Belize southbridges.    
-Based on crashniels' source.
+Based on crashniels' source.  
+This is the primary branch of the repo.
 
 <br>
 
@@ -285,14 +286,21 @@ Pull requests/code contributions are always welcome.
 <br>
 
 ---
-## Documentation, Guides and the PS4 Linux Future (As of December 2025)
+## Documentation, Guides and the PS4 Linux Future (As of May 2026)
 
 While many of the bugs and issues prevalent in PS4 Linux kernels, and PS4 Linux in general have been fixed over the years, many of them still exist, and are seldom worked on.  
 A few honorable mentions aimed at improving this scene go to:
 
-1. Blackscreen/No Display/Unsupported Monitor issue:
-    - https://github.com/oberdfr/kernel-ps4linux/tree/ps4-linux-v6.17.1-custom-resolution:  
-attempts at using the display EDID information from your monitor, to use in Linux. This aims to improve the various blackscreen issues for monitors that don't support 1080p, or when using a capture card.  
+1. 6.18, 7.0 Kernels, Kernel Fan Driver, ICC Drivers, Display, GPU and Mesa Fixes:
+    - https://github.com/rmuxnet/ps4-linux-12xx
+    - https://github.com/sony-jaguar-devs  
+The latest repo with a dedicated developer and group for improving PS4 Linux, check them out and all their different development branches  
+Originally based on the sources from this repo (6.15.4).
+
+
+2. Blackscreen/No Display/Unsupported Monitor issue:
+    - https://github.com/oberdfr/kernel-ps4linux/tree/ps4-linux-v6.17.1-custom-resolution:   
+Attempts at using the display EDID information from your monitor, to use in Linux. This aims to improve the various blackscreen issues for monitors that don't support 1080p, or when using a capture card.  
 (Work in Progress)
 
     - https://github.com/ps4gentoo/initramfs &  
@@ -301,18 +309,20 @@ attempts at using the display EDID information from your monitor, to use in Linu
     (Work in Progress; latest fix might not've been committed)
 
 
-2. Mainling the PS4-specific patches and packages (OS-specific):  
+3. Mainling the PS4-specific patches and packages (OS-specific):  
     See,
     - https://github.com/Jaguarlinux/
     - https://github.com/centi07/arch-ps4-aur
     - https://github.com/FalsePhilosopher/mesa-docker-ps4
 
 
-3. General discussion/help:
+4. General discussion/help:
     - https://ps4linux.com/
     - https://discord.gg/QtcPmzHVVm (PS4-Linux Server Discord)
     - https://discord.gg/jebUjgBu6T (ps4gentoo/ps4boot (mircoho's) Discord)   
-4. Random and other links regarding PS4-Linux that were, are, or could be useful:
+
+
+5. Random and other links regarding PS4-Linux that were, are, or could be useful:
     - https://github.com/Hakkuraifu/PS4Linux-Documentation (Early documentation on PS4-Linux)
     - https://github.com/Ps3itaTeam/ (Fan control, kernel, graphics drivers etc.)
     - https://github.com/ErkkolaMaitohappo/arch-ps4-aur-smth-fork (Clean Arch Linux on PS4 (2025, Dec))
