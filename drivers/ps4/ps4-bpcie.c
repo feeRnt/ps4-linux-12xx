@@ -51,6 +51,7 @@ static void bpcie_msi_write_msg(struct irq_data *data, struct msi_msg *msg)
 {
 	struct bpcie_dev *sc = data->chip_data;
 
+	pr_info("ps4-bpcie: Called %s\n", __func__);
 	//Linux likes to unconfigure MSIs like this, but since we share the
 	//address between subfunctions, we can't do that. The IRQ should be
 	//masked via apcie_msi_mask anyway, so just do nothing.
@@ -404,6 +405,9 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	//IRQs "come from" function 4 as far as the IOMMU/system see
 	unsigned int sc_devfn;
 	struct pci_dev *sc_dev;
+	//struct device* bare_dev;
+
+	struct apcie_dev *sc;
 
 	pr_info("ps4-bpcie: Called %s\n", __func__);
 
@@ -413,14 +417,25 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	if (!sc_dev) {
 		pr_err("ps4-bpcie: sc_dev slot not found! Kernel crash incoming?!\n"); // TODO: Fix this. Lol
 	}
-	//arg->devid = pci_dev_id(sc_dev); // Aeolia-style -- devid is always 14.4 -- 'IRQs "come from" function 4 [14.4] as far as the IOMMU/system see'
-					 // but Baikal also used this natively?
-	arg->devid = pci_dev_id(dev); //Baikal-style? 14.x. We probably shuoldn't do this but try anyway for now
+
+	sc = pci_get_drvdata(sc_dev);
+	WARN_ON(pci_dev_id(sc->pdev) != pci_dev_id(sc_dev));
+
+	arg->devid = pci_dev_id(sc_dev); // Aeolia-style -- devid is always 14.4 -- 'IRQs "come from" function 4 [14.4] as far as the IOMMU/system see'
+					 // but Baikal also used this natively? -- Try to match IR devid with irq_alloc_info devid; so use this for now
+
+	// arg->devid = pci_dev_id(dev); //Baikal-style? 14.x. We probably shouldn't do this but try anyway for now
 
 	arg->desc = desc; // assign desc... removed in 6.15 for some reason? Seems breakworthy to remove
 			  // Since this is .set_desc function, we should reliably set descs ourselves.
 
+	/*bare_dev = &sc_dev->dev;
+
+	arg->data = sc;*/ // we use bare_dev to do alloc_desc, and default MSI core seems to assume caller dev should be the descriptor dev.
+			  // but for Aeolia, like the code here, 14.4 dev is the descriptor dev.. Feels quite important
+
 	pci_dev_put(sc_dev);
+
 	//Our hwirq number is (slot << 8) | (func << 5) plus subfunction.
 	// Subfunction is usually 0 and implicitly increments per hwirq,
 	//but can also be 0xff to indicate that this is a shared IRQ. 
@@ -501,8 +516,9 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	fwspec.param_count = 1;
 
 	// It should be correct to put the pci device id in here
-	//fwspec.param[0] = pci_dev_id(sc->pdev); // (14.4); Aeolia-style
-	fwspec.param[0] = pci_dev_id(pdev);	   // (14.x); Baikal style? // the IR and irq_alloc_info MSI devids should match most likely.
+	fwspec.param[0] = pci_dev_id(sc->pdev); // (14.4); Aeolia-style -- we should likely have one Parent for all domains, so have this for now
+
+	//fwspec.param[0] = pci_dev_id(pdev);	   // (14.x); Baikal style? // the IR and irq_alloc_info MSI devids should match most likely.
 						   /* This does not affect domain creation, but it's just used to find a matching IR for IOMMU <--
 						    * maybe I was wrong about this statement: iommu = __rlookup_amd_iommu((devid >> 16), (devid & 0xffff));
 						    * devid is accessed as devid = fwspec.param[0] in IOMMU
