@@ -1748,12 +1748,18 @@ static void ahci_init_irq(struct pci_dev *pdev, unsigned int n_ports,
 	int ret;
 
 #ifdef CONFIG_X86_PS4
-	if ((pdev->vendor == PCI_VENDOR_ID_SONY)  &&
-	    (pdev->device != PCI_DEVICE_ID_SONY_BAIKAL_AHCI)) {
-		ret = apcie_assign_irqs(pdev, n_ports);
-		if (ret < 0)
-			pr_err("%s: Failed to assign irqs with apcie_assign_irqs. Problem!\n", __func__);
-		return;
+	if (pdev->vendor == PCI_VENDOR_ID_SONY) {
+			if (pdev->device != PCI_DEVICE_ID_SONY_BAIKAL_AHCI) {
+				ret = apcie_assign_irqs(pdev, n_ports);
+				if (ret < 0)
+					pr_err("%s: Failed to assign irqs with apcie_assign_irqs. Problem!\n", __func__);
+				return;
+			} else {
+				ret = bpcie_assign_irqs(pdev, n_ports);
+				if (ret < 0)
+					pr_err("%s: Failed to assign irqs with apcie_assign_irqs. Problem!\n", __func__);
+				return;
+			}
 	}
 #endif
 
