@@ -349,7 +349,7 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	WREG32_UVD_CTX(ixUVD_LMI_CACHE_CTRL, tmp & (~0x10));
 
 	/* enable UMC */
-	WREG32_P(mmUVD_LMI_CTRL2, 0, ~(1 << 8));
+	WREG32_P(mmUVD_LMI_CTRL2, 0, ~(1 << 8)); //good
 
 	WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__LMI_SOFT_RESET_MASK);
 
@@ -427,7 +427,8 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
  */
 static void uvd_v4_2_stop(struct amdgpu_device *adev)
 {
-    pr_info("uvd_v4_2: called %s\n", __func__);
+	/* Number 1: */
+	pr_info("uvd_v4_2: called %s\n", __func__);
 	uint32_t i, j;
 	uint32_t status;
 
@@ -435,7 +436,7 @@ static void uvd_v4_2_stop(struct amdgpu_device *adev)
 
 	for (i = 0; i < 10; ++i) {
 		for (j = 0; j < 100; ++j) {
-			status = RREG32(mmUVD_STATUS);
+			status = RREG32(mmUVD_STATUS); //1
 			if (status & 2) {
 				pr_info("uvd_v4_2: UVD stop status reached in %s!\n", __func__);
 				break;
@@ -452,7 +453,7 @@ static void uvd_v4_2_stop(struct amdgpu_device *adev)
 
 	for (i = 0; i < 10; ++i) {
 		for (j = 0; j < 100; ++j) {
-			status = RREG32(mmUVD_LMI_STATUS);
+			status = RREG32(mmUVD_LMI_STATUS); // 2
 			if (status & 0xf) {
 				pr_info("uvd_v4_2: UVD LMI stop status reached in %s!\n", __func__);
 				break;
@@ -666,7 +667,7 @@ static void uvd_v4_2_enable_mgcg(struct amdgpu_device *adev,
 		WREG32_UVD_CTX(ixUVD_CGC_MEM_CTRL, data);
 
 		orig = data = RREG32(mmUVD_CGC_CTRL);
-		data |= UVD_CGC_CTRL__DYN_CLOCK_MODE_MASK;
+		data |= UVD_CGC_CTRL__DYN_CLOCK_MODE_MASK; // mask = 1 -- looks good
 		if (orig != data)
 			WREG32(mmUVD_CGC_CTRL, data);
 	} else {
