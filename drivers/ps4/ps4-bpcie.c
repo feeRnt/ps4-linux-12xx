@@ -416,7 +416,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 	/* struct irq_alloc_info info; */ //no longer needed -- OR IS IT?
 
 	struct fwnode_handle *fn;
-	struct irq_fwspec fwspec;
+	//struct irq_fwspec fwspec; // not needed since we're skipping parent domain search
 
 	//struct pci_dev *pdev = sc->pdev; // for single domain use-case
 
@@ -469,7 +469,8 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev 
 
 	//parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // should return the same IR-Baikal-MSI parent for all domains?
 	parent = x86_vector_domain;
-
+	bpcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI; // assign anyway even if we don't use an IR parent
+	bpcie_msi_controller.name = "IR-Baikal-MSI"; // TODO: rename controller only after all fwspecs have been assigned a parent
 	/*
 	if (!parent) {
 		sc_info("no parent, assigning x86_vector_domain; will break things!\n");
@@ -531,7 +532,7 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 	struct pci_dev *sc_dev;
 	//struct device* bare_dev;
 
-	struct apcie_dev *sc;
+	struct bpcie_dev *sc;
 
 	pr_info("ps4-bpcie: Called %s\n", __func__);
 
