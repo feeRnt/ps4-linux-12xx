@@ -62,8 +62,10 @@ static void bpcie_msi_write_msg(struct irq_data *data, struct msi_msg *msg)
 		return;
 	}
 
-	dev_info(data->common->msi_desc->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
-	       msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc);
+	//dev_info(data->common->msi_desc->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
+	//       msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc); data->common->msi_desc->dev is null
+	dev_info(&sc->pdev->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
+			msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc);
 
 	pci_msi_domain_write_msg(data, msg); //check this -- looks fine // TODO: Unsure if this breaks with a single domain style
 }
@@ -597,6 +599,10 @@ int bpcie_is_compatible_device(struct pci_dev *dev)
 	return (dev->device == PCI_DEVICE_ID_SONY_BAIKAL_PCIE);
 }
 
+/*int baikal_pci_alloc_irq_vectors(struct pci_dev *dev, unsigned int min_vecs,
+		unsigned int max_vecs, unsigned int flags)
+{*/
+
 int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 {
 	int ret;
@@ -656,7 +662,7 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 
 	dev_info(&dev->dev, "bpcie_assign_irqs(%d) (%ld)\n", nvec, info.hwirq);
 
-	//ret = pci_alloc_irq_vectors(dev, nvec, max_vecs, flags);
+	//ret = pci_alloc_irq_vectors(dev, nvec, max_vecs, flags); // gah all this bogusness!!!!!!!
 	ret = irq_domain_alloc_irqs(sc->irqdomain, nvec, NUMA_NO_NODE, &info);
 	if (ret >= 0) {
 		dev->irq = ret;
