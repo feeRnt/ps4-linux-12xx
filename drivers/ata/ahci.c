@@ -1754,12 +1754,13 @@ static void ahci_init_irq(struct pci_dev *pdev, unsigned int n_ports,
 				if (ret < 0)
 					pr_err("%s: Failed to assign irqs with apcie_assign_irqs. Problem!\n", __func__);
 				return;
-			} else {
+			}
+			/*} else {
 				ret = bpcie_assign_irqs(pdev, n_ports);
 				if (ret < 0)
 					pr_err("%s: Failed to assign irqs with apcie_assign_irqs. Problem!\n", __func__);
 				return;
-			}
+			}*/
 	}
 #endif
 

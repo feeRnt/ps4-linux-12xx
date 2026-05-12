@@ -62,12 +62,15 @@ static void bpcie_msi_write_msg(struct irq_data *data, struct msi_msg *msg)
 		return;
 	}
 
-	//dev_info(data->common->msi_desc->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
-	//       msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc); data->common->msi_desc->dev is null
-	dev_info(&sc->pdev->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
-			msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc);
+	dev_info(data->common->msi_desc->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
+	       msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc); // data->common->msi_desc->dev is null if not using pci_alloc_irq_vectors
+	//dev_info(&sc->pdev->dev, "bpcie_msi_write_msg(%08x, %08x) mask=0x%x irq=%d hwirq=0x%lx %p\n",
+	//		msg->address_lo, msg->data, data->mask, data->irq, data->hwirq, sc);
 
-	pci_msi_domain_write_msg(data, msg); //check this -- looks fine // TODO: Unsure if this breaks with a single domain style
+	pci_msi_domain_write_msg(data, msg); //check this -- looks fine (old) // THE REASON why IR enabled MSI writes work on aeolia is because we use a custom
+					     //write function itself?? Instead of traversing the IOMMU path.. Maybe? Baikal just gets page faults on AMD-Vi and
+					     //actually, the faulting addresses do not seem to be correct either.. Check apcie write msg, and you'll see they're
+					     //direct writes to a low LAPIC addresses
 }
 
 static void bpcie_msi_unmask(struct irq_data *data)
@@ -356,27 +359,26 @@ static void bpcie_msi_free(struct irq_domain *domain,
 	pr_info("bpcie_msi_free(%d)\n", virq);
 }
 
-// Not really needed now since we will set alloc_info_t in bpcie_assign_irqs
-/* static int bpcie_msi_prepare(struct irq_domain *domain, struct device *dev,
+static int bpcie_msi_prepare(struct irq_domain *domain, struct device *dev,
 				  int nvec, msi_alloc_info_t *arg)
 {
 	//memset(arg, 0, sizeof(*arg));
 	//return 0; // This was the old stub -- it's the kernel default stub for kernel/irq/msi.c
-*/
+
 	/* Based on pci_msi_prepare of arch/x86/kernel/apic/msi.c,
 	 * since we don't have an init_irq_alloc_info at alloc_domain anymore,
 	 * and also since we don't use bpcie_assign_irqs but pci_alloc_irq_vectors,
 	 * which does not assign the alloc_info type nor init it.
 
 	 * This function should be called by msi_domain_prepare_irqs in kernel/irq/msi.c */
-/*
+
 	struct pci_dev *pdev = NULL;
 	init_irq_alloc_info(arg, NULL);
-*/
+
 	/* if (to_pci_dev(dev)->msix_enabled)
 		arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSIX;
 	else { */ // we don't use MSI-X
-/*
+
 	arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 
 	if (dev_is_pci(dev)) {
@@ -388,14 +390,14 @@ static void bpcie_msi_free(struct irq_domain *domain,
 			__func__, pdev ? PCI_SLOT(pdev->devfn): 99, pdev ? PCI_FUNC(pdev->devfn) : 99);
 	return 0;
 	//}
-}*/
+}
 
 static struct msi_domain_ops bpcie_msi_domain_ops = {
 	.get_hwirq	= bpcie_msi_get_hwirq,
 	.msi_init	= bpcie_msi_init,
 	.msi_free	= bpcie_msi_free,
 	.set_desc	= bpcie_msi_domain_set_desc,
-	//.msi_prepare	= bpcie_msi_prepare,
+	.msi_prepare	= bpcie_msi_prepare,
 };
 
 static struct msi_domain_info bpcie_msi_domain_info = {
@@ -406,8 +408,8 @@ static struct msi_domain_info bpcie_msi_domain_info = {
 	.handler_name	= "edge", /* Seems important now; though there is a function to set it in x86/kernel/apic/msi.c */
 };
 
-//struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev *pdev)//similar to native_setup_msi_irqs (now, ~6.0, hpet_create_irq_domain)
-struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc)
+struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc, struct pci_dev *pdev)//similar to native_setup_msi_irqs (now, ~6.0, hpet_create_irq_domain)
+//struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc) // - single domain attempt
 {
 	struct irq_domain *d, *parent;
 
@@ -416,7 +418,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc)
 	struct fwnode_handle *fn;
 	struct irq_fwspec fwspec;
 
-	struct pci_dev *pdev = sc->pdev;
+	//struct pci_dev *pdev = sc->pdev; // for single domain use-case
 
 	dev_info(&pdev->dev, "bpcie_create_irq_domain\n");
 	if (x86_vector_domain == NULL) {
@@ -438,33 +440,37 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc)
 
 	//parent = irq_remapping_get_irq_domain(&info); // removed after fwspec
 
-	fn = irq_domain_alloc_named_id_fwnode(bpcie_msi_controller.name, pci_dev_id(sc->pdev));
+	//fn = irq_domain_alloc_named_id_fwnode(bpcie_msi_controller.name, pci_dev_id(sc->pdev));
 	/* this pattern used in Aeolia will allocate only one domain for pci function (14.4). That's fine for Aeolia
 	 * but not Baikal where we have one domain for each pci function in 14.x. */
 
 	sc_info("allocating fwnode for name=%s devid=%d\n", "Baikal-MSI", pci_dev_id(pdev));
 	//fn = irq_domain_alloc_named_id_fwnode(bpcie_msi_controller.name, pci_dev_id(pdev)); // per pdev; don't use since we update controller.name after match
-	//fn = irq_domain_alloc_named_id_fwnode("Baikal-MSI", pci_dev_id(pdev)); // per pdev
+	fn = irq_domain_alloc_named_id_fwnode("Baikal-MSI", pci_dev_id(pdev)); // per pdev
 	if (!fn) {
 		sc_err("failed to allocate named fwnode, returning NULL.\n");
 		return NULL;
 	}
 
+	/* Don't use IR Domain */
+	/*
 	fwspec.fwnode = fn;
 	fwspec.param_count = 1;
 
 	// It should be correct to put the pci device id in here
 	fwspec.param[0] = pci_dev_id(sc->pdev); // (14.4); Aeolia-style -- we should likely have one Parent for all domains, so have this for now
 
-	//fwspec.param[0] = pci_dev_id(pdev);	   // (14.x); Baikal style? // the IR and irq_alloc_info MSI devids should match most likely.
+	//fwspec.param[0] = pci_dev_id(pdev);*/	   // (14.x); Baikal style? // the IR and irq_alloc_info MSI devids should match most likely.
 						   /* This does not affect domain creation, but it's just used to find a matching IR for IOMMU <--
 						    * maybe I was wrong about this statement: iommu = __rlookup_amd_iommu((devid >> 16), (devid & 0xffff));
 						    * devid is accessed as devid = fwspec.param[0] in IOMMU
 						    *
 						    * Will bad assumptions kill us all? */
 
-	parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // should return the same IR-Baikal-MSI parent for all domains?
+	//parent = irq_find_matching_fwspec(&fwspec, DOMAIN_BUS_ANY); // should return the same IR-Baikal-MSI parent for all domains?
+	parent = x86_vector_domain;
 
+	/*
 	if (!parent) {
 		sc_info("no parent, assigning x86_vector_domain; will break things!\n");
 		parent = x86_vector_domain;
@@ -474,7 +480,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc)
 		bpcie_msi_domain_info.flags |= MSI_FLAG_MULTI_PCI_MSI;
 		bpcie_msi_controller.name = "IR-Baikal-MSI"; // TODO: rename controller only after all fwspecs have been assigned a parent
 		sc_info("Matching FWSpec Parent found! Switched to IR-Baikal-MSI from Baikal-MSI.\n");
-	}
+	}*/
 
 	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, parent); // changed in: 6b15ffa07dc325f4e4dd98c877bfa970202c378b
 	//d = pci_msi_create_irq_domain(NULL, &bpcie_msi_domain_info, x86_vector_domain); // I think it should be vector domain now;
@@ -490,10 +496,10 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc)
 					     struct irq_domain *parent) { */
 
 	// not in aeolia code. we set the important device domain in assign_irqs now.
-	/*if (d != NULL)
-		dev_set_msi_domain(&pdev->dev, d);*/ /* for some reason this is missing in 6.15-baikal code; seems important.
+	if (d != NULL)
+		dev_set_msi_domain(&pdev->dev, d);  /*for some reason this is missing in 6.15-baikal code; seems important.
 						    ((Only does dev->msi.domain = d; ifdef CONFIG_GENERIC_MSI_IRQ {which is on for PS4})) */
-	if (!d) {
+	else {
 		dev_err(&pdev->dev, "bpcie: failed to create irq domain\n");
 		irq_domain_free_fwnode(fn); // Was missing in original-bpcie.c, but in apcie.c
 	}
@@ -505,7 +511,7 @@ struct irq_domain *bpcie_create_irq_domain(struct bpcie_dev *sc)
 static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 				    struct msi_desc *desc)
 {
-
+/*
 	arg->desc = desc;
 	struct pci_dev* dev = msi_desc_to_pci_dev(desc);
 
@@ -517,8 +523,7 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 		pr_info("ps4-bpcie: Using shared IRQ for all subfuncs due to missing flag\n");
 	}
 #endif
-
-/*
+*/
 	struct pci_dev *dev = msi_desc_to_pci_dev(desc);
 	arg->type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
 	//IRQs "come from" function 4 as far as the IOMMU/system see
@@ -547,12 +552,12 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 
 	arg->desc = desc; // assign desc... removed in 6.15 for some reason? Seems breakworthy to remove
 			  // Since this is .set_desc function, we should reliably set descs ourselves.
-*/
+
 	/*bare_dev = &sc_dev->dev;
 
 	arg->data = sc;*/ // we use bare_dev to do alloc_desc, and default MSI core seems to assume caller dev should be the descriptor dev.
 			  // but for Aeolia, like the code here, 14.4 dev is the descriptor dev.. Feels quite important ---- Let us see CCCCCCC
-/*
+
 	pci_dev_put(sc_dev);
 
 	//Our hwirq number is (slot << 8) | (func << 5) plus subfunction.
@@ -571,7 +576,7 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 		pr_info("ps4-bpcie: Using shared IRQ for all subfuncs due to missing flag\n");
 	}
 #endif
-*/
+
 	/* Reassign the msi_alloc_info's descriptor's device to 14.4
 	 * because all interrupts come from the AEOLIA/BELIZE/BAIKAL PCIe chip (PCI 14.4)
 	 * Maybe this has an effect on IRQs being routed properly? Trying to fix:
@@ -585,10 +590,10 @@ static void bpcie_msi_domain_set_desc(msi_alloc_info_t *arg,
 		/*[   17.568805] baikal_pcie 0000:00:14.4: icc: interrupted or timeout: ret = 0
 		 *[   17.575833] [drm:ps4_bridge_disable] *ERROR* icc i2c commandqueue failed: -110
 		 *[   17.583200] [drm:ps4_bridge_disable] *ERROR* Failed to disable bridge*/
-/*
+
 	pr_info("ps4-bpcie: Finished setting descriptor for PCI device: %02x.%x, using devid %d (%x)\n",
 			PCI_SLOT(dev->devfn), PCI_FUNC(dev->devfn), arg->devid, arg->devid);
-*/
+
 }
 
 int bpcie_is_compatible_device(struct pci_dev *dev)
@@ -603,6 +608,8 @@ int bpcie_is_compatible_device(struct pci_dev *dev)
 		unsigned int max_vecs, unsigned int flags)
 {*/
 
+//Aeolia style assign_irqs (with a flavor of baikal)
+/* 
 int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 {
 	int ret;
@@ -633,22 +640,25 @@ int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 
 	init_irq_alloc_info(&info, NULL);
 	info.type = X86_IRQ_ALLOC_TYPE_PCI_MSI;
+*/
 	/* IRQs "come from" function 4 as far as the IOMMU/system see */
 	//info.msi_dev = sc->pdev; -- removed after 3b9c1d377d67072d1d8a2373b4969103cca00dab
-	info.devid = pci_dev_id(sc->pdev);
+/*	info.devid = pci_dev_id(sc->pdev);
 
 	bare_dev = &sc->pdev->dev; // use 14.4 device as the owner now directly
-
+*/
 	/* Our hwirq number is (slot << 8) | (func << 5) plus subfunction.
 	 * Subfunction is usually 0 and implicitly increments per hwirq,
 	 * but can also be 0xff (but we used 0x1f) o indicate that this is a shared IRQ. */
+
+/*
 	info.hwirq = (PCI_SLOT(dev->devfn) << 8) | (PCI_FUNC(dev->devfn) << 5);
 	dev_dbg(&dev->dev, "bpcie_assign_irqs(%d)\n", nvec);
 
 #ifndef QEMU_HACK_NO_IOMMU
 	if (!(bpcie_msi_domain_info.flags & MSI_FLAG_MULTI_PCI_MSI)) {
 		nvec = 1; // number of vectors
-		info.hwirq |= 0x1f; /* Shared IRQ for all subfunctions */ // og Baikal had this hwirq mask commented out for some reason
+		info.hwirq |= 0x1f; //Shared IRQ for all subfunctions // og Baikal had this hwirq mask commented out for some reason
 	}
 #endif
 	desc = msi_alloc_desc(bare_dev, nvec, NULL);
@@ -675,7 +685,7 @@ fail: // finish:
 	if (sc_dev)
 		pci_dev_put(sc_dev);
 	return ret;
-}
+}*/
 
 /* int bpcie_assign_irqs(struct pci_dev *dev, int nvec)
 {
@@ -775,20 +785,20 @@ static struct pci_dev * get_bpcie_device(struct bpcie_dev *sc, u32 bcpie_func) {
 	return pci_get_slot(sc_dev->bus, devfn);
 }
 
-/* static void bpcie_create_irq_domains(struct bpcie_dev *sc) {
+static void bpcie_create_irq_domains(struct bpcie_dev *sc) {
 	int func;
 	for (func = 0; func < BAIKAL_NUM_FUNCS; ++func) {
 		struct pci_dev * bpcie_pdev = get_bpcie_device(sc, func);
 		if (bpcie_pdev) {
 			// TODO: Should we really be creating 8 IRQ domains instead of just the 14.4 like how
-			// Aeolia does it? // TESTING WITH 1 domain for now
+			// Aeolia does it?
 			struct irq_domain * domain = bpcie_create_irq_domain(sc, bpcie_pdev);
 			if (func == BAIKAL_FUNC_ID_PCIE) sc->irqdomain = domain;
 			pci_dev_put(bpcie_pdev);
 		} else
 			sc_err("cannot find bpcie func %d device", func);
 	}
-}*/
+}
 
 static int bpcie_glue_init(struct bpcie_dev *sc)
 {
@@ -818,8 +828,8 @@ static int bpcie_glue_init(struct bpcie_dev *sc)
 
 	// we are missing MSI masking and glue_set_region for Baikal. maybe it's not needed
 
-	sc->irqdomain = bpcie_create_irq_domain(sc); // use 1 domain now.
-	//bpcie_create_irq_domains(sc);
+	//sc->irqdomain = bpcie_create_irq_domain(sc); // use 1 domain now.
+	bpcie_create_irq_domains(sc);
 	if (!sc->irqdomain) {
 		sc_err("Failed to create IRQ domain");
 		bpcie_glue_remove(sc);
@@ -827,8 +837,8 @@ static int bpcie_glue_init(struct bpcie_dev *sc)
 	}
 
 	//sc->nvec = bpcie_assign_irqs(sc->pdev, BPCIE_NUM_SUBFUNC);
-	sc->nvec = bpcie_assign_irqs(sc->pdev, BPCIE_SUBFUNC_ICC+1); // 2nd parameter is min_vec = total vectors to assign for this instance; not max_vecs
-	//sc->nvec = pci_alloc_irq_vectors(sc->pdev, BPCIE_SUBFUNC_ICC+1, BPCIE_NUM_SUBFUNCS, PCI_IRQ_MSI);
+	//sc->nvec = bpcie_assign_irqs(sc->pdev, BPCIE_SUBFUNC_ICC+1); // 2nd parameter is min_vec = total vectors to assign for this instance; not max_vecs
+	sc->nvec = pci_alloc_irq_vectors(sc->pdev, BPCIE_SUBFUNC_ICC+1, BPCIE_NUM_SUBFUNCS, PCI_IRQ_MSI);
 	if (sc->nvec <= 0) {
 		sc_err("Failed to assign IRQs; error code: %d", sc->nvec);
 		bpcie_glue_remove(sc);
