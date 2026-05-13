@@ -1183,7 +1183,12 @@ int mtk_p2p_cfg80211_scan(struct wiphy *wiphy, struct cfg80211_scan_request *req
 	return i4RetRslt;
 }				/* mtk_p2p_cfg80211_scan */
 
+/* https://github.com/torvalds/linux/commit/b74947b4f6ff7c122a1bb6eb38bb7ecfbb1d3820 */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 17, 0)
+int mtk_p2p_cfg80211_set_wiphy_params(struct wiphy *wiphy, int radio_idx, u32 changed)
+#else
 int mtk_p2p_cfg80211_set_wiphy_params(struct wiphy *wiphy, u32 changed)
+#endif
 {
 	INT_32 i4Rslt = -EINVAL;
 	P_GLUE_INFO_T prGlueInfo = NULL;
@@ -1252,8 +1257,15 @@ int mtk_p2p_cfg80211_leave_ibss(struct wiphy *wiphy, struct net_device *dev)
 	return -EINVAL;
 }
 
+/* Radio index in cfg80211_set* functions
+ * https://github.com/torvalds/linux/commit/b74947b4f6ff7c122a1bb6eb38bb7ecfbb1d3820 */
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 17, 0)
+int mtk_p2p_cfg80211_set_txpower(struct wiphy *wiphy,
+				 struct wireless_dev *wdev, int radio_idx, enum nl80211_tx_power_setting type, int mbm)
+#else
 int mtk_p2p_cfg80211_set_txpower(struct wiphy *wiphy,
 				 struct wireless_dev *wdev, enum nl80211_tx_power_setting type, int mbm)
+#endif
 {
 	P_GLUE_INFO_T prGlueInfo = NULL;
 
@@ -1266,9 +1278,12 @@ int mtk_p2p_cfg80211_set_txpower(struct wiphy *wiphy,
 	return -EINVAL;
 }
 
+/* https://github.com/torvalds/linux/commit/b74947b4f6ff7c122a1bb6eb38bb7ecfbb1d3820 */
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 17, 0))
+int mtk_p2p_cfg80211_get_txpower(struct wiphy *wiphy, struct wireless_dev *wdev, int radio_idx, unsigned int link_id, int *dbm)
 /* link_id was introduced to get_txpower in nl80211 from Linux 6.14
  * https://github.com/torvalds/linux/commit/7a53af85d3bbdbe06cd47b81a6d99a04dc0a3963 */
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 14, 0))
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 14, 0))
 int mtk_p2p_cfg80211_get_txpower(struct wiphy *wiphy, struct wireless_dev *wdev, unsigned int link_id, int *dbm)
 #else
 int mtk_p2p_cfg80211_get_txpower(struct wiphy *wiphy, struct wireless_dev *wdev, int *dbm)

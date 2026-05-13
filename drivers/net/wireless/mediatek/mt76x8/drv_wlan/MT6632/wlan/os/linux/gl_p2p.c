@@ -127,30 +127,6 @@ struct wireless_dev *gprP2pRoleWdev[KAL_P2P_NUM];
 struct net_device *gPrP2pDev[KAL_P2P_NUM];
 
 #if CFG_ENABLE_WIFI_DIRECT_CFG_80211
-
-/* Wrapper for set_wiphy_params to match expected signature */
-static int mtk_p2p_cfg80211_set_wiphy_params_adapter(struct wiphy *wiphy, int param, u32 val)
-{
-	/* Original: int mtk_p2p_cfg80211_set_wiphy_params(struct wiphy *, u32) */
-	return mtk_p2p_cfg80211_set_wiphy_params(wiphy, val);
-}
-
-/* Wrapper for set_tx_power to match expected signature */
-static int mtk_p2p_cfg80211_set_txpower_adapter(struct wiphy *wiphy, struct wireless_dev *wdev,
-	int ifindex, enum nl80211_tx_power_setting type, int dbm)
-{
-	/* Original: int mtk_p2p_cfg80211_set_txpower(struct wiphy *, struct wireless_dev *, enum nl80211_tx_power_setting, int) */
-	return mtk_p2p_cfg80211_set_txpower(wiphy, wdev, type, dbm);
-}
-
-/* Wrapper for get_tx_power to match expected signature */
-static int mtk_p2p_cfg80211_get_txpower_adapter(struct wiphy *wiphy, struct wireless_dev *wdev,
-	int ifindex, unsigned int dbm, int *type)
-{
-	unsigned int out = dbm;
-	return mtk_p2p_cfg80211_get_txpower(wiphy, wdev, ifindex, &out);
-}
-
 static struct cfg80211_ops mtk_p2p_ops = {
 #if (CFG_ENABLE_WIFI_DIRECT_CFG_80211 != 0)
 	/* Froyo */
@@ -170,7 +146,7 @@ static struct cfg80211_ops mtk_p2p_ops = {
 	.start_ap = mtk_p2p_cfg80211_start_ap,
 	.change_beacon = mtk_p2p_cfg80211_change_beacon,
 	.stop_ap = mtk_p2p_cfg80211_stop_ap,
-	.set_wiphy_params = mtk_p2p_cfg80211_set_wiphy_params_adapter,
+	.set_wiphy_params = mtk_p2p_cfg80211_set_wiphy_params,
 	.del_station = mtk_p2p_cfg80211_del_station,
 	.set_bitrate_mask = mtk_p2p_cfg80211_set_bitrate_mask,
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0))
@@ -186,8 +162,8 @@ static struct cfg80211_ops mtk_p2p_ops = {
 	.set_default_mgmt_key = mtk_p2p_cfg80211_set_mgmt_key,
 	.join_ibss = mtk_p2p_cfg80211_join_ibss,
 	.leave_ibss = mtk_p2p_cfg80211_leave_ibss,
-	.set_tx_power = mtk_p2p_cfg80211_set_txpower_adapter,
-	.get_tx_power = mtk_p2p_cfg80211_get_txpower_adapter,
+	.set_tx_power = mtk_p2p_cfg80211_set_txpower,
+	.get_tx_power = mtk_p2p_cfg80211_get_txpower,
 	.set_power_mgmt = mtk_p2p_cfg80211_set_power_mgmt,
 #if (CFG_SUPPORT_DFS_MASTER == 1)
 	.start_radar_detection = mtk_p2p_cfg80211_start_radar_detection,

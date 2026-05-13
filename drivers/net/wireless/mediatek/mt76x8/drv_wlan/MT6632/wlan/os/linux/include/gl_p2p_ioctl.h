@@ -455,7 +455,11 @@ int mtk_p2p_cfg80211_get_station(struct wiphy *wiphy, struct net_device *ndev, u
 #endif
 int mtk_p2p_cfg80211_scan(struct wiphy *wiphy, struct cfg80211_scan_request *request);
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 17, 0))
+int mtk_p2p_cfg80211_set_wiphy_params(struct wiphy *wiphy, int radio_idx, u32 changed);
+#else
 int mtk_p2p_cfg80211_set_wiphy_params(struct wiphy *wiphy, u32 changed);
+#endif
 
 int mtk_p2p_cfg80211_connect(struct wiphy *wiphy, struct net_device *dev, struct cfg80211_connect_params *sme);
 
@@ -465,10 +469,17 @@ int mtk_p2p_cfg80211_join_ibss(struct wiphy *wiphy, struct net_device *dev, stru
 
 int mtk_p2p_cfg80211_leave_ibss(struct wiphy *wiphy, struct net_device *dev);
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 17, 0))
+int mtk_p2p_cfg80211_set_txpower(struct wiphy *wiphy,
+				 struct wireless_dev *wdev, int radio_idx, enum nl80211_tx_power_setting type, int mbm);
+#else
 int mtk_p2p_cfg80211_set_txpower(struct wiphy *wiphy,
 				 struct wireless_dev *wdev, enum nl80211_tx_power_setting type, int mbm);
+#endif
 
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 14, 0))
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 17, 0))
+int mtk_p2p_cfg80211_get_txpower(struct wiphy *wiphy, struct wireless_dev *wdev, int radio_idx, unsigned int link_id, int *dbm);
+#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 14, 0))
 // link_id introduction to get_txpower in nl80211 from Linux 6.14
 // https://github.com/torvalds/linux/commit/7a53af85d3bbdbe06cd47b81a6d99a04dc0a3963
 int mtk_p2p_cfg80211_get_txpower(struct wiphy *wiphy, struct wireless_dev *wdev, unsigned int link_id, int *dbm);
