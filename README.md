@@ -343,10 +343,6 @@ Attempts at using the display EDID information from your monitor, to use in Linu
 <p align="center">Enjoy your Linux-Station!</p>
 
 ---
-
-<br>
-
----
 ## Licensing
 
 ### Firmware and Drivers Notice
