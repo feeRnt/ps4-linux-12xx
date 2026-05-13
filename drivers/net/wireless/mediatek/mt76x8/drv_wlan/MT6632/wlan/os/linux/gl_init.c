@@ -556,10 +556,16 @@ unsigned int _cfg80211_classify8021d(struct sk_buff *skb)
 }
 #endif
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 16, 0)
 static void legacy_timer_emu_func(struct timer_list *t)
 {
-	struct legacy_timer_emu *lt = container_of(t, struct legacy_timer_emu, t);
+	struct legacy_timer_emu *lt = timer_container_of(lt, t, t);
+	lt->function(lt->data);
+}
+#elif LINUX_VERSION_CODE >= KERNEL_VERSION(4, 15, 0)
+static void legacy_timer_emu_func(struct timer_list *t)
+{
+	struct legacy_timer_emu *lt = from_timer(lt, t, t);
 	lt->function(lt->data);
 }
 #endif
