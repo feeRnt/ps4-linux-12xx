@@ -62,7 +62,8 @@
 
 #define BONAIRE_GB_ADDR_CONFIG_GOLDEN        0x12010001
 #define HAWAII_GB_ADDR_CONFIG_GOLDEN         0x12011003
-#define LIVERPOOL_GB_ADDR_CONFIG_GOLDEN      0x02011002 /* 0x2011002; this seems to be the correct GB_ADDR_CONFIG for Liverpool */
+//#define LIVERPOOL_GB_ADDR_CONFIG_GOLDEN      0x02011002 // 0x2011002; this seems to be the correct GB_ADDR_CONFIG for Liverpool
+							  // Or not.. The dreams we see are colorful dreams of purple and yellow? DO NOT TRY THIS
 
 #define		PIPEID(x)					((x) << 0)
 #define		MEID(x)						((x) << 2)
