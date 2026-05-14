@@ -793,7 +793,8 @@ static int uvd_v4_2_set_powergating_state(struct amdgpu_ip_block *ip_block,
 		uvd_v4_2_stop(adev);
 		if (adev->pg_flags & AMD_PG_SUPPORT_UVD && !adev->pm.dpm_enabled) {
 			rreg_print = RREG32_SMC(ixCURRENT_PG_STATUS);
-			pr_info("uvd_v4_2: ixCURRENT_PG_STATUS through RREG32_SMC after uvd_stop = %08x\n", (unsigned int)rreg_print);
+			pr_info("uvd_v4_2: ixCURRENT_PG_STATUS through RREG32_SMC after uvd_stop = %08x\n", (unsigned int)rreg_print); // orbis never touches
+																       // ixCURRENT_PG_STATUS....
 			if (!(rreg_print &
 				CURRENT_PG_STATUS__UVD_PG_STATUS_MASK)) {
 				WREG32(mmUVD_PGFSM_CONFIG, (UVD_PGFSM_CONFIG__UVD_PGFSM_FSM_ADDR_MASK   |

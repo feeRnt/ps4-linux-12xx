@@ -716,7 +716,7 @@ static int gmc_v7_0_gart_enable(struct amdgpu_device *adev)
 	else
 		gmc_v7_0_set_fault_enable_default(adev, true);
 
-	if (adev->asic_type == CHIP_KAVERI || adev->asic_type == CHIP_LIVERPOOL) {
+	if (adev->asic_type == CHIP_KAVERI /*|| adev->asic_type == CHIP_LIVERPOOL*/) {
 		tmp = RREG32(mmCHUB_CONTROL);
 		tmp &= ~BYPASS_VM;
 		WREG32(mmCHUB_CONTROL, tmp);
