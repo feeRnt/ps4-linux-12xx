@@ -2840,9 +2840,16 @@ static int amdgpu_device_ip_hw_init_phase2(struct amdgpu_device *adev)
 			continue;
 		r = adev->ip_blocks[i].version->funcs->hw_init(&adev->ip_blocks[i]);
 		if (r) {
-			DRM_ERROR("hw_init of IP block <%s> failed %d\n",
+			if (adev->ip_blocks[i].version->type == AMD_IP_BLOCK_TYPE_UVD) {
+				DRM_ERROR("hw_init of IP block <%s> failed %d\n",
+					adev->ip_blocks[i].version->funcs->name, r); // non fatal exit for UVD testing fail
+				WREG32(/*mmUVD_MASTINT_EN*/0x3d40, 0); //hopefully works; disable interrupts
+				continue; // don't set status.hw = true;
+			} else {
+				DRM_ERROR("hw_init of IP block <%s> failed %d\n",
 				  adev->ip_blocks[i].version->funcs->name, r);
-			return r;
+				return r;
+			}
 		}
 		adev->ip_blocks[i].status.hw = true;
 	}
