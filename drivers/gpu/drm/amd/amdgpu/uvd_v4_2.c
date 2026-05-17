@@ -304,28 +304,60 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	u32 mp_swap_cntl = 0;
 
 	/* set uvd busy */
-	WREG32_P(mmUVD_STATUS, 1<<2, ~(1<<2));
+	WREG32_P(mmUVD_STATUS, 1<<2, ~(1<<2)); // set all bits except 4d to 0 // matches dream engine;
 
-	uvd_v4_2_set_dcm(adev, true);
-	WREG32(mmUVD_CGC_GATE, 0);
+	// uvd_v4_2_set_dcm(adev, true); // dream doesn't have this // disable dynamic clock gating for now
+	// WREG32(mmUVD_CGC_GATE, 0); // dream doesn't have this
+
+	WREG32_P(mmUVD_CGC_GATE, 0, 0xfff00008); // mask it directly - eq. to dream engine ; eq to: (.., 0, ~0x000ffff7);
 
 	/* take UVD block out of reset */
-	WREG32_P(mmSRBM_SOFT_RESET, 0, ~SRBM_SOFT_RESET__SOFT_RESET_UVD_MASK);
-	mdelay(5);
+	WREG32_P(mmSRBM_SOFT_RESET, 0, ~SRBM_SOFT_RESET__SOFT_RESET_UVD_MASK); // 0x40000 // eq. to dream engine
+	//mdelay(5); // no delay in dream
+	mdelay(1); // no delay in dream
 
 	/* enable VCPU clock */
-	WREG32(mmUVD_VCPU_CNTL,  1 << 9);
+	WREG32(mmUVD_VCPU_CNTL,  1 << 9); // eq. to DE
 
 	/* disable interrupt */
-	WREG32_P(mmUVD_MASTINT_EN, 0, ~(1 << 1));
+	WREG32_P(mmUVD_MASTINT_EN, 0, ~(1 << 1)); //eq.
 
 #ifdef __BIG_ENDIAN
 	/* swap (8 in 32) RB and IB */
-	lmi_swap_cntl = 0xa;
+	lmi_swap_cntl = 0xa;	//untraversed ifdef
 	mp_swap_cntl = 0;
 #endif
-	WREG32(mmUVD_LMI_SWAP_CNTL, lmi_swap_cntl);
-	WREG32(mmUVD_MP_SWAP_CNTL, mp_swap_cntl);
+	WREG32(mmUVD_LMI_SWAP_CNTL, lmi_swap_cntl); //eq.
+	WREG32(mmUVD_MP_SWAP_CNTL, mp_swap_cntl);  // ...
+
+	//dream does some weird things at this stage:
+
+	WREG32(0x3d68, 0x3dff);  // ... mmUVD_LMI_SOMETHING? Seems to be some sort of mask
+	
+
+	unsigned int Variable1;
+	unsigned int Variable2;
+	unsigned int Variable3;
+	unsigned int Variable4;
+	unsigned long Variable5;
+	int Variable6;
+
+	//Variable1 = *(unsigned int *)(Parameter1 + 0x40); //Parameter1 is adev?
+
+	//Variable2 = Variable1 & 0xf;
+	//Variable3 = RREG32(mmUVD_CTX_INDEX);
+	//WREG32(mmUVD_CTX_INDEX, 0x99);
+	//Variable4 = RREG32(mmUVD_CTX_DATA);
+	//WREG32(mmUVD_CTX_DATA, Variable2 | Variable2 << 4 | Variable2 << 8 |
+	//	Variable2 << 0xc | Variable2 << 0x10 | Variable2 << 0x14 | Variable4 0xff000000); // Could be tiling information
+	//	We might not need it as we use bonaire tiling information for now.
+	//WREG32(mmUVD_CTX_INDEX, Variable3); //restore index to old state
+
+	//WREG32(mmUVD_CTX_INDEX, 0x9a); 
+	//RREG32(mmUVD_CTX_DATA); // weird, needs read before write? whatevs
+	//WREG32(mmUVD_CTX_DATA, 0);
+	//WREG32(mmUVD_CTX_INDEX, Variable3); //restore index to old state
+
 
 	/* initialize UVD memory controller */
 	WREG32(mmUVD_LMI_CTRL, 0x203108);
@@ -333,39 +365,102 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	tmp = RREG32(mmUVD_MPC_CNTL);
 	pr_info("uvd_v4_2: mmUVD_MPC_CNTL through RREG32 = %08x\n", tmp);
 
-	WREG32(mmUVD_MPC_CNTL, tmp | 0x10);
+	//WREG32(mmUVD_MPC_CNTL, tmp | 0x10);
+	WREG32(mmUVD_MPC_CNTL, 0x10); //dream writes 0x10 directly, although they also do a read first into the register
 
-	WREG32(mmUVD_MPC_SET_MUXA0, 0x40c2040);
-	WREG32(mmUVD_MPC_SET_MUXA1, 0x0);
-	WREG32(mmUVD_MPC_SET_MUXB0, 0x40c2040);
-	WREG32(mmUVD_MPC_SET_MUXB1, 0x0);
-	WREG32(mmUVD_MPC_SET_ALU, 0);
-	WREG32(mmUVD_MPC_SET_MUX, 0x88);
+	WREG32(mmUVD_MPC_SET_MUXA0, 0x40c2040); //eq
+	WREG32(mmUVD_MPC_SET_MUXA1, 0x0); //eq
+	WREG32(mmUVD_MPC_SET_MUXB0, 0x40c2040); //eq
+	WREG32(mmUVD_MPC_SET_MUXB1, 0x0); //eq
+	WREG32(mmUVD_MPC_SET_ALU, 0); //eq
+	WREG32(mmUVD_MPC_SET_MUX, 0x88); //eq
 
-	uvd_v4_2_mc_resume(adev);
+	// dream again does some weird things here:
+	Variable1 = RREG32(0x3dab); //dream only ; note assignment into variable 1 from before
+	WREG32(0x3dab, Variable1 | 2); //mmUVD_RBC_RB_RPTR_CNTL? or some lvp internal enable bit? //dream only
 
-	tmp = RREG32_UVD_CTX(ixUVD_LMI_CACHE_CTRL);
-	pr_info("uvd_v4_2: ixUVD_LMI_CACHE_CTRL through RREG32 = %08x\n", tmp);
-	WREG32_UVD_CTX(ixUVD_LMI_CACHE_CTRL, tmp & (~0x10));
+	Variable3 = RREG32(mmUVD_CTX_INDEX);
+	WREG32(mmUVD_CTX_INDEX, 0x9b); //earlier we 0'd out 0x9a
+	Variable1 = RREG32(mmUVD_CTX_DATA);
+	WREG32(mmUVD_CTX_DATA, Variable1 & 0xffffffef); // some sort of mask, {WREG32_P(mmUVD_CTX_DATA, 0, ~(1 << 2 << 2))};
+
+	WREG32(mmUVD_CTX_INDEX, Variable3); //restore index to old state
+	
+	uvd_v4_2_mc_resume(adev); // eq. with ordering switchups and hardcoded vals
+
+	// weird dream stuff again:
+	//Variable3 = *(uint32_t *)(Parameter1 + 0x88);
+	Variable1 = RREG32(mmUVD_RBC_RB_CNTL);
+	WREG32(mmUVD_RBC_RB_CNTL, Variable1 | 0x10000000); // enable Ring Buffer Controller something? Probably important
+	WREG32(0x3dc0, 0); // enable something?
+	WREG32(0x3dab, 1); // disable something? // earlier we OR'ed 2 into here
+
+
+	//*(uint64_t *)((char *)Parameter1 + 0x2c) = 0x40000000000ULL; // we should cast to char before doing + offset for param_1
+	//*(uint64_t *)((char *)Parameter1 + 0x24) = 0x40000000000ULL; // could be setting max address limit/ceiilng or something?  we should probably let the
+								     // driver handle that.
+
+	//Variable1 = RREG32(0x1401);
+	//WREG32(0x1401, Variable1 | 8); // uhhh; IDK WHAT THIS IS. could be mmGARLIC_FLUSH_CNTL = 0x1401 // maybe it just flushes the garlic (vram tunnel);
+				       // TODO: but turn it on in different build
+
+	//Variable1 = RREG32(mmUVD_LMI_EXT40_ADDR); // more address things...
+	//Variable1 = Variable & 0xffe0ffff; // mask
+	//WREG32(mmUVD_LMI_EXT40_ADDR, Variable1 + 0x70000); // i doubt it's needed ?
+	//WREG32(mmUVD_LMI_EXT40_ADDR, Variable1 + 0x100000);
+	//WREG32(mmUVD_LMI_EXT40_ADDR, Variable1 + 0x110000);
+	//WREG32(mmUVD_RBC_RB_BASE, Variable3); //0x3da3, ... // dream sets base address early, we do it later. But it seems Parameter1 is indeed adev struct.
+	//can't know what it holds just now though...
+	
+	//WREG32(mmUVD_RBC_RB_WPTR,0);
+	//WREG32(mmUVD_RBC_RB_RPTR,0); // don't touch r/w  pointers for now
+	//Variable1 = RREG32(mmUVD_RBC_RB_CNTL);
+	//WREG32(mmUVD_RBC_RB_CNTL, (Variable1 & 0xefffe0e0) + 0x80c); // some bit stuff // actually seems to be rbc_rb size. don't touch manually TODO: for now
+	WREG32(0x3dac, 0x10); // some bit set
+	Variable1 = RREG32(0x3dab); 
+	WREG32(0x3dab, Variable1 | 1); // some bit enable.... 3daa is mmUVD_RBC_RB_RPTR_ADDR 
+
+	//---
+	Variable1 = RREG32(mmUVD_VCPU_CNTL);
+	WREG32(mmUVD_VCPU_CNTL,Variable1 & 0xfffbffff); // mask VCPU control
+	Variable3 = RREG32(mmUVD_CTX_INDEX);
+	WREG32(mmUVD_CTX_INDEX, 0x9b);
+	Variable1 = RREG32(mmUVD_CTX_DATA);
+	WREG32(mmUVD_CTX_DATA, Variable1 & 0xffffffef); // mask some CTX_DATA
+	WREG32(mmUVD_CTX_INDEX, Variable3); // reset old index
+	
+
+	//tmp = RREG32_UVD_CTX(ixUVD_LMI_CACHE_CTRL); // not
+	//pr_info("uvd_v4_2: ixUVD_LMI_CACHE_CTRL through RREG32 = %08x\n", tmp); // done
+	//WREG32_UVD_CTX(ixUVD_LMI_CACHE_CTRL, tmp & (~0x10)); // in dream
 
 	/* enable UMC */
-	WREG32_P(mmUVD_LMI_CTRL2, 0, ~(1 << 8)); //good
+	WREG32_P(mmUVD_LMI_CTRL2, 0, ~(1 << 8)); //good - eq.
 
-	WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__LMI_SOFT_RESET_MASK);
+	WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__LMI_SOFT_RESET_MASK); // eq.
 
-	WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__LMI_UMC_SOFT_RESET_MASK);
+	//WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__LMI_UMC_SOFT_RESET_MASK); //eq.
 
-	WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK);
+	//WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK); // eq.
+	// order is switched in dream:
+	
+	WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK); //eq
 
-	mdelay(10);
+	WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__LMI_UMC_SOFT_RESET_MASK); //eq.
+
+
+	//mdelay(10);
+	mdelay(16);
 
 	for (i = 0; i < 10; ++i) {
 		uint32_t status;
-		for (j = 0; j < 100; ++j) {
+		//for (j = 0; j < 100; ++j) {
+		for (j = 0; j < 2000; ++j) { // 2000 checks in total
 			status = RREG32(mmUVD_STATUS);
 			if (status & 2)
 				break;
-			mdelay(10);
+			//mdelay(10);
+			mdelay(1); // more frequent checks in dream
 		}
 		r = 0;
 		pr_info("uvd_v4_2: mmUVD_STATUS through RREG32 after test = %08x\n", (unsigned int)status);
@@ -373,7 +468,7 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 			break;
 
 		DRM_ERROR("UVD not responding, trying to reset the VCPU!!!\n");
-		WREG32_P(mmUVD_SOFT_RESET, UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK,
+		WREG32_P(mmUVD_SOFT_RESET, UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK, // we don't really handle a fail in dream; cuz dreams never fail
 				~UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK);
 		mdelay(10);
 		WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK);
@@ -386,34 +481,39 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 		return r;
 	}
 
+	pr_info("%s: OHMYGOD WE passed THE test.\n", __func__);
 	/* enable interupt */
 	WREG32_P(mmUVD_MASTINT_EN, 3<<1, ~(3 << 1));
+	
+	//Variable1 = RREG32(mmUVD_MASTINT_EN);
+	//WREG32(mmUVD_MASTINT_EN, Variable1 | 2); // dream turns this on directly, but i wonder if this somehow breaks interrupts on newer kernel assumptions
+						 // TODO: pass VCPU test first for now
 
-	WREG32_P(mmUVD_STATUS, 0, ~(1<<2));
+	WREG32_P(mmUVD_STATUS, 0, ~(1<<2)); //eq.
 
 	/* force RBC into idle state */
-	WREG32(mmUVD_RBC_RB_CNTL, 0x11010101);
+	//WREG32(mmUVD_RBC_RB_CNTL, 0x11010101); //not done in dream; we make it 0x10000000 in dream earlier
 
 	/* Set the write pointer delay */
-	WREG32(mmUVD_RBC_RB_WPTR_CNTL, 0);
+	//WREG32(mmUVD_RBC_RB_WPTR_CNTL, 0); // not done in dream, assume default
 
 	/* program the 4GB memory segment for rptr and ring buffer */
 	WREG32(mmUVD_LMI_EXT40_ADDR, upper_32_bits(ring->gpu_addr) |
-				   (0x7 << 16) | (0x1 << 31));
+				   (0x7 << 16) | (0x1 << 31)); // done earlier in dream
 
 	/* Initialize the ring buffer's read and write pointers */
-	WREG32(mmUVD_RBC_RB_RPTR, 0x0);
+	WREG32(mmUVD_RBC_RB_RPTR, 0x0); // done earlier in dream
 
-	ring->wptr = RREG32(mmUVD_RBC_RB_RPTR);
-	WREG32(mmUVD_RBC_RB_WPTR, lower_32_bits(ring->wptr));
+	ring->wptr = RREG32(mmUVD_RBC_RB_RPTR); //done directly in dream
+	WREG32(mmUVD_RBC_RB_WPTR, lower_32_bits(ring->wptr)); // ^^
 
 	/* set the ring address */
-	WREG32(mmUVD_RBC_RB_BASE, ring->gpu_addr);
+	WREG32(mmUVD_RBC_RB_BASE, ring->gpu_addr); // done earlier in dream
 
 	/* Set ring buffer size */
 	rb_bufsz = order_base_2(ring->ring_size);
 	rb_bufsz = (0x1 << 8) | rb_bufsz;
-	WREG32_P(mmUVD_RBC_RB_CNTL, rb_bufsz, ~0x11f1f);
+	WREG32_P(mmUVD_RBC_RB_CNTL, rb_bufsz, ~0x11f1f); // we do this earlier in dream, but check if 0x800 is a required bit for lvp
 
 	return 0;
 }
@@ -628,31 +728,31 @@ static void uvd_v4_2_mc_resume(struct amdgpu_device *adev)
 	/* program the VCPU memory controller bits 0-27 */
 	addr = (adev->uvd.inst->gpu_addr + AMDGPU_UVD_FIRMWARE_OFFSET) >> 3; //is this right - offset = 256? 
 	size = AMDGPU_UVD_FIRMWARE_SIZE(adev) >> 3;
-	WREG32(mmUVD_VCPU_CACHE_OFFSET0, addr);
-	WREG32(mmUVD_VCPU_CACHE_SIZE0, size);
+	WREG32(mmUVD_VCPU_CACHE_OFFSET0, addr); // 3; dream sets to 0; upstream = 256;
+	WREG32(mmUVD_VCPU_CACHE_SIZE0, size); // 4; dream uses hardcoded 0x7d000 for all three gpus. So it must be using gpu agnostic firmware?
 
 	addr += size;
 	size = AMDGPU_UVD_HEAP_SIZE >> 3;
-	WREG32(mmUVD_VCPU_CACHE_OFFSET1, addr);
-	WREG32(mmUVD_VCPU_CACHE_SIZE1, size);
+	WREG32(mmUVD_VCPU_CACHE_OFFSET1, addr); //5;
+	WREG32(mmUVD_VCPU_CACHE_SIZE1, size); //6;
 
 	addr += size;
 	size = (AMDGPU_UVD_STACK_SIZE +
 	       (AMDGPU_UVD_SESSION_SIZE * adev->uvd.max_handles)) >> 3;
-	WREG32(mmUVD_VCPU_CACHE_OFFSET2, addr);
-	WREG32(mmUVD_VCPU_CACHE_SIZE2, size);
+	WREG32(mmUVD_VCPU_CACHE_OFFSET2, addr); //7;
+	WREG32(mmUVD_VCPU_CACHE_SIZE2, size); //8;
 
 	/* bits 28-31 */
 	addr = (adev->uvd.inst->gpu_addr >> 28) & 0xF;
-	WREG32(mmUVD_LMI_ADDR_EXT, (addr << 12) | (addr << 0));
+	WREG32(mmUVD_LMI_ADDR_EXT, (addr << 12) | (addr << 0)); // sequence 1; seems somewhat eq.
 
 	/* bits 32-39 */
 	addr = (adev->uvd.inst->gpu_addr >> 32) & 0xFF;
-	WREG32(mmUVD_LMI_EXT40_ADDR, addr | (0x9 << 16) | (0x1 << 31));
+	WREG32(mmUVD_LMI_EXT40_ADDR, addr | (0x9 << 16) | (0x1 << 31)); // sequence 2; seems eq. 8009000(3?)
 
-	WREG32(mmUVD_UDEC_ADDR_CONFIG, adev->gfx.config.gb_addr_config);
-	WREG32(mmUVD_UDEC_DB_ADDR_CONFIG, adev->gfx.config.gb_addr_config);
-	WREG32(mmUVD_UDEC_DBW_ADDR_CONFIG, adev->gfx.config.gb_addr_config);
+	WREG32(mmUVD_UDEC_ADDR_CONFIG, adev->gfx.config.gb_addr_config); // these
+	WREG32(mmUVD_UDEC_DB_ADDR_CONFIG, adev->gfx.config.gb_addr_config); // three
+	WREG32(mmUVD_UDEC_DBW_ADDR_CONFIG, adev->gfx.config.gb_addr_config); // are set right away in start() in dream; with custom LVP addr_config
 }
 
 static void uvd_v4_2_enable_mgcg(struct amdgpu_device *adev,

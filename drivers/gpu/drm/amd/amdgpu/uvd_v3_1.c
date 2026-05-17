@@ -353,7 +353,7 @@ static int uvd_v3_1_start(struct amdgpu_device *adev)
 
 	/* initialize UVD memory controller */
 	WREG32(mmUVD_LMI_CTRL, 0x40 | (1 << 8) | (1 << 13) |
-		(1 << 21) | (1 << 9) | (1 << 20));
+		(1 << 21) | (1 << 9) | (1 << 20)); // = 0x302340; proves we are not 3.1
 
 	tmp = RREG32(mmUVD_MPC_CNTL);
 	WREG32(mmUVD_MPC_CNTL, tmp | 0x10);

@@ -48,6 +48,7 @@
 #define mmUVD_LMI_ADDR_EXT                                                      0x3d65
 #define mmUVD_LMI_CTRL                                                          0x3d66
 #define mmUVD_LMI_STATUS                                                        0x3d67
+//#define mmUVD_LMI_SOMETHING							0x3d68 ?
 #define mmUVD_LMI_SWAP_CNTL                                                     0x3d6d
 #define mmUVD_MP_SWAP_CNTL                                                      0x3d6f
 #define mmUVD_MPC_CNTL                                                          0x3d77
@@ -73,6 +74,7 @@
 #define mmUVD_RBC_RB_WPTR_CNTL                                                  0x3da6
 #define mmUVD_RBC_RB_CNTL                                                       0x3da9
 #define mmUVD_RBC_RB_RPTR_ADDR                                                  0x3daa
+//#define mmUVD_RBC_RB_RPTR_CNTL						0x3dab ?
 #define mmUVD_STATUS                                                            0x3daf
 #define mmUVD_SEMA_TIMEOUT_STATUS                                               0x3db0
 #define mmUVD_SEMA_WAIT_INCOMPLETE_TIMEOUT_CNTL                                 0x3db1
