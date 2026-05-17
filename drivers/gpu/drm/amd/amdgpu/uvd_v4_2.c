@@ -514,7 +514,11 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	rb_bufsz = order_base_2(ring->ring_size);
 	rb_bufsz = (0x1 << 8) | rb_bufsz;
 	WREG32_P(mmUVD_RBC_RB_CNTL, rb_bufsz, ~0x11f1f); // we do this earlier in dream, but check if 0x800 is a required bit for lvp
-
+							 //
+#ifdef CONFIG_X86_PS4 // Add this to other PS4 specific init paths as well.
+	WREG32_P(mmUVD_CGC_CTRL, 0, ~(1 << 0)); // Preserve all bits except bit 0 (enable?). dream does this at end of start()
+						// not sure if this is needed? Maybe it is. Maybe it disables clock gating? likely...
+#endif
 	return 0;
 }
 
