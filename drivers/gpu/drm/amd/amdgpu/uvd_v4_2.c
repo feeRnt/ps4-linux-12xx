@@ -422,20 +422,22 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 
 	//---
 	Variable1 = RREG32(mmUVD_VCPU_CNTL);
-	WREG32(mmUVD_VCPU_CNTL,Variable1 & 0xfffbffff); // mask VCPU control
+	WREG32(mmUVD_VCPU_CNTL,Variable1 & 0xfffbffff); // mask VCPU control -- TODO: could be bad
 	Variable3 = RREG32(mmUVD_CTX_INDEX);
 	WREG32(mmUVD_CTX_INDEX, 0x9b);
 	Variable1 = RREG32(mmUVD_CTX_DATA);
 	WREG32(mmUVD_CTX_DATA, Variable1 & 0xffffffef); // mask some CTX_DATA
 	WREG32(mmUVD_CTX_INDEX, Variable3); // reset old index
 	
-
 	//tmp = RREG32_UVD_CTX(ixUVD_LMI_CACHE_CTRL); // not
 	//pr_info("uvd_v4_2: ixUVD_LMI_CACHE_CTRL through RREG32 = %08x\n", tmp); // done
 	//WREG32_UVD_CTX(ixUVD_LMI_CACHE_CTRL, tmp & (~0x10)); // in dream
 
 	/* enable UMC */
 	WREG32_P(mmUVD_LMI_CTRL2, 0, ~(1 << 8)); //good - eq.
+
+	tmp = RREG32(mmUVD_STATUS); //TODO: Could damage state to read status before reset? But check for bits.
+	pr_info("%s: mmUVD_STATUS before VCPU soft reset: %08x\n", (unsigned int)tmp);
 
 	WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__LMI_SOFT_RESET_MASK); // eq.
 
@@ -514,7 +516,7 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	rb_bufsz = order_base_2(ring->ring_size);
 	rb_bufsz = (0x1 << 8) | rb_bufsz;
 	WREG32_P(mmUVD_RBC_RB_CNTL, rb_bufsz, ~0x11f1f); // we do this earlier in dream, but check if 0x800 is a required bit for lvp
-							 //
+
 #ifdef CONFIG_X86_PS4 // Add this to other PS4 specific init paths as well.
 	WREG32_P(mmUVD_CGC_CTRL, 0, ~(1 << 0)); // Preserve all bits except bit 0 (enable?). dream does this at end of start()
 						// not sure if this is needed? Maybe it is. Maybe it disables clock gating? likely...
@@ -764,6 +766,13 @@ static void uvd_v4_2_enable_mgcg(struct amdgpu_device *adev,
 {
 	pr_info("uvd_v4_2: called %s\n", __func__);
 	u32 orig, data;
+#ifdef CONFIG_X86_PS4
+	WREG32_P(mmUVD_CGC_CTRL, 0, ~(1 << 0)); // Preserve all bits except bit 0 (enable?). dream does this at end of start()
+	return;
+	// Should we set the MEM_CTRL and CGC_CTRL first then disable like this? Or no.. Just follow hardware guidance
+	// Without MGCG I had faulted in the past, but maybe that's because things were *actually* working, but the addressing was broken?
+	// Just do this dream-iness disabled CGC_CTRL but still unamsked CGC_MEM_CTRL? Probably unnecessary to mask the latter I assume.
+#endif
 
 	if (enable && (adev->cg_flags & AMD_CG_SUPPORT_UVD_MGCG)) {
 		data = RREG32_UVD_CTX(ixUVD_CGC_MEM_CTRL);
@@ -780,7 +789,7 @@ static void uvd_v4_2_enable_mgcg(struct amdgpu_device *adev,
 		WREG32_UVD_CTX(ixUVD_CGC_MEM_CTRL, data);
 
 		orig = data = RREG32(mmUVD_CGC_CTRL);
-		data &= ~UVD_CGC_CTRL__DYN_CLOCK_MODE_MASK;
+		data &= ~UVD_CGC_CTRL__DYN_CLOCK_MODE_MASK; // essentially what dream does but it doesn't mask out CGC_MEM_CTRL
 		if (orig != data)
 			WREG32(mmUVD_CGC_CTRL, data);
 	}
