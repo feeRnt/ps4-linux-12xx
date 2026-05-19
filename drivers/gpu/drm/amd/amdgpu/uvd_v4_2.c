@@ -305,7 +305,7 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 
 	/* set uvd busy */
 	tmp = RREG32(mmUVD_STATUS);
-	pr_info("%s: mmUVD_STATUS before masking all bits except busy: %08x\n", (unsigned int)tmp);
+	pr_info("%s: mmUVD_STATUS before masking all bits except busy: %08x\n", __func__, (unsigned int)tmp);
 	WREG32_P(mmUVD_STATUS, 1<<2, ~(1<<2)); // set all bits except 4d to 0 // matches dream engine;
 
 	// uvd_v4_2_set_dcm(adev, true); // dream doesn't have this // disable dynamic clock gating for now
@@ -393,7 +393,10 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	// weird dream stuff again:
 	//Variable3 = *(uint32_t *)(Parameter1 + 0x88);
 	Variable1 = RREG32(mmUVD_RBC_RB_CNTL);
-	WREG32(mmUVD_RBC_RB_CNTL, Variable1 | 0x10000000); // enable Ring Buffer Controller something? Probably important
+	pr_info("%s: mmUVD_RBC_RB_CNTL before writing 0x10000000 to it: %08x\n", __func__,  (unsigned int)Variable1);
+	WREG32(mmUVD_RBC_RB_CNTL, Variable1 | 0x10000000); // enable Ring Buffer Controller something? Probably important --- Okay so RBC_RB_CNTL is the most
+							   // important register it appears
+	pr_info("%s: mmUVD_RBC_RB_CNTL after Dream specific write: %08x\n", __func__, (unsigned int)RREG32(mmUVD_RBC_RB_CNTL));
 	WREG32(0x3dc0, 0); // enable something?
 	WREG32(0x3dab, 1); // disable something? // earlier we OR'ed 2 into here
 
@@ -413,11 +416,21 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	//WREG32(mmUVD_LMI_EXT40_ADDR, Variable1 + 0x110000);
 	//WREG32(mmUVD_RBC_RB_BASE, Variable3); //0x3da3, ... // dream sets base address early, we do it later. But it seems Parameter1 is indeed adev struct.
 	//can't know what it holds just now though...
-	
-	//WREG32(mmUVD_RBC_RB_WPTR,0);
-	//WREG32(mmUVD_RBC_RB_RPTR,0); // don't touch r/w  pointers for now
-	//Variable1 = RREG32(mmUVD_RBC_RB_CNTL);
-	//WREG32(mmUVD_RBC_RB_CNTL, (Variable1 & 0xefffe0e0) + 0x80c); // some bit stuff // actually seems to be rbc_rb size. don't touch manually TODO: for now
+
+	/* program the 4GB memory segment for rptr and ring buffer */
+	WREG32(mmUVD_LMI_EXT40_ADDR, upper_32_bits(ring->gpu_addr) |
+				   (0x7 << 16) | (0x1 << 31)); // do it early now
+	WREG32(mmUVD_RBC_RB_BASE, ring->gpu_addr); // do it early now
+
+	WREG32(mmUVD_RBC_RB_WPTR,0);
+	WREG32(mmUVD_RBC_RB_RPTR,0); // we set to 0 in upstream as well, but dream does it before vcpu test
+	ring->wptr = RREG32(mmUVD_RBC_RB_RPTR); // do it early now
+
+
+	Variable1 = RREG32(mmUVD_RBC_RB_CNTL);
+	WREG32(mmUVD_RBC_RB_CNTL, (Variable1 & 0xefffe0e0) + 0x80c); // some bit stuff // actually seems to be rbc_rb size. don't touch manually
+	// IMPORTANT: this will probably set rbc size, but also will enable some strange bit at 0x800... If the size is wrong, it'll be fixed after
+	// (if) we pass the VCPU test with this.
 	WREG32(0x3dac, 0x10); // some bit set
 	Variable1 = RREG32(0x3dab); 
 	WREG32(0x3dab, Variable1 | 1); // some bit enable.... 3daa is mmUVD_RBC_RB_RPTR_ADDR 
@@ -439,7 +452,7 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	WREG32_P(mmUVD_LMI_CTRL2, 0, ~(1 << 8)); //good - eq.
 
 	tmp = RREG32(mmUVD_STATUS); //TODO: Could damage state to read status before reset? But check for bits.
-	pr_info("%s: mmUVD_STATUS before VCPU soft reset: %08x\n", (unsigned int)tmp);
+	pr_info("%s: mmUVD_STATUS before VCPU soft reset: %08x\n", __func__,  (unsigned int)tmp);
 
 	WREG32_P(mmUVD_SOFT_RESET, 0, ~UVD_SOFT_RESET__LMI_SOFT_RESET_MASK); // eq.
 
@@ -461,7 +474,7 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 		//for (j = 0; j < 100; ++j) {
 		for (j = 0; j < 2000; ++j) { // 2000 checks in total
 			status = RREG32(mmUVD_STATUS);
-			if (status & 2)
+			if (status & 2) // STATUS & 2 doesn't seem to say "power-on/off. But rather whether UVD responded to the last commands...
 				break;
 			//mdelay(10);
 			mdelay(1); // more frequent checks in dream
@@ -502,23 +515,27 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	//WREG32(mmUVD_RBC_RB_WPTR_CNTL, 0); // not done in dream, assume default
 
 	/* program the 4GB memory segment for rptr and ring buffer */
-	WREG32(mmUVD_LMI_EXT40_ADDR, upper_32_bits(ring->gpu_addr) |
-				   (0x7 << 16) | (0x1 << 31)); // done earlier in dream
+	//WREG32(mmUVD_LMI_EXT40_ADDR, upper_32_bits(ring->gpu_addr) |
+	//			   (0x7 << 16) | (0x1 << 31)); // done earlier in dream -- MAYBE we need to program the ring buffer address before VCPU on LVP?
+	//			    TODO: do beforehand for now
 
 	/* Initialize the ring buffer's read and write pointers */
-	WREG32(mmUVD_RBC_RB_RPTR, 0x0); // done earlier in dream
+	//WREG32(mmUVD_RBC_RB_RPTR, 0x0); // done earlier in dream
 
-	ring->wptr = RREG32(mmUVD_RBC_RB_RPTR); //done directly in dream
-	WREG32(mmUVD_RBC_RB_WPTR, lower_32_bits(ring->wptr)); // ^^
+	//ring->wptr = RREG32(mmUVD_RBC_RB_RPTR); //done directly in dream; but keep this for struct coherence; TODO: do beforehand for now
+	//WREG32(mmUVD_RBC_RB_WPTR, lower_32_bits(ring->wptr)); // ^^
 
 	/* set the ring address */
-	WREG32(mmUVD_RBC_RB_BASE, ring->gpu_addr); // done earlier in dream
+	//WREG32(mmUVD_RBC_RB_BASE, ring->gpu_addr); // done earlier in dream; TODO: do beforehand for now
 
 	/* Set ring buffer size */
 	rb_bufsz = order_base_2(ring->ring_size);
 	rb_bufsz = (0x1 << 8) | rb_bufsz;
 	WREG32_P(mmUVD_RBC_RB_CNTL, rb_bufsz, ~0x11f1f); // we do this earlier in dream, but check if 0x800 is a required bit for lvp
+							 // Doing it twice now.
+	pr_info("%s: mmUVD_RBC_RB_CNTL after upstream mask+size write: %08x\n", __func__, (unsigned int)RREG32(mmUVD_RBC_RB_CNTL));
 
+	/* unnecessary since we do it in mgcg anyway.. but maybe we shouldn't call enable_mgcg early...? */
 #ifdef CONFIG_X86_PS4 // Add this to other PS4 specific init paths as well.
 	WREG32_P(mmUVD_CGC_CTRL, 0, ~(1 << 0)); // Preserve all bits except bit 0 (enable?). dream does this at end of start()
 						// not sure if this is needed? Maybe it is. Maybe it disables clock gating? likely...
@@ -540,6 +557,7 @@ static void uvd_v4_2_stop(struct amdgpu_device *adev)
 	uint32_t i, j;
 	uint32_t status;
 
+	// put RBC into idle state
 	WREG32(mmUVD_RBC_RB_CNTL, 0x11010101);
 
 	for (i = 0; i < 10; ++i) {
