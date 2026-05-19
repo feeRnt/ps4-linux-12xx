@@ -1797,6 +1797,7 @@ static int cik_set_uvd_clock(struct amdgpu_device *adev, u32 clock,
 	struct atom_clock_dividers dividers;
 	uint32_t tmp;
 
+	pr_info("called %s\n", __func__);
 	r = amdgpu_atombios_get_clock_dividers(adev,
 					       COMPUTE_GPUCLK_INPUT_FLAG_DEFAULT_GPUCLK,
 					       clock, false, &dividers);

@@ -304,6 +304,8 @@ static int uvd_v4_2_start(struct amdgpu_device *adev)
 	u32 mp_swap_cntl = 0;
 
 	/* set uvd busy */
+	tmp = RREG32(mmUVD_STATUS);
+	pr_info("%s: mmUVD_STATUS before masking all bits except busy: %08x\n", (unsigned int)tmp);
 	WREG32_P(mmUVD_STATUS, 1<<2, ~(1<<2)); // set all bits except 4d to 0 // matches dream engine;
 
 	// uvd_v4_2_set_dcm(adev, true); // dream doesn't have this // disable dynamic clock gating for now
