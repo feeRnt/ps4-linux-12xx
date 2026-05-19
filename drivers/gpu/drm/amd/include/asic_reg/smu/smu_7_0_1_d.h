@@ -34,13 +34,16 @@
 #define mmGCK1_GCK_SMC_IND_DATA                                                 0x83
 #define mmGCK2_GCK_SMC_IND_DATA                                                 0x85
 #define mmGCK3_GCK_SMC_IND_DATA                                                 0x87
+//#define ixPS4_SOMETHING_IMPORTANT						0xc0500080
 #define ixCG_DCLK_CNTL                                                          0xc050009c
 #define ixCG_DCLK_STATUS                                                        0xc05000a0
 #define ixCG_VCLK_CNTL                                                          0xc05000a4
 #define ixCG_VCLK_STATUS                                                        0xc05000a8
+//#define MISSING_BIT								0xc05000ab
 #define ixCG_ECLK_CNTL                                                          0xc05000ac
 #define ixCG_ECLK_STATUS                                                        0xc05000b0
 #define ixCG_ACLK_CNTL                                                          0xc05000dc
+//#define
 #define ixGCK_DFS_BYPASS_CNTL                                                   0xc0500118
 #define ixCG_SPLL_FUNC_CNTL                                                     0xc0500140
 #define ixCG_SPLL_FUNC_CNTL_2                                                   0xc0500144

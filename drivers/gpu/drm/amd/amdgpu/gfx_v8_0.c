@@ -796,7 +796,7 @@ static void gfx_v8_0_init_golden_registers(struct amdgpu_device *adev)
 		amdgpu_device_program_register_sequence(adev,
 							polaris10_golden_common_all,
 							ARRAY_SIZE(polaris10_golden_common_all));
-		data = RREG32_SMC(ixCG_ACLK_CNTL);
+		data = RREG32_SMC(ixCG_ACLK_CNTL); // dream using this proves PRO is Polaris-esque
 		data &= ~CG_ACLK_CNTL__ACLK_DIVIDER_MASK;
 		data |= 0x18 << CG_ACLK_CNTL__ACLK_DIVIDER__SHIFT;
 		WREG32_SMC(ixCG_ACLK_CNTL, data);

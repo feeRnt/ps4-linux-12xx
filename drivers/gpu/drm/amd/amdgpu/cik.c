@@ -1796,21 +1796,35 @@ static int cik_set_uvd_clock(struct amdgpu_device *adev, u32 clock,
 	int r, i;
 	struct atom_clock_dividers dividers;
 	uint32_t tmp;
+	uint32_t status;
 
 	pr_info("called %s\n", __func__);
 	r = amdgpu_atombios_get_clock_dividers(adev,
 					       COMPUTE_GPUCLK_INPUT_FLAG_DEFAULT_GPUCLK,
 					       clock, false, &dividers);
-	if (r)
+	if (r) {
+		pr_err("%s: atombios_get_clock_dividers failed; returning %d\n", __func__, r);
 		return r;
+	}
+	pr_info("%s: requested clock=%u post_divider=%u\n",
+		__func__, clock, dividers.post_divider);
+	pr_info("%s: status_reg before writes =%08x\n",
+		__func__, RREG32_SMC(status_reg)); // todo might break?
 
 	tmp = RREG32_SMC(cntl_reg);
+	pr_info("%s: cntl_reg after reading = %08x\n", __func__, tmp);
 	tmp &= ~(CG_DCLK_CNTL__DCLK_DIR_CNTL_EN_MASK |
-		CG_DCLK_CNTL__DCLK_DIVIDER_MASK);
+		CG_DCLK_CNTL__DCLK_DIVIDER_MASK); // ~(0x100 | 0x7f) = ~0x17f
+	pr_info("%s: cntl_reg after masking = %08x\n", __func__, tmp);
 	tmp |= dividers.post_divider;
+	pr_info("%s: cntl_reg after adding clock divider = %08x. Writing this value to SMC\n", __func__, tmp);
 	WREG32_SMC(cntl_reg, tmp);
 
 	for (i = 0; i < 100; i++) {
+
+		status = RREG32_SMC(status_reg);
+		pr_info("%s: status poll[%d]=%08x\n",
+			__func__, i, status);
 		if (RREG32_SMC(status_reg) & CG_DCLK_STATUS__DCLK_STATUS_MASK)
 			break;
 		mdelay(10);
@@ -1825,10 +1839,12 @@ static int cik_set_uvd_clocks(struct amdgpu_device *adev, u32 vclk, u32 dclk)
 {
 	int r = 0;
 
+	pr_info("setting UVD VCLK\n");
 	r = cik_set_uvd_clock(adev, vclk, ixCG_VCLK_CNTL, ixCG_VCLK_STATUS);
 	if (r)
 		return r;
 
+	pr_info("setting UVD DCLK\n");
 	r = cik_set_uvd_clock(adev, dclk, ixCG_DCLK_CNTL, ixCG_DCLK_STATUS);
 	return r;
 }
