@@ -166,8 +166,11 @@ static int uvd_v4_2_hw_init(struct amdgpu_ip_block *ip_block)
 	int r;
 
 	uvd_v4_2_enable_mgcg(adev, true);
-	amdgpu_asic_set_uvd_clocks(adev, 10000, 10000);
-
+#ifdef CONFIG_X86_PS4
+	amdgpu_asic_set_uvd_clocks(adev, 53300, 40000); // Use the max/runtime UVD clocks at startup/bootstrap time. UVD3.1 also does this interestingly
+#else
+	amdgpu_asic_set_uvd_clocks(adev, 10000, 10000); // Default bringup vclock and dclock post UVD4.2
+#endif
 	r = amdgpu_ring_test_helper(ring);
 	if (r)
 		goto done;
