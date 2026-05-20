@@ -1822,9 +1822,9 @@ static int cik_set_uvd_clock(struct amdgpu_device *adev, u32 clock,
 
 	for (i = 0; i < 100; i++) {
 
-		status = RREG32_SMC(status_reg);
+		/*status = RREG32_SMC(status_reg);
 		pr_info("%s: status poll[%d]=%08x\n",
-			__func__, i, status);
+			__func__, i, status);*/ // I think this causes faults?
 		if (RREG32_SMC(status_reg) & CG_DCLK_STATUS__DCLK_STATUS_MASK)
 			break;
 		mdelay(10);
