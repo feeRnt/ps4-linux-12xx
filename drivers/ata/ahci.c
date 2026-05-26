@@ -1748,19 +1748,12 @@ static void ahci_init_irq(struct pci_dev *pdev, unsigned int n_ports,
 	int ret;
 
 #ifdef CONFIG_X86_PS4
-	if (pdev->vendor == PCI_VENDOR_ID_SONY) {
-			if (pdev->device != PCI_DEVICE_ID_SONY_BAIKAL_AHCI) {
-				ret = apcie_assign_irqs(pdev, n_ports);
-				if (ret < 0)
-					pr_err("%s: Failed to assign irqs with apcie_assign_irqs. Problem!\n", __func__);
-				return;
-			}
-			/*} else {
-				ret = bpcie_assign_irqs(pdev, n_ports);
-				if (ret < 0)
-					pr_err("%s: Failed to assign irqs with apcie_assign_irqs. Problem!\n", __func__);
-				return;
-			}*/
+	if ((pdev->vendor == PCI_VENDOR_ID_SONY)  &&
+	    (pdev->device != PCI_DEVICE_ID_SONY_BAIKAL_AHCI)) {
+		ret = apcie_assign_irqs(pdev, n_ports);
+		if (ret < 0)
+			pr_err("%s: Failed to assign irqs with apcie_assign_irqs. Problem!\n", __func__);
+		return;
 	}
 #endif
 
@@ -2090,7 +2083,7 @@ static int ahci_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	ahci_init_irq(pdev, n_ports, hpriv);
 
-	hpriv->irq = pci_irq_vector(pdev, 0); //TODO: does this need to be changed for better functionality? Check codedwrench's Baikal branch
+	hpriv->irq = pci_irq_vector(pdev, 0);
 
 	if (!(hpriv->cap & HOST_CAP_SSS) || ahci_ignore_sss)
 		host->flags |= ATA_HOST_PARALLEL_SCAN;

@@ -170,7 +170,7 @@ static void apcie_irq_msi_compose_msg(struct irq_data *data,
 				}
 			}
 		} else	{
-		pr_info("apcie_irq_msi_compose_msg SC null\n");
+		pr_info("bpcie_irq_msi_compose_msg SC null\n");
 		//msg->data = data->irq - 1;
 		}
 	}
@@ -331,8 +331,8 @@ static int apcie_is_compatible_device(struct pci_dev *dev)
 extern bool bpcie_initialized;
 int apcie_assign_irqs(struct pci_dev *dev, int nvec)
 {
-	/*if (bpcie_initialized)
-		return bpcie_assign_irqs(dev, nvec);*/ // remove this part to avoid confusion at call site
+	if (bpcie_initialized)
+		return bpcie_assign_irqs(dev, nvec);
 
 	int ret;
 	unsigned int sc_devfn;

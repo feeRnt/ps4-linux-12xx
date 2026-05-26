@@ -342,7 +342,6 @@ static int ahci_init_one(struct pci_dev *pdev)
 	host_deactivate:
 	release_host:
 	unmap_registers:
-		axhci->host = NULL; // otherwise kernel OOPS from NULL pointer deref if port[i] is uninitialized? Not sure if this is the right fix
 		iounmap(hpriv->mmio);
 	release_mem_region:
 		//release_mem_region(rsrc_start, rsrc_len);
@@ -395,7 +394,6 @@ static int xhci_aeolia_probe(struct pci_dev *dev, const struct pci_device_id *id
 				PCI_IRQ_MSIX | PCI_IRQ_MSI);//apcie_assign_irqs(dev, NR_DEVICES);
 	/* returns: return pci_alloc_irq_vectors_affinity(dev, min_vecs, max_vecs, flags,
 					      NULL); */
-		//axhci->nr_irqs = retval = bpcie_assign_irqs(dev, NR_DEVICES);
 	} else {
 		axhci->nr_irqs = retval = apcie_assign_irqs(dev, NR_DEVICES);
 	}

@@ -871,17 +871,11 @@ static void amd_iommu_report_page_fault(struct amd_iommu *iommu,
 		if (__ratelimit(&dev_data->rs)) {
 			pci_err(pdev, "Event logged [IO_PAGE_FAULT domain=0x%04x address=0x%llx flags=0x%04x]\n",
 				domain_id, address, flags);
-#ifdef CONFIG_X86_PS4
-			dump_stack(); //debug this for now
-#endif
 		}
 	} else {
 		pr_err_ratelimited("Event logged [IO_PAGE_FAULT device=%04x:%02x:%02x.%x domain=0x%04x address=0x%llx flags=0x%04x]\n",
 			iommu->pci_seg->id, PCI_BUS_NUM(devid), PCI_SLOT(devid), PCI_FUNC(devid),
 			domain_id, address, flags);
-#ifdef CONFIG_X86_PS4
-		dump_stack(); //debug this for now -- why did I add this here and not above? oxidative stress?
-#endif
 	}
 
 out:
@@ -3828,10 +3822,8 @@ static int irq_remapping_select(struct irq_domain *d, struct irq_fwspec *fwspec,
 		devid = get_hpet_devid(fwspec->param[0]);
 	else if (x86_fwspec_is_aeolia(fwspec))
 		devid = fwspec->param[0]; // We have manually assigned devid to param 0 in apcie
-	//else if (x86_fwspec_is_baikal(fwspec))
-	//	devid = fwspec->param[0]; // TODO: Baikal IOMMU FWSpec has not been tested before like this. Needs to be tested, but does NOT work without it.
-	//	AMD-Vi seems to break MSI writes by writing to the wrong (high-base, DMA?) address. IOMMU was always broken on PS4s but maybe the reason
-	//	Aeolia gets away with it is because . . .
+	else if (x86_fwspec_is_baikal(fwspec))
+		devid = fwspec->param[0]; // TODO: Baikal IOMMU FWSpec has not been tested before like this. Needs to be tested, but does NOT work without it.
 
 	if (devid < 0)
 		return 0;
