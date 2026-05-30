@@ -15,7 +15,7 @@ valeryy (no Github - contributed to PS4 Baikal southbridges),
 [saya](https://www.youtube.com/channel/UCc20KAcPCj9Ut8IQF3umSjg),    
 [whitehax0r](https://github.com/whitehax0r/ps4-linux-baikal),    
 [DFAUS](https://github.com/DFAUS-git/ps4-baikal-5.4.247-kernel)  
-[rmuxnet](https:/github.com/rmuxnet/ps4-linux-12xx) -- and others.
+[rmuxnet](https://github.com/rmuxnet/ps4-linux-12xx) -- and others.
 
 For a more detailed credits section, check out [this page](https://dionkill.github.io/ps4-linux-tutorial/ending.html#kernel-developers).
 
@@ -25,6 +25,10 @@ Over time, I also managed to fix the common blackscreen at GUI login issue on ne
 The branch names are meant to be descriptive and provide an idea, but they're far from perfect!
 
 Merging all the main fixes into a few distinct branches is a WIP.
+
+> [!NOTE]
+> There is now a 7.x+ kernels repo by rmuxnet at the link above. Feel free to check that out yourself.  
+> Incorporating that and some other changes into this repo is planned for the near future!
 
 <br>
 
