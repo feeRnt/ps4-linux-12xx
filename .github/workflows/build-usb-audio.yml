@@ -1,0 +1,88 @@
+name: Build PS4 12xx Kernel with Built-in USB Audio
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Build Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            clang \
+            lld \
+            llvm \
+            libncurses-dev \
+            bison \
+            flex \
+            libssl-dev \
+            libelf-dev \
+            bc \
+            cpio \
+            dwarves \
+            git
+
+      - name: Prepare PS4 Kernel Configuration
+        run: |
+          if [ ! -f config ]; then
+            echo "ERROR: PS4 kernel config file not found!"
+            exit 1
+          fi
+
+          cp config .config
+
+      - name: Enable Built-in USB Audio
+        run: |
+          scripts/config --enable CONFIG_SOUND
+          scripts/config --enable CONFIG_SND
+          scripts/config --enable CONFIG_SND_USB
+          scripts/config --enable CONFIG_SND_USB_AUDIO
+
+          make LLVM=1 olddefconfig
+
+      - name: Verify USB Audio Configuration
+        run: |
+          echo "=== USB Audio configuration ==="
+
+          grep -E '^CONFIG_(SOUND|SND|SND_USB|SND_USB_AUDIO)=' .config || true
+
+          if ! grep -q '^CONFIG_SND_USB_AUDIO=y$' .config; then
+            echo "ERROR: CONFIG_SND_USB_AUDIO is not built-in!"
+            exit 1
+          fi
+
+          echo "SUCCESS: USB Audio is built into the kernel."
+
+      - name: Prepare Kernel
+        run: |
+          make LLVM=1 prepare
+
+      - name: Build PS4 Kernel
+        run: |
+          make -j"$(nproc)" LLVM=1 bzImage
+
+      - name: Verify bzImage
+        run: |
+          if [ ! -f arch/x86/boot/bzImage ]; then
+            echo "ERROR: bzImage was not created!"
+            exit 1
+          fi
+
+          echo "=== Kernel information ==="
+          file arch/x86/boot/bzImage
+          ls -lh arch/x86/boot/bzImage
+
+      - name: Upload Kernel
+        uses: actions/upload-artifact@v4
+        with:
+          name: PS4-12xx-6.15.4-USB-Audio-BuiltIn
+          path: |
+            arch/x86/boot/bzImage
+            .config
