@@ -71,8 +71,8 @@ RUN <<"EOF"
 mkdir -p /lib/firmware/mrvl
 cd /lib/firmware/mrvl
 wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8897_uapsta.bin
-wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/pcie8897_uapsta.bin
-wget -nc https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git/plain/mrvl/sd8797_uapsta.bin
+# old version
+wget -nc https://gitlab.com/rmuxnet/linux/-/raw/6a65a8f334b327766f6b46ed9ec66d3f664b8602/extra_firmware/mrvl/sd8797_uapsta.bin
 
 mkdir -p /lib/firmware/mediatek
 cd /lib/firmware/mediatek
